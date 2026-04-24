@@ -1,4 +1,4 @@
-from __future__ import annotations  # allows using list[str]
+from __future__ import annotations 
 
 from dataclasses import dataclass   
 from typing import Optional          # for None fields
@@ -31,17 +31,16 @@ def _clean_str(value) -> Optional[str]:
     return s if s else None  # return None if the string was all whitespace
 
 
-def load_scenarios(path: str) -> list[Scenario]:
-    df = pd.read_excel(path, dtype=str)  # read every cell as a string
+def _parse_sheet(df: pd.DataFrame) -> list[Scenario]:
+    """Parse one sheet's DataFrame into a list of Scenario objects."""
 
-    df.columns = [col.replace("\u200b", "").strip() for col in df.columns] # Strip zero-width spaces 
+    df.columns = [col.replace("\u200b", "").strip() for col in df.columns] # Strip zero-width spaces
 
     df = df[df["Scenario Type"].notna() | df["Sender"].notna()].copy() # Drop blank spacer rows
     df = df.reset_index(drop=True)  # renumber rows after dropping rows
 
-    
-    df = df[df["Scenario ID"].apply(lambda v: _clean_str(v) not in ("Example:", "xxx"))] # This one removed the "Example:" header row and any placeholder "xxx" rows but may not be nessiary later so
-    df = df.reset_index(drop=True)  
+    df = df[df["Scenario ID"].apply(lambda v: _clean_str(v) not in ("Example:", "xxx"))] # removed the "Example:" header row and any placeholder "xxx" rows but may not be nessiary later so
+    df = df.reset_index(drop=True)
 
     df["Scenario Type"] = df["Scenario Type"].ffill() # ffill() copies the last seen value downward to fill those blanks being if Multi-email scenarios leave Scenario Type blank on rows after the first one
 
@@ -56,13 +55,12 @@ def load_scenarios(path: str) -> list[Scenario]:
 
         scenario_id = _clean_str(group.iloc[0].get("Scenario ID")) or scenario_type # Use the Scenario ID column if it has a value or if not just use the type code as the ID
 
-        
-        group["_email_num"] = pd.to_numeric(group["Email #"], errors="coerce")  # # Convert Email # to a number so we can sort correctly cuz Excel reads it as a string, this one turns non-numeric to NaN
+        group["_email_num"] = pd.to_numeric(group["Email #"], errors="coerce")  # Convert Email # to a number so we can sort correctly cuz Excel reads it as a string, this one turns non-numeric to NaN
         group = group.sort_values("_email_num", na_position="last")  # ranks them from numbered emails first to unnumbered last but unsure if thats how it should play out
 
         emails: list[Email] = []           # collects Email objects for this scenario
-        success_criteria: Optional[str] = None  
-        puzzle_summary: Optional[str] = None   
+        success_criteria: Optional[str] = None
+        puzzle_summary: Optional[str] = None
 
         for _, row in group.iterrows():  # iterate over each email row in this scenario
 
@@ -116,6 +114,19 @@ def load_scenarios(path: str) -> list[Scenario]:
         )
 
     return scenarios
+
+
+def load_scenarios(path: str) -> list[Scenario]:
+    xl = pd.ExcelFile(path)  # open the whole workbook so we can access each sheet by name without re-reading the file
+
+    all_scenarios: list[Scenario] = []  # master list that will hold scenarios from every sheet combined
+
+    for sheet_name in xl.sheet_names:  # loop over every sheet tab (Will, Thara, Leo, Ellie, Ryan, Jake)
+        df = xl.parse(sheet_name, dtype=str)  # read this sheet as strings same as before
+        scenarios = _parse_sheet(df)          # run the same parsing logic we always used, just on this one sheet
+        all_scenarios.extend(scenarios)        # extend adds all the scenarios from this sheet into the master list (not nested, just appended)
+
+    return all_scenarios  # returns every scenario from all sheets in one flat list
 
 
 if __name__ == "__main__":
