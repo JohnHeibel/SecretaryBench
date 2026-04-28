@@ -1,11 +1,22 @@
-# SecretaryBench
+# AISA Spring 26 — Internal System
 
-Repository for the AISA OpenAI Temporal Reasoning Benchmark.
+An LLM benchmark that tests whether AI agents can handle **time complexity** through realistic email-thread scenarios. The agent reads a scenario's emails, then uses the tool APIs (Todos, Calendars, Emails) to complete the tasks described in those threads.
 
-A 100-day simulation that delivers email scenarios to an AI model and grades
-its responses. Built as a sequence of decoupled stages (Loader → Flow
-Controller → Engine Driver → Grader) connected to an internal FastAPI service
-the model uses for tool calls.
+The benchmark now ships with an **MCP server** — agents call the API as MCP tools directly from Claude Code or any compatible harness. See `MCP.md` for setup.
+
+---
+
+## What Changed (Last Session)
+
+- **`scenario_id` is now required on every write.** Every `POST /todos/`, `POST /calendars/{id}/events`, and `POST /emails/` must include a `scenario_id` that already exists in the store. The server returns `404` otherwise. This is the single biggest behavioral change.
+- **Email API is read/write only.** There is no `DELETE /emails/{id}`. The old README listed one — it does not exist.
+- **Todo updates are `PATCH`, not `PUT`.** `PATCH /todos/{id}` is a partial update; omitted fields stay unchanged. `scenario_id` and `calendar_event_id` are immutable after creation.
+- **Calendar event updates are full replace.** `PUT /calendars/{id}/events/{event_id}` requires all fields, including `scenario_id`.
+- **Todos can link to calendar events.** `POST /todos/` accepts an optional `calendar_event_id`; the server validates the event exists. Create the event first, then the todo.
+- **Package manager is `uv`.** No more `pip` or `venv` — use `uv sync`, `uv run`, `uv add`.
+- **MCP server added** (`mcp_server/`). Exposes all 22 API routes as tools. `.mcp.json` in the repo root wires it up automatically in Claude Code.
+
+For the full, agent-facing API contract see **`docs/api_reference.md`**.
 
 ---
 
@@ -13,41 +24,29 @@ the model uses for tool calls.
 
 ```
 .
-├── README.md                ← this file
-├── requirements.txt         ← Python dependencies
-├── conftest.py              ← pytest helper (sets sys.path)
-├── Emails.xlsx              ← scenario source data
-│
-├── loader.py                ← Excel → Scenario/Email objects
-├── flow_controller.py       ← scenario pool + chain state machine
-├── engine.py                ← 100-day loop, token resolution, model mock
-├── grader.py                ← scoring against tool state
-│
-├── app/                     ← internal FastAPI service (Week 1)
-│   ├── main.py
-│   ├── store.py
-│   ├── models/              ← Pydantic schemas
-│   └── routers/             ← /todos, /calendars, /emails, /scenarios
-│
-├── docs/                    ← module-level documentation
-│   ├── LOADER.md
-│   ├── FLOW_CONTROLLER.md
-│   ├── ENGINE.md
-│   ├── GRADER.md
-│   └── API.md
-│
-├── instructions/            ← sprint planning & delegation docs
-│   ├── sprint-one.md
-│   ├── sprint-two.md
-│   └── Sprint 2 Questions and Delegation.pdf
-│
-└── tests/
-    ├── test_pipeline.py     ← end-to-end loader + flow + engine + grader
-    └── api/                 ← FastAPI service tests (Week 1)
-        ├── test_calendars.py
-        ├── test_emails.py
-        ├── test_scenarios.py
-        └── test_todos.py
+├── app/
+│   ├── main.py           # FastAPI app, error handlers, health check
+│   ├── store.py          # In-memory store (resets on restart)
+│   ├── models/
+│   │   ├── todo.py       # TodoCreate, TodoUpdate, TodoResponse
+│   │   ├── calendar.py   # CalendarCreate, CalendarResponse, EventCreate, EventResponse
+│   │   └── email.py      # Email, Scenario
+│   └── routers/
+│       ├── todos.py
+│       ├── calendar.py
+│       ├── emails.py
+│       └── scenarios.py
+├── mcp_server/           # MCP wrapper — thin HTTP clients over FastAPI
+├── docs/
+│   └── api_reference.md  # Authoritative agent-facing reference
+├── tests/
+│   ├── test_todos.py     # 18 tests
+│   ├── test_calendars.py # 22 tests
+│   ├── test_emails.py    # 8 tests
+│   └── test_scenarios.py # 18 tests
+├── .mcp.json             # Auto-registers MCP server in Claude Code
+├── MCP.md                # MCP setup and usage guide
+└── pyproject.toml
 ```
 
 ---
@@ -55,62 +54,133 @@ the model uses for tool calls.
 ## Setup
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+uv sync
 ```
+
+That's it. No manual `venv` creation, no `pip install`.
 
 ---
 
-## Running things
+## Running
 
-| What | Command |
-|------|---------|
-| Full 100-day simulation | `python3 engine.py` |
-| Flow controller smoke test | `python3 flow_controller.py` |
-| Loader smoke test | `python3 loader.py Emails.xlsx` |
-| Grader smoke test | `python3 grader.py` |
-| Pipeline tests (no pytest needed) | `python3 tests/test_pipeline.py` |
-| FastAPI service | `uvicorn app.main:app --reload` |
-| FastAPI tests | `pytest tests/api/ -v` |
-| All tests | `pytest tests/ -v` |
+**1. Start FastAPI** (required — keep this running the whole time):
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+Server starts at `http://127.0.0.1:8000`. Swagger UI at `/docs`, ReDoc at `/redoc`.
+
+**2. The MCP server** starts automatically via `.mcp.json` when you open Claude Code in this repo. Verify with:
+
+```bash
+claude mcp list
+# aisa: bash -c uv run python -m mcp_server  ✓ Connected
+```
+
+See `MCP.md` for non-Claude-Code clients (MCP Inspector, Claude Desktop, custom harnesses).
 
 ---
 
-## Module overview
+## Running Tests
 
-| Module | Owner | Purpose |
-|--------|-------|---------|
-| `loader.py` | Eyasu | Reads `Emails.xlsx` into `Scenario`/`Email` dataclasses. See `docs/LOADER.md`. |
-| `flow_controller.py` | Nikita | Manages inactive/active scenario pools and per-day email scheduling. See `docs/FLOW_CONTROLLER.md`. |
-| `engine.py` | Nikita | The 100-day simulation loop, date-token resolver, model interaction mock. See `docs/ENGINE.md`. |
-| `grader.py` | Anthony | Scores scenarios against tool state (current: prefix-only matching). See `docs/GRADER.md`. |
-| `app/` | Nikita / Anthony / Miguel | FastAPI service exposing todo, calendar, email, and scenario endpoints for the model to call. See `docs/API.md`. |
+```bash
+uv run pytest tests/ -v
+```
+
+Expected: **66 passed**.
+
+| File | Tests |
+|------|-------|
+| `test_todos.py` | 18 |
+| `test_calendars.py` | 22 |
+| `test_emails.py` | 8 |
+| `test_scenarios.py` | 18 |
 
 ---
 
-## Pipeline at a glance
+## Core Concepts
+
+### `scenario_id` threads through every write
+
+Every object the agent creates must be tagged with a `scenario_id`. The server validates the scenario exists and returns `404` if it doesn't. Load a scenario first via `POST /scenarios/` before calling any create endpoint.
 
 ```
-Emails.xlsx
-    │
-    ▼
-loader.py ───────────► [Scenario, ...] ──► flow_controller.py
-                                              │
-                                              ▼
-                                          (inactive pool)
-                                              │  build_schedule
-                                              ▼
-                                          (active pool)
-                                              │  step(day)
-                                              ▼
-                                       engine.py (loop)
-                                              │  resolve_tokens
-                                              │  model_interaction_mock
-                                              │  mark_served
-                                              ▼
-                                   grader.define_grading_system
-                                              │
-                                              ▼
-                                       score / max_score
+POST /scenarios/  →  POST /emails/
+                      POST /calendars/{id}/events
+                      POST /todos/
 ```
+
+### Linking todos to calendar events
+
+When a task requires both a calendar event and a todo:
+
+1. `POST /calendars/{calendar_id}/events` — get back `event_id`
+2. `POST /todos/` with `calendar_event_id` set to that `event_id`
+
+Order matters — the server validates `calendar_event_id` exists at todo creation time.
+
+### In-memory store
+
+All data resets when uvicorn restarts. Every benchmark run starts clean. This is intentional.
+
+---
+
+## API Surface
+
+Full reference with request/response shapes, error codes, and examples: **`docs/api_reference.md`**.
+
+Quick endpoint map:
+
+| Group | Method | Path |
+|-------|--------|------|
+| Health | `GET` | `/` |
+| Todos | `POST` | `/todos/` |
+| | `GET` | `/todos/` |
+| | `GET` | `/todos/{id}` |
+| | `PATCH` | `/todos/{id}` ← partial update |
+| | `DELETE` | `/todos/{id}` |
+| Calendars | `POST` | `/calendars/` |
+| | `GET` | `/calendars/{id}` |
+| | `DELETE` | `/calendars/{id}` |
+| Events | `POST` | `/calendars/{id}/events` |
+| | `GET` | `/calendars/{id}/events` |
+| | `GET` | `/calendars/{id}/events/{event_id}` |
+| | `PUT` | `/calendars/{id}/events/{event_id}` ← full replace |
+| | `DELETE` | `/calendars/{id}/events/{event_id}` |
+| Emails | `GET` | `/emails/` |
+| | `GET` | `/emails/{id}` |
+| | `POST` | `/emails/` ← no DELETE |
+| Scenarios | `GET` | `/scenarios/` |
+| | `POST` | `/scenarios/` |
+| | `GET` | `/scenarios/{id}` |
+| | `DELETE` | `/scenarios/{id}` |
+| | `POST` | `/scenarios/{id}/emails` |
+
+### Key constraints
+
+- `PATCH /todos/{id}` — partial update only; `scenario_id` and `calendar_event_id` cannot be changed
+- `PUT /calendars/{id}/events/{event_id}` — full replace; send every field
+- Calendar events must fall within the calendar's 100-day window (`start_date` through `start_date + 100 days`)
+- Agent-sent email IDs: `max(all existing email_ids in store, default=0) + 1` — the counter is global, not per-scenario
+
+### Error codes
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid field values, constraint violation (e.g. event outside window) |
+| `404` | Resource not found — also fires when `scenario_id` or `calendar_event_id` reference is missing |
+| `409` | Conflict — caller-assigned ID already exists |
+| `422` | Missing required field or wrong type |
+| `500` | Unexpected server error |
+
+---
+
+## Tooling
+
+| Tool | Version / Notes |
+|------|-----------------|
+| Package manager | `uv` — use `uv add`, `uv sync`, `uv run` |
+| Framework | FastAPI |
+| Validation | Pydantic v2 |
+| Test runner | pytest via `uv run pytest` |

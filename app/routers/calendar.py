@@ -9,18 +9,19 @@ from app.models.calendar import (
     EventCreate,
     EventResponse,
 )
-from app.store import calendars
+from app import store
 
 router = APIRouter(prefix="/calendars", tags=["calendars"])
 
 CALENDAR_DURATION_DAYS = 100
 
 
-def _validate_event(data: EventCreate, calendar: dict):
+def _validate_event(data: EventCreate, calendar: CalendarResponse):
+    # sanity check: event times ordered + inside the 100-day window
     if data.start >= data.end:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Event start must be before end")
 
-    window_start = calendar["start_date"]
+    window_start = calendar.start_date
     window_end = window_start + timedelta(days=CALENDAR_DURATION_DAYS)
 
     if data.start < window_start or data.end > window_end:
@@ -30,44 +31,44 @@ def _validate_event(data: EventCreate, calendar: dict):
         )
 
 
+def _find_event(calendar: CalendarResponse, event_id: str) -> EventResponse | None:
+    # O(n) scan — fine at benchmark scale
+    for event in calendar.events:
+        if event.event_id == event_id:
+            return event
+    return None
+
+
 # --- Calendar endpoints ---
 
 @router.post("/", response_model=CalendarResponse, status_code=status.HTTP_201_CREATED)
 def create_calendar(data: CalendarCreate):
+    # creates a fresh 100-day calendar window starting from start_date
     calendar_id = str(uuid.uuid4())
-    calendar = {
-        "calendar_id": calendar_id,
-        "start_date": data.start_date,
-        "events": {},
-    }
-    calendars[calendar_id] = calendar
-    return CalendarResponse(
+    calendar = CalendarResponse(
         calendar_id=calendar_id,
         start_date=data.start_date,
         events=[],
     )
+    store.calendars[calendar_id] = calendar
+    return calendar
 
 
 @router.get("/{calendar_id}", response_model=CalendarResponse)
 def get_calendar(calendar_id: str):
-    if calendar_id not in calendars:
+    # returns the calendar along with all of its events
+    calendar = store.calendars.get(calendar_id)
+    if calendar is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar not found")
-
-    calendar = calendars[calendar_id]
-
-    return CalendarResponse(
-        calendar_id=calendar["calendar_id"],
-        start_date=calendar["start_date"],
-        events=list(calendar["events"].values()),
-    )
+    return calendar
 
 
 @router.delete("/{calendar_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_calendar(calendar_id: str):
-    if calendar_id not in calendars:
+    # deletes the calendar and every event on it
+    if calendar_id not in store.calendars:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar not found")
-
-    del calendars[calendar_id]
+    del store.calendars[calendar_id]
 
 
 # --- Event endpoints ---
@@ -78,23 +79,30 @@ def delete_calendar(calendar_id: str):
     status_code=status.HTTP_201_CREATED,
 )
 def create_event(calendar_id: str, data: EventCreate):
-    if calendar_id not in calendars:
+    # add a new event; must fall inside the 100-day window and reference a real scenario
+    calendar = store.calendars.get(calendar_id)
+    if calendar is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar not found")
 
-    calendar = calendars[calendar_id]
+    if data.scenario_id not in store.scenarios:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Scenario {data.scenario_id} not found",
+        )
+
     _validate_event(data, calendar)
 
     event_id = str(uuid.uuid4())
-    event = {
-        "event_id": event_id,
-        "title": data.title,
-        "description": data.description,
-        "start": data.start,
-        "end": data.end,
-    }
-    calendar["events"][event_id] = event
-
-    return EventResponse(**event)
+    event = EventResponse(
+        event_id=event_id,
+        title=data.title,
+        description=data.description,
+        start=data.start,
+        end=data.end,
+        scenario_id=data.scenario_id,
+    )
+    calendar.events.append(event)
+    return event
 
 
 @router.get(
@@ -102,10 +110,11 @@ def create_event(calendar_id: str, data: EventCreate):
     response_model=list[EventResponse],
 )
 def list_events(calendar_id: str):
-    if calendar_id not in calendars:
+    # every event on a given calendar
+    calendar = store.calendars.get(calendar_id)
+    if calendar is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar not found")
-
-    return list(calendars[calendar_id]["events"].values())
+    return calendar.events
 
 
 @router.get(
@@ -113,15 +122,15 @@ def list_events(calendar_id: str):
     response_model=EventResponse,
 )
 def get_event(calendar_id: str, event_id: str):
-    if calendar_id not in calendars:
+    # fetch a single event by id
+    calendar = store.calendars.get(calendar_id)
+    if calendar is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar not found")
 
-    calendar = calendars[calendar_id]
-
-    if event_id not in calendar["events"]:
+    event = _find_event(calendar, event_id)
+    if event is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
-
-    return EventResponse(**calendar["events"][event_id])
+    return event
 
 
 @router.put(
@@ -129,26 +138,33 @@ def get_event(calendar_id: str, event_id: str):
     response_model=EventResponse,
 )
 def update_event(calendar_id: str, event_id: str, data: EventCreate):
-    if calendar_id not in calendars:
+    # full replace — the caller must send every field, not just the ones they want to change
+    calendar = store.calendars.get(calendar_id)
+    if calendar is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar not found")
 
-    calendar = calendars[calendar_id]
-
-    if event_id not in calendar["events"]:
+    existing = _find_event(calendar, event_id)
+    if existing is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if data.scenario_id not in store.scenarios:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Scenario {data.scenario_id} not found",
+        )
 
     _validate_event(data, calendar)
 
-    updated_event = {
-        "event_id": event_id,
-        "title": data.title,
-        "description": data.description,
-        "start": data.start,
-        "end": data.end,
-    }
-    calendar["events"][event_id] = updated_event
-
-    return EventResponse(**updated_event)
+    updated_event = EventResponse(
+        event_id=event_id,
+        title=data.title,
+        description=data.description,
+        start=data.start,
+        end=data.end,
+        scenario_id=data.scenario_id,
+    )
+    calendar.events = [e if e.event_id != event_id else updated_event for e in calendar.events]
+    return updated_event
 
 
 @router.delete(
@@ -156,12 +172,13 @@ def update_event(calendar_id: str, event_id: str, data: EventCreate):
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_event(calendar_id: str, event_id: str):
-    if calendar_id not in calendars:
+    # removes a single event from a calendar
+    calendar = store.calendars.get(calendar_id)
+    if calendar is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Calendar not found")
 
-    calendar = calendars[calendar_id]
-
-    if event_id not in calendar["events"]:
+    existing = _find_event(calendar, event_id)
+    if existing is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
-    del calendar["events"][event_id]
+    calendar.events = [e for e in calendar.events if e.event_id != event_id]

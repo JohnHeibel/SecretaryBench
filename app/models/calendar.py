@@ -4,10 +4,12 @@ from pydantic import BaseModel
 
 
 class EventCreate(BaseModel):
+    # what the agent sends. scenario_id is required so every event is attributable.
     title: str
     description: Optional[str] = None
     start: datetime
     end: datetime
+    scenario_id: int
 
 
 class EventResponse(BaseModel):
@@ -16,6 +18,7 @@ class EventResponse(BaseModel):
     description: Optional[str] = None
     start: datetime
     end: datetime
+    scenario_id: Optional[int] = None
 
 
 class CalendarCreate(BaseModel):
