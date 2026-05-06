@@ -2,6 +2,10 @@
 
 `grader.py` exposes a single function, `define_grading_system(input, calendar, todo)`, which takes either an `Email` or `Scenario` object along with a `CalendarResponse` (from `app.models.calendar`) and a `list[TodoResponse]` (from `app.models.todo`) and returns a score dict. It first checks whether the input is a single email or a full scenario, if it's an email, it wraps that email's `success_criteria` string into a list, and if it's a scenario, it uses the already-collected `success_criteria` list directly. Each criteria string is then checked against the tool state using prefix-level matching via the `_check_criteria` helper. **This will need to be updated once we decide what the final success criteria looks like.**
 
+## Scenario-Scoped Grading
+
+The grader itself does not filter by `scenario_id` — that happens upstream. `pipeline.fetch_scenario_results(scenario)` pulls only the todos and calendar events that belong to the scenario being graded (matched by hashed `scenario_id`), then the engine passes that filtered state to the grader. This means the grader always sees only the data relevant to the current scenario, even though the store accumulates state across all scenarios during a run.
+
 ## Prefix-Level Checking
 
 The grader parses the prefix of each criteria string to determine what type of action the model should have taken, then verifies that action against the current calendar and todo state:
