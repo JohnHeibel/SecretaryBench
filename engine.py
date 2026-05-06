@@ -6,13 +6,12 @@ import sys
 import time
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 from typing import Optional
 
 from loader import load_scenarios, Email, Scenario
 from flow_controller import FlowController
 from grader import define_grading_system
-from pipeline import register_scenario
+from pipeline import register_scenario, fetch_scenario_results
 
 # Bridge to Person 3's model runner. The agreed-on signature is
 #   run_model_turn(email: Email, sim_date: datetime) -> None
@@ -187,9 +186,12 @@ def run_simulation(
     sim_start: datetime = SIM_START,
     seed: Optional[int] = 42,
     verbose: bool = True,
+    model_fn=None,
+    scenarios=None,
 ) -> dict:
     """Run the full N-day benchmark simulation and return aggregated results."""
-    scenarios = load_scenarios(path)
+    if scenarios is None:
+        scenarios = load_scenarios(path)
     controller = FlowController(scenarios, seed=seed)
     controller.build_schedule(total_days=sim_days)
 
@@ -198,12 +200,6 @@ def run_simulation(
     total_max = 0
     daily_log: list[dict] = []
 
-    # Empty state stand-ins for the grader. It only reads the events
-    # attribute on the calendar and the length of the task list, so a
-    # SimpleNamespace duck-types the calendar without dragging in pydantic.
-    # Real tool state plugs in here once the model + MCP layer is wired up.
-    empty_calendar = SimpleNamespace(events=[])
-    empty_todos: list = []
 
     if verbose:
         print(f"Simulation: {len(scenarios)} scenarios over {sim_days} days "
@@ -225,7 +221,9 @@ def run_simulation(
 
         for email, scenario, idx in ready:
             resolved = apply_date_substitutions(email, sim_date)
-            if _HAS_MODEL_RUNNER:
+            if model_fn is not None:
+                model_fn(resolved, sim_date)
+            elif _HAS_MODEL_RUNNER:
                 run_model_turn(resolved, sim_date)
             else:
                 model_interaction_mock([resolved], sim_date, verbose=verbose)
@@ -235,7 +233,8 @@ def run_simulation(
         day_score = 0
         day_max = 0
         for scenario in controller.completed_scenarios_today():
-            result = define_grading_system(scenario, empty_calendar, empty_todos)
+            state = fetch_scenario_results(scenario)
+            result = define_grading_system(scenario, state["calendar"], state["todos"])
             day_score += result["score"]
             day_max += result["max_score"]
             if verbose and result["max_score"] > 0:

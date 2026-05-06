@@ -13,7 +13,7 @@ The benchmark now ships with an **MCP server** — agents call the API as MCP to
 - **Todo updates are `PATCH`, not `PUT`.** `PATCH /todos/{id}` is a partial update; omitted fields stay unchanged. `scenario_id` and `calendar_event_id` are immutable after creation.
 - **Calendar event updates are full replace.** `PUT /calendars/{id}/events/{event_id}` requires all fields, including `scenario_id`.
 - **Todos can link to calendar events.** `POST /todos/` accepts an optional `calendar_event_id`; the server validates the event exists. Create the event first, then the todo.
-- **Package manager is `uv`.** No more `pip` or `venv` — use `uv sync`, `uv run`, `uv add`.
+- **Package manager is `pip` with `venv`.** See Setup section below.
 - **MCP server added** (`mcp_server/`). Exposes all 22 API routes as tools. `.mcp.json` in the repo root wires it up automatically in Claude Code.
 
 For the full, agent-facing API contract see **`docs/api_reference.md`**.
@@ -37,16 +37,27 @@ For the full, agent-facing API contract see **`docs/api_reference.md`**.
 │       ├── emails.py
 │       └── scenarios.py
 ├── mcp_server/           # MCP wrapper — thin HTTP clients over FastAPI
+├── engine.py             # 100-day simulation loop
+├── flow_controller.py    # Scenario scheduling & chain-order enforcement
+├── grader.py             # Prefix-level scoring of completed scenarios
+├── loader.py             # Excel → Scenario/Email objects
+├── pipeline.py           # Bridges loader objects ↔ FastAPI store
 ├── docs/
-│   └── api_reference.md  # Authoritative agent-facing reference
+│   ├── api_reference.md  # Authoritative agent-facing reference
+│   ├── ENGINE.md         # Simulation pipeline docs
+│   ├── GRADER.md         # Scoring system docs
+│   ├── FLOW_CONTROLLER.md
+│   └── LOADER.md
 ├── tests/
 │   ├── test_todos.py     # 18 tests
 │   ├── test_calendars.py # 22 tests
 │   ├── test_emails.py    # 8 tests
-│   └── test_scenarios.py # 18 tests
+│   ├── test_scenarios.py # 18 tests
+│   └── test_e2e.py       # End-to-end simulation tests
+├── Emails.xlsx           # 109 scenarios across 6 sheets
 ├── .mcp.json             # Auto-registers MCP server in Claude Code
 ├── MCP.md                # MCP setup and usage guide
-└── pyproject.toml
+└── requirements.txt
 ```
 
 ---
@@ -54,10 +65,10 @@ For the full, agent-facing API contract see **`docs/api_reference.md`**.
 ## Setup
 
 ```bash
-uv sync
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
-
-That's it. No manual `venv` creation, no `pip install`.
 
 ---
 
@@ -66,16 +77,27 @@ That's it. No manual `venv` creation, no `pip install`.
 **1. Start FastAPI** (required — keep this running the whole time):
 
 ```bash
-uv run uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 ```
 
 Server starts at `http://127.0.0.1:8000`. Swagger UI at `/docs`, ReDoc at `/redoc`.
 
-**2. The MCP server** starts automatically via `.mcp.json` when you open Claude Code in this repo. Verify with:
+**2. Run the simulation:**
+
+```bash
+python engine.py                      # default: Emails.xlsx, 100 days, seed=42
+python engine.py path/to/file.xlsx    # custom scenario file
+```
+
+The engine loads scenarios from the Excel file, schedules them across 100 days, serves emails to the model, and grades each scenario when its chain completes. Results print to stdout.
+
+The simulation requires the FastAPI server to be running — the model interacts with it via MCP tools, and the grader reads back the created todos/events to score each scenario.
+
+**3. The MCP server** starts automatically via `.mcp.json` when you open Claude Code in this repo. Verify with:
 
 ```bash
 claude mcp list
-# aisa: bash -c uv run python -m mcp_server  ✓ Connected
+# aisa: bash -c python -m mcp_server  ✓ Connected
 ```
 
 See `MCP.md` for non-Claude-Code clients (MCP Inspector, Claude Desktop, custom harnesses).
@@ -85,17 +107,16 @@ See `MCP.md` for non-Claude-Code clients (MCP Inspector, Claude Desktop, custom 
 ## Running Tests
 
 ```bash
-uv run pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
-Expected: **66 passed**.
-
-| File | Tests |
-|------|-------|
-| `test_todos.py` | 18 |
-| `test_calendars.py` | 22 |
-| `test_emails.py` | 8 |
-| `test_scenarios.py` | 18 |
+| File | Tests | What it covers |
+|------|-------|----------------|
+| `test_todos.py` | 18 | Todo CRUD, validation, linking |
+| `test_calendars.py` | 22 | Calendar & event CRUD, window validation |
+| `test_emails.py` | 8 | Email read/write, ID assignment |
+| `test_scenarios.py` | 18 | Scenario lifecycle, email attachment |
+| `test_e2e.py` | 2 | Full simulation with stubbed AI — perfect stub scores max, bad stub scores zero |
 
 ---
 
@@ -176,11 +197,33 @@ Quick endpoint map:
 
 ---
 
+## Simulation Pipeline
+
+```
+Emails.xlsx
+    ↓  loader.py
+Scenario/Email objects
+    ↓  flow_controller.py
+Scheduled across 100 days (chain-order enforced, capped to fit)
+    ↓  engine.py
+Daily loop:
+    activate scenario → pipeline.register_scenario() seeds the store
+    serve email       → model_runner.run_model_turn() calls Claude via MCP
+    all emails served → pipeline.fetch_scenario_results() pulls todos/events
+                      → grader.define_grading_system() scores the scenario
+    ↓
+Aggregated results: total_score / total_max + daily log
+```
+
+See `docs/ENGINE.md` for the full breakdown.
+
+---
+
 ## Tooling
 
 | Tool | Version / Notes |
 |------|-----------------|
-| Package manager | `uv` — use `uv add`, `uv sync`, `uv run` |
+| Package manager | `pip` with `venv` |
 | Framework | FastAPI |
 | Validation | Pydantic v2 |
-| Test runner | pytest via `uv run pytest` |
+| Test runner | `python -m pytest` |
