@@ -12,6 +12,19 @@ from typing import Optional
 from loader import load_scenarios, Email, Scenario
 from flow_controller import FlowController
 from grader import define_grading_system
+from pipeline import register_scenario
+
+# Bridge to Person 3's model runner. The agreed-on signature is
+#   run_model_turn(email: Email, sim_date: datetime) -> None
+# (one LLM turn per email, with the MCP tools attached on the runner side).
+# Falls back to the in-file mock if model_runner.py hasn't been added yet so
+# the simulation still runs end-to-end before Miguel's piece lands.
+try:
+    from model_runner import run_model_turn  # type: ignore
+    _HAS_MODEL_RUNNER = True
+except ImportError:
+    run_model_turn = None  # type: ignore
+    _HAS_MODEL_RUNNER = False
 
 
 SIM_START = datetime(2000, 1, 1, tzinfo=timezone.utc)
@@ -199,13 +212,23 @@ def run_simulation(
     for day in range(sim_days):
         ready = controller.step(day)
 
+        # Seed the FastAPI store for any scenarios that just activated. This is
+        # Eyasu's adapter (pipeline.register_scenario) — it converts the loader
+        # objects into the store's pydantic shapes and inserts them so the AI
+        # can read the new emails through the API.
+        for activated in controller.newly_activated_today():
+            register_scenario(activated, sim_date)
+
         if ready and verbose:
             print(f"Day {day + 1} ({sim_date.strftime('%Y-%m-%d')}): "
                   f"{len(ready)} email(s) due")
 
         for email, scenario, idx in ready:
             resolved = apply_date_substitutions(email, sim_date)
-            model_interaction_mock([resolved], sim_date, verbose=verbose)
+            if _HAS_MODEL_RUNNER:
+                run_model_turn(resolved, sim_date)
+            else:
+                model_interaction_mock([resolved], sim_date, verbose=verbose)
             controller.mark_served(scenario.scenario_id, idx)
 
         # Grade scenarios that completed today (per-scenario, matches grader design)
