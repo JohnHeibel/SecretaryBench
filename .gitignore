@@ -28,3 +28,4 @@ htmlcov/
 # Claude Code
 settings.local.json
 CLAUDE.md
+modelRunner.md
