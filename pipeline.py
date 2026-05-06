@@ -3,102 +3,120 @@ from __future__ import annotations
 """
 pipeline.py
 
-Bridges loader.py (Excel objects) and the FastAPI server store (Program B).
-Works directly against the in-memory store
+Bridges loader.py (Excel objects) to the FastAPI server store via HTTP.
+
+WHY HTTP, NOT DIRECT MUTATION:
+This file used to mutate `app.store` directly (`store.scenarios[id] = ...`).
+That only works when engine.py and FastAPI live in the same Python process.
+They don't — uvicorn runs in its own process, so direct mutation just edits
+engine's local copy of the module while FastAPI's store stays empty. The
+result was that every model action 404'd because the scenario it was tagged
+with didn't exist in FastAPI's view of the world. All reads/writes now go
+through HTTP so engine, model_runner (via MCP), and the grader all see one
+consistent store.
 """
 
 import hashlib
-from datetime import datetime
+import os
+from datetime import datetime, timezone
+
+import httpx
 
 from loader import Scenario as LoaderScenario, Email as LoaderEmail
 from app.models.email import Email as ApiEmail, Scenario as ApiScenario
+from app.models.todo import TodoResponse
+from app.models.calendar import CalendarResponse, EventResponse
+
+
+API_BASE = os.environ.get("AISA_API_BASE_URL", "http://localhost:8000")
+_TIMEOUT = 10.0
+
 
 # ID conversion — loader uses string IDs like "T01", store expects int
-def scenario_str_to_int(scenario_id: str) -> int: #Convert a string scenario ID like 'T01' into a stable int.
-    return int(hashlib.md5(scenario_id.encode()).hexdigest()[:8], 16)  # first 8 hex chars -> int
+def scenario_str_to_int(scenario_id: str) -> int:  # Convert a string scenario ID like 'T01' into a stable int.
+    return int(hashlib.md5(scenario_id.encode()).hexdigest()[:8], 16)
 
 
-def email_unique_id(scenario_id: str, email_number: int) -> int: # Build a stable unique int ID for a fixture email  Combines scenario string ID + email number so each email across every scenario gets its own unique int.
+def email_unique_id(scenario_id: str, email_number: int) -> int:  # Stable unique int ID per fixture email.
     key = f"{scenario_id}:{email_number}"
     return int(hashlib.md5(key.encode()).hexdigest()[:8], 16)
 
+
 # Shape conversion — turn loader objects into API-compatible models
-def loader_email_to_api(loader_email: LoaderEmail, scenario_id: str, sim_date: datetime) -> ApiEmail: # Convert a single loader Email into the shape the API store expects.
+def loader_email_to_api(loader_email: LoaderEmail, scenario_id: str, sim_date: datetime) -> ApiEmail:
     return ApiEmail(
-        email_id=email_unique_id(scenario_id, loader_email.email_number),  # generated stable int
+        email_id=email_unique_id(scenario_id, loader_email.email_number),
         subject=loader_email.subject,
         body=loader_email.body,
         sender=loader_email.sender,
         recipients=loader_email.recipients,
-        created_at=sim_date,                             # simulation date as the timestamp
-        scenario_id=scenario_str_to_int(scenario_id),   # string "T01" -> int
+        created_at=sim_date,
+        scenario_id=scenario_str_to_int(scenario_id),
     )
 
 
-def loader_scenario_to_api(loader_scenario: LoaderScenario, sim_date: datetime) -> ApiScenario: #Convert a loader Scenario into the shape the API store expects.
+def loader_scenario_to_api(loader_scenario: LoaderScenario, sim_date: datetime) -> ApiScenario:
     api_emails = [
         loader_email_to_api(e, loader_scenario.scenario_id, sim_date)
-        for e in loader_scenario.emails  # convert every email in the scenario
+        for e in loader_scenario.emails
     ]
-
-    # loader stores success_criteria as list[str], API expects Optional[str]
-    # join multiple criteria with comma, or None if the list is empty
     criteria = ", ".join(loader_scenario.success_criteria) if loader_scenario.success_criteria else None
-
     return ApiScenario(
-        scenario_id=scenario_str_to_int(loader_scenario.scenario_id),  # string -> int
+        scenario_id=scenario_str_to_int(loader_scenario.scenario_id),
         emails=api_emails,
         success_criteria=criteria,
         puzzle_summary=loader_scenario.puzzle_summary,
     )
 
-# Setup step — push a scenario into the store when it activates
-def register_scenario(loader_scenario: LoaderScenario, sim_date: datetime) -> bool: #Push a scenario into the in-memory store when it moves from inactive to active pool.
-    from app import store  # import here to avoid circular imports at module load time
 
-    api_scenario = loader_scenario_to_api(loader_scenario, sim_date)  # convert to API shape
+# Setup step — push a scenario into the store via HTTP
+def register_scenario(loader_scenario: LoaderScenario, sim_date: datetime) -> bool:
+    """POST a scenario (with embedded fixture emails) to the FastAPI store.
 
-    if api_scenario.scenario_id in store.scenarios:
-        return False  # already registered, skip
+    Returns True on creation. Returns False if the scenario was already
+    registered (FastAPI returns 409). Any other non-2xx raises.
+    """
+    api_scenario = loader_scenario_to_api(loader_scenario, sim_date)
+    payload = api_scenario.model_dump(mode="json")  # serializes datetimes to ISO 8601
+    resp = httpx.post(f"{API_BASE}/scenarios/", json=payload, timeout=_TIMEOUT)
+    if resp.status_code == 409:
+        return False
+    resp.raise_for_status()
+    return True
 
-    store.scenarios[api_scenario.scenario_id] = api_scenario  # add scenario to store
 
-    for email in api_scenario.emails:
-        email.scenario_id = api_scenario.scenario_id  # make sure every email knows its scenario
-        store.emails[email.email_id] = email           # add each email to the emails store
+# Fetch helper — read AI-created artifacts for a scenario from the FastAPI store
+def fetch_scenario_results(loader_scenario: LoaderScenario) -> dict:
+    """Read every todo and event the model created for one scenario.
 
-    return True  # successfully registered
+    Returns a dict with the keys the grader expects:
+      - "calendar": a CalendarResponse holding ONLY this scenario's events
+      - "todos":    list[TodoResponse] for this scenario
+    """
+    scenario_int_id = scenario_str_to_int(loader_scenario.scenario_id)
 
-# Fetch helper — get what the AI created for a scenario so the grader can check it
-def fetch_scenario_results(loader_scenario: LoaderScenario) -> dict: # Fetch all AI-created artifacts for a scenario from the in-memory store.
+    # Pull all todos and filter client-side (FastAPI doesn't have a per-scenario filter).
+    todos_resp = httpx.get(f"{API_BASE}/todos/", timeout=_TIMEOUT)
+    todos_resp.raise_for_status()
+    todos = [TodoResponse(**t) for t in todos_resp.json() if t.get("scenario_id") == scenario_int_id]
 
-    from app import store  # import here to avoid circular imports at module load time
-    from app.models.calendar import CalendarResponse
-    from datetime import timezone
+    # Pull all calendars (each carries its events embedded) and collect matches.
+    cals_resp = httpx.get(f"{API_BASE}/calendars/", timeout=_TIMEOUT)
+    cals_resp.raise_for_status()
+    cals_list = cals_resp.json()
 
-    scenario_int_id = scenario_str_to_int(loader_scenario.scenario_id)  # string -> int to match store keys
+    matching_events: list[EventResponse] = []
+    chosen_calendar_id: str | None = None
+    for cal in cals_list:
+        for event_dict in cal.get("events", []):
+            if event_dict.get("scenario_id") == scenario_int_id:
+                matching_events.append(EventResponse(**event_dict))
+                if chosen_calendar_id is None:
+                    chosen_calendar_id = cal["calendar_id"]
 
-    # filter todos to only ones the AI created for this scenario
-    todos = [
-        t for t in store.todos_db.values()
-        if t.scenario_id == scenario_int_id  # only this scenario's todos
-    ]
-
-    # collect calendar events belonging to this scenario across all calendars
-    matching_events = []
-    calendar_id = None
-    for cal in store.calendars.values():
-        for event in cal.events:
-            if event.scenario_id == scenario_int_id:  # only this scenario's events
-                matching_events.append(event)
-                if calendar_id is None:
-                    calendar_id = cal.calendar_id  # remember a calendar id for the response
-
-    # build a CalendarResponse to hand to the grader
-    from datetime import timezone
     calendar = CalendarResponse(
-        calendar_id=calendar_id or "none",           # placeholder if no calendar was created
-        start_date=__import__('datetime').datetime.now(timezone.utc),
+        calendar_id=chosen_calendar_id or "none",
+        start_date=datetime.now(timezone.utc),
         events=matching_events,
     )
 
