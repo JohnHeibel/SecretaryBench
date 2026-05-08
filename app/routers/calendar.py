@@ -54,6 +54,13 @@ def create_calendar(data: CalendarCreate):
     return calendar
 
 
+@router.get("/", response_model=list[CalendarResponse])
+def list_calendars():
+    # returns every calendar (with embedded events). Used by the grader to find
+    # events for a scenario without knowing every calendar_id up front.
+    return list(store.calendars.values())
+
+
 @router.get("/{calendar_id}", response_model=CalendarResponse)
 def get_calendar(calendar_id: str):
     # returns the calendar along with all of its events

@@ -11,7 +11,7 @@ from typing import Optional
 from loader import load_scenarios, Email, Scenario
 from flow_controller import FlowController
 from grader import define_grading_system
-from pipeline import register_scenario, fetch_scenario_results
+from pipeline import register_scenario, fetch_scenario_results, scenario_str_to_int
 
 # Bridge to Person 3's model runner. The agreed-on signature is
 #   run_model_turn(email: Email, sim_date: datetime) -> None
@@ -224,7 +224,8 @@ def run_simulation(
             if model_fn is not None:
                 model_fn(resolved, sim_date)
             elif _HAS_MODEL_RUNNER:
-                run_model_turn(resolved, sim_date)
+                run_model_turn(resolved, sim_date,
+                               scenario_id=scenario_str_to_int(scenario.scenario_id))
             else:
                 model_interaction_mock([resolved], sim_date, verbose=verbose)
             controller.mark_served(scenario.scenario_id, idx)
