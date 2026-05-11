@@ -78,7 +78,7 @@ _cached_anthropic_tools: list[dict] | None = None
 _scenario_messages: dict[int, list[dict]] = defaultdict(list)
 
 # Flip to "0" to A/B against the legacy fresh-per-turn behavior.
-CONVERSATION_CONTINUITY = os.environ.get("CONVERSATION_CONTINUITY", "1") == "1"
+CONVERSATION_CONTINUITY = os.environ.get("CONVERSATION_CONTINUITY", "0") == "1"
 
 _stats: dict[str, Any] = {
     "scenarios_run": 0,
