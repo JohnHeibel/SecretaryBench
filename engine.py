@@ -19,10 +19,11 @@ from pipeline import register_scenario, fetch_scenario_results, scenario_str_to_
 # Falls back to the in-file mock if model_runner.py hasn't been added yet so
 # the simulation still runs end-to-end before Miguel's piece lands.
 try:
-    from model_runner import run_model_turn  # type: ignore
+    from model_runner import run_model_turn, scenario_completed  # type: ignore
     _HAS_MODEL_RUNNER = True
 except ImportError:
     run_model_turn = None  # type: ignore
+    scenario_completed = None  # type: ignore
     _HAS_MODEL_RUNNER = False
 
 
@@ -241,6 +242,10 @@ def run_simulation(
             if verbose and result["max_score"] > 0:
                 print(f"  [grader] [{scenario.scenario_type}] {scenario.scenario_id}: "
                       f"{result['score']}/{result['max_score']}")
+            # Free the persistent model conversation for this scenario — keeps
+            # the runner's per-scenario dict from growing unbounded over a run.
+            if scenario_completed is not None:
+                scenario_completed(scenario_str_to_int(scenario.scenario_id))
 
         total_score += day_score
         total_max += day_max

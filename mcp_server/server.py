@@ -184,9 +184,10 @@ def delete_event(calendar_id: str, event_id: str) -> dict:
 # --- Emails ---
 
 @mcp.tool()
-def list_emails() -> list[dict]:
-    """Every email in the system (fixture + agent-sent) across all scenarios."""
-    return _call("GET", "/emails/")
+def list_emails(scenario_id: int | None = None) -> list[dict]:
+    """List emails. Pass scenario_id to get only that scenario's chain (recommended — the global list grows over the run)."""
+    params = {"scenario_id": scenario_id} if scenario_id is not None else None
+    return _call("GET", "/emails/", params=params)
 
 
 @mcp.tool()

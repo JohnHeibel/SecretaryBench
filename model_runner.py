@@ -71,12 +71,26 @@ _api_executor: concurrent.futures.ThreadPoolExecutor | None = None
 _calendar_id: str | None = None
 _cached_anthropic_tools: list[dict] | None = None
 
+# Persistent per-scenario conversation. Keyed by int scenario_id. The chain
+# accumulates {user, assistant, tool_result} blocks across emails in the same
+# scenario so the model retains the context (and tool_use ids) it built earlier.
+# Cleared by scenario_completed() once the engine has graded that scenario.
+_scenario_messages: dict[int, list[dict]] = defaultdict(list)
+
+# Flip to "0" to A/B against the legacy fresh-per-turn behavior.
+CONVERSATION_CONTINUITY = os.environ.get("CONVERSATION_CONTINUITY", "1") == "1"
+
 _stats: dict[str, Any] = {
     "scenarios_run": 0,
     "tool_calls": defaultdict(int),
     "tool_errors": 0,
     "calendars_created": 0,
     "turn_failures": 0,
+    "rounds_total": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
 }
 
 MODEL_NAME = "claude-haiku-4-5"
@@ -84,11 +98,23 @@ PER_TURN_TIMEOUT_S = 300.0
 ROUND_BACKSTOP = 25
 SESSION_OPEN_TIMEOUT_S = 30.0
 
+# Per-round token usage is appended here as JSONL for offline analysis.
+# Override with TOKEN_LOG_PATH env var; set to empty string to disable.
+TOKEN_LOG_PATH = os.environ.get("TOKEN_LOG_PATH", "token_usage.jsonl")
+_token_log_lock = threading.Lock()
+
 # Tools the model should NOT see. The MCP server still exposes them (other
 # harnesses keep working); we just don't pass them in the `tools=` list to
-# the model. Admin/destructive tools cause benchmark corruption (the model
-# fabricates scenarios when it sees a 404) or waste tokens.
+# the model.
+#
+# The benchmark is one-shot email triage: the model sees ONE email and decides
+# what to write. It never needs to read or modify prior state on its own — the
+# only legitimate read is list_emails (for chain context on follow-up emails).
+# Everything else is either admin/destructive (would corrupt the benchmark) or
+# read/update tools the AI doesn't need for this task. Trimming the tool
+# surface keeps the cached/sent tool-schema block small.
 HIDDEN_TOOLS = frozenset({
+    # admin / destructive — corrupt the benchmark
     "create_scenario",
     "delete_scenario",
     "add_scenario_email",
@@ -97,6 +123,17 @@ HIDDEN_TOOLS = frozenset({
     "delete_todo",
     "delete_event",
     "health_check",
+    # read/update tools the one-shot triage AI doesn't need
+    "list_todos",
+    "get_todo",
+    "update_todo",
+    "get_calendar",
+    "list_events",
+    "get_event",
+    "update_event",
+    "get_email",
+    "list_scenarios",
+    "get_scenario",
 })
 
 # Tools where the runner FORCES the foreign-key field to the correct value
@@ -110,6 +147,49 @@ _FORCE_SCENARIO_ID = frozenset({
 _FORCE_CALENDAR_ID = frozenset({
     "create_event", "update_event", "list_events", "get_event", "get_calendar",
 })
+
+
+def _record_usage(
+    scenario_id: int,
+    round_idx: int,
+    response: Any,
+    messages_in_context: int = 0,
+) -> dict[str, int]:
+    """Pull usage off a messages.create response, aggregate into _stats, append JSONL row.
+
+    Returns the per-round usage dict so callers can use it for in-turn logging.
+    """
+    usage = getattr(response, "usage", None)
+    row = {
+        "input_tokens": getattr(usage, "input_tokens", 0) or 0,
+        "output_tokens": getattr(usage, "output_tokens", 0) or 0,
+        "cache_creation_input_tokens": getattr(usage, "cache_creation_input_tokens", 0) or 0,
+        "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
+    }
+    _stats["input_tokens"] += row["input_tokens"]
+    _stats["output_tokens"] += row["output_tokens"]
+    _stats["cache_creation_input_tokens"] += row["cache_creation_input_tokens"]
+    _stats["cache_read_input_tokens"] += row["cache_read_input_tokens"]
+    _stats["rounds_total"] += 1
+
+    if TOKEN_LOG_PATH:
+        tool_uses = sum(1 for b in response.content if b.type == "tool_use")
+        line = json.dumps({
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "scenario_id": scenario_id,
+            "round": round_idx,
+            "stop_reason": getattr(response, "stop_reason", None),
+            "tool_uses": tool_uses,
+            "messages_in_context": messages_in_context,
+            "continuity": CONVERSATION_CONTINUITY,
+            **row,
+        })
+        try:
+            with _token_log_lock, open(TOKEN_LOG_PATH, "a") as f:
+                f.write(line + "\n")
+        except OSError:
+            pass  # logging must never break a run
+    return row
 
 
 def _inject_keys(name: str, args: dict, scenario_id: int, calendar_id: str) -> dict:
@@ -227,11 +307,63 @@ async def _call_tool_async(name: str, args: dict) -> tuple[str, bool]:
     return payload, False
 
 
+# Terse, model-facing descriptions for the 4 visible tools. Replaces the verbose
+# MCP-server descriptions (which are written for human/API discovery). The system
+# prompt already carries the "how to use these" guidance; the description here is
+# just a one-line identity reminder. Override-by-name lets us keep MCP as the
+# single source of truth for tool *behavior* while controlling token cost.
+_MODEL_TOOL_DESCRIPTIONS = {
+    "create_todo": "Create a todo. due_date is ISO 8601 with timezone.",
+    "create_event": "Create a calendar event. start/end are ISO 8601 with timezone; end > start.",
+    "send_email": "Send a reply email.",
+    "list_emails": "List emails for the current scenario. ALWAYS pass scenario_id — the unfiltered list grows huge.",
+}
+
+
+def _minify_schema(schema: dict) -> dict:
+    """Strip Pydantic-generated noise (titles, anyOf-null, defaults) from a tool's
+    input_schema. Equivalent semantics, fewer tokens sent to the model.
+
+    Pydantic emits `"title": "Calendar Id"` on every property and uses
+    `anyOf: [{type:T}, {type:null}]` to express Optional[T]. The model doesn't
+    need either — optional-ness is conveyed by the `required` list.
+    """
+    out: dict = {"type": "object"}
+    props: dict = {}
+    for name, spec in schema.get("properties", {}).items():
+        if "anyOf" in spec:
+            non_null = [s for s in spec["anyOf"] if s.get("type") != "null"]
+            if len(non_null) == 1:
+                spec = non_null[0]
+            elif non_null:
+                spec = {"anyOf": non_null}
+        clean = {k: v for k, v in spec.items() if k not in ("title", "default")}
+        props[name] = clean
+    out["properties"] = props
+    if schema.get("required"):
+        out["required"] = schema["required"]
+    return out
+
+
 def _get_anthropic_tools() -> list[dict]:
-    """Lazy-cache the (filtered) tool list."""
+    """Lazy-cache the (filtered) tool list. Strips Pydantic schema noise and
+    swaps verbose MCP descriptions for terse model-facing ones. cache_control on
+    the last tool is left in place — it's a no-op below the Haiku cache minimum,
+    but free if a larger model is used later.
+    """
     global _cached_anthropic_tools
     if _cached_anthropic_tools is None:
-        _cached_anthropic_tools = _run_async(_list_tools_async(), timeout=30)
+        raw = _run_async(_list_tools_async(), timeout=30)
+        slim = []
+        for t in raw:
+            slim.append({
+                "name": t["name"],
+                "description": _MODEL_TOOL_DESCRIPTIONS.get(t["name"], t["description"]),
+                "input_schema": _minify_schema(t["input_schema"]),
+            })
+        if slim:
+            slim[-1] = {**slim[-1], "cache_control": {"type": "ephemeral"}}
+        _cached_anthropic_tools = slim
     return _cached_anthropic_tools
 
 
@@ -279,66 +411,79 @@ def _bootstrap_calendar(sim_date: datetime) -> str:
 
 # --- Prompt construction ---------------------------------------------------
 
-def _build_system_prompt(scenario_id: int, calendar_id: str, sim_date: datetime) -> str:
-    sim_date_str = sim_date.strftime("%B %d, %Y")
-    sim_date_iso = sim_date.strftime("%Y-%m-%dT%H:%M:%SZ")
-    return f"""You are an AI executive assistant managing a professional's schedule, todos, and email.
+# Static portion of the system prompt — byte-identical across every turn. Anything
+# that varies per-turn (scenario_id, calendar_id, sim_date) MUST go in the dynamic
+# suffix below, never in this string. cache_control is still applied (cheap), but
+# this prompt is intentionally well below Haiku 4.5's 4,096-token cache minimum:
+# the benchmark measures the AI's ability to handle complex requests efficiently,
+# so the system prompt should not coach the model with worked examples or pattern
+# lookup tables — that gamed the cost-per-scenario metric without making the AI
+# under test any more capable. Sonnet (min 2,048) and Opus (min 4,096) still won't
+# cache this; that's fine — lower raw token count is the goal.
+_STATIC_SYSTEM_PROMPT = """You are an AI executive assistant. For each email, decide the action and call the matching tool — or call no tool. Do not narrate.
 
-You will receive ONE email at a time. Decide on the right action(s) using the tools available.
+TOOLS:
+- create_todo: principal must track a task with a deadline.
+- create_event: a time-blocked meeting/call is proposed or confirmed.
+- send_email: a direct question is asked or a response is explicitly requested.
+- list_emails(scenario_id=...): ONLY when the email is a follow-up ("as discussed", "circling back") needing prior context. Always pass scenario_id.
+- (no tool): FYI / newsletter / auto-confirmation / marketing / status update.
 
-POSSIBLE ACTIONS PER EMAIL:
-1. CREATE A TODO     — the email asks you to track a task or follow up.
-2. SCHEDULE AN EVENT — the email involves setting up a meeting or time-based event.
-3. SEND A REPLY      — the email explicitly requires a written response.
-4. DO NOTHING        — the email is purely informational (FYI, newsletter, auto-notification,
-                       confirmation needing no reply or action). Call no tools.
+When in doubt, do nothing. Over-acting is the most common failure.
 
-Multi-tool actions are allowed when an email genuinely needs them. ORDER MATTERS:
-create the calendar event FIRST, then create a todo that references it via
-`calendar_event_id` (the field on `create_todo`). The store rejects todos that
-reference a non-existent event.
+ORDER: if both an event AND a linked todo are needed, create the event first, then pass its returned id as `calendar_event_id` to create_todo.
 
-═══════════════════════════════════════════════════════════
-CRITICAL — SCENARIO ID:
-    scenario_id = {scenario_id}
+DATETIMES: ISO 8601 with timezone (e.g. "2000-05-09T14:00:00Z"). Use the simulated date in FOR THIS EMAIL for relative phrases. Defaults: events 09:00, todo due_date 17:00, 1-hour duration.
 
-Use this EXACT integer when creating todos, events, or sent emails.
-Do NOT substitute, modify, round, or invent your own scenario_id. Copy this
-number verbatim into every tool call. If you receive a 404 error referencing
-a scenario_id, the fix is to use the value ABOVE — never call any scenario-
-management tool to "create" or "fix" the scenario; those tools are not
-available to you and the scenario is already set up correctly.
-═══════════════════════════════════════════════════════════
+SCENARIO_ID: copy verbatim from the LATEST FOR THIS EMAIL into every tool call.
 
-REQUIRED FIELDS:
-- scenario_id  = {scenario_id}                  (the value above — exact)
-- calendar_id  = "{calendar_id}"                 (use only when creating events)
-- All datetimes are ISO 8601 with timezone, e.g. "2000-01-15T10:00:00Z".
-- Today's simulated date is {sim_date_str} (ISO: {sim_date_iso}).
+CONTEXT: prior emails in this scenario (if any) appear earlier in this conversation along with the tool calls you made for them. Reuse that context — do NOT call list_emails for chain history you already remember.
 
-CHAIN CONTEXT:
-This email may be a follow-up in a multi-email chain. Earlier emails for the
-same scenario_id are already in the store. If the email reads like a reply
-or follow-up and you need prior context, you may call `list_emails` (then
-filter for entries whose scenario_id matches the value above) before acting.
+REPLIES (send_email): recipients = incoming sender. Subject = "Re: <original>" (no double prefix). 1-3 sentences for simple Q's.
 
-GUIDELINES:
-- If the email is informational, do nothing. Over-acting costs points.
-- Do not duplicate work you've already done in this turn.
-- Default event duration is 1 hour unless the email specifies otherwise.
+END IMMEDIATELY after the tool call(s). Do not emit confirmation text after a tool succeeds — that wastes a round.
 """
 
 
-def _build_user_message(email: Email, sim_date: datetime) -> str:
+def _build_system_blocks() -> list[dict]:
+    """Return the static system prompt as a single cache-tagged block.
+
+    Everything dynamic (scenario_id, calendar_id, sim_date) now lives in each
+    user message's preamble so the system block can stay byte-identical across
+    every turn — required for cross-scenario prefix caching to ever hit on
+    larger models, and a clean prerequisite for the persistent-conversation path.
+    """
+    return [
+        {"type": "text", "text": _STATIC_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}},
+    ]
+
+
+def _build_user_message(
+    email: Email, sim_date: datetime, scenario_id: int, calendar_id: str
+) -> str:
+    """Email body + FOR THIS EMAIL preamble.
+
+    Putting the dynamic context in the user message (instead of system) means a
+    persistent conversation can carry prior turns forward: the model sees the
+    new FOR THIS EMAIL block on the latest user message and uses those values
+    for tool-call arguments without re-reading earlier turns.
+    """
+    recipients = ", ".join(email.recipients) if email.recipients else "(none)"
     sim_date_str = sim_date.strftime("%B %d, %Y")
-    recipients = ", ".join(email.recipients) if email.recipients else "(no recipients)"
+    sim_date_iso = sim_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+    preamble = (
+        "FOR THIS EMAIL:\n"
+        f"- scenario_id = {scenario_id}\n"
+        f'- calendar_id = "{calendar_id}"\n'
+        f"- Today's simulated date is {sim_date_str} (ISO: {sim_date_iso}).\n\n"
+    )
     return (
-        f"Email received on {sim_date_str}:\n\n"
+        f"{preamble}"
         f"From: {email.sender}\n"
         f"To: {recipients}\n"
-        f"Subject: {email.subject}\n\n"
-        f"{email.body}\n\n"
-        "Handle this email appropriately."
+        f"Subject: {email.subject}\n"
+        f"Date: {sim_date.strftime('%Y-%m-%d')}\n\n"
+        f"{email.body}"
     )
 
 
@@ -360,12 +505,28 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
     calendar_id = _bootstrap_calendar(sim_date)
     tools = _get_anthropic_tools()
 
-    system = _build_system_prompt(scenario_id, calendar_id, sim_date)
-    user_msg = _build_user_message(email, sim_date)
+    system = _build_system_blocks()
+    user_msg = _build_user_message(email, sim_date, scenario_id, calendar_id)
 
-    # max_retries=0 prevents the SDK from sleeping through 429s past our deadline.
-    client = anthropic.Anthropic(api_key=api_key, timeout=120.0, max_retries=0)
-    messages: list[dict] = [{"role": "user", "content": user_msg}]
+    # max_retries=3 lets the SDK absorb transient 429s on burst-y days (4+ emails
+    # in close succession can momentarily exceed the 50k tok/min Haiku limit).
+    # Backoff is exponential, capped well under our 300s per-turn deadline.
+    client = anthropic.Anthropic(api_key=api_key, timeout=120.0, max_retries=3)
+
+    # With continuity ON, append to the persistent chain so the model retains
+    # prior emails' user/assistant/tool_result blocks. With it OFF, behave like
+    # the legacy fresh-per-turn runner (for A/B comparison).
+    if CONVERSATION_CONTINUITY:
+        messages = _scenario_messages[scenario_id]
+    else:
+        messages = []
+    # Snapshot length so we can roll back if this turn fails partway through.
+    # Anthropic rejects malformed chains (orphan tool_use without tool_result,
+    # trailing user with no assistant reply), so leaking a half-finished turn
+    # would break every subsequent email in the scenario.
+    _pre_turn_len = len(messages)
+    messages.append({"role": "user", "content": user_msg})
+
     deadline = time.monotonic() + PER_TURN_TIMEOUT_S
     rounds = 0
 
@@ -400,8 +561,15 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
                     f"messages.create exceeded deadline on scenario {scenario_id}."
                 ) from exc
 
+            _record_usage(scenario_id, rounds, response, messages_in_context=len(messages))
+
             tool_uses = [b for b in response.content if b.type == "tool_use"]
             if not tool_uses:
+                # Preserve the final assistant turn so the conversation chain
+                # ends on an assistant message — required for the next email
+                # to append a user message without producing two consecutive
+                # user roles (which Anthropic rejects).
+                messages.append({"role": "assistant", "content": response.content})
                 break
 
             messages.append({"role": "assistant", "content": response.content})
@@ -446,7 +614,23 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
             sys.stderr.write(f"[model_runner] last-messages tail: {tail!r}\n")
         except Exception:
             pass
+        # Roll the persistent chain back to its pre-turn state so the next
+        # email in this scenario starts from a valid conversation prefix.
+        if CONVERSATION_CONTINUITY:
+            del messages[_pre_turn_len:]
         raise
+
+
+# --- Scenario lifecycle hook ----------------------------------------------
+
+def scenario_completed(scenario_id: int) -> None:
+    """Drop the persistent message chain for a scenario once the engine has
+    graded it. Called from engine.py after `completed_scenarios_today()`.
+
+    Without this, the dict accumulates every scenario's full conversation for
+    the entire run — eventually thousands of dead chains in memory. No-op when
+    continuity is disabled."""
+    _scenario_messages.pop(scenario_id, None)
 
 
 # --- Shutdown + summary ----------------------------------------------------
@@ -478,17 +662,41 @@ def _shutdown() -> None:
 
 def _print_summary() -> None:
     total_calls = sum(_stats["tool_calls"].values())
+    scenarios = _stats["scenarios_run"]
+    rounds = _stats["rounds_total"]
+    in_tok = _stats["input_tokens"]
+    out_tok = _stats["output_tokens"]
+    cache_create = _stats["cache_creation_input_tokens"]
+    cache_read = _stats["cache_read_input_tokens"]
+    billable_in = in_tok + cache_create + cache_read
+    total_tok = billable_in + out_tok
+    cache_denom = cache_read + cache_create + in_tok
+    cache_hit_pct = (100.0 * cache_read / cache_denom) if cache_denom else 0.0
+
     print("\n=== model_runner summary ===")
     print(f"model             : {MODEL_NAME}")
-    print(f"scenarios run     : {_stats['scenarios_run']}")
+    print(f"scenarios run     : {scenarios}")
     print(f"calendars created : {_stats['calendars_created']}")
     print(f"total tool calls  : {total_calls}")
     print(f"tool errors       : {_stats['tool_errors']}")
     print(f"turn failures     : {_stats['turn_failures']}")
+    print(f"api rounds        : {rounds}")
+    print("--- tokens ---")
+    print(f"input  (uncached) : {in_tok}")
+    print(f"cache  write      : {cache_create}")
+    print(f"cache  read       : {cache_read}")
+    print(f"output            : {out_tok}")
+    print(f"total             : {total_tok}")
+    print(f"cache hit %       : {cache_hit_pct:.1f}")
+    if scenarios:
+        print(f"avg tokens/turn   : {total_tok / scenarios:.0f}")
+        print(f"avg rounds/turn   : {rounds / scenarios:.2f}")
     if _stats["tool_calls"]:
         print("tool call breakdown:")
         for name, count in sorted(_stats["tool_calls"].items(), key=lambda x: -x[1]):
             print(f"  {name:<24} {count}")
+    if TOKEN_LOG_PATH:
+        print(f"per-round log     : {TOKEN_LOG_PATH}")
     print("============================\n")
 
 

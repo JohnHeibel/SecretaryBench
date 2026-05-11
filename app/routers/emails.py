@@ -9,9 +9,13 @@ router = APIRouter(prefix="/emails", tags=["emails"])
 
 
 @router.get("/", response_model=list[Email])
-def list_emails() -> list[Email]:
-    # returns every email in the system (fixture-loaded + agent-sent)
-    return list(store.emails.values())
+def list_emails(scenario_id: int | None = None) -> list[Email]:
+    # returns every email in the system (fixture-loaded + agent-sent), optionally
+    # filtered to a single scenario's chain. The AI lane passes scenario_id to
+    # bound the response — the global list grows monotonically across the run.
+    if scenario_id is None:
+        return list(store.emails.values())
+    return [e for e in store.emails.values() if e.scenario_id == scenario_id]
 
 
 @router.get("/{email_id}", response_model=Email)
