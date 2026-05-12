@@ -176,9 +176,8 @@ def model_interaction_mock(
 ) -> None:
     """Placeholder for the real model call. Sleeps briefly to simulate latency."""
     if verbose:
-        senders = ", ".join(e.sender for e in emails)
-        print(f"  [model] serving {len(emails)} email(s) from {senders} "
-              f"on {sim_date.strftime('%Y-%m-%d')}")
+        import bench_logger as log
+        log.info("model", f"serving {len(emails)} email(s) on {sim_date.strftime('%Y-%m-%d')}")
     time.sleep(0.05)
 
 
@@ -190,6 +189,7 @@ def run_simulation(
     verbose: bool = True,
     model_fn=None,
     scenarios=None,
+    grade_by_scenario: bool = True,
 ) -> dict:
     """Run the full N-day benchmark simulation and return aggregated results."""
     if scenarios is None:
@@ -210,8 +210,8 @@ def run_simulation(
 
 
     if verbose:
-        print(f"Simulation: {len(scenarios)} scenarios over {sim_days} days "
-              f"(start {sim_start.strftime('%Y-%m-%d')})\n")
+        import bench_logger as log
+        log.sim_header(len(scenarios), sim_days, sim_start.strftime("%Y-%m-%d"))
 
     for day in range(sim_days):
         ready = controller.step(day)
@@ -224,8 +224,7 @@ def run_simulation(
             register_scenario(activated, sim_date)
 
         if ready and verbose:
-            print(f"Day {day + 1} ({sim_date.strftime('%Y-%m-%d')}): "
-                  f"{len(ready)} email(s) due")
+            log.day_header(day + 1, sim_date.strftime("%Y-%m-%d"), len(ready))
 
         for email, scenario, idx in ready:
             resolved = apply_date_substitutions(email, sim_date)
@@ -243,7 +242,8 @@ def run_simulation(
         day_max = 0
         for scenario in controller.completed_scenarios_today():
             state = fetch_scenario_results(scenario)
-            result = define_grading_system(scenario, state["calendar"], state["todos"])
+            result = define_grading_system(scenario, state["calendar"], state["todos"],
+                                          grade_by_scenario=grade_by_scenario)
             day_score += result["score"]
             day_max += result["max_score"]
             stype = scenario.scenario_type or "(untyped)"
@@ -252,8 +252,9 @@ def run_simulation(
             bucket["score"] += result["score"]
             bucket["max_score"] += result["max_score"]
             if verbose and result["max_score"] > 0:
-                print(f"  [grader] [{scenario.scenario_type}] {scenario.scenario_id}: "
-                      f"{result['score']}/{result['max_score']}")
+                log.grade_result(scenario.scenario_type, scenario.scenario_id,
+                                 result["score"], result["max_score"],
+                                 details=result.get("details"))
             # Free the persistent model conversation for this scenario — keeps
             # the runner's per-scenario dict from growing unbounded over a run.
             if scenario_completed is not None:
@@ -273,11 +274,10 @@ def run_simulation(
         sim_date += timedelta(days=1)
 
     if verbose:
-        print(f"\nSimulation complete. Total: {total_score}/{total_max}")
         st = controller.status()
-        print(f"Remaining inactive: {st['inactive_count']}, "
-              f"active: {st['active_count']}")
-        _print_type_breakdown(by_type)
+        log.sim_footer(total_score, total_max,
+                       st["inactive_count"], st["active_count"])
+        log.type_breakdown(by_type)
 
     return {
         "total_score": total_score,
@@ -289,24 +289,6 @@ def run_simulation(
     }
 
 
-def _print_type_breakdown(by_type: dict[str, dict[str, int]]) -> None:
-    """Sort by points-lost (max - score) descending so the worst categories
-    are at the top. That's the list to bring to a debugging session — fixing
-    the top row buys the most score."""
-    if not by_type:
-        return
-    rows = []
-    for stype, b in by_type.items():
-        lost = b["max_score"] - b["score"]
-        pct = (100.0 * b["score"] / b["max_score"]) if b["max_score"] else 0.0
-        rows.append((stype, b["count"], b["score"], b["max_score"], lost, pct))
-    rows.sort(key=lambda r: (-r[4], -r[3]))
-
-    print("\n=== score by scenario type ===")
-    print(f"{'type':<10} {'n':>4} {'score':>8} {'max':>8} {'lost':>6} {'pct':>6}")
-    for stype, n, score, mx, lost, pct in rows:
-        print(f"{stype:<10} {n:>4} {score:>8} {mx:>8} {lost:>6} {pct:>5.1f}%")
-    print("==============================\n")
 
 
 # ---------------------------------------------------------------------------

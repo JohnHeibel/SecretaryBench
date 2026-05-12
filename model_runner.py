@@ -700,15 +700,15 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
 
     except Exception as exc:
         _stats["turn_failures"] += 1
-        sys.stderr.write(
-            f"\n[model_runner] FAIL scenario={scenario_id} "
-            f"after {rounds} round(s): {exc}\n"
-        )
+        import bench_logger as blog
         tail = messages[-2:] if len(messages) >= 2 else messages
         try:
-            sys.stderr.write(f"[model_runner] last-messages tail: {tail!r}\n")
+            detail = repr(tail)
         except Exception:
-            pass
+            detail = ""
+        blog.error("model_runner",
+                   f"FAIL scenario={scenario_id} after {rounds} round(s): {exc}",
+                   detail=detail)
         # Roll the persistent chain back to its pre-turn state so the next
         # email in this scenario starts from a valid conversation prefix.
         if CONVERSATION_CONTINUITY:
@@ -756,37 +756,13 @@ def _shutdown() -> None:
 
 
 def _print_summary() -> None:
-    total_calls = sum(_stats["tool_calls"].values())
-    scenarios = _stats["scenarios_run"]
-    rounds = _stats["rounds_total"]
-    in_tok = _stats["input_tokens"]
-    out_tok = _stats["output_tokens"]
-    total_tok = in_tok + out_tok
-
-    print("\n=== model_runner summary ===")
-    print(f"model             : {MODEL_NAME}")
-    print(f"scenarios run     : {scenarios}")
-    print(f"calendars created : {_stats['calendars_created']}")
-    print(f"total tool calls  : {total_calls}")
-    print(f"tool errors       : {_stats['tool_errors']}")
-    print(f"turn failures     : {_stats['turn_failures']}")
-    print(f"api rounds        : {rounds}")
-    print("--- tokens ---")
-    print(f"input             : {in_tok}")
-    print(f"output            : {out_tok}")
-    print(f"total             : {total_tok}")
-    if scenarios:
-        print(f"avg tokens/turn   : {total_tok / scenarios:.0f}")
-        print(f"avg rounds/turn   : {rounds / scenarios:.2f}")
-    if _stats["tool_calls"]:
-        print("tool call breakdown:")
-        for name, count in sorted(_stats["tool_calls"].items(), key=lambda x: -x[1]):
-            print(f"  {name:<24} {count}")
-    if TOKEN_LOG_PATH:
-        print(f"per-round log     : {TOKEN_LOG_PATH}")
-    if TOOL_LOG_PATH:
-        print(f"per-tool log      : {TOOL_LOG_PATH}")
-    print("============================\n")
+    import bench_logger as log
+    log.model_summary(
+        _stats,
+        model_name=MODEL_NAME,
+        token_log=TOKEN_LOG_PATH or "",
+        tool_log=TOOL_LOG_PATH or "",
+    )
 
 
 # atexit is LIFO. We register shutdown FIRST so it runs LAST — that way the
