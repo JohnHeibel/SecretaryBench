@@ -21,6 +21,8 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+token_usage.jsonl
+tool_calls.jsonl
 
 # OS
 .DS_Store
