@@ -77,8 +77,9 @@ _cached_anthropic_tools: list[dict] | None = None
 # Cleared by scenario_completed() once the engine has graded that scenario.
 _scenario_messages: dict[int, list[dict]] = defaultdict(list)
 
-# Flip to "0" to A/B against the legacy fresh-per-turn behavior.
-CONVERSATION_CONTINUITY = os.environ.get("CONVERSATION_CONTINUITY", "0") == "1"
+# Default ON: per-scenario message chain retained across emails. Set
+# CONVERSATION_CONTINUITY=0 to A/B against the legacy fresh-per-turn behavior.
+CONVERSATION_CONTINUITY = os.environ.get("CONVERSATION_CONTINUITY", "1") == "1"
 
 _stats: dict[str, Any] = {
     "scenarios_run": 0,
@@ -102,6 +103,13 @@ SESSION_OPEN_TIMEOUT_S = 30.0
 # Override with TOKEN_LOG_PATH env var; set to empty string to disable.
 TOKEN_LOG_PATH = os.environ.get("TOKEN_LOG_PATH", "token_usage.jsonl")
 _token_log_lock = threading.Lock()
+
+# Per-tool-call audit log; one JSONL row per model tool_use. Lets us answer
+# "which scenario/email called list_emails, with what args?" — the per-round
+# token log only stores a count of tool_uses, not the names. Empty string
+# disables; set TOOL_LOG_PATH=/dev/null to suppress without code change.
+TOOL_LOG_PATH = os.environ.get("TOOL_LOG_PATH", "tool_calls.jsonl")
+_tool_log_lock = threading.Lock()
 
 # Tools the model should NOT see. The MCP server still exposes them (other
 # harnesses keep working); we just don't pass them in the `tools=` list to
@@ -141,12 +149,8 @@ HIDDEN_TOOLS = frozenset({
 # scenario_id hash and the calendar UUID; the benchmark tests "can the model
 # decide what action to take", not "can it copy a number". We let the model
 # pass whatever it wants — we overwrite before submission.
-_FORCE_SCENARIO_ID = frozenset({
-    "create_todo", "create_event", "send_email", "update_event",
-})
-_FORCE_CALENDAR_ID = frozenset({
-    "create_event", "update_event", "list_events", "get_event", "get_calendar",
-})
+_FORCE_SCENARIO_ID = frozenset({"create_todo", "create_event", "send_email"})
+_FORCE_CALENDAR_ID = frozenset({"create_event"})
 
 
 def _record_usage(
@@ -190,6 +194,41 @@ def _record_usage(
         except OSError:
             pass  # logging must never break a run
     return row
+
+
+def _log_tool_call(
+    scenario_id: int,
+    round_idx: int,
+    tool_name: str,
+    raw_args: dict,
+    email_index: int,
+    is_error: bool,
+) -> None:
+    """Append one JSONL row per model tool_use.
+
+    raw_args is the model's UNMODIFIED input (pre force-inject) so the log
+    reflects what the model actually decided to pass. email_index is 1-based
+    within the scenario: 1 = first email (no prior chain context, so
+    list_emails is plausibly legit), 2+ = follow-up email (chain already
+    holds prior context, so list_emails is likely redundant).
+    """
+    if not TOOL_LOG_PATH:
+        return
+    line = json.dumps({
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "scenario_id": scenario_id,
+        "round": round_idx,
+        "tool_name": tool_name,
+        "args": raw_args,
+        "email_index": email_index,
+        "is_error": is_error,
+        "continuity": CONVERSATION_CONTINUITY,
+    })
+    try:
+        with _tool_log_lock, open(TOOL_LOG_PATH, "a") as f:
+            f.write(line + "\n")
+    except OSError:
+        pass  # logging must never break a run
 
 
 def _inject_keys(name: str, args: dict, scenario_id: int, calendar_id: str) -> dict:
@@ -527,6 +566,14 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
     _pre_turn_len = len(messages)
     messages.append({"role": "user", "content": user_msg})
 
+    # 1-based index of this email within the scenario chain. Each preamble+body
+    # we append is a string-content user message; tool_result user messages
+    # carry a list. So count string-content user messages to get the email
+    # position. With continuity OFF this is always 1.
+    email_index = sum(
+        1 for m in messages if m["role"] == "user" and isinstance(m["content"], str)
+    )
+
     deadline = time.monotonic() + PER_TURN_TIMEOUT_S
     rounds = 0
 
@@ -577,8 +624,10 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
             tool_results = []
             for tu in tool_uses:
                 _stats["tool_calls"][tu.name] += 1
+                raw_args = dict(tu.input)  # snapshot the model's view pre-inject
                 remaining = max(1.0, deadline - time.monotonic())
-                args = _inject_keys(tu.name, dict(tu.input), scenario_id, calendar_id)
+                args = _inject_keys(tu.name, raw_args, scenario_id, calendar_id)
+                call_failed = False
                 try:
                     content, is_error = _run_async(
                         _call_tool_async(tu.name, args),
@@ -587,9 +636,19 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
                 except Exception as exc:
                     _stats["tool_errors"] += 1
                     content = json.dumps({"error": str(exc)})
+                    call_failed = True
                 else:
                     if is_error:
                         _stats["tool_errors"] += 1
+                        call_failed = True
+                _log_tool_call(
+                    scenario_id=scenario_id,
+                    round_idx=rounds,
+                    tool_name=tu.name,
+                    raw_args=raw_args,
+                    email_index=email_index,
+                    is_error=call_failed,
+                )
                 tool_results.append({
                     "type": "tool_result",
                     "tool_use_id": tu.id,
