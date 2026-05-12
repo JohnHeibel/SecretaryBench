@@ -4,6 +4,7 @@ import calendar as _calendar
 import re
 import sys
 import time
+from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -200,6 +201,12 @@ def run_simulation(
     total_score = 0
     total_max = 0
     daily_log: list[dict] = []
+    # Per-scenario-type breakdown so we can see which categories the model
+    # handles well vs poorly. Same shape across model swaps, so a Haiku vs
+    # Sonnet comparison is just diffing two of these.
+    by_type: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"count": 0, "score": 0, "max_score": 0}
+    )
 
 
     if verbose:
@@ -239,6 +246,11 @@ def run_simulation(
             result = define_grading_system(scenario, state["calendar"], state["todos"])
             day_score += result["score"]
             day_max += result["max_score"]
+            stype = scenario.scenario_type or "(untyped)"
+            bucket = by_type[stype]
+            bucket["count"] += 1
+            bucket["score"] += result["score"]
+            bucket["max_score"] += result["max_score"]
             if verbose and result["max_score"] > 0:
                 print(f"  [grader] [{scenario.scenario_type}] {scenario.scenario_id}: "
                       f"{result['score']}/{result['max_score']}")
@@ -265,14 +277,36 @@ def run_simulation(
         st = controller.status()
         print(f"Remaining inactive: {st['inactive_count']}, "
               f"active: {st['active_count']}")
+        _print_type_breakdown(by_type)
 
     return {
         "total_score": total_score,
         "total_max": total_max,
         "daily_log": daily_log,
+        "by_type": dict(by_type),
         "remaining_inactive": len(controller.inactive_pool),
         "remaining_active": len(controller.active_pool),
     }
+
+
+def _print_type_breakdown(by_type: dict[str, dict[str, int]]) -> None:
+    """Sort by points-lost (max - score) descending so the worst categories
+    are at the top. That's the list to bring to a debugging session — fixing
+    the top row buys the most score."""
+    if not by_type:
+        return
+    rows = []
+    for stype, b in by_type.items():
+        lost = b["max_score"] - b["score"]
+        pct = (100.0 * b["score"] / b["max_score"]) if b["max_score"] else 0.0
+        rows.append((stype, b["count"], b["score"], b["max_score"], lost, pct))
+    rows.sort(key=lambda r: (-r[4], -r[3]))
+
+    print("\n=== score by scenario type ===")
+    print(f"{'type':<10} {'n':>4} {'score':>8} {'max':>8} {'lost':>6} {'pct':>6}")
+    for stype, n, score, mx, lost, pct in rows:
+        print(f"{stype:<10} {n:>4} {score:>8} {mx:>8} {lost:>6} {pct:>5.1f}%")
+    print("==============================\n")
 
 
 # ---------------------------------------------------------------------------
