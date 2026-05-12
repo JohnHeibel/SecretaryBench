@@ -13,6 +13,13 @@ from loader import load_scenarios, Email, Scenario
 from flow_controller import FlowController
 from grader import define_grading_system
 from pipeline import register_scenario, fetch_scenario_results, scenario_str_to_int
+from app.models.calendar import CalendarResponse
+
+
+# Mirrors grader._NO_ACTION. Used to override the per-email grade when the AI
+# took a destructive action (delete_*) that doesn't appear in the added/modified
+# diff — the grader's len(items)==0 check would otherwise falsely pass.
+_NO_ACTION_RE = re.compile(r"no\s*action", re.IGNORECASE)
 
 # Bridge to Person 3's model runner. The agreed-on signature is
 #   run_model_turn(email: Email, sim_date: datetime) -> None
@@ -181,6 +188,93 @@ def model_interaction_mock(
     time.sleep(0.05)
 
 
+def _state_diff(before: dict, after: dict) -> dict:
+    """Compute added/removed/modified todos and events between two snapshots.
+
+    Both inputs are the dict returned by fetch_scenario_results — {"calendar":
+    CalendarResponse, "todos": list[TodoResponse]}. Items are identified by
+    `id` (todos) and `event_id` (events). Modified = same id, different
+    serialized content.
+
+    With the current tool surface (create/update/delete all visible), all three
+    operations need to be detected to attribute a single email's effect.
+    """
+    before_todos = {t.id: t for t in before["todos"]}
+    after_todos = {t.id: t for t in after["todos"]}
+    before_events = {e.event_id: e for e in before["calendar"].events}
+    after_events = {e.event_id: e for e in after["calendar"].events}
+
+    added_todos = [t for tid, t in after_todos.items() if tid not in before_todos]
+    removed_todos = [t for tid, t in before_todos.items() if tid not in after_todos]
+    modified_todos = [t for tid, t in after_todos.items()
+                      if tid in before_todos
+                      and t.model_dump() != before_todos[tid].model_dump()]
+
+    added_events = [e for eid, e in after_events.items() if eid not in before_events]
+    removed_events = [e for eid, e in before_events.items() if eid not in after_events]
+    modified_events = [e for eid, e in after_events.items()
+                       if eid in before_events
+                       and e.model_dump() != before_events[eid].model_dump()]
+
+    return {
+        "added_todos": added_todos,
+        "removed_todos": removed_todos,
+        "modified_todos": modified_todos,
+        "added_events": added_events,
+        "removed_events": removed_events,
+        "modified_events": modified_events,
+    }
+
+
+def _diff_took_action(diff: dict) -> bool:
+    return any((
+        diff["added_todos"], diff["removed_todos"], diff["modified_todos"],
+        diff["added_events"], diff["removed_events"], diff["modified_events"],
+    ))
+
+
+def _grade_email_against_diff(
+    email: Email, before: dict, after: dict
+) -> dict:
+    """Grade one email's success_criteria against the items the AI created or
+    modified during that email's turn.
+
+    Why diff-based: the calendar/todos store is cumulative within a scenario,
+    so naive grading at email-N time would let earlier emails' actions falsely
+    satisfy or falsely violate email-N's criteria. The diff isolates this turn.
+
+    Removed items intentionally don't appear in the synthetic state passed to
+    the grader (the grader's content/date checks don't have a sensible reading
+    for "was deleted"). They DO show up via _diff_took_action — used below to
+    override "No action" grades when the AI deleted something.
+    """
+    diff = _state_diff(before, after)
+    synthetic_calendar = CalendarResponse(
+        calendar_id="diff",
+        start_date=after["calendar"].start_date,
+        events=diff["added_events"] + diff["modified_events"],
+    )
+    synthetic_todos = diff["added_todos"] + diff["modified_todos"]
+
+    result = define_grading_system(
+        email, synthetic_calendar, synthetic_todos, grade_by_scenario=False
+    )
+
+    # If the AI took ANY action (including a delete that's invisible in the
+    # synthetic state), flip any "No action" sub-criteria that the grader
+    # incorrectly passed. Then recompute score.
+    if _diff_took_action(diff):
+        flipped = False
+        for d in result["details"]:
+            if d["passed"] and _NO_ACTION_RE.search(d["criteria"]):
+                d["passed"] = False
+                flipped = True
+        if flipped:
+            result["score"] = sum(1 for d in result["details"] if d["passed"])
+
+    return result
+
+
 def run_simulation(
     path: str = "Emails.xlsx",
     sim_days: int = SIM_DAYS,
@@ -200,11 +294,19 @@ def run_simulation(
     sim_date = sim_start
     total_score = 0
     total_max = 0
+    email_total_score = 0
+    email_total_max = 0
     daily_log: list[dict] = []
     # Per-scenario-type breakdown so we can see which categories the model
     # handles well vs poorly. Same shape across model swaps, so a Haiku vs
     # Sonnet comparison is just diffing two of these.
     by_type: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"count": 0, "score": 0, "max_score": 0}
+    )
+    # Parallel breakdown for per-email grading. Same shape; "count" here is
+    # the number of emails graded (vs scenarios in by_type), so it'll be
+    # higher.
+    by_type_email: dict[str, dict[str, int]] = defaultdict(
         lambda: {"count": 0, "score": 0, "max_score": 0}
     )
 
@@ -228,6 +330,12 @@ def run_simulation(
 
         for email, scenario, idx in ready:
             resolved = apply_date_substitutions(email, sim_date)
+
+            # Snapshot state BEFORE the model acts, so we can diff and attribute
+            # what changed to this email specifically (not to earlier emails
+            # in the chain).
+            state_before = fetch_scenario_results(scenario)
+
             if model_fn is not None:
                 model_fn(resolved, sim_date)
             elif _HAS_MODEL_RUNNER:
@@ -235,7 +343,27 @@ def run_simulation(
                                scenario_id=scenario_str_to_int(scenario.scenario_id))
             else:
                 model_interaction_mock([resolved], sim_date, verbose=verbose)
-            controller.mark_served(scenario.scenario_id, idx)
+
+            # Grade THIS email against the diff before the controller advances
+            # state. Skip silently when the email has no criteria — common for
+            # informational chain links that don't define their own pass/fail.
+            if resolved.success_criteria:
+                state_after = fetch_scenario_results(scenario)
+                email_result = _grade_email_against_diff(
+                    resolved, state_before, state_after
+                )
+                email_total_score += email_result["score"]
+                email_total_max += email_result["max_score"]
+                stype = scenario.scenario_type or "(untyped)"
+                eb = by_type_email[stype]
+                eb["count"] += 1
+                eb["score"] += email_result["score"]
+                eb["max_score"] += email_result["max_score"]
+
+            controller.mark_served(
+                scenario.scenario_id, idx,
+                day=day, sim_date=sim_date.strftime("%Y-%m-%d"),
+            )
 
         # Grade scenarios that completed today (per-scenario, matches grader design)
         day_score = 0
@@ -276,14 +404,22 @@ def run_simulation(
     if verbose:
         st = controller.status()
         log.sim_footer(total_score, total_max,
-                       st["inactive_count"], st["active_count"])
-        log.type_breakdown(by_type)
+                       st["inactive_count"], st["active_count"],
+                       email_score=email_total_score,
+                       email_max=email_total_max)
+        log.type_breakdown(by_type, title="Score Breakdown by Type (per scenario)")
+        if email_total_max:
+            log.type_breakdown(by_type_email,
+                               title="Score Breakdown by Type (per email)")
 
     return {
         "total_score": total_score,
         "total_max": total_max,
+        "email_score": email_total_score,
+        "email_max": email_total_max,
         "daily_log": daily_log,
         "by_type": dict(by_type),
+        "by_type_email": dict(by_type_email),
         "remaining_inactive": len(controller.inactive_pool),
         "remaining_active": len(controller.active_pool),
     }

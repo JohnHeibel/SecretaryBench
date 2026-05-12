@@ -10,9 +10,11 @@ Colour is auto-disabled when stdout is not a TTY (piped / redirected).
 
 from __future__ import annotations
 
+import json
 import os
 import sys
-from datetime import datetime
+import threading
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -156,8 +158,15 @@ def day_summary(day_num: int, score: int, max_score: int) -> None:
 
 
 def sim_footer(total_score: int, total_max: int,
-               inactive: int, active: int) -> None:
-    """Print the simulation completion banner."""
+               inactive: int, active: int,
+               email_score: int = 0, email_max: int = 0) -> None:
+    """Print the simulation completion banner.
+
+    The scenario-level score (total_score/total_max) is the headline. The
+    email-level score, when provided, prints on a second line for contrast —
+    a scenario can score 1/1 with email failures, or 0/1 with most emails
+    correct, and the gap is diagnostically useful.
+    """
     pct = (100.0 * total_score / total_max) if total_max else 0.0
     color = _GRN if pct >= 80 else _YLW if pct >= 50 else _RED
 
@@ -165,14 +174,19 @@ def sim_footer(total_score: int, total_max: int,
     print(_box_top(W))
     print(_box_row(f"{_BOLD}{_CYN}Simulation Complete{_RST}", W))
     print(_box_sep(W))
-    print(_box_row(f"{_DIM}score     :{_RST}  {color}{_BOLD}{total_score}/{total_max}{_RST}  {_DIM}({pct:.1f}%){_RST}", W))
+    print(_box_row(f"{_DIM}scenario  :{_RST}  {color}{_BOLD}{total_score}/{total_max}{_RST}  {_DIM}({pct:.1f}%){_RST}", W))
+    if email_max:
+        epct = 100.0 * email_score / email_max
+        ecolor = _GRN if epct >= 80 else _YLW if epct >= 50 else _RED
+        print(_box_row(f"{_DIM}per-email :{_RST}  {ecolor}{_BOLD}{email_score}/{email_max}{_RST}  {_DIM}({epct:.1f}%){_RST}", W))
     print(_box_row(f"{_DIM}remaining :{_RST}  {_WHT}{inactive}{_RST} inactive  {_WHT}{active}{_RST} active", W))
     print(_box_row(f"{_DIM}end       :{_RST}  {_WHT}{_ts()}{_RST}", W))
     print(_box_bot(W))
     print()
 
 
-def type_breakdown(by_type: dict[str, dict[str, int]]) -> None:
+def type_breakdown(by_type: dict[str, dict[str, int]],
+                   title: str = "Score Breakdown by Type") -> None:
     """Print a score-by-scenario-type table, sorted worst-first."""
     if not by_type:
         return
@@ -192,7 +206,7 @@ def type_breakdown(by_type: dict[str, dict[str, int]]) -> None:
     hdr_pct   = f"{_BOLD}{'pct':>7}{_RST}"
 
     print(_box_top(W))
-    print(_box_row(f"{_BOLD}{_CYN}Score Breakdown by Type{_RST}", W))
+    print(_box_row(f"{_BOLD}{_CYN}{title}{_RST}", W))
     print(_box_sep(W))
     print(_box_row(f"{hdr_type} {hdr_n} {hdr_score} {hdr_max} {hdr_lost} {hdr_pct}", W))
     print(_box_sep(W))
@@ -287,3 +301,61 @@ def info(component: str, msg: str) -> None:
     """Log an info message."""
     prefix = f"{_BLU}INFO{_RST}  {_DIM}[{component}]{_RST}"
     print(f"{prefix} {msg}")
+
+
+# ── Delivery log (JSONL) ─────────────────────────────────────────────────
+
+# Path for the email-delivery JSONL log. Naming matches Miguel's
+# token_usage.jsonl / tool_calls.jsonl pattern. Empty string disables.
+DELIVERY_LOG_PATH = os.environ.get("DELIVERY_LOG_PATH", "delivery_log.jsonl")
+_delivery_log_lock = threading.Lock()
+
+
+def log_delivery(entry: dict) -> None:
+    """Append one row to the delivery JSONL log. Lock-guarded for parallel runs.
+
+    Failures are swallowed — logging must never break a benchmark run.
+    """
+    if not DELIVERY_LOG_PATH:
+        return
+    row = {"ts": datetime.now(timezone.utc).isoformat(), **entry}
+    try:
+        with _delivery_log_lock, open(DELIVERY_LOG_PATH, "a") as f:
+            f.write(json.dumps(row) + "\n")
+    except OSError:
+        pass
+
+
+# ── Pool transition trace ────────────────────────────────────────────────
+#
+# Off by default — verbose runs already print plenty. Set BENCH_TRACE_POOL=1
+# to get a play-by-play of inactive->active->ready->served transitions. ~280
+# extra lines per full run; useful for diagnosing scheduling bugs.
+
+_TRACE_POOL = os.environ.get("BENCH_TRACE_POOL", "") == "1"
+
+
+def pool_activate(scenario_type: str, scenario_id: str, day: int) -> None:
+    """One-line trace when a scenario moves inactive -> active."""
+    if not _TRACE_POOL:
+        return
+    print(f"      {_DIM}{_V} pool   activate {_RST}{_MAG}{scenario_type}{_RST} "
+          f"{scenario_id} {_DIM}(day {day}){_RST}")
+
+
+def pool_email_ready(scenario_type: str, scenario_id: str,
+                     email_idx: int, total: int, day: int) -> None:
+    """One-line trace when an email transitions to READY_TO_SERVE."""
+    if not _TRACE_POOL:
+        return
+    print(f"      {_DIM}{_V} pool   ready    {_RST}{_MAG}{scenario_type}{_RST} "
+          f"{scenario_id} {_DIM}email {email_idx}/{total} (day {day}){_RST}")
+
+
+def pool_email_served(scenario_type: str, scenario_id: str,
+                      email_idx: int, total: int, day: int) -> None:
+    """One-line trace when an email transitions to SERVED."""
+    if not _TRACE_POOL:
+        return
+    print(f"      {_DIM}{_V} pool   served   {_RST}{_MAG}{scenario_type}{_RST} "
+          f"{scenario_id} {_DIM}email {email_idx}/{total} (day {day}){_RST}")

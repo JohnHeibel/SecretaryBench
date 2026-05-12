@@ -117,6 +117,8 @@ python -m pytest tests/ -v
 | `test_emails.py` | 8 | Email read/write, ID assignment |
 | `test_scenarios.py` | 18 | Scenario lifecycle, email attachment |
 | `test_e2e.py` | 2 | Full simulation with stubbed AI — perfect stub scores max, bad stub scores zero |
+| `test_flow_controller_pools.py` | 7 | Completed-pool retention, cross-pool accessors, delivery log + JSONL persistence |
+| `test_engine_email_grading.py` | 11 | State-diff helpers, per-email "No action" override on delete, isolation from prior-email actions |
 
 ---
 
@@ -209,10 +211,12 @@ Scheduled across 100 days (chain-order enforced, capped to fit)
 Daily loop:
     activate scenario → pipeline.register_scenario() seeds the store
     serve email       → model_runner.run_model_turn() calls Claude via MCP
+    each email       → before/after store snapshots → grade against the diff
+                      → controller.mark_served() also appends to delivery_log.jsonl
     all emails served → pipeline.fetch_scenario_results() pulls todos/events
                       → grader.define_grading_system() scores the scenario
     ↓
-Aggregated results: total_score / total_max + daily log
+Aggregated results: scenario score + per-email score + by-type breakdowns + daily log
 ```
 
 See `docs/ENGINE.md` for the full breakdown.

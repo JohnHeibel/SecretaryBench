@@ -109,6 +109,14 @@ class FlowController:
     def __init__(self, scenarios: list[Scenario], seed: Optional[int] = None):
         self.inactive_pool: list[Scenario] = list(scenarios)
         self.active_pool: list[ActiveScenario] = []
+        # Scenarios that finished delivering all emails. Kept around (instead of
+        # discarded) so served_emails() can report the full historical record.
+        # Per-scenario state is small (a list of bools + offsets) so growing
+        # linearly with the run is fine.
+        self.completed_pool: list[ActiveScenario] = []
+        # Append-only record of every delivery event. Populated by mark_served().
+        # See bench_logger.log_delivery() for the JSONL mirror on disk.
+        self.delivery_log: list[dict] = []
         self._schedule: dict[int, list[Scenario]] = {}
         self._just_completed: list[Scenario] = []
         self._just_activated: list[ActiveScenario] = []
@@ -147,6 +155,11 @@ class FlowController:
             max(0, self._total_days - 1 - day) if self._total_days else None
         )
 
+        try:
+            import bench_logger as _bl
+        except ImportError:
+            _bl = None  # type: ignore
+
         # Activate today's scheduled scenarios
         for scenario in self._schedule.get(day, []):
             if scenario in self.inactive_pool:
@@ -161,12 +174,19 @@ class FlowController:
             )
             self.active_pool.append(active)
             self._just_activated.append(active)
+            if _bl is not None:
+                _bl.pool_activate(scenario.scenario_type, scenario.scenario_id, day)
 
         # Collect emails due today
         ready: list[tuple[Email, Scenario, int]] = []
         for active in self.active_pool:
             for idx, email in active.emails_due(day):
                 ready.append((email, active.scenario, idx))
+                if _bl is not None:
+                    _bl.pool_email_ready(
+                        active.scenario.scenario_type, active.scenario.scenario_id,
+                        idx + 1, len(active.scenario.emails), day,
+                    )
 
         return ready
 
@@ -178,18 +198,51 @@ class FlowController:
         """
         return [a.scenario for a in self._just_activated]
 
-    def mark_served(self, scenario_id: str, email_index: int) -> None:
+    def mark_served(
+        self,
+        scenario_id: str,
+        email_index: int,
+        day: Optional[int] = None,
+        sim_date: Optional[str] = None,
+    ) -> None:
         """Engine calls this after delivering an email. Advances chain state.
 
-        If the scenario completes (all emails served), it is removed from the
-        active pool and queued for grading via `completed_scenarios_today`.
+        If the scenario completes (all emails served), it is moved from the
+        active pool to the completed pool (not discarded) and queued for
+        grading via `completed_scenarios_today`.
+
+        `day` and `sim_date` are optional metadata recorded into delivery_log
+        when provided. Callers without that context can omit them.
         """
         for active in self.active_pool:
             if active.scenario.scenario_id == scenario_id:
+                entry = {
+                    "scenario_id": scenario_id,
+                    "scenario_type": active.scenario.scenario_type,
+                    "email_index": email_index,
+                    "email_number": active.scenario.emails[email_index].email_number,
+                    "day": day,
+                    "sim_date": sim_date,
+                }
+                self.delivery_log.append(entry)
+                # Lazy import: keeps flow_controller.py importable without
+                # bench_logger present (e.g., in test environments that stub
+                # logging). Also avoids a circular import risk.
+                try:
+                    import bench_logger as _bl
+                    _bl.log_delivery(entry)
+                    _bl.pool_email_served(
+                        active.scenario.scenario_type, scenario_id,
+                        email_index + 1, len(active.scenario.emails),
+                        day if day is not None else -1,
+                    )
+                except ImportError:
+                    pass
                 active.mark_email_served(email_index)
                 if active.is_complete:
                     self._just_completed.append(active.scenario)
                     self.active_pool.remove(active)
+                    self.completed_pool.append(active)
                 return
 
     def completed_scenarios_today(self) -> list[Scenario]:
@@ -199,6 +252,71 @@ class FlowController:
         serving all of today's emails to know which scenarios to grade.
         """
         return list(self._just_completed)
+
+    # --- Cross-pool accessors -----------------------------------------------
+
+    def served_emails(self) -> list[tuple[Scenario, int, Email]]:
+        """Every email delivered to the model so far, across active and
+        completed scenarios. Order is pool-walking order (active first, then
+        completed); within each scenario the emails are in chain order."""
+        out: list[tuple[Scenario, int, Email]] = []
+        for active in self.active_pool + self.completed_pool:
+            for i, served in enumerate(active.served):
+                if served:
+                    out.append((active.scenario, i, active.scenario.emails[i]))
+        return out
+
+    def pending_emails(
+        self, current_day: Optional[int] = None
+    ) -> list[tuple[Scenario, int, Email, EmailState]]:
+        """Every email not yet served. Includes READY_TO_SERVE (chain-order
+        reached, waiting on the engine to pick up today) and AWAITING_SERVE
+        (chain-order not yet reached).
+
+        `current_day` is needed to compute READY vs AWAITING. Without it,
+        every unserved email is reported with AWAITING_SERVE as a safe default.
+        """
+        out: list[tuple[Scenario, int, Email, EmailState]] = []
+        for active in self.active_pool:
+            if current_day is not None:
+                states = active.email_states(current_day)
+            else:
+                states = {i: EmailState.AWAITING_SERVE
+                          for i in range(len(active.scenario.emails))}
+            for i, served in enumerate(active.served):
+                if not served:
+                    out.append((active.scenario, i, active.scenario.emails[i],
+                                states[i]))
+        return out
+
+    def inactive_scenarios(self) -> list[Scenario]:
+        """Scenarios not yet activated. Convenience wrapper over inactive_pool."""
+        return list(self.inactive_pool)
+
+    def active_scenarios(self) -> list[ActiveScenario]:
+        """Scenarios currently being delivered. Convenience wrapper."""
+        return list(self.active_pool)
+
+    def completed_scenarios(self) -> list[ActiveScenario]:
+        """Scenarios that have finished delivering all emails. Survives grading."""
+        return list(self.completed_pool)
+
+    def in_flight_today(
+        self, current_day: int
+    ) -> list[tuple[Scenario, int, Email]]:
+        """Emails currently ready to serve today but not yet marked served.
+
+        Useful at debug time to answer "what's pending right now in the loop?"
+        between `step()` returning the batch and the engine calling
+        `mark_served()` for each entry.
+        """
+        out: list[tuple[Scenario, int, Email]] = []
+        for active in self.active_pool:
+            states = active.email_states(current_day)
+            for i, state in states.items():
+                if state == EmailState.READY_TO_SERVE:
+                    out.append((active.scenario, i, active.scenario.emails[i]))
+        return out
 
     def status(self, day: Optional[int] = None) -> dict:
         """Pool snapshot for logging."""
