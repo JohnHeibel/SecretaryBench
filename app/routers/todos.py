@@ -50,9 +50,13 @@ def create_todo(payload: TodoCreate) -> TodoResponse:
 
 
 @router.get("/", response_model=list[TodoResponse])
-def list_todos() -> list[TodoResponse]:
-    # returns every todo across all scenarios
-    return list(store.todos_db.values())
+def list_todos(scenario_id: int | None = None) -> list[TodoResponse]:
+    # Optional scenario_id filter — matches the list_emails pattern. Without
+    # it the AI lane would see every todo from every scenario the run has
+    # ever processed, which bloats prompts and confuses small models.
+    if scenario_id is None:
+        return list(store.todos_db.values())
+    return [t for t in store.todos_db.values() if t.scenario_id == scenario_id]
 
 
 @router.get("/{todo_id}", response_model=TodoResponse)

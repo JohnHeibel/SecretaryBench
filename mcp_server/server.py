@@ -46,9 +46,10 @@ def health_check() -> dict:
 # --- Todos ---
 
 @mcp.tool()
-def list_todos() -> list[dict]:
-    """List every todo across all scenarios."""
-    return _call("GET", "/todos/")
+def list_todos(scenario_id: int | None = None) -> list[dict]:
+    """List todos. Pass scenario_id to get only that scenario's todos (recommended — the global list grows over the run)."""
+    params = {"scenario_id": scenario_id} if scenario_id is not None else None
+    return _call("GET", "/todos/", params=params)
 
 
 @mcp.tool()

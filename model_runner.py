@@ -113,30 +113,26 @@ _tool_log_lock = threading.Lock()
 # harnesses keep working); we just don't pass them in the `tools=` list to
 # the model.
 #
-# The benchmark is one-shot email triage: the model sees ONE email and decides
-# what to write. It never needs to read or modify prior state on its own — the
-# only legitimate read is list_emails (for chain context on follow-up emails).
-# Everything else is either admin/destructive (would corrupt the benchmark) or
-# read/update tools the AI doesn't need for this task. Trimming the tool
-# surface keeps the tool-schema block sent each turn small.
+# Design intent: the model sees the same surface a real secretary would have
+# — write (create_*), modify (update_*), delete (delete_*), read (list_*,
+# get_*), reply (send_email). The benchmark measures whether the model can
+# handle reschedules, updates, conflict-avoidance, and duplicate-correction —
+# not just creation — so trimming the surface would understate capability.
+#
+# Hidden categories:
+#   - admin: would let the model corrupt the benchmark harness itself.
+#   - engine-internal: scenario/email metadata is injected into the user
+#     message preamble already, so exposing the read endpoints just gives
+#     the model rope to waste a round fetching what it already has.
 HIDDEN_TOOLS = frozenset({
-    # admin / destructive — corrupt the benchmark
+    # admin — corrupt the benchmark
     "create_scenario",
     "delete_scenario",
     "add_scenario_email",
     "create_calendar",
     "delete_calendar",
-    "delete_todo",
-    "delete_event",
     "health_check",
-    # read/update tools the one-shot triage AI doesn't need
-    "list_todos",
-    "get_todo",
-    "update_todo",
-    "get_calendar",
-    "list_events",
-    "get_event",
-    "update_event",
+    # engine-internal — not the model's concern
     "get_email",
     "list_scenarios",
     "get_scenario",
@@ -147,8 +143,15 @@ HIDDEN_TOOLS = frozenset({
 # scenario_id hash and the calendar UUID; the benchmark tests "can the model
 # decide what action to take", not "can it copy a number". We let the model
 # pass whatever it wants — we overwrite before submission.
-_FORCE_SCENARIO_ID = frozenset({"create_todo", "create_event", "send_email"})
-_FORCE_CALENDAR_ID = frozenset({"create_event"})
+_FORCE_SCENARIO_ID = frozenset({"create_todo", "create_event", "update_event", "send_email", "list_todos"})
+_FORCE_CALENDAR_ID = frozenset({
+    "create_event",
+    "update_event",
+    "delete_event",
+    "list_events",
+    "get_event",
+    "get_calendar",
+})
 
 
 def _record_usage(
@@ -190,6 +193,33 @@ def _record_usage(
     return row
 
 
+def _measure_response(content: str) -> tuple[int, int]:
+    """Return (response_bytes, response_items) for a tool response payload.
+
+    response_items counts list items if the payload is a JSON list, or the
+    nested events/todos array if it's a dict (get_calendar shape). 0 otherwise.
+    Used to detect when list_* responses start growing past the point where
+    they cause prompt-bloat or model confusion — see Phase 0 of the scaling
+    plan. We do NOT touch the content itself; this is read-only measurement.
+    """
+    response_bytes = len(content) if isinstance(content, str) else 0
+    response_items = 0
+    try:
+        parsed = json.loads(content)
+    except (json.JSONDecodeError, ValueError, TypeError):
+        return response_bytes, 0
+    if isinstance(parsed, list):
+        response_items = len(parsed)
+    elif isinstance(parsed, dict):
+        # get_calendar returns {"calendar_id": ..., "events": [...]} etc.
+        for key in ("events", "todos"):
+            value = parsed.get(key)
+            if isinstance(value, list):
+                response_items = len(value)
+                break
+    return response_bytes, response_items
+
+
 def _log_tool_call(
     scenario_id: int,
     round_idx: int,
@@ -197,6 +227,8 @@ def _log_tool_call(
     raw_args: dict,
     email_index: int,
     is_error: bool,
+    response_bytes: int = 0,
+    response_items: int = 0,
 ) -> None:
     """Append one JSONL row per model tool_use.
 
@@ -205,6 +237,10 @@ def _log_tool_call(
     within the scenario: 1 = first email (no prior chain context, so
     list_emails is plausibly legit), 2+ = follow-up email (chain already
     holds prior context, so list_emails is likely redundant).
+
+    response_bytes / response_items capture how big the tool's response was
+    so we can detect when list_* calls start returning enough data to bloat
+    the next round's prompt — the trigger for restoring get_by_id as primary.
     """
     if not TOOL_LOG_PATH:
         return
@@ -216,6 +252,8 @@ def _log_tool_call(
         "args": raw_args,
         "email_index": email_index,
         "is_error": is_error,
+        "response_bytes": response_bytes,
+        "response_items": response_items,
         "continuity": CONVERSATION_CONTINUITY,
     })
     try:
@@ -348,8 +386,17 @@ async def _call_tool_async(name: str, args: dict) -> tuple[str, bool]:
 _MODEL_TOOL_DESCRIPTIONS = {
     "create_todo": "Create a todo. due_date is ISO 8601 with timezone.",
     "create_event": "Create a calendar event. start/end are ISO 8601 with timezone; end > start.",
+    "update_todo": "Modify an existing todo by UUID. Partial — only pass fields you want to change.",
+    "update_event": "Modify an existing event by UUID. Full replace — pass every field (title, start, end, scenario_id), not just changed ones.",
+    "delete_todo": "Delete a todo by UUID. Use ONLY to remove a duplicate you just created by mistake.",
+    "delete_event": "Delete an event by UUID. Use ONLY to remove a duplicate you just created by mistake.",
     "send_email": "Send a reply email.",
     "list_emails": "List emails for the current scenario. ALWAYS pass scenario_id — the unfiltered list grows huge.",
+    "list_todos": "List todos for the current scenario. ALWAYS pass scenario_id — the unfiltered list grows huge.",
+    "list_events": "List events on the shared calendar.",
+    "get_calendar": "Fetch the shared calendar with all its events.",
+    "get_todo": "Fetch one todo by UUID.",
+    "get_event": "Fetch one event by UUID.",
 }
 
 
@@ -452,7 +499,9 @@ TOOLS:
 - create_todo: principal must track a task with a deadline.
 - create_event: a time-blocked meeting/call is proposed or confirmed.
 - send_email: a direct question is asked or a response is explicitly requested.
-- list_emails(scenario_id=...): ONLY when the email is a follow-up ("as discussed", "circling back") needing prior context. Always pass scenario_id.
+- update_todo / update_event: an email modifies something you ALREADY created earlier in this scenario. Reschedules use update_event — never delete-then-create.
+- delete_todo / delete_event: ONLY to undo a duplicate you just created by mistake. Never to "reschedule" or "cancel" — use update_* for changes; for cancellations the email just doesn't need any action.
+- list_emails / list_todos / list_events / get_calendar / get_todo / get_event: ONLY when you need state you don't already remember from this conversation. Prefer NOT to call — you usually remember what you wrote.
 - (no tool): FYI / newsletter / auto-confirmation / marketing / status update.
 
 When in doubt, do nothing. Over-acting is the most common failure.
@@ -625,6 +674,7 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
                     if is_error:
                         _stats["tool_errors"] += 1
                         call_failed = True
+                response_bytes, response_items = _measure_response(content)
                 _log_tool_call(
                     scenario_id=scenario_id,
                     round_idx=rounds,
@@ -632,6 +682,8 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
                     raw_args=raw_args,
                     email_index=email_index,
                     is_error=call_failed,
+                    response_bytes=response_bytes,
+                    response_items=response_items,
                 )
                 tool_results.append({
                     "type": "tool_result",
