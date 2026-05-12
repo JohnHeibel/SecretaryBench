@@ -90,8 +90,6 @@ _stats: dict[str, Any] = {
     "rounds_total": 0,
     "input_tokens": 0,
     "output_tokens": 0,
-    "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 0,
 }
 
 MODEL_NAME = "claude-haiku-4-5"
@@ -120,7 +118,7 @@ _tool_log_lock = threading.Lock()
 # only legitimate read is list_emails (for chain context on follow-up emails).
 # Everything else is either admin/destructive (would corrupt the benchmark) or
 # read/update tools the AI doesn't need for this task. Trimming the tool
-# surface keeps the cached/sent tool-schema block small.
+# surface keeps the tool-schema block sent each turn small.
 HIDDEN_TOOLS = frozenset({
     # admin / destructive — corrupt the benchmark
     "create_scenario",
@@ -167,13 +165,9 @@ def _record_usage(
     row = {
         "input_tokens": getattr(usage, "input_tokens", 0) or 0,
         "output_tokens": getattr(usage, "output_tokens", 0) or 0,
-        "cache_creation_input_tokens": getattr(usage, "cache_creation_input_tokens", 0) or 0,
-        "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
     }
     _stats["input_tokens"] += row["input_tokens"]
     _stats["output_tokens"] += row["output_tokens"]
-    _stats["cache_creation_input_tokens"] += row["cache_creation_input_tokens"]
-    _stats["cache_read_input_tokens"] += row["cache_read_input_tokens"]
     _stats["rounds_total"] += 1
 
     if TOKEN_LOG_PATH:
@@ -385,10 +379,8 @@ def _minify_schema(schema: dict) -> dict:
 
 
 def _get_anthropic_tools() -> list[dict]:
-    """Lazy-cache the (filtered) tool list. Strips Pydantic schema noise and
-    swaps verbose MCP descriptions for terse model-facing ones. cache_control on
-    the last tool is left in place — it's a no-op below the Haiku cache minimum,
-    but free if a larger model is used later.
+    """Lazy-memoize the (filtered) tool list. Strips Pydantic schema noise and
+    swaps verbose MCP descriptions for terse model-facing ones.
     """
     global _cached_anthropic_tools
     if _cached_anthropic_tools is None:
@@ -400,8 +392,6 @@ def _get_anthropic_tools() -> list[dict]:
                 "description": _MODEL_TOOL_DESCRIPTIONS.get(t["name"], t["description"]),
                 "input_schema": _minify_schema(t["input_schema"]),
             })
-        if slim:
-            slim[-1] = {**slim[-1], "cache_control": {"type": "ephemeral"}}
         _cached_anthropic_tools = slim
     return _cached_anthropic_tools
 
@@ -450,15 +440,12 @@ def _bootstrap_calendar(sim_date: datetime) -> str:
 
 # --- Prompt construction ---------------------------------------------------
 
-# Static portion of the system prompt — byte-identical across every turn. Anything
-# that varies per-turn (scenario_id, calendar_id, sim_date) MUST go in the dynamic
-# suffix below, never in this string. cache_control is still applied (cheap), but
-# this prompt is intentionally well below Haiku 4.5's 4,096-token cache minimum:
-# the benchmark measures the AI's ability to handle complex requests efficiently,
-# so the system prompt should not coach the model with worked examples or pattern
-# lookup tables — that gamed the cost-per-scenario metric without making the AI
-# under test any more capable. Sonnet (min 2,048) and Opus (min 4,096) still won't
-# cache this; that's fine — lower raw token count is the goal.
+# Static portion of the system prompt — byte-identical across every turn so
+# anything that varies per-turn (scenario_id, calendar_id, sim_date) MUST go in
+# each user message's preamble, never in this string. Intentionally short: the
+# benchmark measures the AI's ability to handle complex requests, so coaching
+# the model with worked examples or pattern lookup tables would game the
+# capability measurement rather than reveal it.
 _STATIC_SYSTEM_PROMPT = """You are an AI executive assistant. For each email, decide the action and call the matching tool — or call no tool. Do not narrate.
 
 TOOLS:
@@ -485,16 +472,13 @@ END IMMEDIATELY after the tool call(s). Do not emit confirmation text after a to
 
 
 def _build_system_blocks() -> list[dict]:
-    """Return the static system prompt as a single cache-tagged block.
+    """Return the static system prompt as a single text block.
 
-    Everything dynamic (scenario_id, calendar_id, sim_date) now lives in each
-    user message's preamble so the system block can stay byte-identical across
-    every turn — required for cross-scenario prefix caching to ever hit on
-    larger models, and a clean prerequisite for the persistent-conversation path.
+    Everything dynamic (scenario_id, calendar_id, sim_date) lives in each user
+    message's preamble so the system block stays byte-identical across turns —
+    a clean prerequisite for the persistent-conversation path.
     """
-    return [
-        {"type": "text", "text": _STATIC_SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}},
-    ]
+    return [{"type": "text", "text": _STATIC_SYSTEM_PROMPT}]
 
 
 def _build_user_message(
@@ -725,12 +709,7 @@ def _print_summary() -> None:
     rounds = _stats["rounds_total"]
     in_tok = _stats["input_tokens"]
     out_tok = _stats["output_tokens"]
-    cache_create = _stats["cache_creation_input_tokens"]
-    cache_read = _stats["cache_read_input_tokens"]
-    billable_in = in_tok + cache_create + cache_read
-    total_tok = billable_in + out_tok
-    cache_denom = cache_read + cache_create + in_tok
-    cache_hit_pct = (100.0 * cache_read / cache_denom) if cache_denom else 0.0
+    total_tok = in_tok + out_tok
 
     print("\n=== model_runner summary ===")
     print(f"model             : {MODEL_NAME}")
@@ -741,12 +720,9 @@ def _print_summary() -> None:
     print(f"turn failures     : {_stats['turn_failures']}")
     print(f"api rounds        : {rounds}")
     print("--- tokens ---")
-    print(f"input  (uncached) : {in_tok}")
-    print(f"cache  write      : {cache_create}")
-    print(f"cache  read       : {cache_read}")
+    print(f"input             : {in_tok}")
     print(f"output            : {out_tok}")
     print(f"total             : {total_tok}")
-    print(f"cache hit %       : {cache_hit_pct:.1f}")
     if scenarios:
         print(f"avg tokens/turn   : {total_tok / scenarios:.0f}")
         print(f"avg rounds/turn   : {rounds / scenarios:.2f}")
@@ -756,6 +732,8 @@ def _print_summary() -> None:
             print(f"  {name:<24} {count}")
     if TOKEN_LOG_PATH:
         print(f"per-round log     : {TOKEN_LOG_PATH}")
+    if TOOL_LOG_PATH:
+        print(f"per-tool log      : {TOOL_LOG_PATH}")
     print("============================\n")
 
 
