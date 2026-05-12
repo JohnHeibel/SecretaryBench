@@ -1,6 +1,6 @@
 # flow_controller.py — Pool & Chain State Management
 
-`flow_controller.py` manages which scenarios are in flight at any point during the 100-day simulation. It owns the **inactive pool**, the **active pool**, and the per-email state machine inside each active chain.
+`flow_controller.py` manages which scenarios are in flight at any point during the 100-day simulation. It owns the **inactive pool**, the **active pool**, the **completed pool**, the per-email state machine inside each active chain, and an **append-only delivery log** of every email handoff.
 
 It exposes three things to the rest of the system:
 - `EmailState` enum — `READY_TO_SERVE`, `AWAITING_SERVE`, `SERVED`
@@ -19,12 +19,13 @@ Walks through the first 7 simulated days, prints which emails are being served a
 
 ---
 
-## The two pools
+## The three pools
 
 - **Inactive pool** — scenarios that have not yet started. They live here until their scheduled day arrives.
 - **Active pool** — scenarios currently in progress. A single-email scenario lives here briefly (1 day). A multi-email chain stays here across multiple days until every email has been served.
+- **Completed pool** — scenarios that have delivered every email. Moved here from `active_pool` once `is_complete` is true; retained for the rest of the run so `served_emails()` can report the full historical record.
 
-When a scenario activates, the controller generates randomized per-email day offsets (described below), creates an `ActiveScenario` wrapper, and moves it from `inactive_pool` → `active_pool`.
+When a scenario activates, the controller generates randomized per-email day offsets (described below), creates an `ActiveScenario` wrapper, and moves it from `inactive_pool` → `active_pool`. When all of its emails have been served, the same `ActiveScenario` is moved from `active_pool` → `completed_pool` (the bool list of served flags survives so cross-pool queries can still see who got what).
 
 ---
 
@@ -94,9 +95,43 @@ A scenario only enters the active pool on its scheduled day — not before.
 | `__init__(scenarios, seed=None)` | Loads all scenarios into the inactive pool. `seed` controls shuffle + chain-gap RNG. |
 | `build_schedule(total_days)` | Round-robins inactive scenarios across day slots. Must be called before `step`. |
 | `step(day)` | Advances to `day`. Activates today's scheduled scenarios, then returns `[(email, scenario, email_index), ...]` due today across all active chains. |
-| `mark_served(scenario_id, email_index)` | Engine calls this after each delivery. Removes the chain from `active_pool` once it's complete and queues the scenario for grading. |
+| `mark_served(scenario_id, email_index, day=None, sim_date=None)` | Engine calls this after each delivery. Appends a row to `delivery_log` (and to `delivery_log.jsonl` on disk via `bench_logger.log_delivery`). Moves the chain from `active_pool` to `completed_pool` once it's complete and queues the scenario for grading. `day` and `sim_date` are optional metadata for the log row. |
 | `completed_scenarios_today()` | Scenarios that just completed during this day's `mark_served` calls. Cleared at the start of every `step()`. |
 | `status(day=None)` | Pool snapshot for logging — counts + per-active-scenario state breakdown. |
+
+#### Cross-pool accessors
+
+These walk one or more pools to answer "which emails / scenarios are in what state?" without callers needing to know the controller's internals.
+
+| Method | Returns |
+|---|---|
+| `served_emails()` | `[(Scenario, email_index, Email), ...]` — every email delivered to the model so far. Walks `active_pool` then `completed_pool`. |
+| `pending_emails(current_day=None)` | `[(Scenario, email_index, Email, EmailState), ...]` — every email not yet served, annotated with `READY_TO_SERVE` or `AWAITING_SERVE`. `current_day` is needed to compute the state correctly; without it, every entry is `AWAITING_SERVE`. |
+| `inactive_scenarios()` | Copy of the inactive pool (mutating the copy is safe). |
+| `active_scenarios()` | Copy of the active pool. |
+| `completed_scenarios()` | Copy of the completed pool. |
+| `in_flight_today(current_day)` | `[(Scenario, email_index, Email), ...]` for emails currently in `READY_TO_SERVE` state. Useful as a debug probe between `step()` and `mark_served()`. |
+
+#### Delivery log
+
+`controller.delivery_log` is a `list[dict]` appended to inside `mark_served()`. Each entry:
+
+```python
+{
+    "scenario_id": "T01",
+    "scenario_type": "T",
+    "email_index": 0,
+    "email_number": 1,        # 1-based per chain
+    "day": 12,                # sim-day index; None if not provided
+    "sim_date": "2000-01-13", # ISO date string; None if not provided
+}
+```
+
+The same entry is mirrored to `delivery_log.jsonl` (one JSONL row per delivery, with a `ts` field added) via `bench_logger.log_delivery`. The path is overridable via `DELIVERY_LOG_PATH`; set to empty string to disable. The file is gitignored.
+
+#### Pool transition trace
+
+Off by default. Set `BENCH_TRACE_POOL=1` to get a one-line trace per `inactive → active`, `AWAITING → READY`, and `READY → SERVED` transition in stdout. Routed through `bench_logger.pool_*` functions. Useful for diagnosing scheduling bugs; produces ~280 extra lines on a full run.
 
 ---
 

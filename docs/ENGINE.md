@@ -36,20 +36,23 @@ for day in 0..99:
 
     for email, scenario, idx in ready:
         resolved = apply_date_substitutions(email, sim_date)   # tokens → dates
+        before = fetch_scenario_results(scenario)              # snapshot store
         run_model_turn(resolved, sim_date)                     # Claude via MCP
-        controller.mark_served(scenario.scenario_id, idx)
+        after = fetch_scenario_results(scenario)               # snapshot again
+        # per-email grade against the diff (skipped if email has no criteria)
+        controller.mark_served(scenario.scenario_id, idx, day=day, sim_date=...)
 
     for scenario in controller.completed_scenarios_today():
-        state = fetch_scenario_results(scenario)               # pull todos/events from store
+        state = fetch_scenario_results(scenario)               # full cumulative state
         result = define_grading_system(scenario, state["calendar"], state["todos"])
-        # accumulate score
+        # accumulate scenario-level score
 
     sim_date += 1 day
 
 return aggregated results
 ```
 
-Per-day, the engine: (1) asks the controller what's ready, (2) seeds the store for any newly activated scenarios, (3) resolves tokens in each email, (4) hands the resolved email to the model runner (Claude via MCP), (5) tells the controller it was served, (6) fetches the AI-created todos/events from the store and grades any scenarios that finished today, (7) ticks the clock.
+Per-day, the engine: (1) asks the controller what's ready, (2) seeds the store for any newly activated scenarios, (3) resolves tokens in each email, (4) snapshots the store, hands the resolved email to the model runner, snapshots again, and grades the email against the diff, (5) tells the controller it was served, (6) at scenario completion, fetches the full cumulative state and grades the scenario as a whole, (7) ticks the clock.
 
 ---
 
@@ -121,19 +124,35 @@ SIM_DAYS  = 100
 
 ## Connection to the grader
 
-`define_grading_system(input, calendar, todo)` accepts either an `Email` or a `Scenario`. The engine calls it with the **`Scenario` object** at scenario completion (when the last email is served), passing the loader's aggregated `success_criteria` list directly.
+`define_grading_system(input, calendar, todo)` accepts either an `Email` or a `Scenario`. The engine calls it **both ways** during a run, producing two parallel scoreboards:
 
-The engine uses `pipeline.fetch_scenario_results(scenario)` to pull the AI-created todos and calendar events from the in-memory store, filtered to only items belonging to that scenario (matched by hashed `scenario_id`). The grader then checks the filtered state against the scenario's success criteria.
+1. **Per-email grade** — called after every email handoff whose `success_criteria` is set, with `grade_by_scenario=False`. The calendar/todo state passed in is a **diff** of what the AI added or modified during that one email's turn. See "Per-email grading via state diff" below.
+2. **Per-scenario grade** — called at scenario completion with the full cumulative state, the loader's aggregated `success_criteria` list, and `grade_by_scenario=True`. Unchanged from prior behavior.
+
+The two grades can disagree, and the gap is informative:
+- High email score, low scenario score → the AI handled each email correctly in isolation but the cumulative end state isn't right (often: did the same right thing twice, leaving a duplicate).
+- Low email score, high scenario score → individual emails missed their criteria but the final state still matches the scenario's aggregate criteria (often: actions taken in the wrong order, with later emails fixing earlier mistakes).
+
+### Per-email grading via state diff
+
+Naively grading each email against the store's current state would let actions taken for **earlier** emails in the chain falsely satisfy or falsely violate **this** email's criteria — the store is cumulative within a scenario, so it carries forward.
+
+The engine sidesteps this by snapshotting the store before and after each `run_model_turn`, then computing a diff:
 
 ```python
-state = fetch_scenario_results(scenario)
-result = define_grading_system(scenario, state["calendar"], state["todos"])
+state_before = fetch_scenario_results(scenario)
+run_model_turn(resolved, sim_date, scenario_id=...)
+state_after = fetch_scenario_results(scenario)
+email_result = _grade_email_against_diff(resolved, state_before, state_after)
 ```
 
-Why per-scenario instead of per-email:
-- Loader aggregates all per-email criteria onto the scenario already
-- Most chain emails have `success_criteria = None`, so per-email grading is mostly empty calls
-- Tool state accumulates across emails — checking once at the end matches how a real model would build up state
+The diff classifies each todo and event as **added**, **removed**, or **modified** (same id, different content) by comparing the two snapshots. A synthetic `CalendarResponse` + todos list built from added + modified items is what gets passed to the grader, so:
+
+- `TC-x` and `CC-x` criteria match only items the AI created or updated during this turn.
+- "No action" passes only when all six diff lists are empty.
+- Deletes don't appear in the synthetic state, so the engine adds an override: if any of the six lists is non-empty, "No action" sub-criteria are flipped from pass to fail (`_diff_took_action`).
+
+Helper functions: `_state_diff`, `_diff_took_action`, `_grade_email_against_diff` (all in `engine.py`).
 
 ### Scenario filtering
 
@@ -151,14 +170,24 @@ Use `from engine import resolve_tokens` and call it on each criteria string befo
 
 ```python
 {
-    "total_score": int,
+    "total_score": int,        # scenario-level total (1 point per scenario with all criteria met)
     "total_max": int,
+    "email_score": int,        # per-email total (1 point per email criterion met, diff-based)
+    "email_max": int,
     "daily_log": [
         {"day": 1, "date": "2000-01-01", "served": 3, "score": 0, "max_score": 1},
         ...
     ],
-    "remaining_inactive": int,    # scenarios never activated (should be 0 for normal runs)
-    "remaining_active": int,      # chains overflowing past day 100 (rare, see Flow Controller doc)
+    "by_type": {               # scenario-level score grouped by scenario_type
+        "T": {"count": 18, "score": 12, "max_score": 18},
+        ...
+    },
+    "by_type_email": {         # per-email score grouped by scenario_type
+        "T": {"count": 47, "score": 31, "max_score": 47},
+        ...
+    },
+    "remaining_inactive": int, # scenarios never activated (should be 0 for normal runs)
+    "remaining_active": int,   # chains overflowing past day 100 (rare, see Flow Controller doc)
 }
 ```
 
