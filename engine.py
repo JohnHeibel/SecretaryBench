@@ -21,18 +21,7 @@ from app.models.calendar import CalendarResponse
 # diff — the grader's len(items)==0 check would otherwise falsely pass.
 _NO_ACTION_RE = re.compile(r"no\s*action", re.IGNORECASE)
 
-# Bridge to Person 3's model runner. The agreed-on signature is
-#   run_model_turn(email: Email, sim_date: datetime) -> None
-# (one LLM turn per email, with the MCP tools attached on the runner side).
-# Falls back to the in-file mock if model_runner.py hasn't been added yet so
-# the simulation still runs end-to-end before Miguel's piece lands.
-try:
-    from model_runner import run_model_turn, scenario_completed  # type: ignore
-    _HAS_MODEL_RUNNER = True
-except ImportError:
-    run_model_turn = None  # type: ignore
-    scenario_completed = None  # type: ignore
-    _HAS_MODEL_RUNNER = False
+from harness.config import get_harness as _get_harness
 
 
 SIM_START = datetime(2000, 1, 1, tzinfo=timezone.utc)
@@ -311,6 +300,8 @@ def run_simulation(
     )
 
 
+    _model_harness = _get_harness() if model_fn is None else None
+
     if verbose:
         import bench_logger as log
         log.sim_header(len(scenarios), sim_days, sim_start.strftime("%Y-%m-%d"))
@@ -338,9 +329,8 @@ def run_simulation(
 
             if model_fn is not None:
                 model_fn(resolved, sim_date)
-            elif _HAS_MODEL_RUNNER:
-                run_model_turn(resolved, sim_date,
-                               scenario_id=scenario_str_to_int(scenario.scenario_id))
+            elif _model_harness is not None:
+                _model_harness.run_turn(resolved, sim_date, scenario_str_to_int(scenario.scenario_id))
             else:
                 model_interaction_mock([resolved], sim_date, verbose=verbose)
 
@@ -383,10 +373,8 @@ def run_simulation(
                 log.grade_result(scenario.scenario_type, scenario.scenario_id,
                                  result["score"], result["max_score"],
                                  details=result.get("details"))
-            # Free the persistent model conversation for this scenario — keeps
-            # the runner's per-scenario dict from growing unbounded over a run.
-            if scenario_completed is not None:
-                scenario_completed(scenario_str_to_int(scenario.scenario_id))
+            if _model_harness is not None:
+                _model_harness.scenario_completed(scenario_str_to_int(scenario.scenario_id))
 
         total_score += day_score
         total_max += day_max
@@ -411,6 +399,9 @@ def run_simulation(
         if email_total_max:
             log.type_breakdown(by_type_email,
                                title="Score Breakdown by Type (per email)")
+
+    if _model_harness is not None:
+        _model_harness.shutdown()
 
     return {
         "total_score": total_score,

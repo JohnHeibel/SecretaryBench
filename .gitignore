@@ -31,4 +31,5 @@ delivery_log.jsonl
 # Claude Code
 settings.local.json
 CLAUDE.md
-modelRunner.md
+ARCHITECTURE.md
+.claude/worktrees/
