@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import calendar as _calendar
+import json
+import os
 import re
 import sys
+import threading
 import time
 from collections import defaultdict
 from copy import deepcopy
@@ -14,14 +17,38 @@ from flow_controller import FlowController
 from grader import define_grading_system
 from pipeline import register_scenario, fetch_scenario_results, scenario_str_to_int
 from app.models.calendar import CalendarResponse
+from harness.config import get_harness as _get_harness
+
+TURN_LOG_PATH = os.environ.get("TURN_LOG_PATH", "turn_results.jsonl")
+_turn_log_lock = threading.Lock()
+
+
+def _log_turn(result, sim_date: datetime, email_index: int) -> None:
+    if not TURN_LOG_PATH or result is None:
+        return
+    row = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "sim_date": sim_date.strftime("%Y-%m-%d"),
+        "scenario_id": result.scenario_id,
+        "email_index": email_index,
+        "elapsed_s": round(result.elapsed_s, 2),
+        "rounds": result.rounds,
+        "input_tokens": result.input_tokens,
+        "output_tokens": result.output_tokens,
+        "tool_calls": result.tool_calls,
+        "harness": os.environ.get("HARNESS", "claude-p"),
+    }
+    try:
+        with _turn_log_lock, open(TURN_LOG_PATH, "a") as f:
+            f.write(json.dumps(row) + "\n")
+    except OSError:
+        pass
 
 
 # Mirrors grader._NO_ACTION. Used to override the per-email grade when the AI
 # took a destructive action (delete_*) that doesn't appear in the added/modified
 # diff — the grader's len(items)==0 check would otherwise falsely pass.
 _NO_ACTION_RE = re.compile(r"no\s*action", re.IGNORECASE)
-
-from harness.config import get_harness as _get_harness
 
 
 SIM_START = datetime(2000, 1, 1, tzinfo=timezone.utc)
@@ -271,7 +298,7 @@ def run_simulation(
     seed: Optional[int] = 42,
     verbose: bool = True,
     model_fn=None,
-    scenarios=None,
+    scenarios: list[Scenario] | None = None,
     grade_by_scenario: bool = True,
 ) -> dict:
     """Run the full N-day benchmark simulation and return aggregated results."""
@@ -330,7 +357,8 @@ def run_simulation(
             if model_fn is not None:
                 model_fn(resolved, sim_date)
             elif _model_harness is not None:
-                _model_harness.run_turn(resolved, sim_date, scenario_str_to_int(scenario.scenario_id))
+                turn_result = _model_harness.run_turn(resolved, sim_date, scenario_str_to_int(scenario.scenario_id))
+                _log_turn(turn_result, sim_date, idx + 1)
             else:
                 model_interaction_mock([resolved], sim_date, verbose=verbose)
 

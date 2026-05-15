@@ -24,6 +24,7 @@ htmlcov/
 token_usage.jsonl
 tool_calls.jsonl
 delivery_log.jsonl
+turn_results.jsonl
 
 # OS
 .DS_Store
@@ -32,4 +33,5 @@ delivery_log.jsonl
 settings.local.json
 CLAUDE.md
 ARCHITECTURE.md
+harness/UNDERSTANDING.md
 .claude/worktrees/

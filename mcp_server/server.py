@@ -16,6 +16,11 @@ API_REFERENCE_PATH = REPO_ROOT / "docs" / "api_reference.md"
 TOOL_LOG_PATH = os.environ.get("TOOL_LOG_PATH", str(REPO_ROOT / "tool_calls.jsonl"))
 _tool_log_lock = threading.Lock()
 
+# When BENCHMARK_MODE=1 (default), admin and engine-internal tools are not
+# registered with MCP so the model under test never sees them.
+# Set BENCHMARK_MODE=0 only for manual admin tasks outside a benchmark run.
+_BENCHMARK_MODE = os.environ.get("BENCHMARK_MODE", "1") == "1"
+
 mcp = FastMCP("aisa-internal-system")
 client = httpx.Client(base_url=API_BASE, timeout=10.0)
 
@@ -67,12 +72,13 @@ def api_reference() -> str:
     return API_REFERENCE_PATH.read_text()
 
 
-# --- Health ---
+# --- Health (admin only) ---
 
-@mcp.tool()
-def health_check() -> dict:
-    """Check that the AISA service is reachable."""
-    return _call("GET", "/")
+if not _BENCHMARK_MODE:
+    @mcp.tool()
+    def health_check() -> dict:
+        """Check that the AISA service is reachable."""
+        return _call("GET", "/")
 
 
 # --- Todos ---
@@ -138,10 +144,11 @@ def delete_todo(todo_id: str) -> dict:
 
 # --- Calendars ---
 
-@mcp.tool()
-def create_calendar(start_date: str) -> dict:
-    """Create a fresh 100-day calendar window. start_date is ISO 8601 with timezone (e.g. '2026-04-22T00:00:00Z')."""
-    return _call("POST", "/calendars/", json={"start_date": start_date})
+if not _BENCHMARK_MODE:
+    @mcp.tool()
+    def create_calendar(start_date: str) -> dict:
+        """Create a fresh 100-day calendar window. start_date is ISO 8601 with timezone (e.g. '2026-04-22T00:00:00Z')."""
+        return _call("POST", "/calendars/", json={"start_date": start_date})
 
 
 @mcp.tool()
@@ -150,11 +157,12 @@ def get_calendar(calendar_id: str) -> dict:
     return _call("GET", f"/calendars/{calendar_id}")
 
 
-@mcp.tool()
-def delete_calendar(calendar_id: str) -> dict:
-    """Delete a calendar and cascade-delete its events."""
-    _call("DELETE", f"/calendars/{calendar_id}")
-    return {"status": "deleted", "calendar_id": calendar_id}
+if not _BENCHMARK_MODE:
+    @mcp.tool()
+    def delete_calendar(calendar_id: str) -> dict:
+        """Delete a calendar and cascade-delete its events."""
+        _call("DELETE", f"/calendars/{calendar_id}")
+        return {"status": "deleted", "calendar_id": calendar_id}
 
 
 # --- Events ---
@@ -226,10 +234,11 @@ def list_emails(scenario_id: int | None = None) -> list[dict]:
     return _call("GET", "/emails/", params=params)
 
 
-@mcp.tool()
-def get_email(email_id: int) -> dict:
-    """Fetch one email by integer id."""
-    return _call("GET", f"/emails/{email_id}")
+if not _BENCHMARK_MODE:
+    @mcp.tool()
+    def get_email(email_id: int) -> dict:
+        """Fetch one email by integer id."""
+        return _call("GET", f"/emails/{email_id}")
 
 
 @mcp.tool()
@@ -252,61 +261,59 @@ def send_email(
     return _call("POST", "/emails/", json=payload)
 
 
-# --- Scenarios ---
+# --- Scenarios (admin only — hidden from model in benchmark mode) ---
 
-@mcp.tool()
-def list_scenarios() -> list[dict]:
-    """Every scenario currently loaded in memory."""
-    return _call("GET", "/scenarios/")
+if not _BENCHMARK_MODE:
+    @mcp.tool()
+    def list_scenarios() -> list[dict]:
+        """Every scenario currently loaded in memory."""
+        return _call("GET", "/scenarios/")
 
+    @mcp.tool()
+    def get_scenario(scenario_id: int) -> dict:
+        """Fetch a single scenario (with all its emails) by id."""
+        return _call("GET", f"/scenarios/{scenario_id}")
 
-@mcp.tool()
-def get_scenario(scenario_id: int) -> dict:
-    """Fetch a single scenario (with all its emails) by id."""
-    return _call("GET", f"/scenarios/{scenario_id}")
+    @mcp.tool()
+    def create_scenario(
+        scenario_id: int,
+        emails: list[dict] | None = None,
+        success_criteria: str | None = None,
+        puzzle_summary: str | None = None,
+    ) -> dict:
+        """Load a scenario (and its fixture emails) into the in-memory store."""
+        payload: dict[str, Any] = {"scenario_id": scenario_id, "emails": emails or []}
+        if success_criteria is not None:
+            payload["success_criteria"] = success_criteria
+        if puzzle_summary is not None:
+            payload["puzzle_summary"] = puzzle_summary
+        return _call("POST", "/scenarios/", json=payload)
 
-
-@mcp.tool()
-def create_scenario(
-    scenario_id: int,
-    emails: list[dict] | None = None,
-    success_criteria: str | None = None,
-    puzzle_summary: str | None = None,
-) -> dict:
-    """Load a scenario (and its fixture emails) into the in-memory store."""
-    payload: dict[str, Any] = {"scenario_id": scenario_id, "emails": emails or []}
-    if success_criteria is not None:
-        payload["success_criteria"] = success_criteria
-    if puzzle_summary is not None:
-        payload["puzzle_summary"] = puzzle_summary
-    return _call("POST", "/scenarios/", json=payload)
-
-
-@mcp.tool()
-def delete_scenario(scenario_id: int) -> dict:
-    """Delete a scenario and all of its emails."""
-    _call("DELETE", f"/scenarios/{scenario_id}")
-    return {"status": "deleted", "scenario_id": scenario_id}
+    @mcp.tool()
+    def delete_scenario(scenario_id: int) -> dict:
+        """Delete a scenario and all of its emails."""
+        _call("DELETE", f"/scenarios/{scenario_id}")
+        return {"status": "deleted", "scenario_id": scenario_id}
 
 
-@mcp.tool()
-def add_scenario_email(
-    scenario_id: int,
-    email_id: int,
-    subject: str,
-    sender: str,
-    recipients: list[str],
-    body: str,
-    created_at: str,
-) -> dict:
-    """Attach an additional fixture email to an already-loaded scenario. created_at is ISO 8601 with timezone."""
-    payload = {
-        "email_id": email_id,
-        "subject": subject,
-        "sender": sender,
-        "recipients": recipients,
-        "body": body,
-        "created_at": created_at,
-        "scenario_id": scenario_id,
-    }
-    return _call("POST", f"/scenarios/{scenario_id}/emails", json=payload)
+    @mcp.tool()
+    def add_scenario_email(
+        scenario_id: int,
+        email_id: int,
+        subject: str,
+        sender: str,
+        recipients: list[str],
+        body: str,
+        created_at: str,
+    ) -> dict:
+        """Attach an additional fixture email to an already-loaded scenario. created_at is ISO 8601 with timezone."""
+        payload = {
+            "email_id": email_id,
+            "subject": subject,
+            "sender": sender,
+            "recipients": recipients,
+            "body": body,
+            "created_at": created_at,
+            "scenario_id": scenario_id,
+        }
+        return _call("POST", f"/scenarios/{scenario_id}/emails", json=payload)
