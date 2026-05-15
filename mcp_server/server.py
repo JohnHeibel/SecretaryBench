@@ -1,4 +1,7 @@
+import json
 import os
+import threading
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +12,9 @@ API_BASE = os.environ.get("AISA_API_BASE_URL", "http://localhost:8000")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 API_REFERENCE_PATH = REPO_ROOT / "docs" / "api_reference.md"
+
+TOOL_LOG_PATH = os.environ.get("TOOL_LOG_PATH", str(REPO_ROOT / "tool_calls.jsonl"))
+_tool_log_lock = threading.Lock()
 
 mcp = FastMCP("aisa-internal-system")
 client = httpx.Client(base_url=API_BASE, timeout=10.0)
@@ -25,6 +31,32 @@ def _call(method: str, path: str, **kwargs: Any) -> Any:
     if response.status_code == 204 or not response.content:
         return None
     return response.json()
+
+
+def _active_scenario_ids() -> frozenset[int]:
+    try:
+        scenarios = _call("GET", "/scenarios/")
+        return frozenset(s["scenario_id"] for s in scenarios)
+    except Exception:
+        return frozenset()
+
+
+def _log_mcp_call(tool_name: str, scenario_id: int, id_mismatch: bool = False) -> None:
+    if not TOOL_LOG_PATH:
+        return
+    row: dict[str, Any] = {"ts": datetime.now(timezone.utc).isoformat(), "source": "mcp", "tool_name": tool_name, "scenario_id": scenario_id, "id_corrected": False}
+    if id_mismatch:
+        row["id_mismatch"] = True
+    try:
+        with _tool_log_lock, open(TOOL_LOG_PATH, "a") as f:
+            f.write(json.dumps(row) + "\n")
+    except OSError:
+        pass
+
+
+def _check_and_log(tool_name: str, scenario_id: int) -> None:
+    active = _active_scenario_ids()
+    _log_mcp_call(tool_name, scenario_id, id_mismatch=bool(active) and scenario_id not in active)
 
 
 # --- Resource ---
@@ -67,6 +99,7 @@ def create_todo(
     calendar_event_id: str | None = None,
 ) -> dict:
     """Create a todo. due_date is ISO 8601 with timezone (e.g. '2026-05-01T09:00:00Z' or '+00:00'). scenario_id must exist; calendar_event_id (if given) must reference a real event."""
+    _check_and_log("create_todo", scenario_id)
     body: dict[str, Any] = {"title": title, "due_date": due_date, "scenario_id": scenario_id}
     if description is not None:
         body["description"] = description
@@ -148,6 +181,7 @@ def create_event(
     description: str | None = None,
 ) -> dict:
     """Create an event. start and end are ISO 8601 with timezone (e.g. '2026-04-22T10:00:00Z'). start < end, both within the calendar's 100-day window. scenario_id must exist."""
+    _check_and_log("create_event", scenario_id)
     body: dict[str, Any] = {"title": title, "start": start, "end": end, "scenario_id": scenario_id}
     if description is not None:
         body["description"] = description
@@ -165,6 +199,7 @@ def update_event(
     description: str | None = None,
 ) -> dict:
     """Full replace (PUT) — every field is sent, including description (null clears it). start and end are ISO 8601 with timezone."""
+    _check_and_log("update_event", scenario_id)
     body: dict[str, Any] = {
         "title": title,
         "start": start,
@@ -206,6 +241,7 @@ def send_email(
     scenario_id: int,
 ) -> dict:
     """Agent-facing write. The server assigns email_id as (global max existing id) + 1."""
+    _check_and_log("send_email", scenario_id)
     payload = {
         "subject": subject,
         "sender": sender,
