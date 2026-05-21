@@ -59,7 +59,7 @@ _MCP_CONFIG = json.dumps({
     "mcpServers": {
         _MCP_SERVER_NAME: {
             "command": "bash",
-            "args": ["-c", "uv run python -m mcp_server"],
+            "args": ["-c", "python -m mcp_server"],
         }
     }
 })
@@ -155,6 +155,7 @@ def _bootstrap_calendar(sim_date: datetime) -> str:
 def _record_usage(
     scenario_id: int,
     round_idx: int,
+    email_index: int,
     input_tokens: int,
     output_tokens: int,
     cache_creation_input_tokens: int = 0,
@@ -166,15 +167,16 @@ def _record_usage(
     _stats["input_tokens"] += total_input
     _stats["output_tokens"] += output_tokens
     _stats["rounds_total"] += 1
-    if cache_read_input_tokens > 0:
-        _stats["cache_hits"] = _stats.get("cache_hits", 0) + 1
-        blog.info("model_runner", f"CACHE HIT — scenario={scenario_id} round={round_idx} cache_read={cache_read_input_tokens} fresh_input={input_tokens}")
+    if cache_read_input_tokens == 0 and cache_creation_input_tokens > 0:
+        _stats["cache_misses"] = _stats.get("cache_misses", 0) + 1
+        blog.warn("model_runner", f"CACHE MISS scenario={scenario_id} email={email_index} round={round_idx} cache_write={cache_creation_input_tokens} fresh_input={input_tokens}")
 
     if not TOKEN_LOG_PATH:
         return
     line = json.dumps({
         "ts": datetime.now(timezone.utc).isoformat(),
         "scenario_id": scenario_id,
+        "email_index": email_index,
         "round": round_idx,
         "stop_reason": stop_reason,
         "tool_uses": tool_use_count,
@@ -245,7 +247,14 @@ def _parse_stream_output(output: str, scenario_id: int, email_index: int) -> str
     Logs tool_use events and per-round usage as side-effects.
     """
     session_id: str | None = None
-    round_idx = 0
+
+    # Stream-json emits each assistant message multiple times (e.g. once before
+    # a tool_use block is appended, once after) with byte-identical usage. We
+    # dedup by message.id, keeping the LATEST emission per id so we capture the
+    # full content (text + tool_use) and only count usage once.
+    ordered_msg_ids: list[str] = []
+    latest_by_id: dict[str, dict] = {}
+    result_error: dict | None = None
 
     for raw_line in output.splitlines():
         line = raw_line.strip()
@@ -266,44 +275,54 @@ def _parse_stream_output(output: str, scenario_id: int, email_index: int) -> str
             _stats["compactions"] = _stats.get("compactions", 0) + 1
 
         elif etype == "assistant":
-            round_idx += 1
             msg = event.get("message", {})
-            usage = msg.get("usage", {})
-            content = msg.get("content", [])
-            ctx = msg.get("context_management")
-            if ctx:
-                blog.info("model_runner", f"COMPACTION fired — scenario={scenario_id} email_index={email_index} context={ctx}")
-                _stats["compactions"] = _stats.get("compactions", 0) + 1
-            tool_uses = [b for b in content if isinstance(b, dict) and b.get("type") == "tool_use"]
-
-            for tu in tool_uses:
-                name = tu.get("name", "")
-                _stats["tool_calls"][name] += 1
-                _log_tool_call(
-                    scenario_id=scenario_id,
-                    round_idx=round_idx,
-                    tool_name=name,
-                    raw_args=tu.get("input", {}),
-                    email_index=email_index,
-                )
-
-            if usage:
-                _record_usage(
-                    scenario_id=scenario_id,
-                    round_idx=round_idx,
-                    input_tokens=usage.get("input_tokens", 0),
-                    cache_creation_input_tokens=usage.get("cache_creation_input_tokens", 0),
-                    cache_read_input_tokens=usage.get("cache_read_input_tokens", 0),
-                    output_tokens=usage.get("output_tokens", 0),
-                    stop_reason=msg.get("stop_reason"),
-                    tool_use_count=len(tool_uses),
-                )
+            msg_id = msg.get("id") or f"_anon_{len(ordered_msg_ids)}"
+            if msg_id not in latest_by_id:
+                ordered_msg_ids.append(msg_id)
+            latest_by_id[msg_id] = msg
 
         elif etype == "result":
             if not session_id:
                 session_id = event.get("session_id")
             if event.get("is_error"):
-                raise RuntimeError(f"claude turn failed: {event.get('result', event)}")
+                result_error = event
+
+    for round_idx, msg_id in enumerate(ordered_msg_ids, start=1):
+        msg = latest_by_id[msg_id]
+        usage = msg.get("usage", {})
+        content = msg.get("content", [])
+        ctx = msg.get("context_management")
+        if ctx:
+            blog.info("model_runner", f"COMPACTION fired — scenario={scenario_id} email_index={email_index} context={ctx}")
+            _stats["compactions"] = _stats.get("compactions", 0) + 1
+        tool_uses = [b for b in content if isinstance(b, dict) and b.get("type") == "tool_use"]
+
+        for tu in tool_uses:
+            name = tu.get("name", "")
+            _stats["tool_calls"][name] += 1
+            _log_tool_call(
+                scenario_id=scenario_id,
+                round_idx=round_idx,
+                tool_name=name,
+                raw_args=tu.get("input", {}),
+                email_index=email_index,
+            )
+
+        if usage:
+            _record_usage(
+                scenario_id=scenario_id,
+                round_idx=round_idx,
+                email_index=email_index,
+                input_tokens=usage.get("input_tokens", 0),
+                cache_creation_input_tokens=usage.get("cache_creation_input_tokens", 0),
+                cache_read_input_tokens=usage.get("cache_read_input_tokens", 0),
+                output_tokens=usage.get("output_tokens", 0),
+                stop_reason=msg.get("stop_reason"),
+                tool_use_count=len(tool_uses),
+            )
+
+    if result_error is not None:
+        raise RuntimeError(f"claude turn failed: {result_error.get('result', result_error)}")
 
     return session_id
 
@@ -330,6 +349,7 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
         "--tools", "",
         "--permission-mode", "bypassPermissions",
         "--mcp-config", _MCP_CONFIG,
+        "--strict-mcp-config",
         "--disallowed-tools", _DISALLOWED_TOOLS,
     ]
 
