@@ -36,6 +36,7 @@ from loader import Email
 
 FASTAPI_BASE = os.environ.get("FASTAPI_BASE_URL", "http://localhost:8000")
 MODEL_NAME = os.environ.get("CLAUDE_MODEL", "claude-haiku-4-5")
+REASONING_EFFORT = os.environ.get("CLAUDE_REASONING", "")  # e.g. "low", "medium", "high", "xhigh", "max"
 PER_TURN_TIMEOUT_S = 300.0
 
 TOKEN_LOG_PATH = os.environ.get("TOKEN_LOG_PATH", "token_usage.jsonl")
@@ -156,12 +157,18 @@ def _record_usage(
     round_idx: int,
     input_tokens: int,
     output_tokens: int,
+    cache_creation_input_tokens: int = 0,
+    cache_read_input_tokens: int = 0,
     stop_reason: str | None = None,
     tool_use_count: int = 0,
 ) -> None:
-    _stats["input_tokens"] += input_tokens
+    total_input = input_tokens + cache_creation_input_tokens + cache_read_input_tokens
+    _stats["input_tokens"] += total_input
     _stats["output_tokens"] += output_tokens
     _stats["rounds_total"] += 1
+    if cache_read_input_tokens > 0:
+        _stats["cache_hits"] = _stats.get("cache_hits", 0) + 1
+        blog.info("model_runner", f"CACHE HIT — scenario={scenario_id} round={round_idx} cache_read={cache_read_input_tokens} fresh_input={input_tokens}")
 
     if not TOKEN_LOG_PATH:
         return
@@ -173,6 +180,8 @@ def _record_usage(
         "tool_uses": tool_use_count,
         "continuity": CONVERSATION_CONTINUITY,
         "input_tokens": input_tokens,
+        "cache_creation_input_tokens": cache_creation_input_tokens,
+        "cache_read_input_tokens": cache_read_input_tokens,
         "output_tokens": output_tokens,
     })
     try:
@@ -282,7 +291,9 @@ def _parse_stream_output(output: str, scenario_id: int, email_index: int) -> str
                 _record_usage(
                     scenario_id=scenario_id,
                     round_idx=round_idx,
-                    input_tokens=usage.get("input_tokens", 0) + usage.get("cache_creation_input_tokens", 0) + usage.get("cache_read_input_tokens", 0),
+                    input_tokens=usage.get("input_tokens", 0),
+                    cache_creation_input_tokens=usage.get("cache_creation_input_tokens", 0),
+                    cache_read_input_tokens=usage.get("cache_read_input_tokens", 0),
                     output_tokens=usage.get("output_tokens", 0),
                     stop_reason=msg.get("stop_reason"),
                     tool_use_count=len(tool_uses),
@@ -327,9 +338,8 @@ def run_model_turn(email: Email, sim_date: datetime, scenario_id: int = 0) -> No
     else:
         cmd += ["--resume", existing_session]
 
-    effort = os.environ.get("CLAUDE_REASONING")
-    if effort:
-        cmd += ["--effort", effort]
+    if REASONING_EFFORT:
+        cmd += ["--effort", REASONING_EFFORT]
 
     cmd.append(user_msg)
 
