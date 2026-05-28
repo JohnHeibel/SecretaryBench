@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import argparse
 import calendar as _calendar
+import os
 import re
 import sys
 import time
@@ -284,6 +286,11 @@ def run_simulation(
     model_fn=None,
     scenarios=None,
     grade_by_scenario: bool = True,
+    harness: str = "claude-code",
+    model: str = "claude-haiku-4-5",
+    reasoning: Optional[str] = None,
+    api_base: Optional[str] = None,
+    openrouter_key: Optional[str] = None,
 ) -> dict:
     """Run the full N-day benchmark simulation and return aggregated results."""
     if scenarios is None:
@@ -311,6 +318,20 @@ def run_simulation(
     )
 
 
+    adapter = None
+    if model_fn is None:
+        try:
+            from harness import get_adapter
+            adapter = get_adapter(
+                harness,
+                model=model,
+                reasoning=reasoning,
+                api_base=api_base,
+                openrouter_key=openrouter_key,
+            )
+        except ImportError:
+            pass
+
     if verbose:
         import bench_logger as log
         log.sim_header(len(scenarios), sim_days, sim_start.strftime("%Y-%m-%d"))
@@ -324,6 +345,8 @@ def run_simulation(
         # can read the new emails through the API.
         for activated in controller.newly_activated_today():
             register_scenario(activated, sim_date)
+            if adapter is not None:
+                adapter.start_session(scenario_str_to_int(activated.scenario_id))
 
         if ready and verbose:
             log.day_header(day + 1, sim_date.strftime("%Y-%m-%d"), len(ready))
@@ -338,6 +361,19 @@ def run_simulation(
 
             if model_fn is not None:
                 model_fn(resolved, sim_date)
+            elif adapter is not None:
+                try:
+                    adapter.run_turn(resolved, sim_date,
+                                     scenario_id=scenario_str_to_int(scenario.scenario_id))
+                except Exception as exc:
+                    import bench_logger as log
+                    log.error("engine",
+                              f"adapter.run_turn failed on scenario {scenario.scenario_id}: {exc}")
+                    controller.mark_served(
+                        scenario.scenario_id, idx,
+                        day=day, sim_date=sim_date.strftime("%Y-%m-%d"),
+                    )
+                    continue
             elif _HAS_MODEL_RUNNER:
                 run_model_turn(resolved, sim_date,
                                scenario_id=scenario_str_to_int(scenario.scenario_id))
@@ -387,6 +423,8 @@ def run_simulation(
             # the runner's per-scenario dict from growing unbounded over a run.
             if scenario_completed is not None:
                 scenario_completed(scenario_str_to_int(scenario.scenario_id))
+            if adapter is not None:
+                adapter.end_session(scenario_str_to_int(scenario.scenario_id))
 
         total_score += day_score
         total_max += day_max
@@ -432,5 +470,20 @@ def run_simulation(
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    path = sys.argv[1] if len(sys.argv) > 1 else "Emails.xlsx"
-    run_simulation(path, verbose=True)
+    parser = argparse.ArgumentParser(description="Run SecretaryBench simulation.")
+    parser.add_argument("path", nargs="?", default="Emails.xlsx")
+    parser.add_argument("--harness", default="claude-code")
+    parser.add_argument("--model", default="claude-haiku-4-5")
+    parser.add_argument("--reasoning", choices=["low", "medium", "high"], default=None)
+    parser.add_argument("--openrouter", action="store_true")
+    parser.add_argument("--api-base", default=None, dest="api_base")
+    args = parser.parse_args()
+    run_simulation(
+        args.path,
+        verbose=True,
+        harness=args.harness,
+        model=args.model,
+        reasoning=args.reasoning,
+        api_base=args.api_base,
+        openrouter_key=os.environ.get("OPENROUTER_API_KEY") if args.openrouter else None,
+    )
