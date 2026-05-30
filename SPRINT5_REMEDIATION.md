@@ -9,6 +9,53 @@
 
 ---
 
+## Execution kickoff (fresh session: start here)
+
+You are a fresh ultracode session with none of the prior conversation. Do this in order.
+
+**Step 1.** Read Section 1 (the architecture decision) and Section 5 (orchestration).
+
+**Step 2. The four decisions are pre-defaulted below.** These are sensible defaults chosen with the repo owner. If you want to change any, call `AskUserQuestion` now, before writing code. Otherwise proceed with them as written.
+
+- **D1, Architecture: Option A, a `harness/` package.** One shared core, one live path. Create a `harness/` package with `base.py` (the single source of truth: MCP config, hidden-tools set, the full system prompt, `build_user_message`, `build_prompt`, `bootstrap_calendar`, and `parse_stream_output` with token/tool/compaction logging) plus `cli_base.py` / `claude_p.py` (Claude-specific launch and flags). `ClaudeCodeAdapter` becomes a thin consumer of the core. Delete `model_runner.py` as a separate runner, or reduce it to a wrapper that calls the core, so there is exactly one behavior. Harvest structure from the `architecture-update-with-agents-sdk` branch but do not merge it wholesale (it predates the session-continuity, logging, and tool-trimming work on `main`).
+- **D2, FIX-5 free-text grading: "ungraded marker" plus fix the splitter.** Genuinely free-text criteria are excluded from `max_score` and reported in a separate `ungraded` list (no silent auto-pass-and-count). AND fix `grader._parse_sub_criteria`, because the real data (Appendix C) shows the splitter currently fragments real prefixed criteria into auto-passing junk: 13 phantom `^` entries, plus `or CC-{...}` and `Update: TC-{...}` fragments whose prefix is no longer at position 0. Those are not free-text, they are real `CC`/`TC` checks the splitter broke.
+- **D3, FIX-12 scenario_id: detect-and-log at the MCP server.** Keep "the model must pass `scenario_id`" (it is part of the test), but in the MCP write tools, when a write 404s on a non-existent `scenario_id`, log a distinct line (expected vs seen) and count it, so a garbled id becomes a visible diagnostic instead of a silent 0. Do not auto-correct it.
+- **D4, OpenRouter: leave it exactly as is.** Wired, off by default, unverified. Do not build it out, do not remove it (it is intended Sprint 5 scope). Section 7's seam work makes finishing it cheap later.
+
+**Step 3.** Start Phase 0 (Section 5): build the `harness/` package, move the shared logic into it, point the adapter at it. This is sequential and blocks everything else.
+
+**Step 4. Use the `Workflow` tool for fan-out** (ultracode is on). Phase 1's three tracks are file-disjoint and parallelizable; `engine.py` is the one shared file, so route all its edits through a single agent. See Section 5.
+
+### New files you will create (none exist in the repo yet)
+
+- The `harness/` package (`base.py`, `cli_base.py`, `claude_p.py`; `codex.py` optional), per D1.
+- `tests/fixtures/sample_stream_json.jsonl`: a recorded `claude -p` stream with a duplicated `message.id`, for the FIX-3 dedup test. Construct it by hand if you have no recording.
+- `tests/fixtures/stress_chain.xlsx` (or a generator `tests/generate_stress_chain.py`): a 50+ email single-scenario chain so compaction can actually fire (FIX-10).
+
+### Baseline test reality (read before trusting "tests green")
+
+Current `main` baseline: **130 pass, 6 fail, 1 error.** All seven are pre-existing and unrelated to these fixes:
+
+- **4x `tests/api/test_emails.py::test_delete_email_*`**: stale. They test `DELETE /emails`, a feature deliberately removed (the API returns 405; `README.md:12` says so). Delete or rewrite them. Do NOT implement `DELETE /emails`.
+- **2x `tests/test_e2e.py::test_perfect_stub_scores_max` / `test_bad_stub_scores_only_no_action`**: need a live server. They drive `run_simulation` with a stub model (no `claude`), but `pipeline.register_scenario` POSTs to `localhost:8000`, so they pass only with `uvicorn` running.
+- **1x `tests/test_pipeline.py::test` (error)**: benign. A helper `def test(name)` at `tests/test_pipeline.py:48` gets collected by pytest as a test ("fixture 'name' not found"). Rename it (e.g. `_case`).
+
+### How to validate your work
+
+- **Offline (no server, no claude):** `python -m pytest tests/ -q -k "not test_perfect_stub and not test_bad_stub"`. Exercises grader, flow controller, parsing, models.
+- **Engine integrity (server up, no claude):** start `uvicorn app.main:app`, then `python -m pytest tests/test_e2e.py -q`. The perfect-stub test scoring max is your "engine + pipeline + grader still work end to end" smoke test after the refactor (it uses a stub `model_fn`, so it does not touch the adapter). This is the concrete Phase 0 pass gate.
+- **Adapter fixes (server up + `claude` authenticated):** a real run, `python engine.py Emails.xlsx`, is the only way to validate FIX-1 and FIX-3 (calendar events actually created, `token_usage.jsonl` non-empty). There is no offline substitute for the adapter path.
+
+### Adversarial gate (per P0 fix, before calling it done)
+
+After each P0 fix lands, spawn a separate review agent (via `Workflow` or `Agent`) told to *prove the fix is still broken*: for FIX-1, run the bench and confirm an event is actually created on the adapter path; for FIX-2, grade a wrong-date event and confirm it now fails; for FIX-3, confirm `token_usage.jsonl` has rows with cache splits. Only close the fix when the skeptic cannot break it.
+
+### Realistic test Definition of Done
+
+After cleaning the 4 stale delete tests, renaming the `test_pipeline.py:48` helper, and adding the new tests each fix names: **0 failed, 0 errors with `uvicorn` running.** Note that "green" is not achievable on raw `main`; it is achievable only after this cleanup.
+
+---
+
 ## 0. How to use this document
 
 This is a work order, not a discussion. Each fix is a self-contained unit with: the problem, the evidence (`file:line` as of the current `main`), the root cause, the concrete change, the files it touches, acceptance criteria, the tests to add or run, and its dependencies. Line numbers are accurate as of commit `89a0689` and may drift one or two lines after edits, so match on surrounding code, not the raw number.
@@ -28,7 +75,7 @@ There are two implementations of "drive `claude` for one email":
 
 The engine's dispatch (`engine.py:362-381`) is `model_fn` then `adapter` then `model_runner` then mock. Because `harness.py` always imports cleanly, **the adapter always wins and `model_runner.py` is dead code on every normal run.** Almost every P0 and P1 bug below is a direct consequence of the adapter being an incomplete copy of the runner.
 
-**Required decision before P0 work starts.** Pick one:
+**Decision: Option A, using a `harness/` package** (pre-defaulted as D1 in the Execution Kickoff; override before Phase 0 only if you disagree). The two options considered were:
 
 - **Option A (recommended): one shared core, one live path.** Create `runner_core.py` (or a `harness/` package) holding the single source of truth for the system prompt, MCP config, hidden-tools list, `build_user_message`, `bootstrap_calendar`, and the stream-json parser (session id + token/tool/compaction logging). `ClaudeCodeAdapter` and any future adapter call into it. Delete `model_runner.py` as a separate runner (or reduce it to a thin wrapper that calls the same core) so there is exactly one behavior. Miguel's unmerged `architecture-update-with-agents-sdk` branch is a prototype of this shape (it adds a `harness/` package and a shared `bootstrap_calendar`), but it predates the session-continuity, logging, and tool-trimming work on `main`, so harvest its structure, do not merge it wholesale.
 - **Option B (faster, worse): patch the adapter in place.** Copy the missing pieces (calendar bootstrap, full prompt, logging) from `model_runner.py` into `harness.py`. This fixes the runtime bugs but leaves two diverging copies and the duplication findings (FIX-7) stand. Only choose this if you are time-boxed.
@@ -141,7 +188,7 @@ These three break the benchmark signal on `python engine.py Emails.xlsx` (the de
 
 ### FIX-5: Decide and implement free-text criteria handling  `[HIGH, needs a product decision]`
 
-**Problem.** Any criterion without a `TC` / `CC` / `RS` / "No action" prefix auto-passes (`grader.py:161-165`). There are 22 such free-text criteria in `Emails.xlsx` ("Delegate Task", "Flag, insufficient info", and similar). A scenario mixing prefixed and free-text criteria can be passed by satisfying only the prefixed subset, and free-text criteria inflate `max_score` while testing nothing.
+**Problem (bigger than "free-text auto-passes").** Any criterion without a `TC` / `CC` / `RS` / "No action" prefix auto-passes (`grader.py:161-165`). Measured against the real dataset (full breakdown in Appendix C): of 225 sub-criteria, 99 are prefixed and 96 are "no action", but **30 auto-pass as "free-text", and most of those are a splitter bug, not real free-text.** `grader._parse_sub_criteria` splits on commas and `&&` only, which fragments real criteria so their prefix is no longer at position 0: it produces 13 phantom `^` entries, plus `or CC-{date+1- 3PM}` and `Update:  TC-{nextweek-wednesday}` pieces that are genuine `CC`/`TC` checks silently turned into passes. So FIX-5 is two problems: (1) the splitter mangles real prefixed criteria, and (2) genuinely unprefixed criteria ("Delegate Task", "Add task", "Find when quarterly earnings call is") auto-pass and inflate `max_score`.
 
 **Decision required (pick one, document it in `docs/GRADER.md`):**
 1. **Explicit "ungraded" marker.** Free-text criteria are excluded from `max_score` and reported in a separate `ungraded` list. Honest and low-risk. Recommended as the default.
@@ -245,7 +292,12 @@ Fix the docs that currently contradict the code (most resolve automatically once
 
 **Problem.** `scenario_id` is a roughly 10-digit md5-derived int (`pipeline.py:36-37`) that the model must copy verbatim into every write. If it garbles it, the write 404s, nothing is created, and the email scores 0 with no signal that the cause was a bad id rather than a bad decision. The old SDK runner force-injected the id; the subprocess cannot.
 
-**Decision required:** keep "the model must pass it, and that is part of the test" (current, defensible), or add a safety net. If a safety net: the MCP server could detect a write whose `scenario_id` does not exist and log it distinctly, or the runner could post-validate that the model used the expected id. Do not silently swallow it.
+**Decision: D3 (detect-and-log at the MCP server), pre-defaulted in the Execution Kickoff.** The options were:
+- (a) Keep current behavior: bad id, silent 0. Defensible but undiagnosable.
+- (b, chosen) MCP server detect-and-log: in `create_todo` / `create_event` / `send_email` (`mcp_server/server.py`), when the downstream API returns 404 for a missing `scenario_id`, emit a distinct stderr line (`bad scenario_id: expected vs seen`) and increment a counter, then surface the error to the model as today. Cheap, harness-agnostic, makes silent 0s visible. Keeps "the model must pass it" as part of the test.
+- (c) Runner post-validation: after each turn, verify every created todo/event carries the expected `scenario_id` and fail the email loudly otherwise. More thorough, more coupling.
+
+Implement (b) unless the owner overrides. Document the chosen behavior in `docs/api_reference.md`.
 
 **Fix.** At minimum, log when a write fails scenario-id validation so silent 0s become diagnosable. Optionally, reconsider using a short human-typable id at the MCP boundary.
 
@@ -309,7 +361,7 @@ The remediation is complete when a default `python engine.py Emails.xlsx` run on
 10. The stress chain demonstrably triggers compaction and still scores (FIX-10).
 11. No doc contradicts the code (FIX-11).
 12. A bad `scenario_id` is diagnosable, not a silent 0 (FIX-12).
-13. Full test suite green, with new tests for FIX-1 through FIX-3 and FIX-5 and FIX-6.
+13. Test suite at the realistic target from the Execution Kickoff (0 failed, 0 errors with `uvicorn` running, after the stale-test cleanup), with new tests for FIX-1 through FIX-3 and FIX-5 and FIX-6.
 
 ---
 
@@ -400,3 +452,43 @@ The Sprint 5 "done when" for the abstraction was "switching harness is one CLI/e
 - Day-100 overflow is **prevented** by offset clamping (`flow_controller.py:152-155`); a test asserts `remaining_active <= 5`. The "no leftover" invariant essentially holds. The only ungraded tail is a handful of single-email scenarios that activate on the last days, which is acceptable and reported as `remaining_active`.
 - The `CodexAdapter` docstring ("MCP config identical to ClaudeCodeAdapter") is forward-looking design documentation, not a false claim.
 - Every `claude` CLI flag the code uses (`--tools ""`, `--effort`, `--resume`, `--disallowed-tools`, `--append-system-prompt`, `--strict-mcp-config`, `--mcp-config`) exists and behaves as intended on the installed `claude` 2.1.158. The flag surface is not a risk on this machine.
+
+## Appendix C: free-text criteria data (for FIX-5)
+
+Measured from `Emails.xlsx` via `loader.load_scenarios` + `grader._parse_sub_criteria`. This is the real data FIX-5's decision rests on.
+
+- 109 scenarios, **225 sub-criteria total**: 99 prefixed (`TC`/`CC`/`RS`), 96 "no action", **30 auto-pass as free-text** (across 15 distinct strings).
+- The 30 fall into three buckets, and only the third is genuinely "free-text":
+
+**Bucket 1, splitter artifacts (NOT free-text, real checks broken by the parser):**
+| count | string | what it should be |
+|---|---|---|
+| 13 | `^` | a phantom token; the cell uses `^` somewhere the splitter leaves stranded. Investigate the source cells, strip/ignore `^`. |
+| 2 | `or  CC-{date+1- 3PM}` | the second half of a "`CC-{x}` or `CC-{y}`" alternative; prefix no longer at position 0 |
+| 2 | `or CC-{date+2- 11AM}` | same, an "or" alternative |
+| 1 | `Update:  TC-{nextweek-wednesday}` | a real `TC` check prefixed with "Update: " |
+
+These prove the splitter mangles real `CC`/`TC` criteria into auto-passes. Fix `_parse_sub_criteria` to handle `or` alternatives, leading labels ("Update:"), and `^`.
+
+**Bucket 2, natural-language action criteria (no prefix, describe a real action):**
+| count | string |
+|---|---|
+| 1 | `delete meeting {date-14th} {date-11AM}` |
+| 1 | `Remove meeting on {date-1:14PM}` |
+| 1 | `create new meeting on {date-3PM}` |
+
+These describe real expected events but use no `TC`/`CC`/`RS` prefix, so they auto-pass. Either normalize them in the dataset (rewrite as `CC-`/`RS-`) or have the grader recognize the verbs.
+
+**Bucket 3, genuinely free-text intents (the actual FIX-5 question):**
+| count | string |
+|---|---|
+| 2 | `Add task` |
+| 1 | `Flag` |
+| 1 | `insufficient info` |
+| 1 | `Delegate Task` |
+| 1 | `Create to:do` |
+| 1 | `Add task to do list` |
+| 1 | `Find when quarterly earnings call is` |
+| 1 | `Must not re:add` |
+
+`Flag` + `insufficient info` is one criterion ("Flag, insufficient info") split on its comma. The D2 default ("ungraded marker") applies to this bucket: exclude from `max_score`, report separately. Buckets 1 and 2 are bugs to fix, not free-text to mark.
