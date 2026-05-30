@@ -5,6 +5,8 @@
 **Audience:** an ultracode session (multi-agent workflow) or a human implementing the fixes
 **Source of findings:** a 46-agent adversarial audit of `main` plus first-hand reads of every core file. Every claim below was verified against the source, not just the docs.
 
+> **Scope today: this only drives `claude -p`.** The automated runner supports exactly one harness, Claude Code in print mode (`claude -p`). Both runner implementations build a `claude -p` subprocess (`model_runner.py:345-364`, `harness.py:133-152`), and the only other registered adapter, `CodexAdapter` (`harness.py:182-200`), is a stub that raises `NotImplementedError`. So "drop any harness" is currently a clean interface (`HarnessAdapter`) with exactly one working implementation behind it. Note the two axes are different: swapping the *model* already works (`--model`, and any OpenRouter model via the Anthropic-compatible endpoint), but swapping the *harness* does not. Also note: the MCP server is reachable by any MCP client (see `MCP.md`), but the *scored* 100-day simulation in `engine.py` only knows how to launch and parse `claude -p`. **Section 7 is the recipe for making it truly harness-agnostic.**
+
 ---
 
 ## 0. How to use this document
@@ -308,6 +310,68 @@ The remediation is complete when a default `python engine.py Emails.xlsx` run on
 11. No doc contradicts the code (FIX-11).
 12. A bad `scenario_id` is diagnosable, not a silent 0 (FIX-12).
 13. Full test suite green, with new tests for FIX-1 through FIX-3 and FIX-5 and FIX-6.
+
+---
+
+## 7. Supporting other harnesses (what it takes)
+
+Today the benchmark only drives `claude -p`. This section is the recipe for changing that. The good news is the split is already in the right place: the *benchmark* is harness-neutral, only the *runner* is Claude-specific. None of this is required to ship the P0/P1 fixes above; it is the follow-on that makes the "any harness" claim true.
+
+### 7.1 What is already portable (no per-harness work)
+
+These need zero changes to add a new harness, because they never inspect the agent, they only read the store:
+
+- The **MCP server** (`mcp_server/server.py`). The single tool surface, a thin HTTP wrapper over the API. Any MCP-capable harness (Claude Code, Codex, Cursor, Cline, a custom Agent-SDK loop) connects to the same 22 tools.
+- The **store, grader, flow controller, loader** and the **engine contract** (`run_turn(email, sim_date, scenario_id)` then block then diff-grade).
+- The **`HarnessAdapter` interface** (`harness.py:77-97`). This is the correct seam. Adding a harness means adding one subclass.
+
+### 7.2 What is Claude-Code-specific (must be reimplemented per harness)
+
+All of this lives in `ClaudeCodeAdapter` and the shared core (after Option A):
+
+- The subprocess command and its flags: `-p`, `--output-format stream-json`, `--mcp-config`, `--strict-mcp-config`, `--disallowed-tools`, `--append-system-prompt`, `--resume`, `--effort`, `--permission-mode bypassPermissions`. None of these exist on other CLIs.
+- **Session continuity** via `--resume <session_id>`, where the id is scraped from Claude's stream-json `system/init` event (`harness.py:219-235`). Other harnesses have different or no resume mechanism.
+- **Compaction** detection, which parses Claude's stream-json compaction events (`model_runner.py:273-275, 295-297`). Compaction is a Claude Code feature.
+- **Telemetry** parsing (tokens, tool calls), which reads Claude's stream-json schema.
+
+### 7.3 The per-harness adapter recipe
+
+To add harness X, write a `HarnessAdapter` subclass that does each of the following. Items 1 to 3 are mandatory; 4 to 6 are needed for full parity.
+
+1. **Point X at the MCP server.** Reuse the same MCP config; only the config *format* differs per harness. The tool surface must stay identical (that is the fairness invariant in 7.4).
+2. **Run one turn non-interactively and block.** One email in, control returns only after X is done acting. Whatever X's "headless / print / batch" mode is.
+3. **Inject the prompt.** The shared core must expose two shapes, because harnesses split it differently:
+   - CLI subprocess harnesses (claude, codex) take system + user concatenated into the prompt argument. Provide a `build_prompt(...)`.
+   - In-process SDK harnesses (e.g. the Claude Agent SDK, or an OpenAI Agents loop) take the system prompt as a separate option and the email as the user message. Provide a `build_user_message(...)`.
+   This is exactly the `build_prompt` vs `build_user_message` split prototyped on the `architecture-update-with-agents-sdk` branch (`harness/base.py`). Not every harness is a subprocess; the interface allows in-process too.
+4. **Session continuity.** Map `scenario_id` to X's session handle and resume it for emails 2..N. If X cannot resume sessions, you have two honest choices: (a) accept that the continuity and compaction test does not apply to X and report it as "not supported," or (b) manually re-send the accumulated conversation each turn. Do not pretend continuity happened if it did not.
+5. **Telemetry and compaction.** Parse X's output for tokens, tool calls, and whatever X does on context overflow (compact, truncate, error). This is what makes FIX-3 and FIX-9 produce numbers for X. If X emits nothing parseable, log that those dimensions are unavailable for X rather than emitting zeros.
+6. **Non-interactive tool execution.** X must run tools without a human approving each one. Claude uses `--permission-mode bypassPermissions`; every harness has its own auto-approve switch. Find X's.
+
+Then register X in `HARNESS_REGISTRY` (`harness.py:254-257`) and it is selectable via `--harness X`.
+
+### 7.4 Fairness invariants (so a cross-harness score means something)
+
+For two harness runs to be comparable, these MUST be identical across harnesses:
+
+- the MCP tool surface (already enforced by the shared `_MCP_CONFIG` / hidden-tools list),
+- the scenarios and emails, and the `scenario_id` contract,
+- the grader,
+- the secretary system-prompt guidance (the same text, injected via each harness's own mechanism).
+
+These are ALLOWED to vary, and the variance is precisely what the benchmark measures:
+
+- how the harness manages context (compaction vs truncation vs error vs manual re-send),
+- the harness's internal agent loop and round count,
+- session-resume mechanics.
+
+### 7.5 Recommended change that makes every future harness cheaper
+
+Tool hiding today is done with Claude's `--disallowed-tools` flag, which is per-harness and not portable. **Move the hiding into the MCP server instead:** gate the admin tools (`create_scenario`, `delete_scenario`, `create_calendar`, etc.) behind a `BENCH_MODE` env var so the server simply does not register them during a benchmark run. Then every harness automatically gets the trimmed surface with zero per-harness flag work, and the fairness invariant in 7.4 (identical tool surface) is enforced in one place instead of N. This also kills FIX-7's duplication at the source. Strongly recommended before adding harness #2.
+
+### 7.6 Optional FIX-14: prove the abstraction with one real second harness  `[only if multi-harness is a near-term goal]`
+
+The Sprint 5 "done when" for the abstraction was "switching harness is one CLI/env value with zero changes to engine, grader, or MCP." That is satisfied by the *interface*, but it is unproven until a second harness actually runs. To prove it: implement one real adapter (Codex CLI is the natural candidate, it is already MCP-capable and stubbed at `harness.py:182-200`), apply 7.5 so tool hiding is server-side, and confirm a full run produces a score with no edits to `engine.py`, `grader.py`, or the MCP server. Acceptance: two harnesses run the same scenario set and the only difference in the codebase between them is the adapter class plus launch config. Decide the target harness before starting.
 
 ---
 
