@@ -23,15 +23,28 @@ const nodeTypes = { email: EmailNode };
 
 function bodyPreview(g: Graph, id: string): string {
   const segs = g.emails[id]?.body_segments || [];
-  return segs.map((s) => (s.type === "text" ? s.value : `「${chipLabel(s.chip)}」`)).join("");
+  return segs
+    .map((s) =>
+      s.type === "text" ? s.value : s.type === "chip" ? `「${chipLabel(s.chip)}」` : `「${s.name}」`
+    )
+    .join("");
 }
 
-function build(graph: Graph, selected: string | null, oracle: ReturnType<typeof useStore>["oracle"]) {
+function build(
+  graph: Graph,
+  selected: string | null,
+  oracle: ReturnType<typeof useStore>["oracle"],
+  onFollowUp: (id: string) => void
+) {
   const colorOf: Record<string, string> = {};
   graph.threads.forEach((t, i) => (colorOf[t.id] = THREAD_COLORS[i % THREAD_COLORS.length]));
   const emitsBy: Record<string, string[]> = {};
   Object.entries(graph.emission_map).forEach(([name, eid]) => {
     (emitsBy[eid] ||= []).push(name);
+  });
+  const factsBy: Record<string, string[]> = {};
+  Object.entries(graph.fact_map || {}).forEach(([name, eid]) => {
+    (factsBy[eid] ||= []).push(name);
   });
 
   const nodes: RFNode<EmailNodeData>[] = Object.values(graph.emails).map((e) => ({
@@ -40,11 +53,13 @@ function build(graph: Graph, selected: string | null, oracle: ReturnType<typeof 
     position: { x: e.x ?? 80, y: e.y ?? 80 },
     data: {
       email: e,
-      color: colorOf[e.thread] || "#6aa6ff",
+      color: colorOf[e.thread] || "#5b8cff",
       selected: selected === e.id,
       oracle: oracle?.results?.[e.id],
       emitsAnchors: emitsBy[e.id] || [],
+      definesFacts: factsBy[e.id] || [],
       bodyPreview: bodyPreview(graph, e.id),
+      onFollowUp,
     },
   }));
 
@@ -58,10 +73,11 @@ function build(graph: Graph, selected: string | null, oracle: ReturnType<typeof 
         source: d.email,
         target: e.id,
         animated: isDate,
-        label: isDate ? "⏰ deadline" : "🔗 after",
-        labelStyle: { fill: isDate ? "#c084fc" : "#8a97b8", fontSize: 10 },
-        labelBgStyle: { fill: "#161d2e" },
-        style: { stroke: isDate ? "#c084fc" : "#2a3552", strokeDasharray: isDate ? "5 4" : undefined },
+        label: isDate ? "deadline" : "after",
+        labelStyle: { fill: isDate ? "#b98cff" : "#888f9c", fontSize: 10 },
+        labelBgStyle: { fill: "#14171c" },
+        labelBgPadding: [4, 2] as [number, number],
+        style: { stroke: isDate ? "#b98cff" : "#39414e", strokeDasharray: isDate ? "5 4" : undefined },
       });
     });
   });
@@ -69,13 +85,13 @@ function build(graph: Graph, selected: string | null, oracle: ReturnType<typeof 
 }
 
 export function GraphCanvas() {
-  const { graph, selected, select, connect, disconnect, setPosition, oracle } = useStore();
+  const { graph, selected, select, connect, disconnect, setPosition, oracle, addFollowUp } = useStore();
 
   const initial = useMemo(
-    () => (graph ? build(graph, selected, oracle) : { nodes: [], edges: [] }),
+    () => (graph ? build(graph, selected, oracle, addFollowUp) : { nodes: [], edges: [] }),
     // rebuild on structural/content change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [structureSig(graph), selected, oracle]
+    [structureSig(graph), selected, oracle, addFollowUp]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState<RFNode<EmailNodeData>>(initial.nodes);
@@ -123,9 +139,15 @@ export function GraphCanvas() {
       proOptions={{ hideAttribution: true }}
       minZoom={0.2}
     >
-      <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#1d2740" />
-      <MiniMap pannable zoomable nodeColor={(n) => (n.data as EmailNodeData).color} maskColor="#0e152588" style={{ background: "#161d2e" }} />
-      <Controls className="!bg-panel !border-edge" />
+      <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#1b1f26" />
+      <MiniMap
+        pannable
+        zoomable
+        nodeColor={(n) => (n.data as EmailNodeData).color}
+        maskColor="#0b0d11cc"
+        style={{ background: "#14171c", border: "1px solid #262b34", width: 150, height: 100 }}
+      />
+      <Controls showInteractive={false} />
     </ReactFlow>
   );
 }

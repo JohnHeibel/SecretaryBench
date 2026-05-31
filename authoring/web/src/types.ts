@@ -31,7 +31,8 @@ export interface Chip {
 
 export type Segment =
   | { type: "text"; value: string }
-  | { type: "chip"; chip: Chip; token?: string };
+  | { type: "chip"; chip: Chip; token?: string }
+  | { type: "fact"; name: string; value: string | null; token?: string };
 
 export type MatchKind = "on" | "by" | "within" | "any_of";
 
@@ -48,8 +49,8 @@ export interface ExpectForm {
   action: Action;
   title_match: string[];
   when: Predicate | null;
-  duration?: string | null;
-  count?: number | null;
+  duration?: string | null; // literal "90m" OR a fact ref "@client_meeting_len"
+  count?: number | string | null;
   tolerance?: string;
 }
 
@@ -62,6 +63,7 @@ export interface AnswerForm {
   expect: ExpectForm[];
   forbid: ForbidForm[];
   emits: Record<string, Chip>;
+  facts?: Record<string, string>;
 }
 
 export interface Edge {
@@ -82,6 +84,8 @@ export interface EmailForm {
   answer: AnswerForm;
   emits: Record<string, Chip>;
   reachable_anchors: string[];
+  defined_facts: Record<string, string>;
+  reachable_facts: string[];
   // client-only layout (persisted in localStorage, not corpus)
   x?: number;
   y?: number;
@@ -104,6 +108,8 @@ export interface Graph {
   threads: ThreadForm[];
   emails: Record<string, EmailForm>;
   emission_map: Record<string, string>;
+  fact_map: Record<string, string>;
+  fact_values: Record<string, string>;
   errors: string[];
   sample: Sample;
   start: string;

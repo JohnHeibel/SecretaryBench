@@ -101,8 +101,11 @@ export function GradingEditor({ email, serve, anchors, onChange, onAnchorPicked 
               <div className="flex flex-wrap gap-3">
                 {!isTodo && (
                   <Field label="length" inline>
-                    <input className={`${inp} w-24`} placeholder="e.g. 90m" value={e.duration || ""}
-                      onChange={(ev) => setExpect(i, { duration: ev.target.value || null })} />
+                    <DurationControl
+                      value={e.duration || ""}
+                      reachableFacts={email.reachable_facts}
+                      onChange={(d) => setExpect(i, { duration: d || null })}
+                    />
                   </Field>
                 )}
                 <Field label="how many" inline>
@@ -181,6 +184,30 @@ function PredicatePicker({
               onClick={() => onChange({ ...p, avoid_chip: emptyChip("next_weekday") })}>+ blackout</button>
           )}
         </span>
+      )}
+    </div>
+  );
+}
+
+function DurationControl({
+  value, reachableFacts, onChange,
+}: { value: string; reachableFacts: string[]; onChange: (v: string) => void }) {
+  const isFact = value.startsWith("@");
+  return (
+    <div className="flex items-center gap-1">
+      {reachableFacts.length > 0 && (
+        <select
+          className={inp}
+          value={isFact ? value : "__lit"}
+          onChange={(e) => onChange(e.target.value === "__lit" ? "" : e.target.value)}
+        >
+          <option value="__lit">custom</option>
+          {reachableFacts.map((f) => <option key={f} value={`@${f}`}>📏 use {f}</option>)}
+        </select>
+      )}
+      {!isFact && (
+        <input className={`${inp} w-20`} placeholder="e.g. 90m" value={value}
+          onChange={(e) => onChange(e.target.value)} />
       )}
     </div>
   );

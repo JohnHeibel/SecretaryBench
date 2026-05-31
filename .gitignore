@@ -42,3 +42,5 @@ settings.local.json
 CLAUDE.md
 MIGRATION_AI_LANE.md
 TEAMMATE_BREIF.md
+# Playwright MCP scratch
+.playwright-mcp/

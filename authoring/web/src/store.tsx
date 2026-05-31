@@ -55,8 +55,8 @@ interface Store {
   updateEmail: (id: string, patch: Partial<EmailForm>) => void;
   updateAnswer: (id: string, answer: AnswerForm) => void;
   updateThread: (id: string, patch: Partial<ThreadForm>) => void;
-  addThread: () => void;
-  addEmail: (threadId: string) => void;
+  newEmail: () => void;
+  addFollowUp: (sourceId: string) => void;
   deleteEmail: (id: string) => void;
   deleteThread: (id: string) => Promise<void>;
   connect: (sourceId: string, targetId: string) => void;
@@ -141,31 +141,43 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, [mutate, markDirty]);
 
-  const addThread = useCallback(() => {
+  // a brand-new conversation: one thread, one email, placed to the right of the field
+  const newEmail = useCallback(() => {
+    if (!graph) return;
+    let n = 1;
+    let id = `conversation-${n}`;
+    while (graph.threads.some((t) => t.id === id)) id = `conversation-${++n}`;
+    const eid = `${id}.email1`;
+    const maxX = Math.max(40, ...Object.values(graph.emails).map((e) => e.x ?? 0));
+    const x = Object.keys(graph.emails).length ? maxX + 340 : 120;
     mutate((g) => {
-      let n = g.threads.length + 1;
-      let id = `thread-${n}`;
-      while (g.threads.some((t) => t.id === id)) id = `thread-${++n}`;
-      const eid = `${id}.email1`;
-      g.threads = [...g.threads, { id, cast: { ME: "you" }, node_depends_on: [], emails: [eid] }];
-      g.emails[eid] = blankEmail(eid, id, 80 + g.threads.length * 340, 80);
+      g.threads = [...g.threads, { id, cast: { ME: "you", THEM: "" }, node_depends_on: [], emails: [eid] }];
+      g.emails[eid] = blankEmail(eid, id, x, 120);
       markDirty(id);
     });
-  }, [mutate, markDirty]);
+    setSelected(eid);
+  }, [graph, mutate, markDirty]);
 
-  const addEmail = useCallback((threadId: string) => {
+  // a follow-up to an existing email: same thread, linked, placed below it
+  const addFollowUp = useCallback((sourceId: string) => {
     if (!graph) return;
+    const src = graph.emails[sourceId];
+    if (!src) return;
+    const threadId = src.thread;
     const t = graph.threads.find((x) => x.id === threadId);
     if (!t) return;
     let n = t.emails.length + 1;
     let eid = `${threadId}.email${n}`;
     while (graph.emails[eid]) eid = `${threadId}.email${++n}`;
-    const last = t.emails.length ? graph.emails[t.emails[t.emails.length - 1]] : null;
-    const x = last?.x ?? 80;
-    const y = (last?.y ?? 40) + 160;
+    const x = src.x ?? 80;
+    const y = (src.y ?? 40) + 170;
     mutate((g) => {
       g.threads = g.threads.map((x) => (x.id === threadId ? { ...x, emails: [...x.emails, eid] } : x));
-      g.emails[eid] = blankEmail(eid, threadId, x, y);
+      const e = blankEmail(eid, threadId, x, y);
+      e.from = src.from;
+      e.to = src.to;
+      e.depends_on = [{ email: sourceId, type: "static" }];
+      g.emails[eid] = e;
       markDirty(threadId);
     });
     setSelected(eid);
@@ -274,10 +286,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<Store>(() => ({
     graph, selected, dirty, oracle, busy,
     reload, select, setPosition, updateEmail, updateAnswer, updateThread,
-    addThread, addEmail, deleteEmail, deleteThread, connect, disconnect,
+    newEmail, addFollowUp, deleteEmail, deleteThread, connect, disconnect,
     ensureDateEdge, save, runOracle,
   }), [graph, selected, dirty, oracle, busy, reload, select, setPosition,
-       updateEmail, updateAnswer, updateThread, addThread, addEmail, deleteEmail,
+       updateEmail, updateAnswer, updateThread, newEmail, addFollowUp, deleteEmail,
        deleteThread, connect, disconnect, ensureDateEdge, save, runOracle]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -287,7 +299,7 @@ function blankEmail(id: string, thread: string, x: number, y: number): EmailForm
   return {
     id, thread, from: "", to: ["ME"], subject: "",
     body_segments: [{ type: "text", value: "" }],
-    depends_on: [], answer: { expect: [], forbid: [], emits: {} },
-    emits: {}, reachable_anchors: [], x, y,
+    depends_on: [], answer: { expect: [], forbid: [], emits: {}, facts: {} },
+    emits: {}, reachable_anchors: [], defined_facts: {}, reachable_facts: [], x, y,
   };
 }
