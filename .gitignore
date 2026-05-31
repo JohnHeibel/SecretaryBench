@@ -13,6 +13,13 @@ build/
 venv/
 env/
 
+# Node / frontend build (authoring/web)
+node_modules/
+authoring/web/dist/
+*.tsbuildinfo
+authoring/web/vite.config.js
+authoring/web/vite.config.d.ts
+
 # IDE
 .idea/
 .vscode/
