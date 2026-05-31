@@ -20,7 +20,11 @@ class Email(BaseModel):
     recipients: list[str]
     body: str
     email_id: int
-    scenario_id: Optional[int]= None
+    # Optional ON PURPOSE (FIX-13): this model is also parsed from the nested
+    # POST /scenarios/ payload, where fixture emails are authored WITHOUT a
+    # scenario_id and the server back-fills it (routers/scenarios.py). Making it
+    # required would 422 scenario creation. Agent-sent emails always carry it.
+    scenario_id: Optional[int] = None
 
 
 class Scenario(BaseModel):

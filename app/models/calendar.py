@@ -18,7 +18,8 @@ class EventResponse(BaseModel):
     description: Optional[str] = None
     start: datetime
     end: datetime
-    scenario_id: Optional[int] = None
+    # Always set on creation (EventCreate requires it), so the response is non-optional (FIX-13).
+    scenario_id: int
 
 
 class CalendarCreate(BaseModel):

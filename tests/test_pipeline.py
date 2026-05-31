@@ -45,8 +45,12 @@ from engine import (
 _results: list[tuple[str, bool, str]] = []
 
 
-def test(name: str):
-    """Decorator: run the function, capture pass/fail + any traceback."""
+def _case(name: str):
+    """Decorator: run the function, capture pass/fail + any traceback.
+
+    Renamed from `test` so pytest doesn't collect this helper as a test
+    (it would fail with "fixture 'name' not found").
+    """
     def deco(fn):
         try:
             fn()
@@ -79,31 +83,31 @@ REF = datetime(2000, 3, 15, tzinfo=timezone.utc)
 section("Token resolver")
 
 
-@test("plain {date}")
+@_case("plain {date}")
 def _():
     out = resolve_tokens("today is {date}", REF)
     assert "March 15, 2000" in out, out
 
 
-@test("{date+N} day arithmetic")
+@_case("{date+N} day arithmetic")
 def _():
     assert "March 17, 2000" in resolve_tokens("{date+2}", REF)
     assert "March 22, 2000" in resolve_tokens("{date+7}", REF)
 
 
-@test("{date+Nweeks} week arithmetic")
+@_case("{date+Nweeks} week arithmetic")
 def _():
     assert "March 29, 2000" in resolve_tokens("{date+2weeks}", REF)
     assert "April 05, 2000" in resolve_tokens("{date+3weeks}", REF)
 
 
-@test("{date-tomorrow} and {date-nextday}")
+@_case("{date-tomorrow} and {date-nextday}")
 def _():
     assert "March 16, 2000" in resolve_tokens("{date-tomorrow}", REF)
     assert "March 16, 2000" in resolve_tokens("{date-nextday}", REF)
 
 
-@test("{date-nextweek} all spacing variants resolve identically")
+@_case("{date-nextweek} all spacing variants resolve identically")
 def _():
     a = resolve_tokens("{date-nextweek}", REF)
     b = resolve_tokens("{date-next week}", REF)
@@ -112,7 +116,7 @@ def _():
     assert "March 22, 2000" in a, a
 
 
-@test("{nextweek-date} all spacing variants resolve identically")
+@_case("{nextweek-date} all spacing variants resolve identically")
 def _():
     a = resolve_tokens("{nextweek-date}", REF)
     b = resolve_tokens("{nextweek - date}", REF)
@@ -121,14 +125,14 @@ def _():
     assert "March 22, 2000" in a, a
 
 
-@test("{nextweek-date +N} relative offsets")
+@_case("{nextweek-date +N} relative offsets")
 def _():
     assert "March 25, 2000" in resolve_tokens("{nextweek-date +3}", REF)
     assert "March 27, 2000" in resolve_tokens("{nextweek -date +5}", REF)
     assert "March 20, 2000" in resolve_tokens("{nextweek - date -2}", REF)
 
 
-@test("{date-nextmonth} = same day next month (clamped)")
+@_case("{date-nextmonth} = same day next month (clamped)")
 def _():
     # March 15 -> April 15
     assert "April 15, 2000" in resolve_tokens("{date-nextmonth}", REF)
@@ -137,23 +141,23 @@ def _():
     assert "February 29, 2000" in resolve_tokens("{date-nextmonth}", end_of_month)
 
 
-@test("{date-nextmonth+N}")
+@_case("{date-nextmonth+N}")
 def _():
     assert "April 18, 2000" in resolve_tokens("{date-nextmonth+3}", REF)
 
 
-@test("{date-beginningmonth} = first of current month")
+@_case("{date-beginningmonth} = first of current month")
 def _():
     assert "March 01, 2000" in resolve_tokens("{date-beginningmonth}", REF)
 
 
-@test("{date-Nth} day-of-month, future-or-this-month")
+@_case("{date-Nth} day-of-month, future-or-this-month")
 def _():
     assert "March 18, 2000" in resolve_tokens("{date-18th}", REF)  # later this month
     assert "April 14, 2000" in resolve_tokens("{date-14th}", REF)  # already past, next month
 
 
-@test("{date-10AM}, {date-2PM}, {date-1:14PM} render with time")
+@_case("{date-10AM}, {date-2PM}, {date-1:14PM} render with time")
 def _():
     out = resolve_tokens("{date-10AM}", REF)
     assert "March 15, 2000" in out and "10:00 AM" in out, out
@@ -163,13 +167,13 @@ def _():
     assert "01:14 PM" in out, out
 
 
-@test("{link} and {meeting-link}")
+@_case("{link} and {meeting-link}")
 def _():
     assert "[meeting link]" in resolve_tokens("{link}", REF)
     assert "[meeting link]" in resolve_tokens("{meeting-link}", REF)
 
 
-@test("unknown tokens left as-is")
+@_case("unknown tokens left as-is")
 def _():
     # Non-date tokens like document references should pass through
     assert resolve_tokens("see {Annual Report 1}", REF) == "see {Annual Report 1}"
@@ -178,14 +182,14 @@ def _():
     assert "{date-12:30-2:00PM}" in resolve_tokens("{date-12:30-2:00PM}", REF)
 
 
-@test("multiple tokens in one string")
+@_case("multiple tokens in one string")
 def _():
     out = resolve_tokens("from {date} to {date+3}", REF)
     assert "March 15, 2000" in out
     assert "March 18, 2000" in out
 
 
-@test("apply_date_substitutions does not mutate original")
+@_case("apply_date_substitutions does not mutate original")
 def _():
     e = Email(
         email_number=1, subject="meet {date}", body="see you {date+2}",
@@ -205,7 +209,7 @@ def _():
 section("Chain offset generation")
 
 
-@test("offsets are non-decreasing and start at 0")
+@_case("offsets are non-decreasing and start at 0")
 def _():
     import random
     rng = random.Random(123)
@@ -218,13 +222,13 @@ def _():
             assert offsets[i] - offsets[i - 1] in (0, 1, 2), offsets
 
 
-@test("single-email chain has [0]")
+@_case("single-email chain has [0]")
 def _():
     import random
     assert _generate_email_offsets(1, random.Random(0)) == [0]
 
 
-@test("offset distribution roughly matches 50/30/20 weights")
+@_case("offset distribution roughly matches 50/30/20 weights")
 def _():
     import random
     rng = random.Random(42)
@@ -266,7 +270,7 @@ def _make_scenario(sid: str, n_emails: int, criteria=None) -> Scenario:
     )
 
 
-@test("inactive_pool seeded with all scenarios on construction")
+@_case("inactive_pool seeded with all scenarios on construction")
 def _():
     scenarios = [_make_scenario(f"S{i}", 1) for i in range(5)]
     fc = FlowController(scenarios)
@@ -274,7 +278,7 @@ def _():
     assert len(fc.active_pool) == 0
 
 
-@test("build_schedule round-robins across days")
+@_case("build_schedule round-robins across days")
 def _():
     scenarios = [_make_scenario(f"S{i}", 1) for i in range(10)]
     fc = FlowController(scenarios, seed=0)
@@ -284,7 +288,7 @@ def _():
         assert len(fc._schedule[d]) == 2, fc._schedule[d]
 
 
-@test("step() activates scheduled scenarios")
+@_case("step() activates scheduled scenarios")
 def _():
     scenarios = [_make_scenario(f"S{i}", 1) for i in range(3)]
     fc = FlowController(scenarios, seed=0)
@@ -295,7 +299,7 @@ def _():
     assert len(fc.inactive_pool) == 2
 
 
-@test("single-email scenario completes in one day")
+@_case("single-email scenario completes in one day")
 def _():
     s = _make_scenario("X", 1, criteria=["TC-{date}"])
     fc = FlowController([s], seed=0)
@@ -311,7 +315,7 @@ def _():
     assert len(fc.active_pool) == 0
 
 
-@test("multi-email chain spans multiple days when offsets > 0")
+@_case("multi-email chain spans multiple days when offsets > 0")
 def _():
     s = _make_scenario("M", 3)
     fc = FlowController([s], seed=0)
@@ -339,7 +343,7 @@ def _():
     assert len(completed) == 1
 
 
-@test("multi-email chain with zero gaps fires all on same day")
+@_case("multi-email chain with zero gaps fires all on same day")
 def _():
     s = _make_scenario("B", 4)
     fc = FlowController([s], seed=0)
@@ -356,7 +360,7 @@ def _():
     assert len(completed) == 1
 
 
-@test("email_states reflects READY / AWAITING / SERVED correctly")
+@_case("email_states reflects READY / AWAITING / SERVED correctly")
 def _():
     s = _make_scenario("E", 3)
     a = ActiveScenario(scenario=s, start_day=5, email_day_offsets=[0, 1, 2])
@@ -373,7 +377,7 @@ def _():
     assert states_d6[2] == EmailState.AWAITING_SERVE
 
 
-@test("completed_scenarios_today resets each step()")
+@_case("completed_scenarios_today resets each step()")
 def _():
     s = _make_scenario("R", 1)
     fc = FlowController([s], seed=0)
@@ -392,34 +396,58 @@ def _():
 # ---------------------------------------------------------------------------
 # 4. End-to-end simulation with the real Excel data
 # ---------------------------------------------------------------------------
+#
+# These exercise the FLOW CONTROLLER + scheduler + grader contract, not the
+# model. They pass a no-op model_fn so run_simulation never builds the harness
+# adapter or launches a real `claude` subprocess (which, post-FIX-1, would fire
+# ~200 live turns at import time). They still talk to the FastAPI store over
+# HTTP via register_scenario/fetch_scenario_results, so they require uvicorn.
+
+def _noop_model(email, sim_date) -> None:
+    """A model that takes no action — keeps these tests off the live harness."""
+    return None
+
+
+_sim42_cache: dict[int, dict] = {}
+
+
+def _sim42() -> dict:
+    """Memoized seed=42 simulation. Five assertions below probe different
+    properties of the *same* deterministic run, so computing it once (instead
+    of five times) cuts collection time roughly in half. Determinism itself is
+    covered by the dedicated reproducibility test, which runs uncached."""
+    if 42 not in _sim42_cache:
+        _sim42_cache[42] = run_simulation("Emails.xlsx", verbose=False, model_fn=_noop_model, seed=42)
+    return _sim42_cache[42]
+
 
 section("End-to-end simulation")
 
 
-@test("run_simulation completes without errors")
+@_case("run_simulation completes without errors")
 def _():
-    result = run_simulation("Emails.xlsx", verbose=False, seed=42)
+    result = _sim42()
     assert "total_score" in result
     assert "total_max" in result
     assert isinstance(result["daily_log"], list)
 
 
-@test("all 109 scenarios get scheduled (none left in inactive pool)")
+@_case("all 109 scenarios get scheduled (none left in inactive pool)")
 def _():
-    result = run_simulation("Emails.xlsx", verbose=False, seed=42)
+    result = _sim42()
     assert result["remaining_inactive"] == 0, result
 
 
-@test("vast majority of scenarios complete within 100 days")
+@_case("vast majority of scenarios complete within 100 days")
 def _():
-    result = run_simulation("Emails.xlsx", verbose=False, seed=42)
+    result = _sim42()
     # Allow a small overflow (worst-case chains activated late in the sim)
     assert result["remaining_active"] <= 5, result
 
 
-@test("daily_log has entries for active days")
+@_case("daily_log has entries for active days")
 def _():
-    result = run_simulation("Emails.xlsx", verbose=False, seed=42)
+    result = _sim42()
     served_total = sum(d["served"] for d in result["daily_log"])
     # Total emails served across the sim should be close to total emails.
     # (May be less if some chains overflow.)
@@ -428,31 +456,31 @@ def _():
     assert served_total >= total_emails * 0.95, (served_total, total_emails)
 
 
-@test("grader is invoked and returns valid scores")
+@_case("grader is invoked and returns valid scores")
 def _():
-    result = run_simulation("Emails.xlsx", verbose=False, seed=42)
+    result = _sim42()
     assert result["total_max"] > 0
     assert 0 <= result["total_score"] <= result["total_max"]
 
 
-@test("simulation is reproducible with same seed")
+@_case("simulation is reproducible with same seed")
 def _():
-    a = run_simulation("Emails.xlsx", verbose=False, seed=99)
-    b = run_simulation("Emails.xlsx", verbose=False, seed=99)
+    a = run_simulation("Emails.xlsx", verbose=False, model_fn=_noop_model, seed=99)
+    b = run_simulation("Emails.xlsx", verbose=False, model_fn=_noop_model, seed=99)
     assert a["total_score"] == b["total_score"]
     assert a["total_max"] == b["total_max"]
     assert len(a["daily_log"]) == len(b["daily_log"])
 
 
-@test("different seeds produce different schedules")
+@_case("different seeds produce different schedules")
 def _():
-    a = run_simulation("Emails.xlsx", verbose=False, seed=1)
-    b = run_simulation("Emails.xlsx", verbose=False, seed=2)
+    a = run_simulation("Emails.xlsx", verbose=False, model_fn=_noop_model, seed=1)
+    b = run_simulation("Emails.xlsx", verbose=False, model_fn=_noop_model, seed=2)
     # daily_log content should differ even if totals happen to match
     assert a["daily_log"] != b["daily_log"]
 
 
-@test("date tokens get resolved before reaching grader")
+@_case("date tokens get resolved before reaching grader")
 def _():
     # Sanity check by hand-resolving a sample email and checking content
     scenarios = load_scenarios("Emails.xlsx")

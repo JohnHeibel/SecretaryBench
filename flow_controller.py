@@ -204,6 +204,7 @@ class FlowController:
         email_index: int,
         day: Optional[int] = None,
         sim_date: Optional[str] = None,
+        error: Optional[str] = None,
     ) -> None:
         """Engine calls this after delivering an email. Advances chain state.
 
@@ -213,6 +214,10 @@ class FlowController:
 
         `day` and `sim_date` are optional metadata recorded into delivery_log
         when provided. Callers without that context can omit them.
+
+        `error` records a harness crash/timeout for this turn (FIX-6) so a
+        failed delivery is distinguishable from a clean one in the delivery_log.
+        `status` is "failed" when an error is present, else "served".
         """
         for active in self.active_pool:
             if active.scenario.scenario_id == scenario_id:
@@ -223,6 +228,8 @@ class FlowController:
                     "email_number": active.scenario.emails[email_index].email_number,
                     "day": day,
                     "sim_date": sim_date,
+                    "status": "failed" if error else "served",
+                    "error": error,
                 }
                 self.delivery_log.append(entry)
                 # Lazy import: keeps flow_controller.py importable without

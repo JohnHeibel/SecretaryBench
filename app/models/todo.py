@@ -26,5 +26,6 @@ class TodoResponse(BaseModel):
     due_date: datetime
     created_at: datetime
     completed: bool = False
-    scenario_id: Optional[int] = None #if mult scenarios used to see if agent made it for correct scenario
+    # Always set on creation (TodoCreate requires it), so the response is non-optional (FIX-13).
+    scenario_id: int
     calendar_event_id: Optional[str] = None #need linking to where the calendar event is. Available to change.

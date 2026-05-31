@@ -1,4 +1,6 @@
+import atexit
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +15,12 @@ API_REFERENCE_PATH = REPO_ROOT / "docs" / "api_reference.md"
 mcp = FastMCP("aisa-internal-system")
 client = httpx.Client(base_url=API_BASE, timeout=10.0)
 
+# FIX-12: count writes that 404 because the model passed a scenario_id that
+# isn't registered. A garbled id is otherwise a silent 0; this makes it a
+# visible diagnostic. We log and count but DO NOT auto-correct — passing the
+# right scenario_id is part of the test.
+_bad_scenario_id_count = 0
+
 
 def _call(method: str, path: str, **kwargs: Any) -> Any:
     response = client.request(method, path, **kwargs)
@@ -25,6 +33,40 @@ def _call(method: str, path: str, **kwargs: Any) -> Any:
     if response.status_code == 204 or not response.content:
         return None
     return response.json()
+
+
+def _write_checked(method: str, path: str, scenario_id: int, **kwargs: Any) -> Any:
+    """_call wrapper for scenario-scoped writes. If the write fails because
+    `scenario_id` is not registered, log a distinct diagnostic line (seen vs the
+    registered ids) and bump a counter, then re-raise so the model still sees
+    the error exactly as before (FIX-12, D3)."""
+    global _bad_scenario_id_count
+    try:
+        return _call(method, path, **kwargs)
+    except RuntimeError as exc:
+        if f"Scenario {scenario_id} not found" in str(exc):
+            _bad_scenario_id_count += 1
+            try:
+                registered = [s.get("scenario_id") for s in _call("GET", "/scenarios/")]
+            except Exception:
+                registered = "?"
+            sys.stderr.write(
+                f"[mcp_server] bad scenario_id: seen={scenario_id} not registered "
+                f"(registered={registered}) on {method} {path} "
+                f"[count={_bad_scenario_id_count}]\n"
+            )
+            sys.stderr.flush()
+        raise
+
+
+@atexit.register
+def _report_bad_scenario_ids() -> None:
+    if _bad_scenario_id_count:
+        sys.stderr.write(
+            f"[mcp_server] TOTAL bad scenario_id writes this session: "
+            f"{_bad_scenario_id_count}\n"
+        )
+        sys.stderr.flush()
 
 
 # --- Resource ---
@@ -72,7 +114,7 @@ def create_todo(
         body["description"] = description
     if calendar_event_id is not None:
         body["calendar_event_id"] = calendar_event_id
-    return _call("POST", "/todos/", json=body)
+    return _write_checked("POST", "/todos/", scenario_id, json=body)
 
 
 @mcp.tool()
@@ -151,7 +193,7 @@ def create_event(
     body: dict[str, Any] = {"title": title, "start": start, "end": end, "scenario_id": scenario_id}
     if description is not None:
         body["description"] = description
-    return _call("POST", f"/calendars/{calendar_id}/events", json=body)
+    return _write_checked("POST", f"/calendars/{calendar_id}/events", scenario_id, json=body)
 
 
 @mcp.tool()
@@ -213,7 +255,7 @@ def send_email(
         "body": body,
         "scenario_id": scenario_id,
     }
-    return _call("POST", "/emails/", json=payload)
+    return _write_checked("POST", "/emails/", scenario_id, json=payload)
 
 
 # --- Scenarios ---

@@ -17,6 +17,18 @@ Every object the agent creates — a todo, a calendar event, a sent email — mu
 - **Back-filled** automatically on fixture emails loaded via `POST /scenarios/` and `POST /scenarios/{id}/emails`
 - **Immutable after creation** — `PATCH /todos/{id}` cannot change `scenario_id`
 
+#### Diagnosing a bad `scenario_id` (FIX-12)
+
+The agent must copy the `scenario_id` verbatim from its prompt into every write. If it garbles the id, the write `404`s, nothing is created, and the turn scores 0 — historically with no signal that the cause was a bad id rather than a bad decision.
+
+The MCP server now **detects and logs** this: when a `create_todo` / `create_event` / `send_email` write `404`s because the `scenario_id` is not registered, it emits a distinct stderr line and increments a session counter:
+
+```
+[mcp_server] bad scenario_id: seen=12345 not registered (registered=[111, 222]) on POST /todos/ [count=1]
+```
+
+and prints a session total at shutdown. The error is still surfaced to the model exactly as before — the server **does not auto-correct** the id (passing it correctly is part of the test). This turns a silent 0 into a visible diagnostic.
+
 ### Linking todos to calendar events
 
 When a task requires both a todo and a calendar event, the agent performs two calls:

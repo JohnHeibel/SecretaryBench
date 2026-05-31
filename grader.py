@@ -14,6 +14,10 @@ _NO_ACTION = re.compile(r"no\s*action", re.IGNORECASE)
 _PREFIX_RE = re.compile(r"^(TC|CC|RS)-?\s*", re.IGNORECASE)
 _BRACED_TOKEN = re.compile(r"\{([^}]+)\}")
 _EXPLICIT_COUNT_RE = re.compile(r"\(\s*single\b.*only\b", re.IGNORECASE)
+# A leading "Label: " (e.g. "Update: ") that sits in front of a real prefix.
+_LABEL_RE = re.compile(r"^\s*[A-Za-z]+:\s+(?=(?:TC|CC|RS)\b)", re.IGNORECASE)
+# An "or ..." fragment: an alternative continuation of the previous sub.
+_OR_CONT_RE = re.compile(r"^or\b\s*(.*)$", re.IGNORECASE)
 
 
 def _parse_sub_criteria(criteria: str) -> list[str]:
@@ -22,6 +26,15 @@ def _parse_sub_criteria(criteria: str) -> list[str]:
     E.g. 'TC-{date}, TC-{date}, TC-{date}' → three TC sub-criteria.
     Commas inside braces are NOT split points.
     '&&' is also treated as a separator.
+
+    FIX-5 — repairs three ways the naive comma-split mangled REAL prefixed
+    criteria into auto-passing junk (see SPRINT5_REMEDIATION Appendix C):
+      - a lone '^' (a dataset placeholder) is dropped, not kept as a check;
+      - an "or ..." fragment ("CC-{A}, or CC-{B}") is merged back onto the
+        previous sub as an alternative, so its CC/TC prefix isn't lost and it
+        isn't miscounted as a separate required check;
+      - a leading label ("Update:  TC-{...}") is stripped so the prefix is at
+        position 0 where _PREFIX_RE can see it.
     """
     criteria = criteria.replace("&&", ",")
     parts: list[str] = []
@@ -40,7 +53,31 @@ def _parse_sub_criteria(criteria: str) -> list[str]:
     tail = "".join(current).strip()
     if tail:
         parts.append(tail)
-    return [p for p in parts if p]
+
+    cleaned: list[str] = []
+    for p in parts:
+        p = p.strip().strip("^").strip()  # drop stray caret markers
+        if not p:
+            continue
+        p = _LABEL_RE.sub("", p)  # strip a leading "Update:"-style label
+        m = _OR_CONT_RE.match(p)
+        if m and cleaned:
+            cleaned[-1] = f"{cleaned[-1]} or {m.group(1)}".strip()
+            continue
+        cleaned.append(p)
+    return cleaned
+
+
+def _is_gradeable(criteria: str) -> bool:
+    """True if a criterion has something the grader can actually check —
+    a TC/CC/RS prefix or a "No action" rule. Everything else is free-text
+    (e.g. 'Add task', 'Delegate Task', 'Flag') and is reported as ungraded
+    rather than silently auto-passing and inflating max_score (FIX-5, D2)."""
+    if not criteria or not criteria.strip():
+        return False
+    if _NO_ACTION.search(criteria):
+        return True
+    return any(_PREFIX_RE.match(s) for s in _parse_sub_criteria(criteria))
 
 
 def _extract_content_token(sub: str) -> str | None:
@@ -84,20 +121,98 @@ def _todo_matches_content(t: TodoResponse, token: str) -> bool:
     return token in haystack
 
 
-def _event_matches_date(e: EventResponse, date_str: str) -> bool:
-    """Check if an event's start date/time matches a resolved date string."""
-    for fmt in ("%Y-%m-%d %I:%M %p", "%Y-%m-%d %I%p", "%Y-%m-%d %H:%M",
-                "%Y-%m-%d", "%m/%d/%Y", "%B %d, %Y"):
+def _cc_sub_passes(sub: str, events: list[EventResponse]) -> bool:
+    """Whether one CC sub-criterion is satisfied, honoring "or" alternatives.
+
+    A sub may be a single check ("CC-{date}") or an alternative group merged by
+    the splitter ("CC-{A} or CC-{B} or CC-{C}"), which passes if any branch's
+    resolved date matches an event. Only branches that yield a *parseable* date
+    drive a date check; a braced non-date token (e.g. the placeholder "{C}") or
+    a still-unresolved token means "no date" → fall back to the count check in
+    _check_criteria (an event merely has to exist). This keeps non-date tokens
+    lenient while the fail-closed _event_matches_date makes real dates strict.
+    """
+    branches = re.split(r"\bor\b", sub, flags=re.IGNORECASE)
+    dates = [d for d in (_extract_date_token(b) for b in branches)
+             if d and _is_parseable_date(d)]
+    if not dates:
+        return True
+    return any(_event_matches_date(e, d) for e in events for d in dates)
+
+
+def _tc_date_sub_passes(sub: str, todos: list[TodoResponse]) -> bool:
+    """Whether one TC sub-criterion's *date* is satisfied by some todo's due_date.
+
+    Mirrors _cc_sub_passes (G2): a braced token that resolves to a real date is
+    strict-matched against todo due_dates, honoring "or" alternatives; a non-date
+    token (e.g. the placeholder "{C}") or a still-unresolved token (e.g. a bare
+    "{date}" or a form the resolver can't read) means "no specific deadline" ->
+    True, leaving existence/count and content checks to the caller. This is the
+    deadline half of a TC check; content matching stays separate."""
+    branches = re.split(r"\bor\b", sub, flags=re.IGNORECASE)
+    dates = [d for d in (_extract_date_token(b) for b in branches)
+             if d and _is_parseable_date(d)]
+    if not dates:
+        return True
+    return any(_todo_matches_date(t, d) for t in todos for d in dates)
+
+
+# Formats that carry only a date (compare date) vs a date+time (compare both).
+_DATE_ONLY_FMTS = ("%Y-%m-%d", "%m/%d/%Y", "%B %d, %Y")
+_DATETIME_FMTS = ("%Y-%m-%d %I:%M %p", "%Y-%m-%d %I%p", "%Y-%m-%d %H:%M",
+                  # engine._DATETIME_FMT — time-of-day tokens like {date-3PM}
+                  # resolve to "March 15, 2000 at 03:00 PM" (FIX-2 follow-up).
+                  "%B %d, %Y at %I:%M %p")
+
+
+def _is_parseable_date(s: str) -> bool:
+    """True if `s` is a date/datetime in one of the formats the engine emits."""
+    s = s.strip()
+    for fmt in _DATE_ONLY_FMTS + _DATETIME_FMTS:
         try:
-            target = datetime.strptime(date_str.strip(), fmt)
-            if fmt in ("%Y-%m-%d", "%m/%d/%Y", "%B %d, %Y"):
-                return e.start.date() == target.date()
-            return (e.start.date() == target.date()
-                    and e.start.hour == target.hour
-                    and e.start.minute == target.minute)
+            datetime.strptime(s, fmt)
+            return True
         except ValueError:
             continue
-    return True
+    return False
+
+
+def _match_datetime(actual: datetime, date_str: str) -> bool:
+    """Whether `actual` matches the resolved `date_str`.
+
+    Date-only target formats compare the calendar date; date+time formats
+    compare date, hour, and minute. Returns False when the target can't be
+    parsed: by the time we get here the criterion named a specific date, so an
+    unparseable / unmatched target is a non-match, not a free pass. (Previously
+    this returned True, which let a wrong-date event satisfy a time-of-day
+    criterion such as CC-{date-3PM} — caught by the Sprint-5 adversarial gate.)
+    """
+    target = date_str.strip()
+    for fmt in _DATE_ONLY_FMTS:
+        try:
+            return actual.date() == datetime.strptime(target, fmt).date()
+        except ValueError:
+            continue
+    for fmt in _DATETIME_FMTS:
+        try:
+            t = datetime.strptime(target, fmt)
+            return (actual.date() == t.date()
+                    and actual.hour == t.hour
+                    and actual.minute == t.minute)
+        except ValueError:
+            continue
+    return False
+
+
+def _event_matches_date(e: EventResponse, date_str: str) -> bool:
+    """Whether an event's start date/time matches a resolved date string."""
+    return _match_datetime(e.start, date_str)
+
+
+def _todo_matches_date(t: TodoResponse, date_str: str) -> bool:
+    """Whether a todo's due_date matches a resolved date string (G2 — mirrors
+    _event_matches_date so a deadline in the criterion is actually enforced)."""
+    return _match_datetime(t.due_date, date_str)
 
 
 def _check_criteria(criteria: str, calendar: CalendarResponse, todo: list[TodoResponse]) -> bool:
@@ -109,7 +224,9 @@ def _check_criteria(criteria: str, calendar: CalendarResponse, todo: list[TodoRe
     - Content matching: TC-item3 requires a todo whose title/description
       contains 'item3'.
     - Date matching: CC-{resolved-date} requires an event starting on that
-      date (only when the token has been resolved by the engine).
+      date, and TC-{resolved-date} requires a todo whose due_date is that date
+      (only when the token has been resolved by the engine; bare/unresolved
+      tokens stay existence-only).
     - Count awareness: 'TC-{date}, TC-{date}, TC-{date}' requires exactly
       3 todos. Parenthetical '(single to-do only, not three)' forces
       count == 1.
@@ -143,14 +260,17 @@ def _check_criteria(criteria: str, calendar: CalendarResponse, todo: list[TodoRe
             token = _extract_content_token(sub)
             if token and not any(_todo_matches_content(t, token) for t in todo):
                 passed = False
+            # G2: if the sub names a concrete deadline, a todo's due_date must
+            # match it (mirrors the CC date check). Bare/unresolved -> lenient.
+            if not _tc_date_sub_passes(sub, todo):
+                passed = False
 
     # --- CC checks ---
     if cc_subs:
         if len(calendar.events) < len(cc_subs):
             passed = False
         for sub in cc_subs:
-            date_str = _extract_date_token(sub)
-            if date_str and not any(_event_matches_date(e, date_str) for e in calendar.events):
+            if not _cc_sub_passes(sub, calendar.events):
                 passed = False
 
     # --- RS checks ---
@@ -158,9 +278,10 @@ def _check_criteria(criteria: str, calendar: CalendarResponse, todo: list[TodoRe
         if len(calendar.events) == 0:
             passed = False
 
-    # Criteria that don't start with any known prefix but aren't "No action"
-    # fall through as passed=True (lenient on free-text criteria like
-    # 'Flag, insufficient info', 'Delegate Task', etc.)
+    # Sub-criteria with no known prefix (free-text like 'Flag') add no check —
+    # they neither pass nor fail this criterion. A criterion that is ENTIRELY
+    # free-text never reaches here: define_grading_system routes it to the
+    # `ungraded` list instead of grading it (FIX-5).
 
     return passed
 
@@ -184,8 +305,14 @@ def define_grading_system(
     Returns:
         dict with keys:
             score      — points awarded
-            max_score  — total possible points
-            details    — list of per-criteria results
+            max_score  — total possible points (gradeable criteria only)
+            details    — list of per-criteria results (gradeable only)
+            ungraded   — free-text criteria excluded from scoring (FIX-5)
+
+    Free-text criteria (no TC/CC/RS prefix, not "No action") are NOT graded and
+    do NOT count toward max_score; they are reported in `ungraded` so the score
+    reflects only what the grader can actually verify (FIX-5, D2). See
+    docs/GRADER.md.
     """
     if isinstance(input, Email):
         criteria_list = [input.success_criteria] if input.success_criteria else []
@@ -195,26 +322,31 @@ def define_grading_system(
         raise TypeError(f"Expected Email or Scenario, got {type(input).__name__}")
 
     details = []
+    ungraded = []
     for criteria in criteria_list:
-        passed = _check_criteria(criteria, calendar, todo)
+        if not _is_gradeable(criteria):
+            ungraded.append(criteria)
+            continue
         details.append({
             "criteria": criteria,
-            "passed": passed,
+            "passed": _check_criteria(criteria, calendar, todo),
         })
 
     if grade_by_scenario:
         all_passed = all(d["passed"] for d in details) if details else False
         return {
             "score": 1 if all_passed else 0,
-            "max_score": 1 if criteria_list else 0,
+            "max_score": 1 if details else 0,
             "details": details,
+            "ungraded": ungraded,
         }
 
     score = sum(1 for d in details if d["passed"])
     return {
         "score": score,
-        "max_score": len(criteria_list),
+        "max_score": len(details),
         "details": details,
+        "ungraded": ungraded,
     }
 
 

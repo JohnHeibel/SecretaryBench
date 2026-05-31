@@ -164,6 +164,7 @@ Quick endpoint map:
 | | `PATCH` | `/todos/{id}` ← partial update |
 | | `DELETE` | `/todos/{id}` |
 | Calendars | `POST` | `/calendars/` |
+| | `GET` | `/calendars/` ← list all (used by the grader to find a scenario's events) |
 | | `GET` | `/calendars/{id}` |
 | | `DELETE` | `/calendars/{id}` |
 | Events | `POST` | `/calendars/{id}/events` |

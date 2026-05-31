@@ -57,6 +57,8 @@ The left side is stdio — your harness launches `mcp_server` as a subprocess an
 
 The right side is HTTP — the MCP server calls FastAPI exactly like any external client would. This is intentional: all benchmark logic lives in `app/`, not in `mcp_server/`. If behavior is wrong, the bug is in `app/`.
 
+**The tool surface is identical across every harness.** Claude Code, Cursor, Codex, or a custom Agent-SDK loop all connect to the *same* `mcp_server` exposing the *same* tools — the benchmark is defined by this MCP surface, not by any one harness. Harness adapters differ only in **launch** (the CLI/SDK command and its flags) and **session resume** (how emails 2..N re-attach context); they do not add, remove, or alter tools. That identical surface is the fairness invariant that makes a cross-harness score comparable (see `SPRINT5_REMEDIATION.md` §7.4). The benchmark-time tool trimming (hiding `create_scenario`, `delete_scenario`, etc.) is applied the same way for every harness — today via the runner's disallowed-tools list, with a recommended move to a server-side `BENCH_MODE` gate so it is enforced in one place (§7.5).
+
 **The MCP server itself does almost nothing.** Each tool in `mcp_server/server.py` is ~3 lines: build a JSON body, call FastAPI, return the response. The tool's docstring becomes its description in the MCP protocol — that's what the agent reads to understand what each tool does.
 
 **The resource.** There's one resource at `aisa://api-reference` that returns the full contents of `docs/api_reference.md`. The agent can fetch this on demand to understand workflows, the `scenario_id` rule, and how todos link to calendar events. Think of it as the agent's manual.

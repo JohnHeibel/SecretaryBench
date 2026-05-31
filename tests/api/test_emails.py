@@ -59,27 +59,15 @@ def test_get_email_not_found_returns_404():
     assert response.status_code == 404
 
 
-# --- Delete ---
+# --- Delete (intentionally unsupported) ---
+# DELETE /emails was deliberately removed: the email log is append-only across a
+# run (README.md). The route does not exist, so the API returns 405. This test
+# replaces four stale tests that asserted a 204/404 delete contract.
 
-def test_delete_email_returns_204():
+def test_delete_email_not_allowed():
     client.post("/scenarios/", json=SAMPLE_SCENARIO)
     response = client.delete("/emails/1")
-    assert response.status_code == 204
-
-
-def test_delete_email_removes_from_store():
-    client.post("/scenarios/", json=SAMPLE_SCENARIO)
-    client.delete("/emails/1")
-    assert client.get("/emails/1").status_code == 404
-
-
-def test_delete_email_removes_from_scenario():
-    client.post("/scenarios/", json=SAMPLE_SCENARIO)
-    client.delete("/emails/1")
-    scenario = client.get("/scenarios/1").json()
-    assert all(e["email_id"] != 1 for e in scenario["emails"])
-
-
-def test_delete_email_not_found_returns_404():
-    response = client.delete("/emails/999")
-    assert response.status_code == 404
+    assert response.status_code == 405, (
+        "DELETE /emails is intentionally unsupported (append-only log); "
+        f"got {response.status_code}"
+    )

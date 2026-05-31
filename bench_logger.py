@@ -223,6 +223,46 @@ def type_breakdown(by_type: dict[str, dict[str, int]],
     print()
 
 
+def compaction_breakdown(split: dict[str, dict[str, int]],
+                         total_compactions: int = 0,
+                         total_input_tokens: int = 0,
+                         total_output_tokens: int = 0,
+                         ungraded: int = 0) -> None:
+    """Print the FIX-9 compaction/token dimension: how scenarios scored
+    'within the context window' vs 'through compaction', plus token totals.
+
+    Silent when there is nothing to report (e.g. a stub run with no telemetry).
+    """
+    within = split.get("within_window", {})
+    through = split.get("through_compaction", {})
+    if not (within.get("count") or through.get("count") or total_compactions
+            or total_input_tokens or ungraded):
+        return
+
+    def _line(label: str, g: dict[str, int]) -> str:
+        n = g.get("count", 0)
+        sc = g.get("score", 0)
+        mx = g.get("max_score", 0)
+        pct = (100.0 * sc / mx) if mx else 0.0
+        color = _GRN if pct >= 80 else _YLW if pct >= 50 else _RED
+        return (f"{_DIM}{label:<20}:{_RST}  {_WHT}{n:>3}{_RST} scen  "
+                f"{color}{sc:>4}/{mx:<4}{_RST} {_DIM}({pct:>5.1f}%){_RST}")
+
+    print(_box_top(W))
+    print(_box_row(f"{_BOLD}{_CYN}Compaction & Token Dimension{_RST}", W))
+    print(_box_sep(W))
+    print(_box_row(_line("within window", within), W))
+    print(_box_row(_line("through compaction", through), W))
+    print(_box_sep(W))
+    print(_box_row(f"{_DIM}{'compaction events':<20}:{_RST}  {_WHT}{total_compactions}{_RST}", W))
+    print(_box_row(f"{_DIM}{'input tokens':<20}:{_RST}  {_WHT}{total_input_tokens:,}{_RST}", W))
+    print(_box_row(f"{_DIM}{'output tokens':<20}:{_RST}  {_WHT}{total_output_tokens:,}{_RST}", W))
+    if ungraded:
+        print(_box_row(f"{_DIM}{'ungraded criteria':<20}:{_RST}  {_WHT}{ungraded}{_RST}", W))
+    print(_box_bot(W))
+    print()
+
+
 def model_summary(stats: dict[str, Any], model_name: str = "",
                   token_log: str = "", tool_log: str = "") -> None:
     """Print the model_runner exit summary."""
