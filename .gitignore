@@ -21,11 +21,6 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
-token_usage.jsonl
-tool_calls.jsonl
-delivery_log.jsonl
-# Generated stress-chain workbook (FIX-10) — produced on demand by the generator
-stress_chain.xlsx
 
 # OS
 .DS_Store

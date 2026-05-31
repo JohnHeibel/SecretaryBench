@@ -1,11 +1,20 @@
 """
 sb.live.mcp_app — the model-facing MCP tool surface for a live run.
 
-Spawned fresh by each `claude -p` call; routes every tool call over HTTP to the
-persistent store (sb.live.store_app). The model sees ONE inbox/context for the
-whole run and a powerful search_inbox for facts that have scrolled out.
+Runs ONCE as a persistent server for the whole run (started by sb.live.runner)
+and routes every tool call over HTTP to the store (sb.live.store_app). Each
+`claude -p` turn attaches to it as a fresh client. The model sees ONE
+inbox/context for the whole run and a powerful search_inbox for facts that have
+scrolled out.
 
-    python -m sb.live.mcp_app          # stdio MCP server (claude --mcp-config)
+    MCP_TRANSPORT=streamable-http MCP_PORT=8078 python -m sb.live.mcp_app   # persistent (what the runner uses)
+    python -m sb.live.mcp_app                                               # stdio (manual debugging)
+
+Persistent HTTP is the default the runner uses because cold-spawning a stdio
+server on every `claude -p` turn raced the model: on `--resume` turns a fast
+model (e.g. Sonnet) would start generating before the freshly-spawned server
+finished connecting, so its tool calls never landed. One always-connected
+server removes that race.
 """
 from __future__ import annotations
 
@@ -117,4 +126,9 @@ def get_email(email_id: str) -> dict:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    transport = os.environ.get("MCP_TRANSPORT", "stdio")
+    if transport != "stdio":
+        mcp.settings.host = "127.0.0.1"
+        mcp.settings.port = int(os.environ.get("MCP_PORT", "8078"))
+        mcp.settings.stateless_http = True   # each ephemeral claude client is independent
+    mcp.run(transport=transport)

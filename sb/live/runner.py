@@ -17,6 +17,7 @@ import argparse
 import json
 import os
 import signal
+import socket
 import subprocess
 import sys
 import time
@@ -35,6 +36,8 @@ from sb.scheduler import build_plan
 REPO = Path(__file__).resolve().parents[2]
 STORE_PORT = int(os.environ.get("STORE_PORT", "8077"))
 STORE_URL = f"http://localhost:{STORE_PORT}"
+MCP_PORT = int(os.environ.get("MCP_PORT", "8078"))
+MCP_URL = f"http://127.0.0.1:{MCP_PORT}/mcp"
 
 # --- ANSI palette (disabled if stdout isn't a tty or NO_COLOR is set) -------
 _COLOR = (sys.stdout.isatty() or os.environ.get("FORCE_COLOR")) and not os.environ.get("NO_COLOR")
@@ -80,11 +83,9 @@ RESCHEDULING: to move an event, update_event it (delete-and-recreate is also fin
 
 
 def _mcp_config() -> str:
-    return json.dumps({"mcpServers": {"secretary": {
-        "command": sys.executable,
-        "args": ["-m", "sb.live.mcp_app"],
-        "env": {"STORE_BASE_URL": STORE_URL, "PYTHONPATH": str(REPO)},
-    }}})
+    # Attach to the ONE persistent server (see start_mcp) over HTTP, instead of
+    # cold-spawning a stdio server per turn — which raced --resume turns on fast models.
+    return json.dumps({"mcpServers": {"secretary": {"type": "http", "url": MCP_URL}}})
 
 
 def _parse_iso(s: str) -> Optional[datetime]:
@@ -162,11 +163,11 @@ def _parse_stream(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
     return session_id, tools, is_error, " ".join(texts)
 
 
-def _free_port() -> None:
-    """Best-effort kill of any process still holding the store port from a
-    previous (e.g. interrupted) run, so every run owns a fresh store."""
+def _free_port(port: int) -> None:
+    """Best-effort kill of any process still holding `port` from a previous
+    (e.g. interrupted) run, so every run owns fresh servers."""
     try:
-        out = subprocess.run(["lsof", "-ti", f"tcp:{STORE_PORT}"],
+        out = subprocess.run(["lsof", "-ti", f"tcp:{port}"],
                              capture_output=True, text=True).stdout.split()
         for pid in out:
             try:
@@ -180,7 +181,7 @@ def _free_port() -> None:
 
 
 def start_store() -> subprocess.Popen:
-    _free_port()
+    _free_port(STORE_PORT)
     proc = subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "sb.live.store_app:app", "--port", str(STORE_PORT),
          "--log-level", "warning"],
@@ -197,6 +198,25 @@ def start_store() -> subprocess.Popen:
     raise RuntimeError("store did not come up")
 
 
+def start_mcp() -> subprocess.Popen:
+    """Start the ONE persistent MCP server every claude turn attaches to."""
+    _free_port(MCP_PORT)
+    env = {**os.environ, "MCP_TRANSPORT": "streamable-http", "MCP_PORT": str(MCP_PORT),
+           "STORE_BASE_URL": STORE_URL, "PYTHONPATH": str(REPO)}
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "sb.live.mcp_app"],
+        cwd=str(REPO), env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    for _ in range(60):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            if s.connect_ex(("127.0.0.1", MCP_PORT)) == 0:  # port is accepting connections
+                return proc
+        time.sleep(0.5)
+    proc.terminate()
+    raise RuntimeError("mcp server did not come up")
+
+
 def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
         per_turn_timeout: float = 240.0) -> None:
     corpus = load_corpus("corpus")
@@ -207,6 +227,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
 
     store = start_store()
     httpx.post(f"{STORE_URL}/reset", timeout=10)
+    mcp = start_mcp()
     mcp_config = _mcp_config()
     session: Optional[str] = None
     results: dict[str, object] = {}
@@ -262,6 +283,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             results[eid] = res
             _print_email(i, eid, sd.strftime("%a %b %d"), res, tools, said)
     finally:
+        mcp.terminate()
         store.terminate()
 
     graded = [r for r in results.values() if r is not None]
