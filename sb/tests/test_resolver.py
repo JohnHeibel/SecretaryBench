@@ -1,5 +1,5 @@
 """Unit tests for the date grammar evaluator (the keystone)."""
-from datetime import date, datetime
+from datetime import date
 
 import pytest
 
@@ -10,7 +10,6 @@ from sb.resolver import (
     human,
     render_body,
     resolve,
-    value_kind,
 )
 
 # A fixed serve anchor for determinism: Tuesday, June 9, 2026.
@@ -77,36 +76,11 @@ def test_day_of_month():
     assert resolve("dom:25,0m", ctx()) == date(2026, 6, 25)
 
 
-# --- time attach -----------------------------------------------------------
-
-def test_time_attach_makes_datetime():
-    v = resolve("next:THU@14:00", ctx())
-    assert v == datetime(2026, 6, 11, 14, 0)
-    assert value_kind(v) == "datetime"
-
-
-def test_canonical_order_offset_then_attach():
-    v = resolve("next:THU+1w@14:00", ctx())
-    assert v == datetime(2026, 6, 18, 14, 0)
-
-
-def test_offset_preserves_time_of_a_datetime_anchor():
-    # An anchor that holds a datetime keeps its time when shifted.
-    anchors = {"mtg": datetime(2026, 6, 11, 14, 0)}
-    assert resolve("@mtg+1w", Context(SERVE, anchors)) == datetime(2026, 6, 18, 14, 0)
-
-
 # --- anchors (cross-node) --------------------------------------------------
 
 def test_anchor_reference_and_arithmetic():
     anchors = {"signing": date(2026, 6, 14)}
     assert resolve("@signing+2w", Context(SERVE, anchors)) == date(2026, 6, 28)
-
-
-def test_anchor_with_time_attach():
-    anchors = {"signing": date(2026, 6, 14)}
-    v = resolve("@signing+2w@09:00", Context(SERVE, anchors))
-    assert v == datetime(2026, 6, 28, 9, 0)
 
 
 def test_unknown_anchor_raises():
@@ -132,8 +106,8 @@ def test_week_of_nested_expr():
 # --- body rendering + emissions --------------------------------------------
 
 def test_render_plain_token():
-    r = render_body("Let's meet {next:THU@14:00}.", ctx())
-    assert "Thursday, June 11th, 2026 at 2 PM" in r.text
+    r = render_body("Let's meet {next:THU}.", ctx())
+    assert "Thursday, June 11th, 2026" in r.text
     assert r.emissions == {}
 
 

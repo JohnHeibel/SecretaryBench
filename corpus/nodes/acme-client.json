@@ -11,17 +11,15 @@
       "from": "ACME",
       "to": "CEO",
       "subject": "Can we meet?",
-      "body": "Hi! Could we grab time on {next:THU@14:00} to walk through the renewal? Thanks.",
+      "body": "Hi! Could we grab time on {next:THU} at 2 PM to walk through the renewal? Thanks.",
       "depends_on": [],
       "answer": {
         "expect": [
           {
             "action": "create_event",
             "title_match": ["acme"],
-            "start": { "eq": "next:THU@14:00" },
-            "duration": "90m",
-            "count": 1,
-            "tolerance": "exact_time"
+            "start": { "eq": "next:THU" },
+            "count": 1
           }
         ]
       }
@@ -31,7 +29,7 @@
       "from": "ACME",
       "to": "CEO",
       "subject": "Re: Can we meet?",
-      "body": "Actually, something came up — can we move our renewal call to {next:MON} instead? Same length is fine.",
+      "body": "Actually, something came up — can we move our renewal call to {next:MON} instead?",
       "depends_on": [ { "email": "acme-client.request", "type": "static" } ],
       "answer": {
         "expect": [
@@ -39,9 +37,7 @@
             "action": "create_event",
             "title_match": ["acme"],
             "start": { "eq": "next:MON" },
-            "duration": "90m",
-            "count": 1,
-            "tolerance": "exact_day"
+            "count": 1
           }
         ]
       }

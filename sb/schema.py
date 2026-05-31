@@ -41,9 +41,8 @@ class ExpectEntry:
     title_match: list[str] = field(default_factory=list)
     start: Optional[dict] = None          # predicate: {"eq"|"in"|"by"|"any_of"|"not_in": expr}
     due: Optional[dict] = None            # predicate (todos)
-    duration: Optional[str] = None        # static, e.g. "60m"
     count: Optional[int] = None
-    tolerance: str = "exact_day"          # exact_day | exact_time | within:Nd
+    tolerance: str = "exact_day"          # exact_day | within:Nd  (whole-day granularity)
     recurrence: Optional[dict] = None
 
 
@@ -127,7 +126,6 @@ def _parse_expect(raw: dict) -> ExpectEntry:
         title_match=list(raw.get("title_match", [])),
         start=raw.get("start"),
         due=raw.get("due"),
-        duration=raw.get("duration"),
         count=raw.get("count"),
         tolerance=raw.get("tolerance", "exact_day"),
         recurrence=raw.get("recurrence"),

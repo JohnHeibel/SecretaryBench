@@ -36,17 +36,6 @@ class Obj:
     end: Optional[datetime] = None    # event end (for duration checks)
 
 
-def _parse_duration_minutes(s: str) -> int:
-    """'90m' -> 90, '1h' -> 60, '1h30m' -> 90, '2h' -> 120."""
-    import re as _re
-    total = 0
-    for amount, unit in _re.findall(r"(\d+)\s*([hm])", s.lower()):
-        total += int(amount) * (60 if unit == "h" else 1)
-    if total == 0:
-        raise ValueError(f"bad duration {s!r}")
-    return total
-
-
 @dataclass
 class NodeState:
     events: list[Obj] = field(default_factory=list)
@@ -85,9 +74,7 @@ def _matches_value(obj_when: datetime, expected: Value, tolerance: str) -> bool:
     if tolerance.startswith("within:"):
         n = int(tolerance.split(":", 1)[1].rstrip("d"))
         return abs((obj_when.date() - _to_date(expected)).days) <= n
-    if tolerance == "exact_time" and isinstance(expected, datetime):
-        return obj_when.replace(second=0, microsecond=0) == expected.replace(second=0, microsecond=0)
-    # default: day equality
+    # day equality (the benchmark grades at whole-day granularity)
     return obj_when.date() == _to_date(expected)
 
 
@@ -162,20 +149,13 @@ def _grade_expect(entry: ExpectEntry, ctx: Context, state: NodeState) -> dict:
     def date_ok(o: Obj) -> bool:
         return _predicate_ok(o, predicate, ctx, entry.tolerance)
 
-    def dur_ok(o: Obj) -> bool:
-        if not entry.duration or o.end is None:
-            return True
-        return round((o.end - o.when).total_seconds() / 60) == _parse_duration_minutes(entry.duration)
-
-    matched = [o for o in title_set if date_ok(o) and dur_ok(o)]
+    matched = [o for o in title_set if date_ok(o)]
     need = entry.count if entry.count is not None else 1
     count_ok = entry.count is None or len(title_set) == entry.count
     passed = len(matched) >= need and count_ok
 
     kw = "/".join(entry.title_match) or "any"
     expected = f'{kind} ~"{kw}" @ {_describe_predicate(predicate, ctx)}'
-    if entry.duration:
-        expected += f" · {_parse_duration_minutes(entry.duration)} min"
     if entry.count is not None:
         expected += f" · exactly {entry.count}"
 
@@ -191,9 +171,7 @@ def _grade_expect(entry: ExpectEntry, ctx: Context, state: NodeState) -> dict:
         extra = " (duplicate / double-booked)" if len(title_set) > entry.count else ""
         reason = f"created {len(title_set)}, expected exactly {entry.count}{extra}"
     elif not any(date_ok(o) for o in title_set):
-        reason = f"created, but on the wrong date/time"
-    elif entry.duration and not any(dur_ok(o) for o in title_set):
-        reason = f"right time, wrong length (expected {_parse_duration_minutes(entry.duration)} min)"
+        reason = "created, but on the wrong day"
     else:
         reason = "did not match the expected action"
 

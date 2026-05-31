@@ -39,16 +39,15 @@
       "from": "BOSS",
       "to": "CEO",
       "subject": "Project kickoff",
-      "body": "Once Henderson signs, get the project kickoff on the calendar for two weeks after the signing, 9am.",
+      "body": "Once Henderson signs, get the project kickoff on the calendar for two weeks after the signing.",
       "depends_on": [ { "email": "henderson.signing", "type": "date" } ],
       "answer": {
         "expect": [
           {
             "action": "create_event",
             "title_match": ["kickoff"],
-            "start": { "eq": "@signing+2w@09:00" },
-            "count": 1,
-            "tolerance": "exact_time"
+            "start": { "eq": "@signing+2w" },
+            "count": 1
           }
         ]
       }

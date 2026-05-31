@@ -3,6 +3,13 @@
 > Status: **DRAFT.** The closed, deterministic language for *when* each email's correct
 > action falls due. Companion to `BENCHMARK_REDESIGN.md`. Revised 2026-05-30 after John's
 > call to cut idiomatic bloat. **[OPEN]** = needs a decision.
+>
+> **DECIDED (day-level grammar):** times-of-day and durations are **out**. Tokens resolve to
+> whole **days**; the grader checks the *day* an event/todo lands on, nothing finer. Times may
+> still appear as plain prose in an email ("at 2pm") but are never tokens and never graded.
+> Removed since the earlier draft: the `@HH:MM` time-attach, the `DATETIME` value type, the
+> `duration` answer field, and the `exact_time` tolerance. Within-day overlap/conflict is
+> therefore not represented — reintroduce times only if conflict-avoidance becomes a target.
 
 ---
 
@@ -61,7 +68,7 @@ baked straight into the descendant's answer key).
 Same compact form serves as the in-email token `{ … }` and the answer-key expr.
 
 ```
-expr      := base (offset)* (attach)?
+expr      := base (offset)*
 base      := "serve" | "@" NAME | selector
 offset    := ("+"|"-") INT unit
 unit      := "d" (calendar days) | "bd" (business days) | "w" | "m" | "y"
@@ -69,12 +76,12 @@ selector  := "next:" WD                 // next WD strictly after the anchor
            | "this:" WD                 // WD in the anchor's Mon–Sun week
            | "nth:" N "," WD "," monthref   // Nth WD of a month (N = 1..5 or "last")
            | "dom:" D "," monthref          // the Dth day-of-month
-           | "week_of:" expr                // INTERVAL: Mon–Sun containing expr
+           | "week_of:(" expr ")"           // INTERVAL: Mon–Sun containing expr
            | "month:" monthref              // INTERVAL: a whole month
 monthref  := "0m" | ("+"|"-") INT "m"   // relative to serve's month
-attach    := "@" HH:MM                  // optional time-of-day → DATETIME  [OPEN: keep?]
 WD        := MON|TUE|WED|THU|FRI|SAT|SUN
 ```
+(No time-of-day: tokens resolve to a DATE or INTERVAL only.)
 
 | Token | Resolves to |
 |-------|-------------|
@@ -84,8 +91,7 @@ WD        := MON|TUE|WED|THU|FRI|SAT|SUN
 | `{nth:3,FRI,+1m}` | 3rd Friday of next month  ← the C19 gala, correct |
 | `{nth:last,FRI,0m}` | last Friday of this month |
 | `{dom:25,0m}` | the 25th of this month |
-| `{next:THU@14:00}` | next Thursday at 2 PM (DATETIME) |
-| `{week_of:{+1w}}` | next week's Mon–Sun interval |
+| `{week_of:(serve+1w)}` | next week's Mon–Sun interval |
 | `{@signing+2w}` | two weeks after the ancestor's signing date |
 
 **Date emission** (ancestor declares a named date anchor), inline or in node metadata:
@@ -124,9 +130,9 @@ the old `or`-clause string hackery with clean set-membership.
     {
       "action": "create_event",             // create_event | create_todo | reschedule | reply | delegate
       "title_match": ["kickoff"],           // static: keyword(s), case-insensitive
-      "start": { "eq": "@signing+2w@09:00" },// the only token-driven field
-      "duration": "60m",                     // static
-      "tolerance": "exact_time"              // exact_day | exact_time | within:Nd
+      "start": { "eq": "@signing+2w" },      // the only token-driven field (a DAY)
+      "count": 1,                            // static: exact cardinality for this action+title
+      "tolerance": "exact_day"               // exact_day (default) | within:Nd
     }
   ],
   "forbid": []                               // no-action emails: forbid all creates  [OPEN B2]
@@ -206,11 +212,10 @@ matching events exist.
 - Match a model object to an expected entry by `email_id` (model tags every create) then by
   `title_match`. Resolve date tokens against `(serve_date_of_that_email, anchor_table)` —
   **ground truth**, independent of the model's earlier actions.
-- `DATE` token → day equality; `DATETIME` token → day + time; `within:Nd` relaxes.
+- Tokens resolve to a DATE (or INTERVAL) → **day equality**; `within:Nd` relaxes the window.
 - `count` → exact cardinality **within the entry's action + title_match** (over-creation,
   double-booking, and "forgot to cancel" all fail). `count: 0` = must not exist.
-- `attach` (`@HH:MM`) on a `DATE` adds a time; on a `DATETIME` it **overrides** the time.
-- Per-email result **binary** by default + a "right-action-wrong-time" diagnostic. **[OPEN B3]**
+- Per-email result **binary** by default + a "right-action-wrong-day" diagnostic. **[OPEN B3]**
 
 ---
 

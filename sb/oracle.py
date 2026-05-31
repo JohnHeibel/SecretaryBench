@@ -11,10 +11,9 @@ It is NOT a model under test — it reads ground truth. The harness-backed model
 """
 from __future__ import annotations
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 
 from sb.engine import Store
-from sb.grader import _parse_duration_minutes
 from sb.resolver import Context, Interval, Value, resolve
 from sb.schema import Email
 
@@ -53,14 +52,12 @@ def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -
                 while (oid := store.find_in_node(email.node, "event", title)) is not None:
                     store.delete(oid)
                 continue
-            start = _as_dt(_target(entry.start, ctx), 9)
-            minutes = _parse_duration_minutes(entry.duration) if entry.duration else 60
-            end = start + timedelta(minutes=minutes)
+            start = _as_dt(_target(entry.start, ctx), 9)   # default 9am; only the DAY is graded
             existing = store.find_in_node(email.node, "event", title)
             if existing is not None:                      # reschedule in place
-                store.update_event(existing, start=start, end=end)
+                store.update_event(existing, start=start)
             else:
-                store.create_event(email.id, title, start, end)
+                store.create_event(email.id, title, start)
 
         elif entry.action == "create_todo":
             if entry.count == 0:

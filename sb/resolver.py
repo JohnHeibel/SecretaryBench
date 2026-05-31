@@ -12,10 +12,10 @@ Public surface:
     human(value)                  -> str            (natural-language rendering)
     Context(serve, anchors)       -> evaluation context
 
-Only DATES vary with serve order, so the grammar encodes dates only. Durations,
-counts, names, times-of-day-as-prose are static and live in the answer key, not
-here. The one exception carried in-grammar is an optional @HH:MM time attached to
-a date (so a calendar event's date+time render from a single source).
+Only DATES vary with serve order, so the grammar encodes dates only. Times of day,
+durations, counts, and names are static prose / answer-key fields, never tokens —
+the benchmark grades at whole-day granularity (a token resolves to a day, and the
+grader checks the day an event/todo lands on, not the clock time).
 """
 from __future__ import annotations
 
@@ -213,21 +213,9 @@ class _Offset:
         return nd
 
 
-@dataclass
-class _AtTime:
-    base: object
-    hh: int
-    mm: int
-
-    def eval(self, ctx: Context) -> Value:
-        d = _as_date(self.base.eval(ctx))
-        return datetime(d.year, d.month, d.day, self.hh, self.mm)
-
-
 # --- parser ----------------------------------------------------------------
 
 _OFFSET_RE = re.compile(r"\s*([+-]\d+)(bd|d|w|m|y)")
-_ATTACH_RE = re.compile(r"\s*@(\d{1,2}):(\d{2})\s*$")
 
 
 def _parse_base(s: str) -> tuple[object, str]:
@@ -298,11 +286,6 @@ def _parse_expr(s: str) -> object:
         if not m:
             break
         node = _Offset(node, int(m.group(1)), m.group(2))
-        rest = rest[m.end():]
-    # optional trailing time attach
-    m = _ATTACH_RE.match(rest) or _ATTACH_RE.search(rest)
-    if m and rest[:m.start()].strip() == "":
-        node = _AtTime(node, int(m.group(1)), int(m.group(2)))
         rest = rest[m.end():]
     if rest.strip():
         raise ResolverError(f"trailing junk {rest!r} in expression")
