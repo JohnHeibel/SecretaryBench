@@ -1,0 +1,101 @@
+{
+  "id": "globex-acq",
+  "cast": {
+    "PRIYA": "Priya Nair (Outside Counsel)",
+    "MARCUS": "Marcus Webb (CEO)",
+    "FACILITIES": "Building Facilities",
+    "CEO": "you"
+  },
+  "emails": [
+    {
+      "id": "globex.loi",
+      "from": "PRIYA",
+      "to": "CEO",
+      "subject": "Globex LOI executed",
+      "body": "Quick update: we executed the Globex letter of intent this morning. The definitive signing is now locked in for {!globex_signing = serve+2w}. Nothing to action yet — I'll send the diligence and post-close logistics as we get closer.",
+      "depends_on": [],
+      "answer": { "expect": [] }
+    },
+    {
+      "id": "globex.diligence",
+      "from": "PRIYA",
+      "to": "CEO",
+      "subject": "Final diligence review before signing",
+      "body": "Before we sign I need a final diligence review on the calendar for the last business day before the signing — it's our go / no-go.",
+      "depends_on": [ { "email": "globex.loi", "type": "date" } ],
+      "answer": {
+        "expect": [
+          {
+            "action": "create_event",
+            "title_match": ["diligence"],
+            "start": { "eq": "@globex_signing-1bd" },
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "globex.kickoff",
+      "from": "MARCUS",
+      "to": "CEO",
+      "subject": "Integration kickoff",
+      "body": "Assuming we sign, get the integration kickoff on the books for ten business days after the signing.",
+      "depends_on": [ { "email": "globex.loi", "type": "date" } ],
+      "answer": {
+        "expect": [
+          {
+            "action": "create_event",
+            "title_match": ["kickoff"],
+            "start": { "eq": "@globex_signing+10bd" },
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "globex.kickoff_move",
+      "from": "MARCUS",
+      "to": "CEO",
+      "subject": "Re: Integration kickoff",
+      "body": "Change of plans — push the integration kickoff back by three more business days.",
+      "depends_on": [ { "email": "globex.kickoff", "type": "date" } ],
+      "answer": {
+        "expect": [
+          {
+            "action": "create_event",
+            "title_match": ["kickoff"],
+            "start": { "eq": "@globex_signing+10bd+3bd" },
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "globex.parking",
+      "from": "FACILITIES",
+      "to": "CEO",
+      "subject": "Visitor lot repaving",
+      "body": "Heads up: the HQ visitor lot will be repaved {week_of:(serve+1w)}. Please use the parking garage that week. No meeting changes are needed on your end.",
+      "depends_on": [],
+      "answer": { "expect": [] }
+    },
+    {
+      "id": "globex.filing",
+      "from": "PRIYA",
+      "to": "CEO",
+      "subject": "Post-close HSR filing",
+      "body": "Post-close housekeeping: we must file the HSR notification within five business days of the signing. Please add it as a task so it doesn't slip.",
+      "depends_on": [ { "email": "globex.loi", "type": "date" } ],
+      "answer": {
+        "expect": [
+          {
+            "action": "create_todo",
+            "title_match": ["HSR"],
+            "due": { "by": "@globex_signing+5bd" },
+            "count": 1
+          }
+        ]
+      }
+    }
+  ]
+}

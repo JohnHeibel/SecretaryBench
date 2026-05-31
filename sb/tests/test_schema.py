@@ -10,8 +10,8 @@ CORPUS = "corpus"
 
 def test_pilot_corpus_loads_and_lints():
     c = load_corpus(CORPUS)
-    assert set(c.nodes) == {"henderson", "hr-policy", "acme-client"}
-    assert len(c.emails) == 6
+    assert set(c.nodes) == {"henderson", "hr-policy", "acme-client", "globex-acq", "pr-comms"}
+    assert len(c.emails) == 13
 
 
 def test_emission_map_built():

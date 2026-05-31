@@ -1,0 +1,27 @@
+{
+  "id": "pr-comms",
+  "cast": {
+    "SASHA": "Sasha Kim (Comms)",
+    "CEO": "you"
+  },
+  "emails": [
+    {
+      "id": "pr.release",
+      "from": "SASHA",
+      "to": "CEO",
+      "subject": "Globex announcement timing",
+      "body": "The Globex announcement embargo lifts the morning after we sign. Put 'Press release goes live' on the calendar for that day.",
+      "depends_on": [ { "email": "globex.loi", "type": "date" } ],
+      "answer": {
+        "expect": [
+          {
+            "action": "create_event",
+            "title_match": ["press"],
+            "start": { "eq": "@globex_signing+1d" },
+            "count": 1
+          }
+        ]
+      }
+    }
+  ]
+}
