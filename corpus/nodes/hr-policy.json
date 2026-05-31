@@ -10,7 +10,7 @@
       "from": "HR",
       "to": "CEO",
       "subject": "Updated meeting policy",
-      "body": "Quick policy note for scheduling going forward: all external client meetings should now be booked as 90-minute blocks instead of the old 60. No action needed right now — just apply it from here on.",
+      "body": "Quick policy note for scheduling going forward: all external client meetings should now be booked as {=client_meeting_len = 90m} blocks instead of the old 60. No action needed right now — just apply it from here on.",
       "depends_on": [],
       "answer": { "expect": [] }
     }

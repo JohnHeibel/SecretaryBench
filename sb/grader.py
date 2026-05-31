@@ -159,41 +159,48 @@ def _grade_expect(entry: ExpectEntry, ctx: Context, state: NodeState) -> dict:
     title_set = [o for o in pool if _title_hit(o, entry.title_match)]
     predicate = entry.start if entry.action in _EVENT_ACTIONS else (entry.due or entry.start)
 
+    # duration / count may be literals OR fact references ("@meeting_len"); resolve
+    # both against the shared fact table so a policy change propagates here.
+    dur_min = (_parse_duration_minutes(resolver.resolve_scalar(entry.duration, ctx.facts))
+               if entry.duration else None)
+    want_count = (int(resolver.resolve_scalar(str(entry.count), ctx.facts))
+                  if entry.count is not None else None)
+
     def date_ok(o: Obj) -> bool:
         return _predicate_ok(o, predicate, ctx, entry.tolerance)
 
     def dur_ok(o: Obj) -> bool:
-        if not entry.duration or o.end is None:
+        if dur_min is None or o.end is None:
             return True
-        return round((o.end - o.when).total_seconds() / 60) == _parse_duration_minutes(entry.duration)
+        return round((o.end - o.when).total_seconds() / 60) == dur_min
 
     matched = [o for o in title_set if date_ok(o) and dur_ok(o)]
-    need = entry.count if entry.count is not None else 1
-    count_ok = entry.count is None or len(title_set) == entry.count
+    need = want_count if want_count is not None else 1
+    count_ok = want_count is None or len(title_set) == want_count
     passed = len(matched) >= need and count_ok
 
     kw = "/".join(entry.title_match) or "any"
     expected = f'{kind} ~"{kw}" @ {_describe_predicate(predicate, ctx)}'
-    if entry.duration:
-        expected += f" · {_parse_duration_minutes(entry.duration)} min"
-    if entry.count is not None:
-        expected += f" · exactly {entry.count}"
+    if dur_min is not None:
+        expected += f" · {dur_min} min"
+    if want_count is not None:
+        expected += f" · exactly {want_count}"
 
     actual = "; ".join(_fmt_obj(o) for o in title_set) if title_set else "(nothing matching created)"
 
     if passed:
         reason = "matched"
-    elif entry.count == 0:
+    elif want_count == 0:
         reason = f"should be cancelled, but {len(title_set)} still on the calendar"
     elif not title_set:
         reason = f'no {kind} titled like "{kw}" was created'
     elif not count_ok:
-        extra = " (duplicate / double-booked)" if len(title_set) > entry.count else ""
-        reason = f"created {len(title_set)}, expected exactly {entry.count}{extra}"
+        extra = " (duplicate / double-booked)" if len(title_set) > (want_count or 0) else ""
+        reason = f"created {len(title_set)}, expected exactly {want_count}{extra}"
     elif not any(date_ok(o) for o in title_set):
         reason = f"created, but on the wrong date/time"
-    elif entry.duration and not any(dur_ok(o) for o in title_set):
-        reason = f"right time, wrong length (expected {_parse_duration_minutes(entry.duration)} min)"
+    elif dur_min is not None and not any(dur_ok(o) for o in title_set):
+        reason = f"right time, wrong length (expected {dur_min} min)"
     else:
         reason = "did not match the expected action"
 

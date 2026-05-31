@@ -137,7 +137,7 @@ def run(corpus: Corpus, plan: Plan, model: Model, store: Optional[Store] = None)
     for day, batch in enumerate(plan.per_day):
         for email_id in batch:
             email = corpus.emails[email_id]
-            ctx = Context(serve=plan.serve_date[email_id], anchors=plan.anchors)
+            ctx = Context(serve=plan.serve_date[email_id], anchors=plan.anchors, facts=corpus.facts)
             rendered = resolver.render_body(email.body, ctx).text
 
             before = store.snapshot_ids()

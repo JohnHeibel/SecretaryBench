@@ -25,6 +25,8 @@ from sb import schema
 
 _TOKEN_RE = re.compile(r"\{([^{}]*)\}")
 _EMIT_RE = re.compile(r"^\s*!\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$")
+_FACT_DEF_RE = re.compile(r"^\s*=\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+?)\s*$")
+_FACT_REF_RE = re.compile(r"^\s*=\s*([A-Za-z_][A-Za-z0-9_]*)\s*$")
 
 _EVENT_ACTIONS = {"create_event", "reschedule"}
 
@@ -54,6 +56,7 @@ def load_graph(corpus_dir: str | Path) -> dict:
     deps, emits, answer_refs = _build_edges_and_emits(raw_nodes, errors)
     emission_map = _emission_map(emits, errors)
     anc = _ancestors_all(deps)
+    fact_emits, fact_map, fact_values = _fact_tables(raw_nodes, errors)
 
     threads = []
     emails: dict[str, dict] = {}
@@ -71,19 +74,24 @@ def load_graph(corpus_dir: str | Path) -> dict:
                 continue
             ancestors = anc.get(eid, set())
             reachable = sorted(n for n, src in emission_map.items() if src in ancestors)
+            reach_facts = sorted(n for n, src in fact_map.items()
+                                 if src in ancestors or src == eid)
             emails[eid] = _email_to_form(
                 nid, eraw,
                 ancestors=ancestors, emission_map=emission_map,
                 answer_refs=answer_refs.get(eid, set()), reachable=reachable,
+                defined_facts=fact_emits.get(eid, {}), reachable_facts=reach_facts,
             )
 
     return {"threads": threads, "emails": emails,
-            "emission_map": emission_map, "errors": errors}
+            "emission_map": emission_map, "fact_map": fact_map, "fact_values": fact_values,
+            "errors": errors}
 
 
 def _email_to_form(node_id: str, eraw: dict, *, ancestors: set[str],
                    emission_map: dict[str, str], answer_refs: set[str],
-                   reachable: list[str]) -> dict:
+                   reachable: list[str], defined_facts: dict[str, str],
+                   reachable_facts: list[str]) -> dict:
     body = eraw.get("body", "")
     answer = eraw.get("answer", {}) or {}
 
@@ -110,6 +118,8 @@ def _email_to_form(node_id: str, eraw: dict, *, ancestors: set[str],
         "answer": _answer_to_form(answer),
         "emits": _body_emits(body),
         "reachable_anchors": reachable,
+        "defined_facts": defined_facts,
+        "reachable_facts": reachable_facts,
     }
 
 
@@ -121,12 +131,17 @@ def _split_body(body: str) -> list[dict]:
         if m.start() > pos:
             segs.append({"type": "text", "value": body[pos:m.start()]})
         inner = m.group(1).strip()
+        fd = _FACT_DEF_RE.match(inner)
+        fr = _FACT_REF_RE.match(inner)
         em = _EMIT_RE.match(inner)
-        if em:
-            chip = chips.parse_token(em.group(2), emit_as=em.group(1))
+        if fd:
+            segs.append({"type": "fact", "name": fd.group(1), "value": fd.group(2).strip(), "token": m.group(0)})
+        elif fr:
+            segs.append({"type": "fact", "name": fr.group(1), "value": None, "token": m.group(0)})
+        elif em:
+            segs.append({"type": "chip", "chip": chips.parse_token(em.group(2), emit_as=em.group(1)), "token": m.group(0)})
         else:
-            chip = chips.parse_token(inner)
-        segs.append({"type": "chip", "chip": chip, "token": m.group(0)})
+            segs.append({"type": "chip", "chip": chips.parse_token(inner), "token": m.group(0)})
         pos = m.end()
     if pos < len(body):
         segs.append({"type": "text", "value": body[pos:]})
@@ -138,7 +153,8 @@ def _answer_to_form(answer: dict) -> dict:
     forbid = [{"action": f.get("action"), "title_match": list(f.get("title_match", []))}
               for f in answer.get("forbid", [])]
     emits = {name: chips.parse_token(expr) for name, expr in (answer.get("emits", {}) or {}).items()}
-    return {"expect": expect, "forbid": forbid, "emits": emits}
+    facts = {name: str(v) for name, v in (answer.get("facts", {}) or {}).items()}
+    return {"expect": expect, "forbid": forbid, "emits": emits, "facts": facts}
 
 
 def _expect_to_form(e: dict) -> dict:
@@ -212,10 +228,16 @@ def _email_to_raw(form: dict) -> dict:
 def _segments_to_body(segments: list[dict]) -> str:
     parts: list[str] = []
     for seg in segments:
-        if seg.get("type") == "text":
+        kind = seg.get("type")
+        if kind == "text":
             parts.append(seg.get("value", ""))
-        elif seg.get("type") == "chip":
+        elif kind == "chip":
             parts.append(chips.compile_body_token(seg["chip"]))
+        elif kind == "fact":
+            if seg.get("value") is None:
+                parts.append(f"{{={seg['name']}}}")
+            else:
+                parts.append(f"{{={seg['name']} = {seg['value']}}}")
     return "".join(parts)
 
 
@@ -232,6 +254,9 @@ def _answer_to_raw(answer: dict) -> dict:
     emits = {name: chips.compile_chip(chip) for name, chip in (answer.get("emits", {}) or {}).items()}
     if emits:
         out["emits"] = emits
+    facts = {name: str(v) for name, v in (answer.get("facts", {}) or {}).items()}
+    if facts:
+        out["facts"] = facts
     return out
 
 
@@ -365,6 +390,33 @@ def _answer_predicate_exprs(answer: dict) -> list[str]:
                 else:
                     out.append(str(v))
     return out
+
+
+def _fact_tables(raw_nodes: dict[str, dict], errors: list[str]):
+    """Return (per-email defined facts, fact name -> email, fact name -> value)."""
+    per_email: dict[str, dict[str, str]] = {}
+    fact_map: dict[str, str] = {}
+    values: dict[str, str] = {}
+    for raw in raw_nodes.values():
+        for eraw in raw.get("emails", []):
+            eid = eraw.get("id")
+            if not eid:
+                continue
+            defined: dict[str, str] = {}
+            for m in _TOKEN_RE.finditer(eraw.get("body", "")):
+                fd = _FACT_DEF_RE.match(m.group(1).strip())
+                if fd:
+                    defined[fd.group(1)] = fd.group(2).strip()
+            for name, val in (eraw.get("answer", {}).get("facts", {}) or {}).items():
+                defined[name] = str(val)
+            per_email[eid] = defined
+            for name, val in defined.items():
+                if name in fact_map:
+                    errors.append(f"fact ={name} defined by both {fact_map[name]!r} and {eid!r}")
+                    continue
+                fact_map[name] = eid
+                values[name] = val
+    return per_email, fact_map, values
 
 
 def _emission_map(emits: dict[str, dict[str, str]], errors: list[str]) -> dict[str, str]:

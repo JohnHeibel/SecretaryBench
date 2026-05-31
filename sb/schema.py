@@ -19,6 +19,8 @@ from sb import resolver
 
 _ANCHOR_REF_RE = re.compile(r"@([A-Za-z_][A-Za-z0-9_]*)")
 _EMIT_IN_BODY_RE = re.compile(r"\{\s*!\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^{}]*)\}")
+_FACT_DEF_IN_BODY_RE = re.compile(r"\{\s*=\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^{}]*)\}")
+_FACT_REF_IN_BODY_RE = re.compile(r"\{\s*=\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}")
 _TOKEN_RE = re.compile(r"\{([^{}]*)\}")
 
 VALID_ACTIONS = {"create_event", "create_todo", "reschedule", "reply", "delegate"}
@@ -41,8 +43,8 @@ class ExpectEntry:
     title_match: list[str] = field(default_factory=list)
     start: Optional[dict] = None          # predicate: {"eq"|"in"|"by"|"any_of"|"not_in": expr}
     due: Optional[dict] = None            # predicate (todos)
-    duration: Optional[str] = None        # static, e.g. "60m"
-    count: Optional[int] = None
+    duration: Optional[str] = None        # static literal "60m" OR a fact ref "@meeting_len"
+    count: Optional[object] = None        # int literal OR a fact ref "@name"
     tolerance: str = "exact_day"          # exact_day | exact_time | within:Nd
     recurrence: Optional[dict] = None
 
@@ -57,7 +59,8 @@ class ForbidEntry:
 class Answer:
     expect: list[ExpectEntry] = field(default_factory=list)
     forbid: list[ForbidEntry] = field(default_factory=list)
-    emits: dict[str, str] = field(default_factory=dict)   # name -> expr (explicit, non-rendered)
+    emits: dict[str, str] = field(default_factory=dict)   # name -> expr (explicit DATE anchor)
+    facts: dict[str, str] = field(default_factory=dict)   # name -> static scalar value
 
 
 @dataclass
@@ -74,6 +77,8 @@ class Email:
     # derived
     emits: dict[str, str] = field(default_factory=dict)    # name -> expr (body + answer.emits)
     anchor_refs: set[str] = field(default_factory=set)
+    fact_emits: dict[str, str] = field(default_factory=dict)   # name -> value (body + answer.facts)
+    fact_refs: set[str] = field(default_factory=set)           # facts used in body/answer
 
 
 @dataclass
@@ -89,6 +94,8 @@ class Corpus:
     nodes: dict[str, Node]
     emails: dict[str, Email]                  # flat, by id
     emission_map: dict[str, str]              # anchor name -> emitting email id
+    fact_map: dict[str, str] = field(default_factory=dict)    # fact name -> emitting email id
+    facts: dict[str, str] = field(default_factory=dict)       # fact name -> static value
 
     def topo_order(self) -> list[str]:
         return _topo_sort(self.emails)
@@ -140,6 +147,7 @@ def _parse_answer(raw: dict) -> Answer:
         forbid=[ForbidEntry(action=f.get("action"), title_match=list(f.get("title_match", [])))
                 for f in raw.get("forbid", [])],
         emits=dict(raw.get("emits", {})),
+        facts={k: str(v) for k, v in raw.get("facts", {}).items()},
     )
 
 
@@ -164,20 +172,40 @@ def _email_predicates(ans: Answer) -> list[str]:
     return exprs
 
 
+def _fact_refs_in_answer(ans: Answer) -> set[str]:
+    """Fact names referenced via '@name' in scalar answer fields (duration / count)."""
+    refs: set[str] = set()
+    for e in ans.expect:
+        for scalar in (e.duration, e.count):
+            if isinstance(scalar, str) and scalar.strip().startswith("@"):
+                refs.add(scalar.strip()[1:])
+    return refs
+
+
 def _build_email(node_id: str, raw: dict) -> Email:
     body = raw.get("body", "")
     answer = _parse_answer(raw.get("answer", {}))
 
-    # emissions: body {!name=expr} tokens + explicit answer.emits
+    # DATE emissions: body {!name=expr} tokens + explicit answer.emits
     emits: dict[str, str] = {name: expr.strip() for name, expr in _EMIT_IN_BODY_RE.findall(body)}
     emits.update(answer.emits)
 
-    # anchor references: body tokens (minus the emission target) + answer predicates
+    # FACT emissions: body {=name=value} tokens + explicit answer.facts
+    fact_emits: dict[str, str] = {name: val.strip() for name, val in _FACT_DEF_IN_BODY_RE.findall(body)}
+    fact_emits.update(answer.facts)
+
+    # anchor references: body DATE tokens (minus emission/fact tokens) + answer predicates
     refs: set[str] = set()
     for tok in _TOKEN_RE.findall(body):
+        if tok.lstrip().startswith("="):      # a fact token carries no date anchor ref
+            continue
         refs |= _refs_in(tok)
     for expr in _email_predicates(answer):
         refs |= _refs_in(expr)
+
+    # fact references: scalar answer fields + body {=name} references
+    fact_refs = _fact_refs_in_answer(answer)
+    fact_refs |= set(_FACT_REF_IN_BODY_RE.findall(body))
 
     return Email(
         id=raw["id"],
@@ -191,6 +219,8 @@ def _build_email(node_id: str, raw: dict) -> Email:
         answer=answer,
         emits=emits,
         anchor_refs=refs,
+        fact_emits=fact_emits,
+        fact_refs=fact_refs,
     )
 
 
@@ -225,7 +255,9 @@ def load_corpus(corpus_dir: str | Path) -> Corpus:
 
     _expand_node_edges(nodes, emails)
     emission_map = _build_emission_map(emails)
-    corpus = Corpus(nodes=nodes, emails=emails, emission_map=emission_map)
+    fact_map, facts = _build_fact_map(emails)
+    corpus = Corpus(nodes=nodes, emails=emails, emission_map=emission_map,
+                    fact_map=fact_map, facts=facts)
     lint(corpus)
     return corpus
 
@@ -270,6 +302,20 @@ def _build_emission_map(emails: dict[str, Email]) -> dict[str, str]:
     return emission_map
 
 
+def _build_fact_map(emails: dict[str, Email]) -> tuple[dict[str, str], dict[str, str]]:
+    fact_map: dict[str, str] = {}
+    facts: dict[str, str] = {}
+    for email in emails.values():
+        for name, value in email.fact_emits.items():
+            if name in fact_map:
+                raise CorpusError(
+                    f"fact ={name} defined by both {fact_map[name]!r} and {email.id!r}"
+                )
+            fact_map[name] = email.id
+            facts[name] = value
+    return fact_map, facts
+
+
 # --- linter ----------------------------------------------------------------
 
 def _topo_sort(emails: dict[str, Email]) -> list[str]:
@@ -308,6 +354,8 @@ def lint(corpus: Corpus) -> None:
     for email in emails.values():
         for tok in _TOKEN_RE.findall(email.body):
             inner = tok.strip()
+            if inner.startswith("="):          # fact token (define/reference), not a date expr
+                continue
             m = re.match(r"^!\s*[A-Za-z_]\w*\s*=\s*(.+)$", inner)
             expr = m.group(1) if m else inner
             try:
@@ -334,6 +382,24 @@ def lint(corpus: Corpus) -> None:
             if src not in ancestors:
                 raise CorpusError(
                     f"email {email.id!r} references @{name} emitted by {src!r}, "
+                    f"which is not an ancestor (add a depends_on edge)"
+                )
+
+    # 3b. every referenced FACT is defined by a transitive ancestor (or self). Facts
+    #     are static, so an ordinary 'static' edge suffices — no date edge needed.
+    for email in emails.values():
+        if not email.fact_refs:
+            continue
+        ancestors = corpus.ancestors(email.id)
+        for name in email.fact_refs:
+            src = corpus.fact_map.get(name)
+            if src is None:
+                raise CorpusError(f"email {email.id!r} references undefined fact ={name}")
+            if src == email.id:
+                continue
+            if src not in ancestors:
+                raise CorpusError(
+                    f"email {email.id!r} references fact ={name} defined by {src!r}, "
                     f"which is not an ancestor (add a depends_on edge)"
                 )
 

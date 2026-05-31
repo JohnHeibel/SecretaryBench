@@ -15,7 +15,7 @@ from datetime import datetime, time, timedelta
 
 from sb.engine import Store
 from sb.grader import _parse_duration_minutes
-from sb.resolver import Context, Interval, Value, resolve
+from sb.resolver import Context, Interval, Value, resolve, resolve_scalar
 from sb.schema import Email
 
 
@@ -47,14 +47,16 @@ def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -
 
     for entry in ans.expect:
         title = entry.title_match[0] if entry.title_match else "task"
+        count = (int(resolve_scalar(str(entry.count), ctx.facts))
+                 if entry.count is not None else None)
 
         if entry.action in ("create_event", "reschedule"):
-            if entry.count == 0:  # cancellation
+            if count == 0:  # cancellation
                 while (oid := store.find_in_node(email.node, "event", title)) is not None:
                     store.delete(oid)
                 continue
             start = _as_dt(_target(entry.start, ctx), 9)
-            minutes = _parse_duration_minutes(entry.duration) if entry.duration else 60
+            minutes = _parse_duration_minutes(resolve_scalar(entry.duration, ctx.facts)) if entry.duration else 60
             end = start + timedelta(minutes=minutes)
             existing = store.find_in_node(email.node, "event", title)
             if existing is not None:                      # reschedule in place
@@ -63,7 +65,7 @@ def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -
                 store.create_event(email.id, title, start, end)
 
         elif entry.action == "create_todo":
-            if entry.count == 0:
+            if count == 0:
                 while (oid := store.find_in_node(email.node, "todo", title)) is not None:
                     store.delete(oid)
                 continue

@@ -50,12 +50,14 @@ class Interval:
 class Context:
     serve: date                                   # the day the email is served (its "now")
     anchors: dict[str, Value] = field(default_factory=dict)
+    facts: dict[str, str] = field(default_factory=dict)   # named static scalars (e.g. a duration)
 
 
 @dataclass
 class RenderResult:
     text: str
     emissions: dict[str, Value]
+    fact_emissions: dict[str, str] = field(default_factory=dict)
 
 
 # --- date helpers ----------------------------------------------------------
@@ -326,21 +328,37 @@ def value_kind(v: Value) -> str:
 
 _TOKEN_RE = re.compile(r"\{([^{}]*)\}")
 _EMIT_RE = re.compile(r"^\s*!\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$")
+# a fact token: {=name = value} defines + renders a static scalar; {=name} references one
+_FACT_RE = re.compile(r"^\s*=\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:=\s*(.+?))?\s*$")
 
 
 def render_body(body: str, ctx: Context) -> RenderResult:
-    """Render every {token} in an email body to a concrete date string, and
-    collect any {!name = expr} emissions into the anchor table.
+    """Render every {token} in an email body and collect emissions.
 
-    Emissions are evaluated against ctx (this email's serve date) and added to a
-    local copy of the anchor table as we go, so a later token in the same body
-    may reference an anchor an earlier token emitted.
+    Three token forms:
+      {date_expr}            -> rendered to a concrete date string
+      {!name = date_expr}    -> defines a named DATE anchor (and renders it)
+      {=name = value}        -> defines a named static FACT scalar (and renders it)
+      {=name}                -> references a previously-defined fact (and renders it)
+
+    Emissions are evaluated against ctx and added to a local copy of the tables as
+    we go, so a later token in the same body may reference an earlier emission.
     """
     emissions: dict[str, Value] = {}
-    local = Context(ctx.serve, dict(ctx.anchors))
+    fact_emissions: dict[str, str] = {}
+    local = Context(ctx.serve, dict(ctx.anchors), dict(ctx.facts))
 
     def _sub(match: re.Match) -> str:
         inner = match.group(1).strip()
+        fact = _FACT_RE.match(inner)
+        if fact:
+            name, value = fact.group(1), fact.group(2)
+            if value is not None:
+                local.facts[name] = value.strip()
+                fact_emissions[name] = value.strip()
+            elif name not in local.facts:
+                raise ResolverError(f"unknown fact ={name}")
+            return human_fact(local.facts[name])
         emit = _EMIT_RE.match(inner)
         if emit:
             name, expr = emit.group(1), emit.group(2)
@@ -351,7 +369,31 @@ def render_body(body: str, ctx: Context) -> RenderResult:
         return human(resolve(inner, local))
 
     text = _TOKEN_RE.sub(_sub, body)
-    return RenderResult(text=text, emissions=emissions)
+    return RenderResult(text=text, emissions=emissions, fact_emissions=fact_emissions)
+
+
+def resolve_scalar(ref: str, facts: dict[str, str]) -> str:
+    """Resolve an answer scalar (duration/count). '@name' looks up a fact; anything
+    else is a literal returned unchanged."""
+    ref = str(ref).strip()
+    if ref.startswith("@"):
+        name = ref[1:]
+        if name not in facts:
+            raise ResolverError(f"unknown fact @{name}")
+        return facts[name]
+    return ref
+
+
+def human_fact(value: str) -> str:
+    """Natural-language rendering of a static fact (currently durations)."""
+    v = value.strip()
+    m = re.fullmatch(r"(\d+)\s*m", v)
+    if m:
+        return f"{m.group(1)}-minute"
+    m = re.fullmatch(r"(\d+)\s*h", v)
+    if m:
+        return f"{m.group(1)}-hour"
+    return v
 
 
 def _ordinal(n: int) -> str:

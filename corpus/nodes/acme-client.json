@@ -19,7 +19,7 @@
             "action": "create_event",
             "title_match": ["acme"],
             "start": { "eq": "next:THU@14:00" },
-            "duration": "90m",
+            "duration": "@client_meeting_len",
             "count": 1,
             "tolerance": "exact_time"
           }
@@ -39,7 +39,7 @@
             "action": "create_event",
             "title_match": ["acme"],
             "start": { "eq": "next:MON" },
-            "duration": "90m",
+            "duration": "@client_meeting_len",
             "count": 1,
             "tolerance": "exact_day"
           }
