@@ -31,7 +31,7 @@ from typing import Any
 import httpx
 
 import bench_logger as blog
-from loader import Email
+from sb.schema import Email
 
 # --- Config (env knobs; read once at import) -------------------------------
 
@@ -119,8 +119,6 @@ TOOLS:
 - delete_todo / delete_event: ONLY to undo a duplicate you just created by mistake. Never to "reschedule" or "cancel" — use update_* for changes; for cancellations the email just doesn't need any action.
 - list_emails / list_todos / list_events / get_calendar / get_todo / get_event: ONLY when you need state you don't already remember from this conversation. Prefer NOT to call — you usually remember what you wrote.
 - (no tool): FYI / newsletter / auto-confirmation / marketing / status update.
-
-When in doubt, do nothing. Over-acting is the most common failure.
 
 ORDER: if both an event AND a linked todo are needed, create the event first, then pass its returned id as `calendar_event_id` to create_todo.
 

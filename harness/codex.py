@@ -12,7 +12,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from loader import Email
+from sb.schema import Email
 from harness.cli_base import HarnessAdapter
 
 

@@ -22,7 +22,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from loader import Email
+from sb.schema import Email
 
 from harness import base
 from harness.base import (  # re-export the shared core for convenience

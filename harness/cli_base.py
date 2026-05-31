@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Optional
 
-from loader import Email
+from sb.schema import Email
 
 from harness import base
 
