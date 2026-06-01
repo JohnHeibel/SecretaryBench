@@ -30,6 +30,10 @@ settings.local.json
 CLAUDE.md
 MIGRATION_AI_LANE.md
 TEAMMATE_BREIF.md
+.claude/worktrees/
+
+# Browser-driven test artifacts (Playwright MCP)
+.playwright-mcp/
 
 # Generated scaled corpus (sb.scale) — offline span experiments
 build/
