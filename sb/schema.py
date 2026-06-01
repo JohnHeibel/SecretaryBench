@@ -199,15 +199,37 @@ def load_corpus(corpus_dir: str | Path) -> Corpus:
     node_files = sorted((corpus_dir / "nodes").glob("*.json"))
     if not node_files:
         raise CorpusError(f"no node files under {corpus_dir}/nodes/")
+    raw_nodes = [json.loads(path.read_text()) for path in node_files]
+    sources = [str(path) for path in node_files]
+    return build_corpus(raw_nodes, sources=sources)
+
+
+# ids become filenames (corpus/nodes/<id>.json via sb.sync) and are interpolated
+# into paths, so they must be a safe, simple slug — no path separators, no `..`.
+_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def _check_id(value: str, kind: str, src: str) -> None:
+    if not isinstance(value, str) or not _ID_RE.match(value) or ".." in value:
+        raise CorpusError(f"invalid {kind} id {value!r} ({src}): must match {_ID_RE.pattern} and contain no '..'")
+
+
+def build_corpus(raw_nodes: list[dict], sources: Optional[list[str]] = None) -> Corpus:
+    """Build + lint a Corpus from in-memory raw node dicts (same shape as the node
+    JSON files). `sources` is an optional parallel list of human labels (e.g. file
+    paths) used only in duplicate-id error messages. This is the disk-free entry
+    point the web app's lint endpoint calls; load_corpus reads files then delegates."""
+    if sources is None:
+        sources = [str(raw.get("id", f"#{i}")) for i, raw in enumerate(raw_nodes)]
 
     nodes: dict[str, Node] = {}
     emails: dict[str, Email] = {}
 
-    for path in node_files:
-        raw = json.loads(path.read_text())
+    for raw, src in zip(raw_nodes, sources):
         node_id = raw["id"]
+        _check_id(node_id, "node", src)
         if node_id in nodes:
-            raise CorpusError(f"duplicate node id {node_id!r} ({path})")
+            raise CorpusError(f"duplicate node id {node_id!r} ({src})")
         node = Node(
             id=node_id,
             cast=raw.get("cast", {}),
@@ -215,8 +237,9 @@ def load_corpus(corpus_dir: str | Path) -> Corpus:
         )
         for eraw in raw.get("emails", []):
             email = _build_email(node_id, eraw)
+            _check_id(email.id, "email", src)
             if email.id in emails:
-                raise CorpusError(f"duplicate email id {email.id!r} ({path})")
+                raise CorpusError(f"duplicate email id {email.id!r} ({src})")
             node.emails.append(email)
             emails[email.id] = email
         nodes[node_id] = node
