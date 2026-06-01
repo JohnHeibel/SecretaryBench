@@ -62,7 +62,15 @@ def main() -> None:
     if "--check" in sys.argv[1:]:
         raise SystemExit(check())
     if not SRC.exists():
-        raise SystemExit(f"cannot find sb/ at {SRC} — run from inside the repo")
+        # A CLI/archive deploy uploads only webapp/, so the parent sb/ and corpus/
+        # aren't here. Fall back to the copy that was vendored before upload — but
+        # only if it is COMPLETE, else fail loudly rather than ship stale/missing code.
+        missing = [n for n in MODULES if not (DST / n).exists()]
+        if missing or not SEED.exists():
+            raise SystemExit(f"cannot find sb/ at {SRC} and the vendored copy is incomplete "
+                             f"(missing: {missing or ['seed/nodes.json']}) — run `npm run vendor` from a full checkout")
+        print(f"sb/ not present (archive deploy) — using the pre-vendored {len(MODULES)} modules + seed already in webapp/")
+        return
     DST.mkdir(parents=True, exist_ok=True)
     for name in MODULES:
         src = SRC / name

@@ -1,0 +1,13 @@
+# Vercel CLI deploys from webapp/ as the project root, so the parent sb/ and corpus/
+# are NOT uploaded. This file (NOT .gitignore) governs the upload, so we deliberately
+# DO ship the pre-vendored api/_lib/sb/ and seed/ that .gitignore excludes — the build
+# can't regenerate them without the parent dirs. Only exclude what Vercel rebuilds or
+# what must never ship.
+node_modules
+.next
+.vercel
+.data
+.env
+.env*.local
+.playwright-mcp
+**/__pycache__
