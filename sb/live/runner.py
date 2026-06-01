@@ -218,8 +218,8 @@ def start_mcp() -> subprocess.Popen:
 
 
 def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
-        per_turn_timeout: float = 240.0) -> None:
-    corpus = load_corpus("corpus")
+        per_turn_timeout: float = 240.0, corpus_dir: str = "corpus") -> None:
+    corpus = load_corpus(corpus_dir)
     plan = build_plan(corpus, start_date=start, seed=seed, n_days=n_days)
     order = [e for day in plan.per_day for e in day]
     if limit:
@@ -264,15 +264,27 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                 cmd += ["--resume", session]
             cmd.append(user_msg)
 
-            try:
-                proc = subprocess.run(cmd, capture_output=True, text=True, timeout=per_turn_timeout)
-                sid, tools, is_err, said = _parse_stream(proc.stdout)
-                session = session or sid
-                if is_err or proc.returncode != 0:
-                    raise RuntimeError(proc.stderr.strip()[:200] or "claude error")
-            except Exception as exc:
+            # Retry with exponential backoff: a transient rate-limit / overload
+            # blip should pause-and-resume, not throw the email away.
+            ok, sid, tools, said, detail = False, None, [], "", "claude error"
+            for attempt in range(5):
+                try:
+                    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=per_turn_timeout)
+                    sid, tools, is_err, said = _parse_stream(proc.stdout)
+                    if not is_err and proc.returncode == 0:
+                        session = session or sid
+                        ok = True
+                        break
+                    detail = proc.stderr.strip()[:160] or "claude returned is_error"
+                except Exception as exc:
+                    detail = str(exc)[:160]
+                if attempt < 4:
+                    wait = 5 * (3 ** attempt)        # 5s, 15s, 45s, 135s
+                    print(f"[{i:>2}] {eid:24s}  transient ({detail}) — retry {attempt+1}/4 in {wait}s")
+                    time.sleep(wait)
+            if not ok:
                 results[eid] = None
-                print(f"[{i:>2}] {eid:24s}  ERROR: {exc}")
+                print(f"[{i:>2}] {eid:24s}  ERROR after retries: {detail}")
                 continue
 
             state = httpx.get(f"{STORE_URL}/state", timeout=10).json()
@@ -307,8 +319,9 @@ def main():
     ap.add_argument("--start", default="2026-06-01")
     ap.add_argument("--days", type=int, default=60)
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--corpus", default="corpus")
     a = ap.parse_args()
-    run(a.model, a.seed, date.fromisoformat(a.start), a.days, a.limit)
+    run(a.model, a.seed, date.fromisoformat(a.start), a.days, a.limit, corpus_dir=a.corpus)
 
 
 if __name__ == "__main__":
