@@ -3,17 +3,20 @@ sb.scale — build a SCALED corpus to drive retrieval span, and measure it offli
 
 The base corpus keeps every needed fact in context (see `python -m sb.span`), so a
 model never has to retrieve. This tool copies the real corpus into a build dir and
-injects:
-  - a haystack of no-action FYI "filler" emails (the distractors that push facts
-    out of context and that search_inbox must sift through), and
-  - a "needle" pair: an early email that emits a date anchor, and a later payoff
-    whose answer needs that anchor with a far deadline, so the scheduler can hold
-    it many emails/days away from the setup.
+injects a haystack of no-action FYI "filler" emails — the distractors that push
+facts out of context and that search_inbox must sift through.
+
+The DISCRIMINATING needles (an early email emitting a date anchor + a later payoff
+whose answer needs it with a far deadline) are hand-authored in corpus/ via the web
+app, NOT generated — templated needles don't separate models. So the default run is
+JUNK-ONLY (--needles 0): it buries the authored needles in haystack. --needles N>0
+additionally injects N generated needles per reasoning tier, for span experiments.
 
 Everything here is OFFLINE (no API calls): generate -> plan -> span -> oracle. The
 real corpus/ and the test suite are untouched (we build into build/scaled/).
 
-    python -m sb.scale --filler 120 --seed 42      # build + report span + oracle
+    python -m sb.scale --filler 200 --seed 42      # junk-only: bury authored needles
+    python -m sb.scale --filler 120 --needles 8    # + generated needles (span study)
 """
 from __future__ import annotations
 
@@ -190,7 +193,11 @@ def build_scaled(dst: Path, n_filler: int, seed: int, n_per_tier: int = 8) -> No
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--filler", type=int, default=120)
-    ap.add_argument("--needles", type=int, default=8, help="needles PER reasoning tier (x4 tiers)")
+    # Default 0: the discriminating needles are hand-authored in the corpus (via the
+    # web app), not generated. Generated needles are templated and don't separate
+    # models, so the production use of this tool is junk-only — bury the real,
+    # authored needles in haystack. Pass --needles N>0 only for span experiments.
+    ap.add_argument("--needles", type=int, default=0, help="GENERATED needles per reasoning tier (x4); 0 = junk-only around the authored corpus")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--days", type=int, default=200)
     ap.add_argument("--dst", default="build/scaled")
@@ -204,9 +211,13 @@ def main() -> None:
 
     recs = sorted(spans(corpus, plan), key=lambda r: r["email_span"], reverse=True)
     print(f"\nscaled corpus: {len(corpus.emails)} emails, {len(served)} served over {plan.n_days} days")
-    print(f"needles: {a.needles} per tier x4 ({', '.join(_TIERS)})")
+    kind = f"{a.needles} per tier x4 ({', '.join(_TIERS)})" if a.needles else "0 generated — burying the authored corpus needles in junk"
+    print(f"needles: {kind}")
     es = [r["email_span"] for r in recs]
-    print(f"needle span: max {max(es)}, mean {sum(es)/len(es):.1f}  (n={len(es)})")
+    if es:
+        print(f"needle span: max {max(es)}, mean {sum(es)/len(es):.1f}  (n={len(es)})")
+    else:
+        print("needle span: no answer-key anchor references in this corpus")
 
     store = Store(corpus)
     res = run(corpus, plan, oracle_model, store=store)
