@@ -30,3 +30,6 @@ settings.local.json
 CLAUDE.md
 MIGRATION_AI_LANE.md
 TEAMMATE_BREIF.md
+
+# Generated scaled corpus (sb.scale) — offline span experiments
+build/

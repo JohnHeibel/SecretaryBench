@@ -45,7 +45,8 @@ def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -
         return  # correctly take no action
 
     for entry in ans.expect:
-        title = entry.title_match[0] if entry.title_match else "task"
+        # title must contain ALL match keywords (the grader requires all of them)
+        title = " ".join(entry.title_match) if entry.title_match else "task"
 
         if entry.action in ("create_event", "reschedule"):
             if entry.count == 0:  # cancellation
