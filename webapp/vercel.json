@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/resolve.py": { "maxDuration": 10 },
+    "api/lint.py": { "maxDuration": 30 },
+    "api/oracle.py": { "maxDuration": 60 }
+  }
+}

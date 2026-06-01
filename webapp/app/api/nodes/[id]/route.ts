@@ -1,0 +1,27 @@
+import { NextResponse } from "next/server";
+import { getNode, upsertNode, deleteNode } from "@/lib/store";
+import type { CorpusNode } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
+
+type Ctx = { params: Promise<{ id: string }> };
+
+export async function GET(_req: Request, { params }: Ctx) {
+  const { id } = await params;
+  const node = await getNode(id);
+  return node ? NextResponse.json(node) : NextResponse.json({ error: "not found" }, { status: 404 });
+}
+
+export async function PUT(req: Request, { params }: Ctx) {
+  const { id } = await params;
+  const node = (await req.json()) as CorpusNode;
+  if (node.id !== id) return NextResponse.json({ error: "id mismatch" }, { status: 400 });
+  const by = req.headers.get("x-author") ?? "anon";
+  return NextResponse.json(await upsertNode(node, by));
+}
+
+export async function DELETE(_req: Request, { params }: Ctx) {
+  const { id } = await params;
+  await deleteNode(id);
+  return NextResponse.json({ deleted: id });
+}

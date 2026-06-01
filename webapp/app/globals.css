@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-edge-static: #f59e0b;
+  --color-edge-date: #38bdf8;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+/* React Flow + Blockly inject their own stylesheets at runtime; keep a dark base. */
+.react-flow__attribution {
+  display: none;
+}
