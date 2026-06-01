@@ -128,6 +128,51 @@ def test_human_interval():
     assert human(Interval(date(2026, 6, 15), date(2026, 6, 21))) == "the week of June 15th, 2026"
 
 
+# --- anchor-relative weekday selectors (from <expr>) -----------------------
+
+def test_next_wd_from_anchor_midweek():
+    # ref = Wed Jun 10, 2026; next FRI strictly after -> same-week Fri Jun 12.
+    anchors = {"migration": date(2026, 6, 10)}
+    assert date(2026, 6, 10).weekday() == 2  # WED
+    assert resolve("next:FRI from @migration", Context(SERVE, anchors)) == date(2026, 6, 12)
+
+
+def test_next_wd_from_anchor_on_that_weekday_jumps_a_week():
+    # ref = Fri Jun 12; next FRI strictly after -> following Fri Jun 19.
+    anchors = {"migration": date(2026, 6, 12)}
+    assert date(2026, 6, 12).weekday() == 4  # FRI
+    assert resolve("next:FRI from @migration", Context(SERVE, anchors)) == date(2026, 6, 19)
+
+
+def test_this_wd_from_anchor_midweek():
+    # ref = Wed Jun 10; this FRI = Friday of that week -> Jun 12.
+    anchors = {"migration": date(2026, 6, 10)}
+    assert resolve("this:FRI from @migration", Context(SERVE, anchors)) == date(2026, 6, 12)
+
+
+def test_this_wd_from_anchor_on_that_weekday_is_same_day():
+    # ref = Fri Jun 12; this FRI = same Friday Jun 12.
+    anchors = {"migration": date(2026, 6, 12)}
+    assert resolve("this:FRI from @migration", Context(SERVE, anchors)) == date(2026, 6, 12)
+
+
+def test_from_expr_supports_offsets():
+    # @migration is Wed Jun 10; +1w -> Wed Jun 17; next MON strictly after -> Jun 22.
+    anchors = {"migration": date(2026, 6, 10)}
+    assert resolve("next:MON from @migration+1w", Context(SERVE, anchors)) == date(2026, 6, 22)
+
+
+def test_from_unknown_anchor_raises():
+    with pytest.raises(ResolverError):
+        resolve("next:FRI from @nope", ctx())
+
+
+def test_from_does_not_change_serve_relative_forms():
+    # No from clause: identical to current serve-relative behavior.
+    assert resolve("next:THU", ctx()) == date(2026, 6, 11)
+    assert resolve("this:FRI", ctx()) == date(2026, 6, 12)
+
+
 # --- error handling --------------------------------------------------------
 
 def test_trailing_junk_raises():

@@ -128,20 +128,23 @@ class _Anchor:
 @dataclass
 class _NextWD:
     wd: int
+    ref: object = None                           # None -> serve-relative; else anchor expr
 
     def eval(self, ctx: Context) -> Value:
-        d = ctx.serve
+        d = ctx.serve if self.ref is None else _as_date(self.ref.eval(ctx))
         delta = (self.wd - d.weekday()) % 7
-        delta = delta or 7                       # strictly after serve
+        delta = delta or 7                       # strictly after the reference date
         return d + timedelta(days=delta)
 
 
 @dataclass
 class _ThisWD:
     wd: int
+    ref: object = None                           # None -> serve-relative; else anchor expr
 
     def eval(self, ctx: Context) -> Value:
-        monday = ctx.serve - timedelta(days=ctx.serve.weekday())
+        d = ctx.serve if self.ref is None else _as_date(self.ref.eval(ctx))
+        monday = d - timedelta(days=d.weekday())
         return monday + timedelta(days=self.wd)
 
 
@@ -216,6 +219,17 @@ class _Offset:
 # --- parser ----------------------------------------------------------------
 
 _OFFSET_RE = re.compile(r"\s*([+-]\d+)(bd|d|w|m|y)")
+_FROM_RE = re.compile(r"\s+from\s+", re.I)
+
+
+def _parse_from_clause(rest: str) -> tuple[object, str]:
+    """If rest begins with a ` from ` clause, parse the remainder of the string
+    as a full grammar sub-expression (the anchor reference point) and return
+    (ref_node, ""). Otherwise return (None, rest) leaving rest for offsets."""
+    m = _FROM_RE.match(rest)
+    if not m:
+        return None, rest
+    return _parse_expr(rest[m.end():]), ""
 
 
 def _parse_base(s: str) -> tuple[object, str]:
@@ -231,11 +245,13 @@ def _parse_base(s: str) -> tuple[object, str]:
 
     m = re.match(r"next:([A-Za-z]{3})", s, re.I)
     if m:
-        return _NextWD(_wd(m.group(1))), s[m.end():]
+        ref, rest = _parse_from_clause(s[m.end():])
+        return _NextWD(_wd(m.group(1)), ref), rest
 
     m = re.match(r"this:([A-Za-z]{3})", s, re.I)
     if m:
-        return _ThisWD(_wd(m.group(1))), s[m.end():]
+        ref, rest = _parse_from_clause(s[m.end():])
+        return _ThisWD(_wd(m.group(1)), ref), rest
 
     m = re.match(r"nth:(\d+|last),([A-Za-z]{3}),([+-]?\d+)m", s, re.I)
     if m:

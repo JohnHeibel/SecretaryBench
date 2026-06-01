@@ -72,8 +72,8 @@ expr      := base (offset)*
 base      := "serve" | "@" NAME | selector
 offset    := ("+"|"-") INT unit
 unit      := "d" (calendar days) | "bd" (business days) | "w" | "m" | "y"
-selector  := "next:" WD                 // next WD strictly after the anchor
-           | "this:" WD                 // WD in the anchor's Mon–Sun week
+selector  := "next:" WD ("from" expr)?  // next WD strictly after serve, or after expr's date
+           | "this:" WD ("from" expr)?  // WD in serve's (or expr's) Mon–Sun week
            | "nth:" N "," WD "," monthref   // Nth WD of a month (N = 1..5 or "last")
            | "dom:" D "," monthref          // the Dth day-of-month
            | "week_of:(" expr ")"           // INTERVAL: Mon–Sun containing expr
@@ -88,6 +88,8 @@ WD        := MON|TUE|WED|THU|FRI|SAT|SUN
 | `{+9d}` | serve + 9 calendar days |
 | `{+3bd}` | serve + 3 business days |
 | `{next:THU}` | next Thursday after serve |
+| `{next:MON from @signing}` | the first Monday after the signing |
+| `{this:FRI from @migration}` | the Friday of the week containing the migration |
 | `{nth:3,FRI,+1m}` | 3rd Friday of next month  ← the C19 gala, correct |
 | `{nth:last,FRI,0m}` | last Friday of this month |
 | `{dom:25,0m}` | the 25th of this month |
@@ -237,9 +239,10 @@ human discipline shipped with the authoring kit.
   fuzzy "morning/afternoon"; quarter/fiscal dates; date *ranges as the deliverable*.)
 - **[OPEN B2]** No-action strictness. **[OPEN B3]** Binary vs partial-credit headline metric.
 - **[OPEN]** Reply / delegate action schemas (reschedule/cancel now drafted in §5.1).
-- **[OPEN, optional]** Weekday selectors relative to a *named anchor* ("the Monday after
-  the signing"). Most reschedules avoid needing it (serve-relative date, or `@anchor±Nd`);
-  add a `from <expr>` base to selectors only if real emails demand it.
+- **[DONE]** Weekday selectors relative to a *named anchor* ("the Monday after the
+  signing"). Implemented as an optional `from <expr>` clause on `next:`/`this:` (e.g.
+  `next:MON from @signing`, `this:FRI from @migration+1w`); with no `from`, behavior is
+  unchanged (serve-relative).
 - **[OPEN]** Timezone & locale lock; default valid-slot rules for `in:` answers.
 - **[IMPLEMENTATION NOTE]** Grader must be **state-based** (snapshot the calendar/todos
   after each email and evaluate `expect`/`forbid`/`count` against it), not diff-based.
