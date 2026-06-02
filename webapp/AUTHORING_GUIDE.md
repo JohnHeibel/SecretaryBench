@@ -252,31 +252,39 @@ Tick it for a **filler / distractor** email. The email is then graded as **do no
 if the AI creates any event or to-do for it, that's a failure (over-acting). That's the
 whole test. Done.
 
-### Adding an expected action (tests and needles)
+### Adding an obligation (tests and needles)
 
-Leave that box unticked and click **+ expected action**. You get a row with:
+Leave that box unticked and click **+ obligation**. An obligation is one thing the
+secretary must do — named, so a later email can move or cancel it by that name. You get a
+row with:
 
-- **Action type** dropdown — what the secretary should do:
-  - `create_event` — put a meeting on the calendar (has a start date)
-  - `create_todo` — add a to-do (has a due date)
-  - `reschedule` — move an existing event (has a date)
-  - `reply` — send a reply (no date)
-  - `delegate` — hand it to someone (no date)
-- **title keywords** — comma-separated words that should appear in the title (e.g.
-  `kickoff, planning`). The grader checks these loosely, so a couple of distinctive words
-  is plenty.
-- **count** — leave this blank in almost every case. The grader already expects **exactly
-  one** matching item (so a reschedule that leaves a stale duplicate fails on its own). Only
-  set `count` for the two exceptions: `0` ("this should be cancelled / must not exist") or a
-  specific number when an email genuinely asks for several.
+- **What to do** dropdown:
+  - `Create an event` — put a meeting on the calendar (has a date)
+  - `Create a to-do` — add a task (has a due date)
+  - `Move / reschedule` — move an obligation created by an earlier email, by its name
+  - `Cancel` — the obligation must end up gone (no date, no kind)
+- **obligation name** — a short slug like `kickoff`. It does double duty: it's the
+  obligation's identity (so `Move`/`Cancel` can refer to it later), **and** it's the default
+  title keyword the grader looks for. Name it something a natural calendar title would
+  contain.
+- **title keywords** — optional, comma-separated. **Leave blank and it defaults to the
+  obligation name** — which is what you want almost always. Only fill it in when the natural
+  title wouldn't contain the name (e.g. obligation `filing` but the title says "HSR"). The
+  grader matches loosely (the title just has to contain every keyword), so pick a word a
+  real assistant would actually write. The builder shows you, in plain text, exactly what
+  it will match on.
 - **tolerance** — how exact the date must be. `exact_day` means the day must match; you can
   also allow slack like `within:2d`.
 
-### The date predicate (for actions that have a date)
+There is no "count" — an obligation is exactly one object by definition, so a reschedule
+that leaves a stale duplicate fails on its own, and "must not exist" is just the **Cancel**
+verb.
 
-For `create_event`, `create_todo`, and `reschedule`, a date row appears. You choose an
-**operator** and then click **build date** (the same block builder from section 4) to fill
-in the date. The operators:
+### The date predicate (for Create and Move)
+
+For `Create an event`, `Create a to-do`, and `Move / reschedule`, a date row appears
+(Cancel has none). You choose an **operator** and then click **build date** (the same block
+builder from section 4) to fill in the date. The operators:
 
 | Operator | Meaning |
 |----------|---------|
@@ -308,7 +316,7 @@ A needle is **two emails plus a link between them.** Here's the whole thing:
    Body mentions a date and                  Answer key books something
    PUBLISHES it as an anchor.                 RELATIVE to that anchor.
                                               
-   "Migration is {!migration = ...}"   ───►   create_event, date = @migration + 1 week
+   "Migration is {!migration = ...}"   ───►   Create an event, date = @migration + 1 week
         (tick "publish as anchor",            (build date → use the "anchor @ migration"
          name it: migration)                   block, plus an offset block)
                                               
@@ -322,7 +330,7 @@ Step by step:
    (Email A itself can be filler — often the setup fact arrives in an otherwise no-action
    email.)
 2. **Write Email B**, somewhere later in the storyline.
-3. In **Email B's answer key**, add an expected action, click **build date**, and use the
+3. In **Email B's answer key**, add an obligation, click **build date**, and use the
    **anchor @** block (pick `migration` from its dropdown). Snap on an **± offset** block if
    the payoff is "one week after," etc. The preview will say *uses an anchor; resolves at
    serve time* — that's correct.
