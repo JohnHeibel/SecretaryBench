@@ -103,6 +103,12 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, onChange 
                   </div>
                 )}
 
+                {f && /@\w/.test(predExpr(pred)) && (
+                  <div className="mb-2 rounded bg-violet-500/10 px-2 py-1 text-[11px] leading-snug text-violet-300">
+                    ↳ this date uses an <code className="font-mono">@anchor</code> from another email, so this email is a <strong>needle</strong> — a retrieval test. The model has to find that earlier email to answer it, and it gets harder the more filler sits between the two.
+                  </div>
+                )}
+
                 <div className="flex items-center gap-3 text-xs text-slate-400">
                   <label className="flex items-center gap-1">count
                     <input type="number" value={entry.count ?? 1} min={0} onChange={(e) => patch(i, { count: Number(e.target.value) })}
