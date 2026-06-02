@@ -295,7 +295,11 @@ def _wd(token: str) -> int:
 
 
 def _parse_expr(s: str) -> object:
-    node, rest = _parse_base(s)
+    s = s.strip()
+    if _OFFSET_RE.match(s):
+        node, rest = _Serve(), s
+    else:
+        node, rest = _parse_base(s)
     # offsets
     while True:
         m = _OFFSET_RE.match(rest)

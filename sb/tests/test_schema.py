@@ -182,3 +182,55 @@ def test_move_derives_edge_to_creator(tmp_path):
     assert any(d.email == "n.make" for d in c.emails["n.move"].depends_on)
     order = c.topo_order()
     assert order.index("n.make") < order.index("n.move")
+
+
+def test_move_upgrades_explicit_static_edge_to_date_edge(tmp_path):
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [
+            {"id": "n.make", "answer": {"ops": [
+                {"create": "call", "kind": "event", "on": {"eq": "next:THU"}}]}},
+            {"id": "n.move", "depends_on": [{"email": "n.make", "type": "static"}],
+             "answer": {"ops": [{"move": "call", "on": {"eq": "@call+3d"}}]}},
+        ],
+    })
+    c = load_corpus(tmp_path)
+    assert any(d.email == "n.make" and d.type == "date" for d in c.emails["n.move"].depends_on)
+
+
+def test_body_anchor_in_other_node_does_not_shadow_obligation_anchor(tmp_path):
+    _write_node(tmp_path, "n1", {
+        "id": "n1",
+        "emails": [{"id": "n1.a", "body": "external {!call=+1d}", "answer": {"ops": []}}],
+    })
+    _write_node(tmp_path, "n2", {
+        "id": "n2",
+        "emails": [
+            {"id": "n2.make", "answer": {"ops": [
+                {"create": "call", "kind": "event", "on": {"eq": "next:THU"}}]}},
+            {"id": "n2.move", "answer": {"ops": [{"move": "call", "on": {"eq": "@call+3d"}}]}},
+        ],
+    })
+    c = load_corpus(tmp_path)
+    assert "__obl_n2__call" in c.emission_map
+    assert c.emission_map["call"] == "n1.a"
+
+
+def test_unknown_predicate_key_rejected(tmp_path):
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [{"id": "n.a", "answer": {"ops": [
+            {"create": "call", "kind": "event", "on": {"around": "next:THU"}}]}}],
+    })
+    with pytest.raises(CorpusError, match="unknown date predicate"):
+        load_corpus(tmp_path)
+
+
+def test_bad_tolerance_rejected(tmp_path):
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [{"id": "n.a", "answer": {"ops": [
+            {"create": "call", "kind": "event", "on": {"eq": "next:THU"}, "tolerance": "loose"}]}}],
+    })
+    with pytest.raises(CorpusError, match="bad tolerance"):
+        load_corpus(tmp_path)

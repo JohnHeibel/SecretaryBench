@@ -146,9 +146,35 @@ def _parse_op(raw: dict) -> Op:
         raise CorpusError(f"move op {name!r} needs an 'on' date predicate")
     if verb == "cancel" and (on or kind):
         raise CorpusError(f"cancel op {name!r} takes neither 'on' nor 'kind'")
+    if on:
+        _validate_predicate(on, name)
+    tolerance = raw.get("tolerance", "exact_day")
+    if tolerance != "exact_day" and not re.match(r"^within:\d+d$", tolerance):
+        raise CorpusError(f"op {name!r} has bad tolerance {tolerance!r} (expected exact_day or within:Nd)")
     return Op(verb=verb, name=name, kind=kind,
               match=list(raw.get("match", [])) or [name],
-              on=on, tolerance=raw.get("tolerance", "exact_day"))
+              on=on, tolerance=tolerance)
+
+
+def _validate_predicate(predicate: object, op_name: str) -> None:
+    if not isinstance(predicate, dict):
+        raise CorpusError(f"op {op_name!r} has bad 'on' predicate {predicate!r} (expected object)")
+    keys = set(predicate)
+    unknown = keys - set(PREDICATE_OPS)
+    if unknown:
+        raise CorpusError(f"op {op_name!r} has unknown date predicate key(s): {sorted(unknown)}")
+    primary = keys & {"eq", "by", "in", "any_of"}
+    if len(primary) != 1:
+        raise CorpusError(f"op {op_name!r} needs exactly one primary date predicate (eq/by/in/any_of)")
+    if "not_in" in keys and "in" not in keys:
+        raise CorpusError(f"op {op_name!r} uses not_in without an in window")
+    for key in ("eq", "by", "in", "not_in"):
+        if key in predicate and not isinstance(predicate[key], str):
+            raise CorpusError(f"op {op_name!r} predicate {key!r} must be a string expression")
+    if "any_of" in predicate:
+        values = predicate["any_of"]
+        if not isinstance(values, list) or not values or not all(isinstance(v, str) for v in values):
+            raise CorpusError(f"op {op_name!r} predicate 'any_of' must be a non-empty list of string expressions")
 
 
 def _parse_answer(raw: dict) -> Answer:
@@ -260,8 +286,10 @@ def build_corpus(raw_nodes: list[dict], sources: Optional[list[str]] = None) -> 
         nodes[node_id] = node
 
     _expand_node_edges(nodes, emails)
-    body_anchors = {name for em in emails.values() for name in em.emits}   # before obligation wiring
-    _wire_obligations(nodes, emails, body_anchors)
+    emitted_anchors_by_node = {
+        node.id: {name for em in node.emails for name in em.emits} for node in nodes.values()
+    }   # before obligation wiring
+    _wire_obligations(nodes, emails, emitted_anchors_by_node)
     _recompute_refs(emails)
     emission_map = _build_emission_map(emails)
     corpus = Corpus(nodes=nodes, emails=emails, emission_map=emission_map)
@@ -335,7 +363,7 @@ def _predicate_target_expr(predicate: dict) -> Optional[object]:
     return None
 
 
-def _wire_obligations(nodes: dict[str, Node], emails: dict[str, Email], body_anchors: set[str]) -> None:
+def _wire_obligations(nodes: dict[str, Node], emails: dict[str, Email], emitted_anchors_by_node: dict[str, set[str]]) -> None:
     """Resolve the verb model into anchors + edges the scheduler/grader already speak:
 
       - each `create: X` registers obligation X (node-scoped) and, if a sibling op
@@ -368,11 +396,12 @@ def _wire_obligations(nodes: dict[str, Node], emails: dict[str, Email], body_anc
 
         # which sibling obligations are referenced as @name (and aren't a body anchor)?
         siblings = set(registry)
+        node_emitted_anchors = emitted_anchors_by_node.get(node.id, set())
         referenced: set[str] = set()
         for em in node.emails:
             for op in em.answer.ops:
                 for expr in _predicate_exprs(op.on):
-                    referenced |= {r for r in _refs_in(expr) if r in siblings and r not in body_anchors}
+                    referenced |= {r for r in _refs_in(expr) if r in siblings and r not in node_emitted_anchors}
 
         rename = {name: _obl_anchor(node.id, name) for name in referenced}
 
@@ -397,9 +426,14 @@ def _wire_obligations(nodes: dict[str, Node], emails: dict[str, Email], body_anc
                 if op.verb not in ("move", "cancel"):
                     continue
                 creator_id = registry[op.name]["creator"]
-                if creator_id == em.id or any(d.email == creator_id for d in em.depends_on):
+                if creator_id == em.id:
                     continue
                 has_anchor = any(_refs_in(expr) for expr in _predicate_exprs(op.on))
+                existing = [d for d in em.depends_on if d.email == creator_id]
+                if existing:
+                    if has_anchor and not any(d.type == "date" for d in existing):
+                        existing[0].type = "date"
+                    continue
                 em.depends_on.append(Edge(email=creator_id, type="date" if has_anchor else "static"))
 
 

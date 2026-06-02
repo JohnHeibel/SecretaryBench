@@ -11,7 +11,7 @@ It is NOT a model under test — it reads ground truth. The harness-backed model
 """
 from __future__ import annotations
 
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 from sb.engine import Store
 from sb.resolver import Context, Interval, Value, resolve
@@ -27,7 +27,15 @@ def _target(predicate: dict, ctx: Context) -> Value:
         return resolve(predicate["by"], ctx)
     if "in" in predicate:
         win = resolve(predicate["in"], ctx)
-        return win.start if isinstance(win, Interval) else win
+        if not isinstance(win, Interval):
+            return win
+        block = resolve(predicate["not_in"], ctx) if "not_in" in predicate else None
+        cur = win.start
+        while cur <= win.end:
+            if not (isinstance(block, Interval) and block.contains(cur)):
+                return cur
+            cur += timedelta(days=1)
+        raise ValueError(f"oracle cannot satisfy fully blocked predicate {predicate!r}")
     raise ValueError(f"oracle cannot satisfy predicate {predicate!r}")
 
 

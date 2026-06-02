@@ -25,6 +25,7 @@ def ctx(anchors=None):
 
 def test_calendar_day_offset():
     assert resolve("serve+9d", ctx()) == date(2026, 6, 18)
+    assert resolve("+9d", ctx()) == date(2026, 6, 18)
     assert resolve("serve-2d", ctx()) == date(2026, 6, 7)
 
 
@@ -112,7 +113,7 @@ def test_render_plain_token():
 
 
 def test_render_emission_records_and_renders():
-    r = render_body("Signing is locked for {!signing = serve+5d}.", ctx())
+    r = render_body("Signing is locked for {!signing = +5d}.", ctx())
     assert r.emissions == {"signing": date(2026, 6, 14)}
     assert "Sunday, June 14th, 2026" in r.text
 

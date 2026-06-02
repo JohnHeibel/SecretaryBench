@@ -46,12 +46,12 @@ are an authoring + grading device, never shown raw.
 | Type | Meaning | Resolved example |
 |------|---------|------------------|
 | `DATE` | a calendar day | 2026-08-03 |
-| `DATETIME` | a day with a time | 2026-08-03T14:00 |
 | `INTERVAL` | a date span | the week of 2026-08-03 |
 
-Non-temporal values (`DURATION`, counts, names) are **static answer-key fields, not token
-types.** Grading granularity follows the token: a `DATE` token → match the day; a
-`DATETIME` token → match day **and** time.
+Non-temporal values (`DURATION`, counts, names, clock times) are **static prose or
+answer-key fields, not token types.** Grading granularity follows the token: a
+`DATE` token matches the day, and an `INTERVAL` token matches containment in a
+date span.
 
 ---
 
@@ -60,7 +60,7 @@ types.** Grading granularity follows the token: a `DATE` token → match the day
 | Anchor | Meaning |
 |--------|---------|
 | `serve` | the date the email was delivered — its "now" (default anchor) |
-| `@name` | a **date/datetime/interval** emitted by an ancestor email |
+| `@name` | a **date/interval** emitted by an ancestor email |
 
 A named anchor is frozen when its emitting email is served and stored in a run-wide table.
 The DAG guarantees the emitter precedes any referencing email, so `@name` always resolves.
@@ -106,7 +106,7 @@ WD        := MON|TUE|WED|THU|FRI|SAT|SUN
 
 ```
 {!signing = +5d}              // emits @signing = serve+5d, and renders the date in the email
-{!blackout = week_of:{+9d}}   // emits an INTERVAL
+{!blackout = week_of:(+9d)}   // emits an INTERVAL
 ```
 
 ---
@@ -156,8 +156,8 @@ on a named obligation. The verb's value *is* the obligation name.
 - **`match` defaults to `[name]`.** Override it only when the natural calendar title differs
   from the slug (e.g. `"create": "filing", "match": ["HSR"]`). All grading is fuzzy: the
   model's object matches if its title contains every keyword.
-- **No-action / FYI / bait email** → `ops: []`. The turn must create nothing (graded on the
-  per-email turn delta until the day loop lands; see §8 and `DAY_LOOP_DESIGN_ISSUE.md`).
+- **No-action / FYI / bait email** → `ops: []`. The turn must create nothing attributable
+  to that email in the current day-loop grader.
 - **Todo with a deadline** → `"create": "...", "kind": "todo", "on": { "by": "@x+5bd" }`.
 - **Reply / delegate** verbs still TBD. **[OPEN]**
 
@@ -213,7 +213,7 @@ does not parse `recurrence`. Revisit if a recurring obligation becomes a target.
    A: *"Get the kickoff on the books."*  B: *"Push the kickoff back three days."*
    → B op: `{ "move": "kickoff", "on": { "eq": "@kickoff+3bd" } }`; the edge to A and the base
    date both derive from the name.
-3. **Avoidance.**  A: *"Out the `{!blackout=week_of:{+9d}}`."*  B: *"Review next week."*
+3. **Avoidance.**  A: *"Out the `{!blackout=week_of:(+9d)}`."*  B: *"Review next week."*
    → B op: `{ "create": "review", "kind": "event",
    "on": { "in": "week_of:(serve+1w)", "not_in": "@blackout" } }`, with a `date` edge A→B.
 
@@ -232,11 +232,9 @@ does not parse `recurrence`. Revisit if a recurring obligation becomes a target.
   date tokens against `(serve_date, anchor_table)` — **ground truth**, independent of the
   model's earlier actions.
 - Tokens resolve to a DATE (or INTERVAL) → **day equality**; `within:Nd` relaxes the window.
-- **No-action / FYI / bait email** (`ops: []`) → the turn must create nothing. This is graded
-  on the per-email turn delta. When the day loop lands (`DAY_LOOP_DESIGN_ISSUE.md`), per-email
-  attribution disappears and reconciliation becomes *per-obligation closed, globally open* —
-  unrelated objects are no longer punished. Until then we keep the stricter per-email check so
-  bait emails stay discriminating.
+- **No-action / FYI / bait email** (`ops: []`) → the model must create nothing attributable
+  to that email. The live runner now works by day, but created objects still carry an
+  `email_id`, so bait emails stay discriminating.
 - Per-email result **binary** + a "right-action-wrong-day" reason in the details. **[OPEN B3]**
 
 ---
@@ -253,12 +251,10 @@ human discipline shipped with the authoring kit.
 
 ## 10. Open items
 
-- **[OPEN]** Keep optional `@HH:MM` time-attach on tokens (anti-drift on the event's "when"),
-  or push times to prose too for a strictly date-only grammar? (John's call.)
 - **[OPEN]** Anything real emails need that a date token can't express? (multi-day events;
   fuzzy "morning/afternoon"; quarter/fiscal dates; date *ranges as the deliverable*.)
 - **[DECIDED B2]** No-action strictness: empty `ops` ⇒ the turn must create nothing
-  (per-email), relaxing to globally-open reconciliation when the day loop lands (§8).
+  attributable to that email in the current day-loop grader (§8).
 - **[OPEN B3]** Binary vs partial-credit headline metric.
 - **[OPEN]** Reply / delegate verbs (`create`/`move`/`cancel` now implemented in §5.1).
 - **[DONE]** Weekday selectors relative to a *named anchor* ("the Monday after the

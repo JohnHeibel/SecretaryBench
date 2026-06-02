@@ -20,12 +20,11 @@ Two problems:
    has no notion of *which* event, so it counts them to detect duplicates. Once we name the
    thing an email acts on, "exactly one" is inherent and the count disappears.
 
-This decision is also forced by a planned execution change (see
-`DAY_LOOP_DESIGN_ISSUE.md`): the runner is moving from **one email per turn** to **one
+This decision is also aligned with the day-loop execution change (historically tracked in
+`DAY_LOOP_DESIGN_ISSUE.md`): the live runner moved from **one email per turn** to **one
 simulated day per turn, model triages its own inbox**. When the model handles a batch of
-emails in a single pass, calendar actions are no longer attributable to a single email, so
-per-email / per-turn grading (and `count`, a per-turn-state patch) stops being well-defined.
-The only thing that survives is grading the **resulting state of the world**.
+emails in a single pass, the durable grading primitive is the **resulting state of the
+world**, not the exact edit sequence the model used.
 
 ## Decision
 
@@ -62,10 +61,9 @@ table. Authors only ever write the bare name. Cross-node references still use bo
 
 Per-obligation **closed**, globally **open**: for each known obligation's identity there must
 be no unexpected/duplicate match (this recovers what `count: 1` did), but objects unrelated
-to any obligation are ignored (so a benign prep block is not punished). **Staging caveat:**
-globally-open only makes sense once the day loop removes per-email attribution. Until then the
-grader keeps the stricter per-email rule for `ops: []` emails (the turn must create nothing),
-so bait/FYI emails stay discriminating. See `DAY_LOOP_DESIGN_ISSUE.md`.
+to any obligation are ignored (so a benign prep block is not punished). No-action emails
+remain strict: `ops: []` means the model must create nothing attributable to that email, so
+bait/FYI emails stay discriminating.
 
 ## What changes maps to what `count` did
 
@@ -102,10 +100,10 @@ UI + seed, tests). It lands in stages so the suite stays green and the risk stay
     no dual-read path). Oracle is 100% on the migrated corpus; `pytest sb/tests/` at 46.
   - Webapp builder migration to the verb form: in progress (vendored `sb` + the React
     authoring surface).
-- **Stage 3 — day loop + globally-open reconciliation.** Move serving from one-email-per-turn
-  to one-day-per-turn (`DAY_LOOP_DESIGN_ISSUE.md`, in progress in `sb/live/`). At that point
-  per-email attribution disappears, the no-action turn-delta check is replaced by globally-open
-  reconciliation at the day checkpoint, and grading reads only the resulting state of the world.
+- **Stage 3 — day loop + live runner integration (DONE).** Serving moved from one-email-per-turn
+  to one-day-per-turn in `sb/live/`: the model lists the day's inbox, reads each email, acts
+  through MCP tools, and the runner grades the resulting state at the day checkpoint. Created
+  objects still carry `email_id`, which preserves strict no-action grading for bait/FYI mail.
 
 ## Consequences
 
@@ -116,8 +114,7 @@ UI + seed, tests). It lands in stages so the suite stays green and the risk stay
   silently weaken a test.
 - **`count: 0` and `count: N` remain expressible** during the staged transition; cancellation
   gets a first-class verb in Stage 2.
-- The destination is coupled to the day-loop execution change; Stages 2–3 should not land
-  before that work is ready.
+- The destination is coupled to the day-loop execution change now implemented in `sb/live/`.
 
 ## Alternatives considered
 

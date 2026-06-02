@@ -93,7 +93,7 @@ def _predicate_ok(obj: Obj, predicate: Optional[dict], ctx: Context, tolerance: 
         return any(_matches_value(obj.when, resolver.resolve(e, ctx), tolerance)
                    for e in predicate["any_of"])
     if "by" in predicate:
-        return obj.when.date() <= _to_date(resolver.resolve(predicate["by"], ctx))
+        return ctx.serve <= obj.when.date() <= _to_date(resolver.resolve(predicate["by"], ctx))
     if "in" in predicate:
         window = resolver.resolve(predicate["in"], ctx)
         ok = isinstance(window, Interval) and window.contains(obj.when)

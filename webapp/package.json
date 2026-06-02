@@ -10,7 +10,8 @@
     "validator": "python3 scripts/validator_server.py",
     "build": "npm run vendor && next build",
     "start": "next start",
-    "lint": "next lint"
+    "typecheck": "tsc --noEmit",
+    "lint": "npm run typecheck"
   },
   "dependencies": {
     "@vercel/postgres": "^0.10.0",

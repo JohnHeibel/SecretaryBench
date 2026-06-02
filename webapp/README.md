@@ -12,9 +12,9 @@ emails depend on each other. This app removes both failure modes:
   `sb.resolver` (vendored, not reimplemented), so what you see is what gets graded.
 - **A DAG canvas** — see every email, its `static` / `date` dependencies, and the
   `@anchors` it publishes, so the structure is legible.
-- **A hard validation gate** — the whole corpus is linted by the real
+- **Live validation status** — the whole corpus is linted by the real
   `sb.schema.build_corpus`; the status bar is green only when it would load in the
-  benchmark. You can't save a corpus the runner would reject.
+  benchmark. Today this is an author-facing warning, not a server-side save/export block.
 
 The app does authoring + validation + export. Running the benchmark stays local:
 **Export corpus** downloads `nodes/*.json` byte-identical to what
@@ -30,7 +30,7 @@ The app does authoring + validation + export. Running the benchmark stays local:
 | Validation | Python serverless fns in `api/` that import the **real** `sb` | zero drift with the grader |
 | Store | Neon Postgres (Vercel) — one `nodes` table, JSONB per node | corpus is small + document-shaped |
 
-`api/resolve.py` and `api/lint.py` import `sb/{resolver,schema}.py`, vendored into
+`api/resolve.py`, `api/lint.py`, and `api/oracle.py` import `sb/{resolver,schema,...}.py`, vendored into
 `api/_lib/sb/` by `scripts/vendor_sb.py` (a pure copy — the anti-drift guarantee).
 
 ## Local development
@@ -51,9 +51,10 @@ seeded from `../corpus/nodes/`. Open http://localhost:3000.
 
 1. Import the repo, set **Root Directory = `webapp`**.
 2. Add the **Neon** integration (Storage tab) — it sets `POSTGRES_URL` automatically.
-3. Set `APP_PASSCODE` to a shared club passcode (gates the whole app; omit for open).
+3. Set `APP_PASSCODE` to a shared club passcode for the current login flow. This is
+   not full route/API enforcement yet; omit for open local/dev use.
 4. Deploy. `npm run build` vendors `sb` first; `requirements.txt` enables the Python
-   functions. They serve `/api/resolve` and `/api/lint` at the same origin (no
+   functions. They serve `/api/resolve`, `/api/lint`, and `/api/oracle` at the same origin (no
    `NEXT_PUBLIC_VALIDATOR_BASE` needed in prod).
 
 ## Round-trip with the benchmark
