@@ -101,6 +101,15 @@ def list_todos() -> list[dict]:
 # --- inbox retrieval (the whole point: recover facts from earlier emails) ---
 
 @mcp.tool()
+def list_new_emails() -> list[dict]:
+    """List the emails that arrived TODAY, the ones you have to work through this turn.
+    Returns each email's id, sender, and subject — NOT the body. Start every day by
+    calling this, then call get_email(email_id) to read each one before deciding what
+    to do. Calling it again returns the same list (it does not mark anything read)."""
+    return _call("GET", "/inbox/new")
+
+
+@mcp.tool()
 def search_inbox(query: Optional[str] = None, sender: Optional[str] = None,
                  regex: bool = False, recent: Optional[int] = None, limit: int = 10) -> list[dict]:
     """Search your past emails. Use this whenever an email refers to something you don't

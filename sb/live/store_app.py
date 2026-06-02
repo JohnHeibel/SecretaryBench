@@ -23,6 +23,7 @@ _ids = itertools.count(1)
 _events: dict[str, dict] = {}
 _todos: dict[str, dict] = {}
 _inbox: list[dict] = []         # served emails, in serve order
+_today: Optional[str] = None    # the current simulated day; list_new_emails filters to it
 
 
 # --- payloads ---
@@ -65,21 +66,36 @@ class InboxIn(BaseModel):
     served_date: str
 
 
+class DayIn(BaseModel):
+    date: str
+
+
 # --- lifecycle ---
 
 @app.get("/health")
 def health():
-    return {"ok": True, "events": len(_events), "todos": len(_todos), "inbox": len(_inbox)}
+    return {"ok": True, "events": len(_events), "todos": len(_todos),
+            "inbox": len(_inbox), "today": _today}
 
 
 @app.post("/reset")
 def reset():
-    global _ids
+    global _ids, _today
     _events.clear()
     _todos.clear()
     _inbox.clear()
     _ids = itertools.count(1)
+    _today = None
     return {"ok": True}
+
+
+@app.post("/day")
+def set_day(d: DayIn):
+    """The runner tells the store which simulated day it's currently serving, so
+    list_new_emails can return just today's arrivals."""
+    global _today
+    _today = d.date
+    return {"ok": True, "today": _today}
 
 
 # --- events ---
@@ -164,6 +180,15 @@ def search_inbox(q: Optional[str] = None, sender: Optional[str] = None,
     if recent:
         results = results[-recent:]
     return results[-limit:] if limit else results
+
+
+@app.get("/inbox/new")
+def list_new_emails():
+    """Today's arrivals only — id/sender/subject, no body. Idempotent within the
+    day. Defined before /inbox/{email_id} so 'new' isn't swallowed as an id."""
+    return [{"email_id": m["email_id"], "sender": m["sender"], "subject": m["subject"],
+             "served_date": m["served_date"]}
+            for m in _inbox if m["served_date"] == _today]
 
 
 @app.get("/inbox/{email_id}")

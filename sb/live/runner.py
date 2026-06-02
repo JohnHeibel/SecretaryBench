@@ -3,10 +3,13 @@ sb.live.runner — drive a REAL model over the corpus and grade it.
 
 Architecture for one run:
     [this process] starts uvicorn store_app (persistent state)
-        for each email in plan order:
-            POST the rendered email to the store inbox
-            call `claude -p` (ONE continuous session, --resume) -> model acts via MCP
-            snapshot /state -> grade the email against its node state
+        for each DAY in the plan:
+            tell the store the date, POST the day's rendered emails to the inbox
+            call `claude -p` (ONE continuous session, --resume) with a bodyless
+                "it's <date>, you have new mail" prompt -> the model pulls its own
+                inbox (list_new_emails -> get_email) and acts via MCP
+            snapshot /state -> grade each email in the day's batch (objects are
+                attributed back to emails by the email_id the model stamped on them)
         tear down
 
     python -m sb.live.runner --model claude-haiku-4-5 --seed 42
@@ -48,7 +51,19 @@ RED, GREEN, YELLOW = _c("\033[31m"), _c("\033[32m"), _c("\033[33m")
 CYAN, GREY, BLUE = _c("\033[36m"), _c("\033[90m"), _c("\033[34m")
 
 
-def _print_email(i: int, eid: str, served: str, res, tools: list[str], said: str) -> None:
+def _print_day(day_no: int, served: str, n: int, tools: list[str], said: str) -> None:
+    """One header per day. tools/said belong to the whole day's turn, not any one
+    email, so they're reported here — not on the per-email rows."""
+    print(f"\n{BOLD}{BLUE}── day {day_no} · {served} · {n} new email(s) ──{RESET}")
+    tool_str = ", ".join(tools) if tools else "(none)"
+    searched = f"  {CYAN}🔍 searched inbox{RESET}" if any("inbox" in t or t == "get_email" for t in tools) else ""
+    print(f"   {DIM}tools{RESET}  {GREY}{tool_str}{RESET}{searched}")
+    if said:
+        snippet = said[:200].replace("\n", " ")
+        print(f"   {DIM}model said{RESET}  {YELLOW}“{snippet}…”{RESET}")
+
+
+def _print_email(i: int, eid: str, served: str, res) -> None:
     ok = res.passed
     badge = f"{GREEN}{BOLD} ✓ PASS {RESET}" if ok else f"{RED}{BOLD} ✗ FAIL {RESET}"
     print(f"\n{badge} {BOLD}[{i}] {eid}{RESET}  {GREY}· served {served}{RESET}")
@@ -58,26 +73,26 @@ def _print_email(i: int, eid: str, served: str, res, tools: list[str], said: str
         print(f"   {tick} {DIM}expected{RESET}  {CYAN}{d['expected']}{RESET}")
         print(f"     {DIM}actual  {RESET}  {d['actual']}")
         print(f"     {DIM}why     {RESET}  {rc}{d['reason']}{RESET}")
-    tool_str = ", ".join(tools) if tools else "(none)"
-    searched = f"  {CYAN}🔍 searched inbox{RESET}" if any("inbox" in t or t == "get_email" for t in tools) else ""
-    print(f"     {DIM}tools   {RESET}  {GREY}{tool_str}{RESET}{searched}")
-    if not ok and said:
-        snippet = said[:200].replace("\n", " ")
-        print(f"     {DIM}model said{RESET}  {YELLOW}“{snippet}…”{RESET}")
 
-SYSTEM_PROMPT = """You are an executive assistant managing one person's calendar and to-dos from their email inbox. You receive emails ONE AT A TIME over many simulated days, and you keep ONE continuous memory across all of them.
+SYSTEM_PROMPT = """You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.
 
-For each email, decide the correct action(s) and call the matching tool — or do nothing. Do not narrate; stop after the tool call(s).
+Each turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:
+
+1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).
+2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.
+3. Work through the whole day's batch, then stop. Do not narrate.
 
 TOOLS:
+- list_new_emails — today's arrivals (ids + subjects). Always start here.
+- get_email(email_id) — read the full body of one email (today's or any earlier one).
 - create_event / update_event / delete_event — the calendar.
 - create_todo / update_todo / delete_todo — tasks that have a deadline.
-- search_inbox / get_email — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. "two weeks after the signing", "per the new meeting policy"). The information was usually set in an earlier email.
+- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. "two weeks after the signing", "per the new meeting policy"). The information was usually set in an earlier email.
 - (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.
 
-EVERY create_event and create_todo REQUIRES the email_id of the email you are acting on. It is given in the header as "Email-Id: <id>". Copy it exactly.
+EVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.
 
-DATES: each email header gives "Today: <date>". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.
+DATES: the turn gives you "Today: <date>". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.
 
 RESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates."""
 
@@ -221,9 +236,21 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
         per_turn_timeout: float = 240.0, corpus_dir: str = "corpus") -> None:
     corpus = load_corpus(corpus_dir)
     plan = build_plan(corpus, start_date=start, seed=seed, n_days=n_days)
-    order = [e for day in plan.per_day for e in day]
-    if limit:
-        order = order[:limit]
+
+    # One turn = one day. Drop empty days (no mail arrived) and, if --limit is set,
+    # truncate so the total number of emails graded stays under the cap.
+    days: list[list[str]] = []
+    seen = 0
+    for batch in plan.per_day:
+        if not batch:
+            continue
+        b = batch[: (limit - seen)] if limit else batch
+        if b:
+            days.append(b)
+            seen += len(b)
+        if limit and seen >= limit:
+            break
+    order = [e for b in days for e in b]
 
     store = start_store()
     httpx.post(f"{STORE_URL}/reset", timeout=10)
@@ -234,24 +261,27 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
 
     print(f"\n{BOLD}{BLUE}╔═══ SecretaryBench · live run ═══╗{RESET}")
     print(f"{BLUE}║{RESET} model {BOLD}{model}{RESET}")
-    print(f"{BLUE}║{RESET} seed {seed} · {len(order)} emails · start {start}")
+    print(f"{BLUE}║{RESET} seed {seed} · {len(days)} days · {len(order)} emails · start {start}")
     print(f"{BOLD}{BLUE}╚═════════════════════════════════╝{RESET}")
+    email_no = 0
     try:
-        for i, eid in enumerate(order, 1):
-            email = corpus.emails[eid]
-            sd = plan.serve_date[eid]
-            ctx = Context(sd, plan.anchors)
-            rendered = resolver.render_body(email.body, ctx).text
+        for day_no, batch in enumerate(days, 1):
+            sd = plan.serve_date[batch[0]]   # every email in a batch shares the serve day
 
-            httpx.post(f"{STORE_URL}/inbox", timeout=10, json={
-                "email_id": eid, "sender": email.sender, "recipients": email.recipients,
-                "subject": email.subject, "body": rendered, "served_date": sd.isoformat()})
+            # Tell the store which day it is, then drop today's mail into the inbox so
+            # list_new_emails can see it. Bodies go to the store, NOT the prompt.
+            httpx.post(f"{STORE_URL}/day", timeout=10, json={"date": sd.isoformat()})
+            for eid in batch:
+                email = corpus.emails[eid]
+                rendered = resolver.render_body(email.body, Context(sd, plan.anchors)).text
+                httpx.post(f"{STORE_URL}/inbox", timeout=10, json={
+                    "email_id": eid, "sender": email.sender, "recipients": email.recipients,
+                    "subject": email.subject, "body": rendered, "served_date": sd.isoformat()})
 
             user_msg = (
-                f"Email-Id: {eid}\n"
                 f"Today: {sd.strftime('%A, %B %d, %Y')}\n"
-                f"From: {email.sender}\nTo: {', '.join(email.recipients)}\n"
-                f"Subject: {email.subject}\n\n{rendered}")
+                f"New mail has arrived. List your inbox, work through everything that "
+                f"arrived today, then stop.")
 
             before = _all_ids(httpx.get(f"{STORE_URL}/state", timeout=10).json())
 
@@ -265,7 +295,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             cmd.append(user_msg)
 
             # Retry with exponential backoff: a transient rate-limit / overload
-            # blip should pause-and-resume, not throw the email away.
+            # blip should pause-and-resume, not throw the day away.
             ok, sid, tools, said, detail = False, None, [], "", "claude error"
             for attempt in range(5):
                 try:
@@ -280,20 +310,32 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                     detail = str(exc)[:160]
                 if attempt < 4:
                     wait = 5 * (3 ** attempt)        # 5s, 15s, 45s, 135s
-                    print(f"[{i:>2}] {eid:24s}  transient ({detail}) — retry {attempt+1}/4 in {wait}s")
+                    print(f"day {day_no:>2} ({sd}): transient ({detail}) — retry {attempt+1}/4 in {wait}s")
                     time.sleep(wait)
+
+            _print_day(day_no, sd.strftime("%a %b %d"), len(batch), tools, said)
             if not ok:
-                results[eid] = None
-                print(f"[{i:>2}] {eid:24s}  ERROR after retries: {detail}")
+                for eid in batch:
+                    email_no += 1
+                    results[eid] = None
+                    print(f"[{email_no:>2}] {eid:24s}  ERROR after retries: {detail}")
                 continue
 
+            # One turn handled the whole day; split its new objects back to each email
+            # by the email_id the model stamped on them.
             state = httpx.get(f"{STORE_URL}/state", timeout=10).json()
-            new_ids = _all_ids(state) - before
-            res = grade_email(email.answer, ctx,
-                              _node_state(corpus, state, email.node, new_ids),
-                              _turn_delta(corpus, state, new_ids))
-            results[eid] = res
-            _print_email(i, eid, sd.strftime("%a %b %d"), res, tools, said)
+            day_new = _all_ids(state) - before
+            by_eid = {r["id"]: r.get("email_id", "") for r in state["events"] + state["todos"]}
+            for eid in batch:
+                email_no += 1
+                email = corpus.emails[eid]
+                ctx = Context(plan.serve_date[eid], plan.anchors)
+                eid_new = {i for i in day_new if by_eid.get(i) == eid}
+                res = grade_email(email.answer, ctx,
+                                  _node_state(corpus, state, email.node, eid_new),
+                                  _turn_delta(corpus, state, eid_new))
+                results[eid] = res
+                _print_email(email_no, eid, sd.strftime("%a %b %d"), res)
     finally:
         mcp.terminate()
         store.terminate()
