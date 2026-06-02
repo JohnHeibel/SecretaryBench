@@ -24,21 +24,6 @@ export async function deleteNode(id: string): Promise<void> {
   await fetch(`/api/nodes/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
-// Bulk import — the mirror of the /api/export download. Posts a corpus and returns
-// how many nodes landed. Accepts either nodes parsed from JSON or a raw export .zip
-// (Blob); the route sniffs the content-type. `mode: "replace"` makes the corpus
-// exactly the imported set, default "upsert" overlays it.
-export async function importCorpus(payload: CorpusNode[] | Blob, mode: "upsert" | "replace" = "upsert"): Promise<{ imported: number; mode: string }> {
-  const zip = payload instanceof Blob;
-  const r = await fetch(`/api/import?mode=${mode}`, {
-    method: "POST",
-    headers: { "content-type": zip ? "application/zip" : "application/json" },
-    body: zip ? payload : JSON.stringify({ nodes: payload }),
-  });
-  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? `import failed: ${r.status}`);
-  return r.json();
-}
-
 export async function resolveExpr(expr: string, serveDate: string, anchors: Record<string, string> = {}): Promise<ResolveResult> {
   try {
     const r = await fetch(`${VALIDATOR}/api/resolve`, {

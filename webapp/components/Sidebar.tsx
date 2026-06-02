@@ -1,5 +1,6 @@
 "use client";
 import type { CorpusNode, LintResult } from "@/lib/types";
+import { TIER_STYLE } from "./EmailEditor";
 
 interface Props {
   nodes: CorpusNode[];
@@ -36,6 +37,7 @@ export default function Sidebar({ nodes, selNode, selEmail, onSelectNode, onSele
                   <button onClick={() => onSelectEmail(node.id, email.id)} className="min-w-0 flex-1 truncate text-left text-xs text-slate-300">
                     {email.subject || email.id}
                   </button>
+                  {email.tier && <span className={`rounded px-1 text-[10px] font-medium ${TIER_STYLE[email.tier]}`}>{email.tier}</span>}
                   <button onClick={() => onRemoveEmail(node.id, email.id)} className="hidden px-1 text-xs text-slate-500 hover:text-rose-400 group-hover:block">✕</button>
                 </div>
               ))}

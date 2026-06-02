@@ -1,8 +1,15 @@
 "use client";
-import { useState } from "react";
-import type { CorpusNode, Edge, EdgeType, Email } from "@/lib/types";
+import { useEffect, useState } from "react";
+import type { CorpusNode, Edge, EdgeType, Email, Tier } from "@/lib/types";
 import BodyEditor from "./BodyEditor";
 import AnswerKeyBuilder from "./AnswerKeyBuilder";
+
+// T1 easy / T2 medium / T3 hard — green -> amber -> rose, matching the Sidebar badge.
+export const TIER_STYLE: Record<Tier, string> = {
+  T1: "bg-emerald-600/30 text-emerald-300",
+  T2: "bg-amber-600/30 text-amber-300",
+  T3: "bg-rose-600/30 text-rose-300",
+};
 
 interface Props {
   node: CorpusNode;
@@ -13,16 +20,19 @@ interface Props {
   onUpdateNode: (node: CorpusNode) => void;
   onRenameNode: (oldId: string, newId: string) => boolean;
   onUpdateEmail: (email: Email) => void;
+  onAutoSlugEmail: (email: Email) => void;
 }
 
 function castKeys(node: CorpusNode): string[] {
   return Object.keys(node.cast ?? {});
 }
 
-export default function EmailEditor({ node, email, allNodes, anchors, serveDate, onUpdateNode, onRenameNode, onUpdateEmail }: Props) {
+export default function EmailEditor({ node, email, allNodes, anchors, serveDate, onUpdateNode, onRenameNode, onUpdateEmail, onAutoSlugEmail }: Props) {
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-5">
-      <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <Primer />
+      <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400"
+        title="A node is one storyline — a folder of related emails (one scenario). This is its name; rename it freely.">
         Node id
         <input key={node.id} defaultValue={node.id} spellCheck={false}
           onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
@@ -31,12 +41,40 @@ export default function EmailEditor({ node, email, allNodes, anchors, serveDate,
       </label>
       <CastManager node={node} onUpdateNode={onUpdateNode} />
       {email ? (
-        <EmailPanel node={node} email={email} allNodes={allNodes} anchors={anchors} serveDate={serveDate} onUpdateEmail={onUpdateEmail} />
+        <EmailPanel node={node} email={email} allNodes={allNodes} anchors={anchors} serveDate={serveDate} onUpdateEmail={onUpdateEmail} onAutoSlugEmail={onAutoSlugEmail} />
       ) : (
         <p className="rounded-lg border border-dashed border-slate-800 px-4 py-8 text-center text-sm text-slate-500">
           Select an email in the sidebar, or <span className="text-slate-300">+ email</span> to add one to <code>{node.id}</code>.
         </p>
       )}
+    </div>
+  );
+}
+
+// A one-read orientation for first-time authors. Collapses and remembers the choice,
+// so returning authors aren't nagged. The deep version is the in-app /guide page.
+function Primer() {
+  const [open, setOpen] = useState(true);
+  useEffect(() => { setOpen(localStorage.getItem("sb_primer_closed") !== "1"); }, []);
+  function close() { setOpen(false); localStorage.setItem("sb_primer_closed", "1"); }
+  if (!open) return (
+    <button onClick={() => setOpen(true)} className="text-xs text-slate-500 hover:text-sky-300">▸ How this works</button>
+  );
+  return (
+    <div className="rounded-lg border border-sky-900/60 bg-sky-950/30 p-3 text-xs leading-relaxed text-slate-300">
+      <div className="mb-1 flex items-center justify-between">
+        <span className="font-semibold text-sky-300">How this works</span>
+        <button onClick={close} className="text-slate-500 hover:text-slate-300">hide ✕</button>
+      </div>
+      <p>You&apos;re writing an email to a busy exec&apos;s <strong>AI assistant</strong>, then saying what a <em>perfect</em> assistant should do with it. Each email either needs an action — put something on the calendar, add a to-do, move or cancel one — or it&apos;s just an FYI that needs <strong>nothing</strong>.</p>
+      <p className="mt-1 text-slate-400">You&apos;re inside a <strong className="text-slate-300">node</strong> — one storyline (a folder of related emails). Its <strong className="text-slate-300">cast</strong> is the people in it; it starts with <span className="font-mono text-sky-300">CEO → you</span>, the person the AI works for.</p>
+      <ol className="ml-4 mt-1 list-decimal space-y-0.5">
+        <li>Write the email (who it&apos;s from, the subject, the body). Use <span className="font-mono text-sky-300">+ insert date token</span> for any date so it stays exact.</li>
+        <li>In <strong>Answer key</strong>, say what to do: name the thing, pick its date, or tick <em>&ldquo;this email needs no action.&rdquo;</em></li>
+        <li>Tag the <strong>difficulty</strong> (T1 easy → T3 hard) so we can score models by tier.</li>
+        <li>The bar at the bottom must read <span className="text-emerald-400">✓ corpus valid</span> and <span className="text-emerald-400">oracle solves 100%</span> — that means a perfect assistant could actually do it.</li>
+      </ol>
+      <p className="mt-1 text-slate-400">Want more? <a href="/guide" className="text-sky-400 underline hover:text-sky-300">Open the full walkthrough →</a> (worked examples, the date blocks, how to build a needle)</p>
     </div>
   );
 }
@@ -78,7 +116,7 @@ function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (
   );
 }
 
-function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail }: Omit<Props, "onUpdateNode" | "onRenameNode"> & { email: Email }) {
+function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, onAutoSlugEmail }: Omit<Props, "onUpdateNode" | "onRenameNode"> & { email: Email }) {
   const keys = castKeys(node);
   const toValue = Array.isArray(email.to) ? email.to[0] ?? "" : email.to;
   const set = (p: Partial<Email>) => onUpdateEmail({ ...email, ...p });
@@ -86,7 +124,14 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail }
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-xs text-slate-500">
-        <span className="rounded bg-slate-800 px-2 py-0.5 font-mono text-slate-400">{email.id}</span>
+        <span className="truncate font-medium text-slate-300">{email.subject || "(untitled email — set a subject below)"}</span>
+        <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="corpus id — derived from the subject, used by dependency edges">{email.id}</span>
+        <span className="ml-auto flex shrink-0 items-center gap-1">difficulty
+          {(["T1", "T2", "T3"] as const).map((t) => (
+            <button key={t} onClick={() => set({ tier: email.tier === t ? undefined : t })}
+              className={`rounded px-1.5 py-0.5 font-medium ${email.tier === t ? TIER_STYLE[t] : "bg-slate-800 text-slate-500 hover:text-slate-300"}`}>{t}</button>
+          ))}
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -107,7 +152,7 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail }
       </div>
 
       <label className="block text-xs text-slate-400">Subject
-        <input value={email.subject} onChange={(e) => set({ subject: e.target.value })}
+        <input value={email.subject} onChange={(e) => set({ subject: e.target.value })} onBlur={() => onAutoSlugEmail(email)}
           className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-100" />
       </label>
 

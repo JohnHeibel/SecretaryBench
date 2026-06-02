@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { deleteNode as apiDelete, fetchNodes, importCorpus, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
+import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
 import { anchorsInCorpus, normalizeAnswer } from "@/lib/grammar";
 import type { CorpusNode, Edge, Email, LintResult, OracleResult } from "@/lib/types";
 import Sidebar from "./Sidebar";
@@ -9,8 +9,15 @@ import DagCanvas from "./DagCanvas";
 import ValidateBar from "./ValidateBar";
 
 const EMPTY_EMAIL = (id: string): Email => ({
-  id, from: "", to: "", subject: "", body: "", depends_on: [], answer: { ops: [] },
+  id, from: "", to: "", subject: "", body: "", depends_on: [], answer: { ops: [{ create: "", kind: "event", on: { eq: "" } }] },
 });
+
+// A fresh email's id is `${node}.e${n}` — opaque. Once it has a subject we slug that into the id
+// (`henderson.kickoff-reminder`) so the corpus JSON and dependency edges read like prose. We only
+// auto-slug while the id is still in the default `.e<digits>` shape, so a deliberate id is never
+// clobbered as the subject keeps changing.
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40).replace(/-+$/, "");
+const isDefaultEmailId = (id: string, nodeId: string) => id.startsWith(`${nodeId}.e`) && /^\d+$/.test(id.slice(nodeId.length + 2));
 
 export default function Workspace() {
   const [nodes, setNodes] = useState<CorpusNode[]>([]);
@@ -25,12 +32,10 @@ export default function Workspace() {
   const lintTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const oracleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const importInput = useRef<HTMLInputElement>(null);
-  const altHeld = useRef(false); // captured at click so the file dialog's async return knows replace-vs-merge
 
   // Pull the whole corpus from the store and seat it in state. Normalize each stored
   // answer into the verb-model shape at the data boundary, so a legacy/partial row can
-  // never crash the editor downstream. Reused on first mount and after an import.
+  // never crash the editor downstream.
   const reload = useCallback(async () => {
     const raw = await fetchNodes();
     const n = raw.map((node) => ({ ...node, emails: node.emails.map((e) => ({ ...e, answer: normalizeAnswer(e.answer) })) }));
@@ -41,20 +46,6 @@ export default function Workspace() {
   }, []);
 
   useEffect(() => { reload(); }, [reload]);
-
-  // Import an export .zip into the store, then reload. Replace vs merge is the author's
-  // call: hold a modifier (alt/⌥) while picking the file to replace the whole corpus.
-  const onImportFile = useCallback(async (file: File, replace: boolean) => {
-    try {
-      const { imported, mode } = await importCorpus(file, replace ? "replace" : "upsert");
-      await reload();
-      // eslint-disable-next-line no-alert
-      alert(`Imported ${imported} node(s) (${mode}).`);
-    } catch (e) {
-      // eslint-disable-next-line no-alert
-      alert(`Import failed: ${(e as Error).message}`);
-    }
-  }, [reload]);
 
   // Re-lint the whole corpus (debounced) whenever it changes — the same gate the runner uses.
   useEffect(() => {
@@ -90,6 +81,35 @@ export default function Workspace() {
     const node = nodes.find((n) => n.id === nodeId);
     if (node) persist({ ...node, emails: node.emails.map((e) => e.id === email.id ? email : e) });
   }, [nodes, persist]);
+
+  // Change an email's id (the corpus PK) and rewrite every depends_on edge across the whole corpus
+  // that pointed at the old id, so cross-node references stay valid. Mirrors renameNode's edge-fix
+  // pass. No-ops on collision so the caller can fall back. All touched nodes are re-saved.
+  const renameEmail = useCallback((oldId: string, newId: string): boolean => {
+    if (!newId || newId === oldId || nodes.some((n) => n.emails.some((e) => e.id === newId))) return false;
+    const fixEdge = (d: Edge): Edge => ({ ...d, email: d.email === oldId ? newId : d.email });
+    const next = nodes.map((n) => ({ ...n,
+      emails: n.emails.map((e) => ({ ...e, id: e.id === oldId ? newId : e.id, depends_on: e.depends_on.map(fixEdge) })),
+      node_depends_on: n.node_depends_on?.map(fixEdge),
+    }));
+    setNodes(next);
+    for (const n of next) saveNode(n).catch(() => {});
+    if (selEmail === oldId) setSelEmail(newId);
+    return true;
+  }, [nodes, selEmail]);
+
+  // Fired when the subject field blurs. While the id is still the default `.e<n>`, derive it from
+  // the subject; dedupe against the node's other emails by suffixing -2, -3… Once slugged the id is
+  // no longer default, so it stays put through later subject edits.
+  const autoSlugEmail = useCallback((nodeId: string, email: Email) => {
+    if (!isDefaultEmailId(email.id, nodeId)) return;
+    const base = slugify(email.subject); if (!base) return;
+    const node = nodes.find((n) => n.id === nodeId); if (!node) return;
+    const taken = new Set(node.emails.filter((e) => e.id !== email.id).map((e) => e.id));
+    let id = `${nodeId}.${base}`, i = 2;
+    while (taken.has(id)) id = `${nodeId}.${base}-${i++}`;
+    renameEmail(email.id, id);
+  }, [nodes, renameEmail]);
 
   const addNode = useCallback(() => {
     const base = "node"; let i = 1; const ids = new Set(nodes.map((n) => n.id));
@@ -156,14 +176,10 @@ export default function Workspace() {
           </div>
         </div>
         <div className="flex items-center gap-3 text-xs text-slate-400">
-          <label className="flex items-center gap-1">preview serve date
+          <label className="flex items-center gap-1" title="A what-if: pretend this email arrived on this day, so the date chips show real dates while you author. It is NOT saved and does NOT change what you export — the real run picks its own send date.">
+            see dates as if sent
             <input type="date" value={serveDate} onChange={(e) => setServeDate(e.target.value)} className="rounded border border-slate-700 bg-slate-800 px-2 py-0.5 text-slate-200" />
           </label>
-          <input ref={importInput} type="file" accept=".zip,application/zip" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) onImportFile(f, altHeld.current); e.target.value = ""; }} />
-          <button onClick={(e) => { altHeld.current = e.altKey; importInput.current?.click(); }}
-            title="Import an export .zip (merge). Hold ⌥/Alt to replace the whole corpus."
-            className="rounded-md border border-slate-700 px-3 py-1 text-slate-200 hover:bg-slate-800">Import corpus ⬆</button>
           <a href="/api/export" className="rounded-md border border-slate-700 px-3 py-1 text-slate-200 hover:bg-slate-800">Export corpus ⬇</a>
         </div>
       </header>
@@ -188,6 +204,7 @@ export default function Workspace() {
               node={node} email={email} allNodes={nodes} anchors={anchors} serveDate={serveDate}
               onUpdateNode={updateNode} onRenameNode={renameNode}
               onUpdateEmail={(e) => updateEmail(node.id, e)}
+              onAutoSlugEmail={(e) => autoSlugEmail(node.id, e)}
             />
           ) : (
             <div className="grid h-full place-items-center text-slate-500">Pick or create a node to start.</div>
