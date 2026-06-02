@@ -53,7 +53,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, onChange 
   }
 
   function addEntry() {
-    setExpect([...answer.expect, { action: "create_event", title_match: [], start: { eq: "" }, count: 1, tolerance: "exact_day" }]);
+    setExpect([...answer.expect, { action: "create_event", title_match: [], start: { eq: "" }, tolerance: "exact_day" }]);
   }
 
   function toggleNoAction(on: boolean) {
@@ -109,15 +109,16 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, onChange 
                   </div>
                 )}
 
-                <div className="flex items-center gap-3 text-xs text-slate-400">
-                  <label className="flex items-center gap-1">count
-                    <input type="number" value={entry.count ?? 1} min={0} onChange={(e) => patch(i, { count: Number(e.target.value) })}
-                      className="w-16 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200" />
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                  <label className="flex items-center gap-1.5" title="The grader already expects exactly one matching item. Tick this only when the email asks to remove it.">
+                    <input type="checkbox" checked={entry.count === 0} onChange={(e) => patch(i, { count: e.target.checked ? 0 : undefined })} />
+                    should be cancelled (must end up with none)
                   </label>
                   <label className="flex items-center gap-1">tolerance
                     <input value={entry.tolerance ?? "exact_day"} onChange={(e) => patch(i, { tolerance: e.target.value })}
                       className="w-28 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200" />
                   </label>
+                  {entry.count !== 0 && <span className="text-slate-600">· expects exactly one by default</span>}
                 </div>
 
                 {picking === i && f && (
