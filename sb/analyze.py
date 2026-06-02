@@ -23,6 +23,8 @@ from sb.schema import load_corpus
 from sb.span import spans
 
 _LINE = re.compile(r"\b(PASS|FAIL)\b\s+\[(\d+)\]\s+(\S+)")
+_DAY = re.compile(r"── day \d+ ·")
+_ANSI = re.compile(r"\x1b\[[0-9;]*m")
 
 SPAN_BINS = [(0, 50), (50, 100), (100, 10**9)]
 BIN_LABELS = ["0-50", "50-100", "100+"]
@@ -30,17 +32,35 @@ TIER_ORDER = ["T1", "T2", "T3", "T4"]
 
 
 def parse_log(path: str) -> dict[str, dict]:
-    """email_id -> {passed, searched}. 'searched' read from the tools line."""
+    """email_id -> {passed, searched}.
+
+    The live runner is day-based: it prints one tools line for the whole day, then
+    one PASS/FAIL row per email. `searched` therefore means "the model used
+    search_inbox at least once during this email's day." Normal inbox handling
+    (`list_new_emails`, `get_email`) does not count as retrieval search.
+    """
     out: dict[str, dict] = {}
-    cur = None
+    day_searched = False
+    legacy_cur = None
     for raw in open(path, encoding="utf-8", errors="replace"):
-        m = _LINE.search(raw)
+        line = _ANSI.sub("", raw)
+        if _DAY.search(line):
+            day_searched = False
+            legacy_cur = None
+            continue
+        if "tools" in line:
+            used_search = "search_inbox" in line
+            if legacy_cur:
+                out[legacy_cur]["searched"] = used_search
+                legacy_cur = None
+            else:
+                day_searched = used_search
+            continue
+        m = _LINE.search(line)
         if m:
-            cur = m.group(3)
-            out[cur] = {"passed": m.group(1) == "PASS", "searched": False}
-        elif cur and "tools" in raw:
-            out[cur]["searched"] = ("inbox" in raw or "get_email" in raw)
-            cur = None
+            eid = m.group(3)
+            out[eid] = {"passed": m.group(1) == "PASS", "searched": day_searched}
+            legacy_cur = eid
     return out
 
 

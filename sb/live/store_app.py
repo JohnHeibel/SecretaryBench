@@ -23,6 +23,7 @@ _ids = itertools.count(1)
 _events: dict[str, dict] = {}
 _todos: dict[str, dict] = {}
 _inbox: list[dict] = []         # served emails, in serve order
+_warnings: list[dict] = []      # potential gaming / instrumentation events, read by the runner
 _today: Optional[str] = None    # the current simulated day; list_new_emails filters to it
 
 
@@ -70,6 +71,27 @@ class DayIn(BaseModel):
     date: str
 
 
+def _warn(kind: str, **fields) -> None:
+    _warnings.append({"kind": kind, "today": _today, **fields})
+
+
+def _served_email_ids() -> set[str]:
+    return {m["email_id"] for m in _inbox}
+
+
+def _today_email_ids() -> set[str]:
+    return {m["email_id"] for m in _inbox if m["served_date"] == _today}
+
+
+def _watch_attribution(kind: str, email_id: str, title: str) -> None:
+    """Monitor-only for now. The grader trusts email_id attribution; if models start
+    hiding work under stale or fake ids, this warning tells us to harden it."""
+    if email_id not in _served_email_ids():
+        _warn("invalid_email_id", object_kind=kind, email_id=email_id, title=title)
+    elif email_id not in _today_email_ids():
+        _warn("stale_email_id", object_kind=kind, email_id=email_id, title=title)
+
+
 # --- lifecycle ---
 
 @app.get("/health")
@@ -84,6 +106,7 @@ def reset():
     _events.clear()
     _todos.clear()
     _inbox.clear()
+    _warnings.clear()
     _ids = itertools.count(1)
     _today = None
     return {"ok": True}
@@ -102,6 +125,7 @@ def set_day(d: DayIn):
 
 @app.post("/events", status_code=201)
 def create_event(e: EventIn):
+    _watch_attribution("event", e.email_id, e.title)
     eid = f"evt_{next(_ids)}"
     _events[eid] = {"id": eid, **e.model_dump()}
     return _events[eid]
@@ -131,6 +155,7 @@ def delete_event(eid: str):
 
 @app.post("/todos", status_code=201)
 def create_todo(t: TodoIn):
+    _watch_attribution("todo", t.email_id, t.title)
     tid = f"todo_{next(_ids)}"
     _todos[tid] = {"id": tid, **t.model_dump()}
     return _todos[tid]
@@ -167,6 +192,12 @@ def add_inbox(m: InboxIn):
 @app.get("/inbox/search")
 def search_inbox(q: Optional[str] = None, sender: Optional[str] = None,
                  regex: bool = False, recent: Optional[int] = None, limit: int = 10):
+    # Monitor-only for now. Search is supposed to be targeted retrieval; if models
+    # routinely dump the archive, tighten this endpoint instead of changing scores.
+    if not q and not sender:
+        _warn("broad_search", limit=limit, recent=recent, inbox_size=len(_inbox))
+    if limit == 0 or limit > 25:
+        _warn("large_search_result", limit=limit, recent=recent, inbox_size=len(_inbox))
     results = list(_inbox)
     if sender:
         results = [m for m in results if sender.lower() in m["sender"].lower()]
@@ -204,3 +235,8 @@ def get_email(email_id: str):
 @app.get("/state")
 def state():
     return {"events": list(_events.values()), "todos": list(_todos.values())}
+
+
+@app.get("/warnings")
+def warnings():
+    return list(_warnings)

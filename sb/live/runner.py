@@ -56,11 +56,18 @@ def _print_day(day_no: int, served: str, n: int, tools: list[str], said: str) ->
     email, so they're reported here — not on the per-email rows."""
     print(f"\n{BOLD}{BLUE}── day {day_no} · {served} · {n} new email(s) ──{RESET}")
     tool_str = ", ".join(tools) if tools else "(none)"
-    searched = f"  {CYAN}🔍 searched inbox{RESET}" if any("inbox" in t or t == "get_email" for t in tools) else ""
+    searched = f"  {CYAN}🔍 used search_inbox{RESET}" if "search_inbox" in tools else ""
     print(f"   {DIM}tools{RESET}  {GREY}{tool_str}{RESET}{searched}")
     if said:
         snippet = said[:200].replace("\n", " ")
         print(f"   {DIM}model said{RESET}  {YELLOW}“{snippet}…”{RESET}")
+
+
+def _print_warnings(warnings: list[dict]) -> None:
+    for w in warnings:
+        details = ", ".join(f"{k}={v}" for k, v in w.items() if k not in {"kind", "today"})
+        suffix = f" ({details})" if details else ""
+        print(f"   {YELLOW}warning{RESET}  {w.get('kind', 'unknown')}{suffix}")
 
 
 def _print_email(i: int, eid: str, served: str, res) -> None:
@@ -267,6 +274,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     try:
         for day_no, batch in enumerate(days, 1):
             sd = plan.serve_date[batch[0]]   # every email in a batch shares the serve day
+            warning_cursor = len(httpx.get(f"{STORE_URL}/warnings", timeout=10).json())
 
             # Tell the store which day it is, then drop today's mail into the inbox so
             # list_new_emails can see it. Bodies go to the store, NOT the prompt.
@@ -314,6 +322,8 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                     time.sleep(wait)
 
             _print_day(day_no, sd.strftime("%a %b %d"), len(batch), tools, said)
+            all_warnings = httpx.get(f"{STORE_URL}/warnings", timeout=10).json()
+            _print_warnings(all_warnings[warning_cursor:])
             if not ok:
                 for eid in batch:
                     email_no += 1

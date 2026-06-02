@@ -11,6 +11,8 @@ it tells you where things live and what each part is responsible for.
 - `RECAP.md`: latest working recap of the day loop, grading, and authoring risks.
 - `TIER_LIST.md`: authoring playbook for T1/T2/T3 email difficulty.
 - `RUN_RESULTS.md`: historical Haiku retrieval-span pilot results.
+- `docs/POTENTIAL_GAMING.md`: monitor-first notes for broad search and suspicious
+  `email_id` attribution risks.
 - `DAY_LOOP_DESIGN_ISSUE.md`: historical design issue from before the day loop was
   rebuilt.
 - `docs/design/BENCHMARK_REDESIGN.md`: why the project moved away from Excel and
@@ -100,4 +102,3 @@ it tells you where things live and what each part is responsible for.
 - `webapp/components/DagCanvas.tsx`: dependency graph view.
 - `webapp/components/ValidateBar.tsx`: lint/oracle validation controls.
 - `webapp/components/blockly/*`: Scratch-style date-token block editor.
-
