@@ -28,8 +28,7 @@
           {
             "action": "create_event",
             "title_match": ["diligence"],
-            "start": { "eq": "@globex_signing-1bd" },
-            "count": 1
+            "start": { "eq": "@globex_signing-1bd" }
           }
         ]
       }
@@ -46,8 +45,7 @@
           {
             "action": "create_event",
             "title_match": ["kickoff"],
-            "start": { "eq": "@globex_signing+10bd" },
-            "count": 1
+            "start": { "eq": "@globex_signing+10bd" }
           }
         ]
       }
@@ -64,8 +62,7 @@
           {
             "action": "create_event",
             "title_match": ["kickoff"],
-            "start": { "eq": "@globex_signing+10bd+3bd" },
-            "count": 1
+            "start": { "eq": "@globex_signing+10bd+3bd" }
           }
         ]
       }
@@ -91,8 +88,7 @@
           {
             "action": "create_todo",
             "title_match": ["HSR"],
-            "due": { "by": "@globex_signing+5bd" },
-            "count": 1
+            "due": { "by": "@globex_signing+5bd" }
           }
         ]
       }

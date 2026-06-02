@@ -150,26 +150,29 @@ def _grade_expect(entry: ExpectEntry, ctx: Context, state: NodeState) -> dict:
         return _predicate_ok(o, predicate, ctx, entry.tolerance)
 
     matched = [o for o in title_set if date_ok(o)]
-    need = entry.count if entry.count is not None else 1
-    count_ok = entry.count is None or len(title_set) == entry.count
-    passed = len(matched) >= need and count_ok
+    # Cardinality defaults to exactly one: an obligation is a single thing, so a
+    # reschedule that leaves a stale duplicate fails with no annotation. Authors set
+    # `count` only for the exceptions — 0 (must be cancelled) or N (genuinely several).
+    want = entry.count if entry.count is not None else 1
+    count_ok = len(title_set) == want
+    passed = count_ok and len(matched) >= want
 
     kw = "/".join(entry.title_match) or "any"
     expected = f'{kind} ~"{kw}" @ {_describe_predicate(predicate, ctx)}'
-    if entry.count is not None:
-        expected += f" · exactly {entry.count}"
+    if want != 1:
+        expected += f" · exactly {want}"
 
     actual = "; ".join(_fmt_obj(o) for o in title_set) if title_set else "(nothing matching created)"
 
     if passed:
         reason = "matched"
-    elif entry.count == 0:
+    elif want == 0:
         reason = f"should be cancelled, but {len(title_set)} still on the calendar"
     elif not title_set:
         reason = f'no {kind} titled like "{kw}" was created'
     elif not count_ok:
-        extra = " (duplicate / double-booked)" if len(title_set) > entry.count else ""
-        reason = f"created {len(title_set)}, expected exactly {entry.count}{extra}"
+        extra = " (duplicate / double-booked)" if len(title_set) > want else ""
+        reason = f"created {len(title_set)}, expected exactly {want}{extra}"
     elif not any(date_ok(o) for o in title_set):
         reason = "created, but on the wrong day"
     else:

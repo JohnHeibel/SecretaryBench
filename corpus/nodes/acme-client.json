@@ -18,8 +18,7 @@
           {
             "action": "create_event",
             "title_match": ["acme"],
-            "start": { "eq": "next:THU" },
-            "count": 1
+            "start": { "eq": "next:THU" }
           }
         ]
       }
@@ -36,8 +35,7 @@
           {
             "action": "create_event",
             "title_match": ["acme"],
-            "start": { "eq": "next:MON" },
-            "count": 1
+            "start": { "eq": "next:MON" }
           }
         ]
       }

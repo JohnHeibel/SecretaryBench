@@ -18,7 +18,7 @@ def imperfect_model(email: Email, rendered: str, ctx: Context, store: Store) -> 
     """A plausible-but-wrong model:
       - over-acts on no-action mail (creates a stray todo on every FYI)
       - 'reschedules' by creating a second event instead of moving the first,
-        so any move leaves a duplicate (count != 1)
+        so any move leaves a duplicate (more than the expected single event)
     """
     ans = email.answer
     if not ans.expect and not ans.forbid:
@@ -54,7 +54,7 @@ def test_imperfect_model_is_caught():
     _corpus, res = _run(imperfect_model)
     # over-action on a no-action FYI, and a reschedule done as a duplicate, must fail.
     assert not res.results["hr-policy.memo"].passed          # no-action violated
-    assert not res.results["acme-client.move"].passed        # double-booked (count != 1)
+    assert not res.results["acme-client.move"].passed        # double-booked (not the expected single event)
     # a plain single create on the right day still passes (day-level grading)
     assert res.results["henderson.signing"].passed
     assert res.results["henderson.kickoff"].passed

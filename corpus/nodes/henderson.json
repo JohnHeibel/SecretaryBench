@@ -28,7 +28,6 @@
             "action": "create_event",
             "title_match": ["signing"],
             "start": { "eq": "@signing" },
-            "count": 1,
             "tolerance": "exact_day"
           }
         ]
@@ -46,8 +45,7 @@
           {
             "action": "create_event",
             "title_match": ["kickoff"],
-            "start": { "eq": "@signing+2w" },
-            "count": 1
+            "start": { "eq": "@signing+2w" }
           }
         ]
       }
