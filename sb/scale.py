@@ -76,7 +76,7 @@ def _filler_node(n: int, rng: random.Random) -> dict:
             "subject": f"{rng.choice(_SUBJECTS)} #{i}",
             "body": body,
             "depends_on": [],
-            "answer": {"expect": []},
+            "answer": {"ops": []},
         })
     return {"id": "gen-filler", "cast": {"CEO": "you"}, "emails": emails}
 

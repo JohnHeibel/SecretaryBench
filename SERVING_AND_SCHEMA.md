@@ -161,7 +161,7 @@ Plain JSON in version control. One file per node; emails carry their own edges a
       "subject": "Henderson acquisition — kickoff soon",
       "body": "Hi — we're moving forward on Henderson. More to come.",
       "depends_on": [],
-      "answer": { "expect": [] }                       // no action expected
+      "answer": { "ops": [] }                           // no action expected
     },
     {
       "id": "henderson.signing",
@@ -169,9 +169,8 @@ Plain JSON in version control. One file per node; emails carry their own edges a
       "subject": "Signing date",
       "body": "The signing is locked for {!signing = +5d}.",   // emits @signing, renders a date
       "depends_on": [ { "email": "henderson.intro", "type": "static" } ],
-      "answer": { "expect": [
-        { "action": "create_event", "title_match": ["signing"],
-          "start": { "eq": "@signing" }, "count": 1, "tolerance": "exact_day" } ] }
+      "answer": { "ops": [
+        { "create": "signing", "kind": "event", "on": { "eq": "@signing" } } ] }
     },
     {
       "id": "henderson.kickoff",
@@ -179,9 +178,8 @@ Plain JSON in version control. One file per node; emails carry their own edges a
       "subject": "Kickoff",
       "body": "Once Henderson signs, get the project kickoff on the calendar for two weeks after.",
       "depends_on": [ { "email": "henderson.signing", "type": "date" } ],  // ← carries a deadline
-      "answer": { "expect": [
-        { "action": "create_event", "title_match": ["kickoff"],
-          "start": { "eq": "@signing+2w@09:00" }, "count": 1, "tolerance": "exact_time" } ] }
+      "answer": { "ops": [
+        { "create": "kickoff", "kind": "event", "on": { "eq": "@signing+2w" } } ] }
     }
   ]
 }
@@ -210,8 +208,8 @@ Field notes:
   (the retrieval channel). Already flagged in the redesign doc.
 - **Resolver** (likely a repurpose of `engine.py`'s token logic) does three jobs: render
   body tokens, record emitted anchors, and compute answer dates + deadlines.
-- **Grader** is **state-based** (snapshot store after each email; evaluate
-  `expect`/`forbid`/`count`) per the grammar spec — not the legacy diff grader.
+- **Grader** is **state-based** (snapshot store after each email; reconcile each
+  obligation's `create`/`move`/`cancel` op) per the grammar spec — not the legacy diff grader.
 - **Scheduler** is the new module replacing `flow_controller.py`.
 
 Build order (unchanged recommendation): schema + resolver + scheduler + state-grader, proven

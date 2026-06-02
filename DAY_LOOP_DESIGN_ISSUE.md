@@ -108,8 +108,8 @@ that structure.
    - Let the model list → read (`get_email`) → act across the whole batch in that
      single turn.
 3. **Grade per email, as today**: after the day's turn, diff the store state and run
-   `grade_email` for each email in the batch against its own `answer.expect` /
-   `forbid`. Grading is already state-based, so it doesn't care whether the actions
+   `grade_email` for each email in the batch against its own `answer.ops`
+   obligations. Grading is already state-based, so it doesn't care whether the actions
    came from one turn or several — only the loop shape changes.
 4. **Decide the store's "today" semantics** so `list_new_emails` returns only the
    current day's arrivals while `search_inbox` / `get_email` still reach everything
