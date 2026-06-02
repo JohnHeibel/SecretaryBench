@@ -1,6 +1,6 @@
 # ADR 0001 — Replace `count` with verb-on-a-named-thing obligations
 
-**Status:** accepted, staged · **Date:** 2026-06-01 · **Area:** `sb/grader.py`, `sb/schema.py`, corpus answer keys, webapp authoring surface
+**Status:** accepted · stages 1–2 landed · **Date:** 2026-06-01 · **Area:** `sb/grader.py`, `sb/schema.py`, corpus answer keys, webapp authoring surface
 
 ## Context
 
@@ -45,11 +45,27 @@ earlier) and `date` edges + anchors (depend on a **date** established earlier) a
 and well-liked. Obligation verbs *reference* obligations and anchors, which means many edges
 become derivable rather than hand-wired.
 
+### Obligation identity = a node-scoped anchor (decided: "Option A")
+
+The obligation name *is* an anchor. `create: kickoff` registers obligation `kickoff` and, when
+a sibling op references `@kickoff`, publishes `@kickoff` = its resolved date. So `move: kickoff`
+references it by name, its dependency edge to the creator **derives**, and its date is reusable
+as `@kickoff` (no repeating the base expression). This is strictly *less* to author than the old
+model (which repeated title keywords, edges, and base dates) — the win that motivated the change.
+
+Names are **node-scoped**: the loader qualifies them internally (`__obl_<node>__<name>`), so
+`globex-acq` and `henderson` can both own a `kickoff` without colliding in the global anchor
+table. Authors only ever write the bare name. Cross-node references still use body anchors
+(`{!signing=…}`), the pre-existing mechanism.
+
 ### Reconciliation scope (the one policy knob)
 
 Per-obligation **closed**, globally **open**: for each known obligation's identity there must
 be no unexpected/duplicate match (this recovers what `count: 1` did), but objects unrelated
-to any obligation are ignored (so a benign prep block is not punished).
+to any obligation are ignored (so a benign prep block is not punished). **Staging caveat:**
+globally-open only makes sense once the day loop removes per-email attribution. Until then the
+grader keeps the stricter per-email rule for `ops: []` emails (the turn must create nothing),
+so bait/FYI emails stay discriminating. See `DAY_LOOP_DESIGN_ISSUE.md`.
 
 ## What changes maps to what `count` did
 
@@ -75,13 +91,21 @@ UI + seed, tests). It lands in stages so the suite stays green and the risk stay
   - The `count` field stays in the schema for the `0` / `N` exceptions (e.g. `oracle.py`
     uses `count == 0` to emit a cancellation).
   - `pytest sb/tests/` stays at 45 passing.
-- **Stage 2 — verb authoring surface.** Add `op: { create | move | cancel: <name>, ... }` to
-  the schema as the authored form; compile it down to expected-state for the existing grader.
-  Update the webapp builder so authors pick a verb + a named thing instead of an `expect`
-  block. Land alongside or just before the day-loop change.
-- **Stage 3 — reconciliation grader + day loop.** Replace per-email/per-turn grading with
-  checkpoint state reconciliation (`DAY_LOOP_DESIGN_ISSUE.md`). At this point the per-email
-  `expect`/`forbid` path and the residual `count` field can be retired.
+- **Stage 2 — verb model + reconciliation grader (DONE).**
+  - `sb/schema.py`: the answer key is now `ops: [ { create|move|cancel: <name>, kind, on,
+    match } ]`. Obligations are node-scoped anchors (Option A above): `create` publishes
+    `@name` when referenced; `move`/`cancel` inherit the obligation's kind/match and
+    auto-derive their dependency edge to the creator. `expect`/`forbid`/`count` are gone.
+  - `sb/grader.py`: per-obligation reconciliation against cumulative node state —
+    `create`/`move` = exactly one match on the `on` day, `cancel` = none. No `count`.
+  - `sb/oracle.py`, the e2e + schema tests, and all five corpus nodes migrated (hard cutover,
+    no dual-read path). Oracle is 100% on the migrated corpus; `pytest sb/tests/` at 46.
+  - Webapp builder migration to the verb form: in progress (vendored `sb` + the React
+    authoring surface).
+- **Stage 3 — day loop + globally-open reconciliation.** Move serving from one-email-per-turn
+  to one-day-per-turn (`DAY_LOOP_DESIGN_ISSUE.md`, in progress in `sb/live/`). At that point
+  per-email attribution disappears, the no-action turn-delta check is replaced by globally-open
+  reconciliation at the day checkpoint, and grading reads only the resulting state of the world.
 
 ## Consequences
 

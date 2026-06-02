@@ -1,8 +1,14 @@
-# SecretaryBench — Token & Answer-Key Grammar (v0.1, slimmed)
+# SecretaryBench — Token & Answer-Key Grammar (v0.2, verb-based)
 
 > Status: **DRAFT.** The closed, deterministic language for *when* each email's correct
 > action falls due. Companion to `BENCHMARK_REDESIGN.md`. Revised 2026-05-30 after John's
-> call to cut idiomatic bloat. **[OPEN]** = needs a decision.
+> call to cut idiomatic bloat; **2026-06-01 the answer key moved from `expect`/`count` to
+> `create`/`move`/`cancel` verbs on named obligations (ADR 0001).** **[OPEN]** = needs a decision.
+>
+> **Answer key in one line:** an email's `answer` is a list of `ops`, each a verb on a named
+> obligation — `{ "create": "kickoff", "kind": "event", "on": { "eq": "@signing+2w" } }`. The
+> name is the obligation's identity *and* a node-scoped anchor, so a later `move`/`cancel`
+> references it by name. There is no `count` field; "exactly one" is inherent to an obligation.
 >
 > **DECIDED (day-level grammar):** times-of-day and durations are **out**. Tokens resolve to
 > whole **days**; the grader checks the *day* an event/todo lands on, nothing finer. Times may
@@ -25,7 +31,7 @@ So:
 - **Tokens encode dates only.** They render to a concrete date in the email and resolve to
   the grader's expected date — one source, no drift (the C19 bug becomes impossible).
 - **Everything non-temporal is plain prose** in the email, plus a **static field** in the
-  answer key (`duration: 90m`, `count: 3`, `title_match: ["kickoff"]`). No token, no emission.
+  answer key (the obligation `name`, its `kind`, the `match` keywords). No token, no emission.
 - **The only dynamic cross-node dependency is date-on-date** (kickoff = signing + 2w, where
   the signing date isn't known until the scheduler serves the ancestor). That, and only
   that, needs a **named date emission**.
@@ -117,93 +123,99 @@ A date slot is matched by one of:
 | `in: <interval>, not_in: @anchor` | within a window, avoiding a blackout | the Tokyo case |
 | `any_of: [<expr>, …]` | matches any listed | "Mon, Tue, or Wed work" |
 
-(Cardinality is **exactly one by default** — an obligation is a single thing. The static
-`count` field is only for exceptions: `0` = must not exist, `N` = genuinely several.)
+A predicate is the value of an op's `on` field. Cardinality never appears: one obligation is
+one object, so `create`/`move` mean "exactly one match on this day" and `cancel` means "none."
 `in`/`not_in`/`any_of` replace the old `or`-clause string hackery with clean set-membership.
 
 ---
 
-## 5. Answer-key entry (tokens for dates, static fields for the rest)
+## 5. Answer-key entry — verbs on named obligations
+
+An email's `answer` is a list of `ops`. Each op is one verb (`create` / `move` / `cancel`)
+on a named obligation. The verb's value *is* the obligation name.
 
 ```jsonc
 {
-  "email_id": "henderson-kickoff",
-  "emits": { "signing": "+5d" },            // date anchors this email establishes (if any)
-  "expect": [
+  "ops": [
     {
-      "action": "create_event",             // create_event | create_todo | reschedule | reply | delegate
-      "title_match": ["kickoff"],           // static: keyword(s), case-insensitive
-      "start": { "eq": "@signing+2w" },      // the only token-driven field (a DAY)
-      "tolerance": "exact_day"               // exact_day (default) | within:Nd
-      // cardinality defaults to exactly one — omit it. Set `count` only for 0 (cancel) or N.
+      "create": "kickoff",              // verb: create | move | cancel; value = obligation name
+      "kind": "event",                  // event | todo  (create only)
+      "on": { "eq": "@signing+2w" },    // the date predicate (a DAY); create/move only
+      "match": ["kickoff"],             // OPTIONAL title keywords; defaults to [name]
+      "tolerance": "exact_day"          // OPTIONAL: exact_day (default) | within:Nd
     }
-  ],
-  "forbid": []                               // no-action emails: forbid all creates  [OPEN B2]
+  ]
 }
 ```
 
-- **No-action email** → `expect: []`, `forbid` all creates. **[OPEN B2: any create = fail?]**
-- **Todo with deadline** → `action: create_todo`, `due: { "by": "{this:FRI}" }`.
-- Cardinality is **scoped to the entry's `action` + `title_match`** (e.g. "how many *board*
-  events"), never a global tally. The default is exactly one, which is what makes a
-  reschedule-that-left-a-duplicate fail; `count` is set only for `0` (cancel) or `N`.
-- **Reply / delegate** schemas still TBD. **[OPEN]**
+- **The name does three jobs.** It is the obligation's identity (so `move`/`cancel`
+  reference it later), the default title `match`, and — when a sibling op references `@name`
+  — a node-scoped anchor equal to the obligation's date. Authors write the bare name; the
+  loader qualifies it internally (`__obl_<node>__<name>`) so two nodes can both have a
+  `kickoff`.
+- **`match` defaults to `[name]`.** Override it only when the natural calendar title differs
+  from the slug (e.g. `"create": "filing", "match": ["HSR"]`). All grading is fuzzy: the
+  model's object matches if its title contains every keyword.
+- **No-action / FYI / bait email** → `ops: []`. The turn must create nothing (graded on the
+  per-email turn delta until the day loop lands; see §8 and `DAY_LOOP_DESIGN_ISSUE.md`).
+- **Todo with a deadline** → `"create": "...", "kind": "todo", "on": { "by": "@x+5bd" }`.
+- **Reply / delegate** verbs still TBD. **[OPEN]**
 
-### 5.1 Modify / reschedule / cancel
+### 5.1 Move / cancel — reference an obligation by name
 
-These grade on **final state**, not on the model's mechanics — a model may reschedule by
-`update_event` *or* by `delete_event` + `create_event`, and both must score identically.
-Express the *intended end state*, not the edit:
+These grade on **final state**, not the model's mechanics — a model may reschedule by
+`update_event` *or* by `delete`+`create`, and both score identically. Express the *intended
+end state*, and let the obligation's identity catch leftovers:
 
 ```jsonc
-// "Move the board meeting to the following Monday."
-{ "email_id": "board-move",
-  "expect": [ { "action": "create_event", "title_match": ["board"],
-               "start": { "eq": "{next:MON}" } } ] }
-// The default exactly-one catches the "created a new one but forgot to delete the old"
-// failure — a double-booked calendar fails with no annotation.
+// email A — "Get the board meeting on the calendar for next Thursday."
+{ "ops": [ { "create": "board", "kind": "event", "on": { "eq": "next:THU" } } ] }
 
-// "Push the board meeting back a week."  (email 1 emitted {!board = next:THU@14:00})
-{ "expect": [ { "action": "create_event", "title_match": ["board"],
-               "start": { "eq": "@board+1w" } } ] }
+// email B — "Move the board meeting to the following Monday."
+//   No depends_on needed: the edge to A derives from `move: board`. And @board is A's date,
+//   so you don't repeat it. Exactly-one catches "created a new one, forgot the old" (a
+//   double-booked calendar fails).
+{ "ops": [ { "move": "board", "on": { "eq": "@board+4d" } } ] }
 
-// "Cancel the board meeting."   count:0 is the one cardinality you still write.
-{ "expect": [ { "action": "create_event", "title_match": ["board"], "count": 0 } ] }
-
-// "Keep the day, move 2pm → 4pm."   attach on a DATETIME overrides its time.
-{ "expect": [ { "action": "create_event", "title_match": ["board"],
-               "start": { "eq": "@board@16:00" } } ] }
+// email C — "Cancel the board meeting."   no `on`, no `kind` — just the name.
+{ "ops": [ { "cancel": "board" } ] }
 ```
+
+`move`/`cancel` inherit the obligation's `kind` and `match` from its `create`, and auto-derive
+their dependency edge to the creating email (a `date` edge when the op references an anchor,
+else `static`). That is the ergonomic win over the old model: name the thing once, then act
+on it by name.
 
 ---
 
-## 6. Recurrence (start is a token; cadence is static)
+## 6. Recurrence — **[NOT IMPLEMENTED]**
+
+A recurring series ("training every Tuesday for four weeks") would be a single `create` op
+with a static cadence block resolving to N day-grained events. The grammar sketch:
 
 ```jsonc
-{ "action": "create_event",
-  "title_match": ["training"],
-  "start": "month:+1m",          // token: which month the series begins
-  "recurrence": { "every": "TUE", "at": "10:00", "dur": "60m", "count": 4 },  // all static
-  "tolerance": "exact_time" }
+{ "create": "training", "kind": "event", "on": { "eq": "month:+1m" },
+  "recurrence": { "every": "TUE", "count": 4 } }   // start token + static cadence
 ```
 
-Grader expands the 4 expected datetimes from the token start + static cadence and checks 4
-matching events exist.
+No times-of-day (those are prose, not graded — see the header). Not built yet; the schema
+does not parse `recurrence`. Revisit if a recurring obligation becomes a target.
 
 ---
 
 ## 7. Cross-node templates (revised — no fact emissions)
 
-1. **Date-on-date (the only thing that truly needs emission).**
+1. **Date-on-date (a body emission the descendant references).**
    A: *"Signing locked for `{!signing=+5d}`."*  B: *"Kickoff two weeks after the signing."*
-   → B answer: `start: eq @signing+2w`, `tolerance: exact_day`.
-2. **Static fact set by an ancestor (no emission — baked in).**
-   A: *"Client meetings are now 90 minutes."*  B: *"Meet `{next:THU@14:00}`?"*
-   → B answer: `start: eq {next:THU@14:00}`, `duration: "90m"` (static; we know A set it; the
-   A→B edge forces A served first so the model can learn it).
-3. **Cadence (static) starting at a token date.**  → the recurrence block in §6.
-4. **Avoidance.**  A: *"Out the `{!blackout=week_of:{+9d}}`."*  B: *"Review next week."*
-   → B answer: `start: { in: "week_of:{+1w}", not_in: "@blackout" }`, `tolerance: exact_day`.
+   → B op: `{ "create": "kickoff", "kind": "event", "on": { "eq": "@signing+2w" } }`, with a
+   `date` edge A→B (the serve-by window).
+2. **Obligation referenced later in the same node (no hand-wiring).**
+   A: *"Get the kickoff on the books."*  B: *"Push the kickoff back three days."*
+   → B op: `{ "move": "kickoff", "on": { "eq": "@kickoff+3bd" } }`; the edge to A and the base
+   date both derive from the name.
+3. **Avoidance.**  A: *"Out the `{!blackout=week_of:{+9d}}`."*  B: *"Review next week."*
+   → B op: `{ "create": "review", "kind": "event",
+   "on": { "in": "week_of:(serve+1w)", "not_in": "@blackout" } }`, with a `date` edge A→B.
 
 ---
 
@@ -211,16 +223,21 @@ matching events exist.
 
 - **Grade on cumulative final state, not the per-email diff.** A reschedule done as
   `update_event` and one done as `delete`+`create` must score identically, so the grader
-  checks the calendar/todo *state* after the email, not the edit the model made. (This is
-  a change from the legacy diff-based grader and is required for §5.1 to work.)
-- Match a model object to an expected entry by `email_id` (model tags every create) then by
-  `title_match`. Resolve date tokens against `(serve_date_of_that_email, anchor_table)` —
-  **ground truth**, independent of the model's earlier actions.
+  checks the calendar/todo *state* after the email, not the edit the model made.
+- **Reconcile each obligation against the node's state.** For a `create`/`move` op, find the
+  objects whose title contains the obligation's `match` keywords: there must be exactly one,
+  and it must fall on the `on` day. For `cancel`, there must be none. Uniqueness is inherent
+  to an obligation, so a reschedule that left a stale duplicate fails — no `count` needed.
+- Match a model object to an obligation by `match` keywords within the email's node. Resolve
+  date tokens against `(serve_date, anchor_table)` — **ground truth**, independent of the
+  model's earlier actions.
 - Tokens resolve to a DATE (or INTERVAL) → **day equality**; `within:Nd` relaxes the window.
-- Cardinality → **exactly one by default**, scoped to the entry's action + title_match
-  (over-creation, double-booking, and "forgot to cancel" all fail). Write `count` only to
-  override: `count: 0` = must not exist, `count: N` = exactly N.
-- Per-email result **binary** by default + a "right-action-wrong-day" diagnostic. **[OPEN B3]**
+- **No-action / FYI / bait email** (`ops: []`) → the turn must create nothing. This is graded
+  on the per-email turn delta. When the day loop lands (`DAY_LOOP_DESIGN_ISSUE.md`), per-email
+  attribution disappears and reconciliation becomes *per-obligation closed, globally open* —
+  unrelated objects are no longer punished. Until then we keep the stricter per-email check so
+  bait emails stay discriminating.
+- Per-email result **binary** + a "right-action-wrong-day" reason in the details. **[OPEN B3]**
 
 ---
 
@@ -240,12 +257,14 @@ human discipline shipped with the authoring kit.
   or push times to prose too for a strictly date-only grammar? (John's call.)
 - **[OPEN]** Anything real emails need that a date token can't express? (multi-day events;
   fuzzy "morning/afternoon"; quarter/fiscal dates; date *ranges as the deliverable*.)
-- **[OPEN B2]** No-action strictness. **[OPEN B3]** Binary vs partial-credit headline metric.
-- **[OPEN]** Reply / delegate action schemas (reschedule/cancel now drafted in §5.1).
+- **[DECIDED B2]** No-action strictness: empty `ops` ⇒ the turn must create nothing
+  (per-email), relaxing to globally-open reconciliation when the day loop lands (§8).
+- **[OPEN B3]** Binary vs partial-credit headline metric.
+- **[OPEN]** Reply / delegate verbs (`create`/`move`/`cancel` now implemented in §5.1).
 - **[DONE]** Weekday selectors relative to a *named anchor* ("the Monday after the
   signing"). Implemented as an optional `from <expr>` clause on `next:`/`this:` (e.g.
   `next:MON from @signing`, `this:FRI from @migration+1w`); with no `from`, behavior is
   unchanged (serve-relative).
 - **[OPEN]** Timezone & locale lock; default valid-slot rules for `in:` answers.
-- **[IMPLEMENTATION NOTE]** Grader must be **state-based** (snapshot the calendar/todos
-  after each email and evaluate `expect`/`forbid`/`count` against it), not diff-based.
+- **[IMPLEMENTATION NOTE]** Grader is **state-based** (snapshot the calendar/todos after each
+  email and reconcile each obligation's `ops` against it), not diff-based. `sb/grader.py`.
