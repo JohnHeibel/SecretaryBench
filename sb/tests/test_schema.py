@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from sb.schema import CorpusError, load_corpus
+from sb.schema import CorpusError, build_corpus, load_corpus
 
 CORPUS = "corpus"
 
@@ -44,6 +44,72 @@ def test_topo_order_respects_dependencies():
 def _write_node(tmp_path, name, obj):
     (tmp_path / "nodes").mkdir(exist_ok=True)
     (tmp_path / "nodes" / f"{name}.json").write_text(json.dumps(obj))
+
+
+def test_duplicate_node_id_rejected():
+    # two node files declaring the same `id` must be refused — names are identities.
+    node = {"id": "dup", "emails": [{"id": "dup.a", "answer": {"ops": []}}]}
+    with pytest.raises(CorpusError, match="duplicate node id"):
+        build_corpus([node, {"id": "dup", "emails": [{"id": "dup.b", "answer": {"ops": []}}]}])
+
+
+def test_colliding_match_keywords_rejected(tmp_path):
+    # two event obligations in one node whose keyword filters catch each other.
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [
+            {"id": "n.a", "answer": {"ops": [
+                {"create": "kickoff", "kind": "event", "on": {"eq": "serve+1w"}, "match": ["meeting"]}]}},
+            {"id": "n.b", "answer": {"ops": [
+                {"create": "review", "kind": "event", "on": {"eq": "serve+2w"}, "match": ["meeting"]}]}},
+        ],
+    })
+    with pytest.raises(CorpusError, match="colliding match keywords"):
+        load_corpus(tmp_path)
+
+
+def test_substring_match_keywords_rejected(tmp_path):
+    # "kickoff" is a substring of "kickoff sync", so the broader filter is caught too.
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [
+            {"id": "n.a", "answer": {"ops": [
+                {"create": "k1", "kind": "event", "on": {"eq": "serve+1w"}, "match": ["kickoff"]}]}},
+            {"id": "n.b", "answer": {"ops": [
+                {"create": "k2", "kind": "event", "on": {"eq": "serve+2w"}, "match": ["kickoff", "sync"]}]}},
+        ],
+    })
+    with pytest.raises(CorpusError, match="colliding match keywords"):
+        load_corpus(tmp_path)
+
+
+def test_overlapping_but_distinct_keywords_ok(tmp_path):
+    # shared "meeting" but each has a distinguishing word -> neither filter catches the
+    # other -> must NOT be flagged (no false positive on safe overlap).
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [
+            {"id": "n.a", "answer": {"ops": [
+                {"create": "board", "kind": "event", "on": {"eq": "serve+1w"}, "match": ["board", "meeting"]}]}},
+            {"id": "n.b", "answer": {"ops": [
+                {"create": "staff", "kind": "event", "on": {"eq": "serve+2w"}, "match": ["staff", "meeting"]}]}},
+        ],
+    })
+    load_corpus(tmp_path)   # should not raise
+
+
+def test_same_keyword_different_kind_ok(tmp_path):
+    # an event and a todo never share a pool, so identical keywords don't collide.
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [
+            {"id": "n.a", "answer": {"ops": [
+                {"create": "ev", "kind": "event", "on": {"eq": "serve+1w"}, "match": ["sync"]}]}},
+            {"id": "n.b", "answer": {"ops": [
+                {"create": "td", "kind": "todo", "on": {"by": "serve+2w"}, "match": ["sync"]}]}},
+        ],
+    })
+    load_corpus(tmp_path)   # should not raise
 
 
 def test_cycle_rejected(tmp_path):

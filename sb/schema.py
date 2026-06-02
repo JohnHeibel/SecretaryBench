@@ -504,3 +504,26 @@ def lint(corpus: Corpus) -> None:
                     f"email {email.id!r} uses @{name} (from {src!r}) in its answer but has no "
                     f"'date' dependency edge to it — the serve-by window can't be derived"
                 )
+
+    # 5. within a node, no two same-kind obligations may have match keywords where one
+    #    filter is guaranteed to also catch the other's object. The grader matches by
+    #    substring and requires EXACTLY ONE object per obligation, so if every keyword of
+    #    obligation A is a substring of some keyword of B, then any object correctly
+    #    titled for B is also caught by A — A then sees two objects and fails even when
+    #    the model did everything right. Authors invent match keywords; the model invents
+    #    titles, so this can only be prevented here, at authoring time. (Pure overlap, e.g.
+    #    ["board","meeting"] vs ["staff","meeting"], is safe and not flagged.)
+    def _catches(probe: set[str], target: set[str]) -> bool:
+        return all(any(p in t for t in target) for p in probe)
+    for node in corpus.nodes.values():
+        obls = [(op.name, op.kind, {k.lower() for k in op.match})
+                for em in node.emails for op in em.answer.ops if op.verb == "create"]
+        for i, (name_a, kind_a, kw_a) in enumerate(obls):
+            for name_b, kind_b, kw_b in obls[i + 1:]:
+                if kind_a == kind_b and (_catches(kw_a, kw_b) or _catches(kw_b, kw_a)):
+                    raise CorpusError(
+                        f"node {node.id!r}: obligations {name_a!r} and {name_b!r} have colliding "
+                        f"match keywords ({sorted(kw_a)} vs {sorted(kw_b)}) — one {kind_a}'s filter "
+                        f"also catches the other's, breaking the grader's exactly-one rule. "
+                        f"Give them distinct keywords."
+                    )
