@@ -1,0 +1,37 @@
+{
+  "id": "conversation-2",
+  "cast": {
+    "ME": "you",
+    "THEM": ""
+  },
+  "scenario": "scenario-1",
+  "emails": [
+    {
+      "id": "conversation-2.email1",
+      "from": "",
+      "to": [
+        "ME"
+      ],
+      "subject": "schedule new meeting on same day as last meeting",
+      "body": "schedule new meeting on same day as last meeting",
+      "depends_on": [
+        {
+          "email": "conversation-1.email1",
+          "type": "static"
+        }
+      ],
+      "answer": {
+        "expect": [
+          {
+            "action": "create_event",
+            "start": {
+              "eq": "next:THU"
+            },
+            "count": 1,
+            "tolerance": "exact_day"
+          }
+        ]
+      }
+    }
+  ]
+}

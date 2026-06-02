@@ -94,9 +94,12 @@ export interface EmailForm {
 export interface ThreadForm {
   id: string;
   cast: Record<string, string>;
+  scenario: string;
   node_depends_on: Edge[];
   emails: string[];
 }
+
+export const DEFAULT_SCENARIO = "unsorted";
 
 export interface Sample {
   ok: boolean;

@@ -1,12 +1,16 @@
 import { useStore } from "./store";
 import { EmailEditor } from "./components/EmailEditor";
 import { GraphCanvas } from "./components/GraphCanvas";
+import { TabBar } from "./components/TabBar";
 import { ValidationPanel } from "./components/ValidationPanel";
 
 export default function App() {
-  const { graph, selected, dirty, busy, oracle, save, runOracle, newEmail, reload } = useStore();
+  const { graph, selected, dirty, busy, oracle, save, runOracle, newEmail, reload, activeScenario } = useStore();
   const errorCount = graph?.errors.length ?? 0;
-  const isEmpty = graph && Object.keys(graph.emails).length === 0;
+  const activeCount = graph
+    ? graph.threads.filter((t) => t.scenario === activeScenario).reduce((n, t) => n + t.emails.length, 0)
+    : 0;
+  const isEmpty = !!graph && activeCount === 0;
 
   return (
     <div className="flex h-full flex-col bg-ink">
@@ -46,6 +50,8 @@ export default function App() {
         </div>
       </header>
 
+      <TabBar />
+
       <div className="relative flex min-h-0 flex-1">
         <div className="relative min-w-0 flex-1">
           <GraphCanvas />
@@ -53,9 +59,10 @@ export default function App() {
           {isEmpty && (
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
               <div className="pointer-events-auto flex flex-col items-center gap-3 text-center">
-                <div className="text-lg font-medium text-white/90">No emails yet</div>
+                <div className="text-lg font-medium text-white/90">This scenario is empty</div>
                 <div className="max-w-xs text-sm text-muted">
-                  Each card is one email a secretary receives. Start your first conversation.
+                  Each card is one email a secretary receives. Emails added here stay independent
+                  from other tabs. Start your first conversation.
                 </div>
                 <button onClick={newEmail} className="bg-accent px-4 py-2 text-sm font-medium text-ink hover:brightness-110">
                   + New email

@@ -4,7 +4,10 @@ import { BodyComposer } from "./BodyComposer";
 import { GradingEditor } from "./GradingEditor";
 
 export function EmailEditor() {
-  const { graph, selected, select, updateEmail, updateAnswer, deleteEmail, disconnect, ensureDateEdge } = useStore();
+  const {
+    graph, selected, select, updateEmail, updateAnswer, deleteEmail, disconnect,
+    ensureDateEdge, connect, scenarios, activeScenario, moveThreadToScenario, createScenario,
+  } = useStore();
   if (!graph || !selected) return null;
   const email = graph.emails[selected];
   if (!email) return null;
@@ -13,6 +16,19 @@ export function EmailEditor() {
   const castKeys = Object.keys(thread?.cast || {});
   const serve = graph.sample.serve_date[email.id] || graph.start;
   const anchors = graph.sample.anchors;
+
+  const scenarioOf = (eid: string) => {
+    const e = graph.emails[eid];
+    const t = e && graph.threads.find((x) => x.id === e.thread);
+    return t?.scenario ?? "";
+  };
+  const myScenario = thread?.scenario ?? activeScenario;
+  // candidates to depend ON: any other email not already a dependency.
+  const depCandidates = Object.values(graph.emails)
+    .filter((e) => e.id !== email.id && !email.depends_on.some((d) => d.email === e.id))
+    .sort((a, b) => scenarioOf(a.id).localeCompare(scenarioOf(b.id)) || a.id.localeCompare(b.id));
+
+  const moveValue = "__current";
 
   return (
     <div className="flex h-full w-[560px] shrink-0 flex-col border-l border-edge bg-panel scroll-thin">
@@ -32,6 +48,29 @@ export function EmailEditor() {
       </div>
 
       <div className="flex-1 overflow-y-auto scroll-thin p-4">
+        <Labeled label="Scenario (tab)" className="mb-3">
+          <select
+            className={inp}
+            value={moveValue}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (!thread) return;
+              if (v === "__new") {
+                const name = createScenario();
+                moveThreadToScenario(thread.id, name);
+              } else if (v !== moveValue) {
+                moveThreadToScenario(thread.id, v);
+              }
+            }}
+          >
+            <option value={moveValue}>{myScenario === "unsorted" ? "Unsorted" : myScenario} (current)</option>
+            {scenarios.filter((s) => s !== myScenario).map((s) => (
+              <option key={s} value={s}>move thread → {s === "unsorted" ? "Unsorted" : s}</option>
+            ))}
+            <option value="__new">move thread → new scenario…</option>
+          </select>
+        </Labeled>
+
         <div className="grid grid-cols-2 gap-3">
           <Labeled label="From">
             <input list="cast" className={inp} value={email.from} onChange={(e) => updateEmail(email.id, { from: e.target.value })} />
@@ -47,10 +86,10 @@ export function EmailEditor() {
           <input className={inp} value={email.subject} onChange={(e) => updateEmail(email.id, { subject: e.target.value })} />
         </Labeled>
 
-        {email.depends_on.length > 0 && (
-          <div className="mt-3">
-            <div className="mb-1 text-[11px] uppercase tracking-wide text-muted">Depends on</div>
-            <div className="flex flex-wrap gap-1.5">
+        <div className="mt-3">
+          <div className="mb-1 text-[11px] uppercase tracking-wide text-muted">Depends on</div>
+          {email.depends_on.length > 0 && (
+            <div className="mb-1.5 flex flex-wrap gap-1.5">
               {email.depends_on.map((d) => (
                 <span key={d.email} className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs ${
                   d.type === "date" ? "border-anchor/50 bg-anchor/10 text-anchor" : "border-edge bg-panel2 text-muted"}`}>
@@ -59,8 +98,24 @@ export function EmailEditor() {
                 </span>
               ))}
             </div>
-          </div>
-        )}
+          )}
+          <select
+            className={inp}
+            value=""
+            onChange={(e) => { if (e.target.value) connect(e.target.value, email.id); }}
+          >
+            <option value="">+ depends on…</option>
+            {depCandidates.map((c) => {
+              const cross = scenarioOf(c.id) !== myScenario;
+              return (
+                <option key={c.id} value={c.id}>
+                  {c.id}{cross ? `  (merges ${scenarioOf(c.id) === "unsorted" ? "Unsorted" : scenarioOf(c.id)})` : ""}
+                </option>
+              );
+            })}
+          </select>
+          <div className="mt-1 text-[10px] text-muted">Picking an email from another tab merges the two scenarios.</div>
+        </div>
 
         <div className="mt-4">
           <div className="mb-1 text-[11px] uppercase tracking-wide text-muted">Email body</div>

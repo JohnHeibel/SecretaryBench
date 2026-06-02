@@ -26,6 +26,12 @@ _TOKEN_RE = re.compile(r"\{([^{}]*)\}")
 VALID_ACTIONS = {"create_event", "create_todo", "reschedule", "reply", "delegate"}
 EDGE_TYPES = {"static", "date"}
 
+# Nodes are grouped into authoring "scenarios" (the editor's tabs). Relations may
+# not cross a scenario boundary — that's what makes a scenario an independent,
+# self-contained unit. Nodes with no explicit scenario fall into one shared bucket
+# so existing single-scenario corpora keep loading unchanged.
+DEFAULT_SCENARIO = "unsorted"
+
 
 class CorpusError(ValueError):
     """Raised when a corpus fails to load or lint."""
@@ -87,6 +93,7 @@ class Node:
     cast: dict[str, str] = field(default_factory=dict)
     emails: list[Email] = field(default_factory=list)
     node_depends_on: list[Edge] = field(default_factory=list)
+    scenario: str = DEFAULT_SCENARIO
 
 
 @dataclass
@@ -244,6 +251,7 @@ def load_corpus(corpus_dir: str | Path) -> Corpus:
             id=node_id,
             cast=raw.get("cast", {}),
             node_depends_on=[_parse_edge(e) for e in raw.get("node_depends_on", [])],
+            scenario=raw.get("scenario") or DEFAULT_SCENARIO,
         )
         for eraw in raw.get("emails", []):
             email = _build_email(node_id, eraw)
@@ -422,4 +430,23 @@ def lint(corpus: Corpus) -> None:
                 raise CorpusError(
                     f"email {email.id!r} uses @{name} (from {src!r}) in its answer but has no "
                     f"'date' dependency edge to it — the serve-by window can't be derived"
+                )
+
+    # 5. scenario isolation: a relation may not cross a scenario boundary. Every
+    #    anchor/fact reference is already required to ride a depends_on edge (rules
+    #    3/3b/4), so checking depends_on alone covers ordering, dates, anchors and
+    #    facts. node_depends_on is already expanded into these edges.
+    node_scenario = {nid: n.scenario for nid, n in corpus.nodes.items()}
+    for email in emails.values():
+        here = node_scenario.get(email.node, DEFAULT_SCENARIO)
+        for dep in email.depends_on:
+            dep_email = emails.get(dep.email)
+            if dep_email is None:
+                continue                       # unknown ref already raised by topo_sort
+            there = node_scenario.get(dep_email.node, DEFAULT_SCENARIO)
+            if here != there:
+                raise CorpusError(
+                    f"email {email.id!r} (scenario {here!r}) depends on {dep.email!r} "
+                    f"(scenario {there!r}) — relations may not cross scenarios; put both "
+                    f"in the same scenario"
                 )

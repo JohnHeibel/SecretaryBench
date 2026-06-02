@@ -65,6 +65,7 @@ def load_graph(corpus_dir: str | Path) -> dict:
         threads.append({
             "id": nid,
             "cast": raw.get("cast", {}),
+            "scenario": raw.get("scenario") or schema.DEFAULT_SCENARIO,
             "node_depends_on": [_edge_dict(e) for e in raw.get("node_depends_on", [])],
             "emails": email_ids,
         })
@@ -205,6 +206,11 @@ def thread_to_raw(form: dict) -> dict:
     raw: dict[str, Any] = {"id": form["id"]}
     if form.get("cast"):
         raw["cast"] = form["cast"]
+    # Persist scenario only when it's a real grouping — omit the default bucket so
+    # untouched corpora keep their original, scenario-less node files.
+    scenario = form.get("scenario")
+    if scenario and scenario != schema.DEFAULT_SCENARIO:
+        raw["scenario"] = scenario
     if form.get("node_depends_on"):
         raw["node_depends_on"] = [_edge_out(e) for e in form["node_depends_on"]]
     raw["emails"] = [_email_to_raw(e) for e in form.get("emails", [])]

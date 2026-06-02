@@ -1,0 +1,31 @@
+{
+  "id": "conversation-1",
+  "cast": {
+    "ME": "you",
+    "THEM": ""
+  },
+  "scenario": "scenario-1",
+  "emails": [
+    {
+      "id": "conversation-1.email1",
+      "from": "ME",
+      "to": [
+        "ME"
+      ],
+      "subject": "",
+      "body": "New email. please schedule meeting fo r {next:THU}",
+      "answer": {
+        "expect": [
+          {
+            "action": "create_event",
+            "start": {
+              "eq": "next:THU"
+            },
+            "count": 1,
+            "tolerance": "exact_day"
+          }
+        ]
+      }
+    }
+  ]
+}
