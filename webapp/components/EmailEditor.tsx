@@ -19,6 +19,7 @@ interface Props {
   serveDate: string;
   onUpdateNode: (node: CorpusNode) => void;
   onRenameNode: (oldId: string, newId: string) => boolean;
+  onAddEmail: () => void;
   onUpdateEmail: (email: Email) => void;
   onAutoSlugEmail: (email: Email) => void;
 }
@@ -27,7 +28,7 @@ function castKeys(node: CorpusNode): string[] {
   return Object.keys(node.cast ?? {});
 }
 
-export default function EmailEditor({ node, email, allNodes, anchors, serveDate, onUpdateNode, onRenameNode, onUpdateEmail, onAutoSlugEmail }: Props) {
+export default function EmailEditor({ node, email, allNodes, anchors, serveDate, onUpdateNode, onRenameNode, onAddEmail, onUpdateEmail, onAutoSlugEmail }: Props) {
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-5">
       <Primer />
@@ -43,10 +44,19 @@ export default function EmailEditor({ node, email, allNodes, anchors, serveDate,
       {email ? (
         <EmailPanel node={node} email={email} allNodes={allNodes} anchors={anchors} serveDate={serveDate} onUpdateEmail={onUpdateEmail} onAutoSlugEmail={onAutoSlugEmail} />
       ) : (
-        <p className="rounded-lg border border-dashed border-slate-800 px-4 py-8 text-center text-sm text-slate-500">
-          Select an email in the sidebar, or <span className="text-slate-300">+ email</span> to add one to <code>{node.id}</code>.
-        </p>
+        <FirstEmailEmpty nodeId={node.id} onAddEmail={onAddEmail} />
       )}
+    </div>
+  );
+}
+
+function FirstEmailEmpty({ nodeId, onAddEmail }: { nodeId: string; onAddEmail: () => void }) {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-700 bg-slate-900/35 px-5 py-8 text-center">
+      <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">Next step</p>
+      <h2 className="mt-2 text-lg font-semibold text-slate-100">Add the first email to {nodeId}.</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-400">Start with a real email someone might send. After you write it, the answer key says what a perfect assistant should do.</p>
+      <button onClick={onAddEmail} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Add first email</button>
     </div>
   );
 }
@@ -72,7 +82,7 @@ function Primer() {
         <li>Write the email (who it&apos;s from, the subject, the body). Use <span className="font-mono text-sky-300">+ insert date token</span> for any date so it stays exact.</li>
         <li>In <strong>Answer key</strong>, say what to do: name the thing, pick its date, or tick <em>&ldquo;this email needs no action.&rdquo;</em></li>
         <li>Tag the <strong>difficulty</strong> (T1 easy → T3 hard) so we can score models by tier.</li>
-        <li>The bar at the bottom must read <span className="text-emerald-400">✓ corpus valid</span> and <span className="text-emerald-400">oracle solves 100%</span> — that means a perfect assistant could actually do it.</li>
+        <li>The bar at the bottom must read <span className="text-emerald-400">Ready for export</span> and <span className="text-emerald-400">oracle solves 100%</span> — that means a perfect assistant could actually do it.</li>
       </ol>
       <p className="mt-1 text-slate-400">Want more? <a href="/guide" className="text-sky-400 underline hover:text-sky-300">Open the full walkthrough →</a> (worked examples, the date blocks, how to build a needle)</p>
     </div>
@@ -80,8 +90,8 @@ function Primer() {
 }
 
 function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (n: CorpusNode) => void }) {
-  const [open, setOpen] = useState(false);
   const entries = Object.entries(node.cast ?? {});
+  const [open, setOpen] = useState(entries.length < 2);
 
   function setCast(cast: Record<string, string>) { onUpdateNode({ ...node, cast }); }
   function rename(oldKey: string, newKey: string) {
@@ -99,6 +109,7 @@ function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (
       </button>
       {open && (
         <div className="space-y-1.5 border-t border-slate-800 p-3">
+          <p className="text-xs leading-5 text-slate-500">Add everyone who can appear in From or To. Keep <code className="font-mono text-sky-300">CEO</code> as the assistant&apos;s boss.</p>
           {entries.map(([key, name]) => (
             <div key={key} className="flex items-center gap-2">
               <input defaultValue={key} onBlur={(e) => rename(key, e.target.value.trim())}
@@ -109,20 +120,22 @@ function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (
             </div>
           ))}
           <button onClick={() => setCast({ ...node.cast, [`PERSON_${entries.length + 1}`]: "" })}
-            className="text-xs text-slate-500 hover:text-sky-300">+ person</button>
+            className="rounded border border-dashed border-slate-700 px-2 py-1 text-xs text-slate-400 hover:border-sky-600 hover:text-sky-300">+ Add person</button>
         </div>
       )}
     </div>
   );
 }
 
-function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, onAutoSlugEmail }: Omit<Props, "onUpdateNode" | "onRenameNode"> & { email: Email }) {
+function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, onAutoSlugEmail }: Omit<Props, "onUpdateNode" | "onRenameNode" | "onAddEmail"> & { email: Email }) {
   const keys = castKeys(node);
   const toValue = Array.isArray(email.to) ? email.to[0] ?? "" : email.to;
   const set = (p: Partial<Email>) => onUpdateEmail({ ...email, ...p });
 
   return (
     <div className="space-y-4">
+      <section className="space-y-3">
+        <StepTitle n={1} title="Write the email" note="Use normal email prose. Use date tokens only for dates." />
       <div className="flex items-center gap-2 text-xs text-slate-500">
         <span className="truncate font-medium text-slate-300">{email.subject || "(untitled email — set a subject below)"}</span>
         <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="corpus id — derived from the subject, used by dependency edges">{email.id}</span>
@@ -157,10 +170,29 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
       </label>
 
       <BodyEditor body={email.body} anchors={anchors} serveDate={serveDate} onChange={(body) => set({ body })} />
+      </section>
 
+      <section className="space-y-3">
+      <StepTitle n={2} title="Connect earlier facts" note="Only add a dependency if this email relies on a previous email." />
       <DependencyPicker email={email} allNodes={allNodes} onChange={(depends_on) => set({ depends_on })} />
+      </section>
 
+      <section className="space-y-3">
+      <StepTitle n={3} title="Tell the grader the perfect answer" note="This is the answer key, not text the model sees." />
       <AnswerKeyBuilder answer={email.answer} anchors={anchors} serveDate={serveDate} onChange={(answer) => set({ answer })} />
+      </section>
+    </div>
+  );
+}
+
+function StepTitle({ n, title, note }: { n: number; title: string; note: string }) {
+  return (
+    <div className="mb-3 flex items-start gap-2">
+      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-sky-600 text-xs font-semibold text-white">{n}</span>
+      <div>
+        <h2 className="text-sm font-semibold text-slate-100">{title}</h2>
+        <p className="text-xs text-slate-500">{note}</p>
+      </div>
     </div>
   );
 }

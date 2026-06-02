@@ -28,6 +28,7 @@ export default function Workspace() {
   const [serveDate, setServeDate] = useState("2026-06-01");
   const [view, setView] = useState<"editor" | "dag">("editor");
   const [loaded, setLoaded] = useState(false);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const lintTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const oracleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -68,7 +69,10 @@ export default function Workspace() {
 
   const persist = useCallback((node: CorpusNode) => {
     clearTimeout(saveTimers.current[node.id]);
-    saveTimers.current[node.id] = setTimeout(() => { saveNode(node).catch(() => {}); }, 500);
+    setSaveState("saving");
+    saveTimers.current[node.id] = setTimeout(() => {
+      saveNode(node).then(() => setSaveState("saved")).catch(() => setSaveState("error"));
+    }, 500);
   }, []);
 
   const updateNode = useCallback((updated: CorpusNode) => {
@@ -122,7 +126,7 @@ export default function Workspace() {
     const node = nodes.find((n) => n.id === nodeId); if (!node) return;
     let i = node.emails.length + 1; const ids = new Set(node.emails.map((e) => e.id));
     while (ids.has(`${nodeId}.e${i}`)) i++;
-    const email = EMPTY_EMAIL(`${nodeId}.e${i}`);
+    const email = { ...EMPTY_EMAIL(`${nodeId}.e${i}`), to: node.cast.CEO !== undefined ? "CEO" : "" };
     const updated = { ...node, emails: [...node.emails, email] };
     updateNode(updated); setSelEmail(email.id);
   }, [nodes, updateNode]);
@@ -167,20 +171,26 @@ export default function Workspace() {
 
   return (
     <div className="flex h-screen flex-col">
-      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-2">
-        <div className="flex items-center gap-3">
-          <h1 className="text-sm font-semibold">SecretaryBench · Corpus Authoring</h1>
+      <header className="flex flex-wrap items-center gap-3 border-b border-slate-800 bg-slate-900 px-4 py-2">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="min-w-0">
+            <h1 className="text-sm font-semibold">SecretaryBench authoring</h1>
+            <p className="hidden text-[11px] text-slate-500 md:block">Write emails, tell the grader the perfect action, then export when the bottom bar is green.</p>
+          </div>
           <div className="flex overflow-hidden rounded-md border border-slate-700 text-xs">
             <button onClick={() => setView("editor")} className={`px-3 py-1 ${view === "editor" ? "bg-sky-600 text-white" : "text-slate-300 hover:bg-slate-800"}`}>Editor</button>
             <button onClick={() => setView("dag")} className={`px-3 py-1 ${view === "dag" ? "bg-sky-600 text-white" : "text-slate-300 hover:bg-slate-800"}`}>DAG</button>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-xs text-slate-400">
+        <div className="ml-auto flex items-center gap-3 text-xs text-slate-400">
+          <span className={`hidden sm:inline ${saveState === "error" ? "text-rose-300" : saveState === "saving" ? "text-amber-300" : "text-slate-500"}`}>
+            {saveState === "saving" ? "saving…" : saveState === "saved" ? "autosaved" : saveState === "error" ? "save failed" : "autosaves"}
+          </span>
           <label className="flex items-center gap-1" title="A what-if: pretend this email arrived on this day, so the date chips show real dates while you author. It is NOT saved and does NOT change what you export — the real run picks its own send date.">
-            see dates as if sent
+            <span className="hidden md:inline">preview date</span>
             <input type="date" value={serveDate} onChange={(e) => setServeDate(e.target.value)} className="rounded border border-slate-700 bg-slate-800 px-2 py-0.5 text-slate-200" />
           </label>
-          <a href="/api/export" className="rounded-md border border-slate-700 px-3 py-1 text-slate-200 hover:bg-slate-800">Export corpus ⬇</a>
+          <a href="/api/export" className="rounded-md border border-emerald-700/70 bg-emerald-600/10 px-3 py-1.5 font-medium text-emerald-100 hover:bg-emerald-600/20" title="Export when the bottom validation bar says Ready for export.">Export corpus</a>
         </div>
       </header>
 
@@ -203,16 +213,30 @@ export default function Workspace() {
               key={`${node.id}/${email?.id ?? "node"}`}
               node={node} email={email} allNodes={nodes} anchors={anchors} serveDate={serveDate}
               onUpdateNode={updateNode} onRenameNode={renameNode}
+              onAddEmail={() => addEmail(node.id)}
               onUpdateEmail={(e) => updateEmail(node.id, e)}
               onAutoSlugEmail={(e) => autoSlugEmail(node.id, e)}
             />
           ) : (
-            <div className="grid h-full place-items-center text-slate-500">Pick or create a node to start.</div>
+            <StartEmpty onAddNode={addNode} />
           )}
         </main>
       </div>
 
       <ValidateBar lint={lint} oracle={oracle} />
+    </div>
+  );
+}
+
+function StartEmpty({ onAddNode }: { onAddNode: () => void }) {
+  return (
+    <div className="grid h-full place-items-center p-6">
+      <div className="max-w-md rounded-lg border border-slate-800 bg-slate-900/50 p-6 text-center">
+        <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">First step</p>
+        <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is just a folder for related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
+        <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
+      </div>
     </div>
   );
 }
