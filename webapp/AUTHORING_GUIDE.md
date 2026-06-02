@@ -265,7 +265,10 @@ Leave that box unticked and click **+ expected action**. You get a row with:
 - **title keywords** — comma-separated words that should appear in the title (e.g.
   `kickoff, planning`). The grader checks these loosely, so a couple of distinctive words
   is plenty.
-- **count** — how many of this action are expected (almost always `1`).
+- **count** — leave this blank in almost every case. The grader already expects **exactly
+  one** matching item (so a reschedule that leaves a stale duplicate fails on its own). Only
+  set `count` for the two exceptions: `0` ("this should be cancelled / must not exist") or a
+  specific number when an email genuinely asks for several.
 - **tolerance** — how exact the date must be. `exact_day` means the day must match; you can
   also allow slack like `within:2d`.
 

@@ -117,8 +117,9 @@ A date slot is matched by one of:
 | `in: <interval>, not_in: @anchor` | within a window, avoiding a blackout | the Tokyo case |
 | `any_of: [<expr>, …]` | matches any listed | "Mon, Tue, or Wed work" |
 
-(Cardinality lives in the static `count` field, not here.) `in`/`not_in`/`any_of` replace
-the old `or`-clause string hackery with clean set-membership.
+(Cardinality is **exactly one by default** — an obligation is a single thing. The static
+`count` field is only for exceptions: `0` = must not exist, `N` = genuinely several.)
+`in`/`not_in`/`any_of` replace the old `or`-clause string hackery with clean set-membership.
 
 ---
 
@@ -133,8 +134,8 @@ the old `or`-clause string hackery with clean set-membership.
       "action": "create_event",             // create_event | create_todo | reschedule | reply | delegate
       "title_match": ["kickoff"],           // static: keyword(s), case-insensitive
       "start": { "eq": "@signing+2w" },      // the only token-driven field (a DAY)
-      "count": 1,                            // static: exact cardinality for this action+title
       "tolerance": "exact_day"               // exact_day (default) | within:Nd
+      // cardinality defaults to exactly one — omit it. Set `count` only for 0 (cancel) or N.
     }
   ],
   "forbid": []                               // no-action emails: forbid all creates  [OPEN B2]
@@ -143,8 +144,9 @@ the old `or`-clause string hackery with clean set-membership.
 
 - **No-action email** → `expect: []`, `forbid` all creates. **[OPEN B2: any create = fail?]**
 - **Todo with deadline** → `action: create_todo`, `due: { "by": "{this:FRI}" }`.
-- `count` is **scoped to the entry's `action` + `title_match`** (e.g. "how many *board*
-  events"), never a global tally. This scoping is what makes reschedule/cancel gradeable.
+- Cardinality is **scoped to the entry's `action` + `title_match`** (e.g. "how many *board*
+  events"), never a global tally. The default is exactly one, which is what makes a
+  reschedule-that-left-a-duplicate fail; `count` is set only for `0` (cancel) or `N`.
 - **Reply / delegate** schemas still TBD. **[OPEN]**
 
 ### 5.1 Modify / reschedule / cancel
@@ -157,20 +159,20 @@ Express the *intended end state*, not the edit:
 // "Move the board meeting to the following Monday."
 { "email_id": "board-move",
   "expect": [ { "action": "create_event", "title_match": ["board"],
-               "start": { "eq": "{next:MON}" }, "count": 1 } ] }
-// count:1 catches the "created a new one but forgot to delete the old" failure —
-// without it, a double-booked calendar would pass.
+               "start": { "eq": "{next:MON}" } } ] }
+// The default exactly-one catches the "created a new one but forgot to delete the old"
+// failure — a double-booked calendar fails with no annotation.
 
 // "Push the board meeting back a week."  (email 1 emitted {!board = next:THU@14:00})
 { "expect": [ { "action": "create_event", "title_match": ["board"],
-               "start": { "eq": "@board+1w" }, "count": 1 } ] }
+               "start": { "eq": "@board+1w" } } ] }
 
-// "Cancel the board meeting."
+// "Cancel the board meeting."   count:0 is the one cardinality you still write.
 { "expect": [ { "action": "create_event", "title_match": ["board"], "count": 0 } ] }
 
 // "Keep the day, move 2pm → 4pm."   attach on a DATETIME overrides its time.
 { "expect": [ { "action": "create_event", "title_match": ["board"],
-               "start": { "eq": "@board@16:00" }, "count": 1 } ] }
+               "start": { "eq": "@board@16:00" } } ] }
 ```
 
 ---
@@ -215,8 +217,9 @@ matching events exist.
   `title_match`. Resolve date tokens against `(serve_date_of_that_email, anchor_table)` —
   **ground truth**, independent of the model's earlier actions.
 - Tokens resolve to a DATE (or INTERVAL) → **day equality**; `within:Nd` relaxes the window.
-- `count` → exact cardinality **within the entry's action + title_match** (over-creation,
-  double-booking, and "forgot to cancel" all fail). `count: 0` = must not exist.
+- Cardinality → **exactly one by default**, scoped to the entry's action + title_match
+  (over-creation, double-booking, and "forgot to cancel" all fail). Write `count` only to
+  override: `count: 0` = must not exist, `count: N` = exactly N.
 - Per-email result **binary** by default + a "right-action-wrong-day" diagnostic. **[OPEN B3]**
 
 ---
