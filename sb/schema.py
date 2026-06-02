@@ -78,6 +78,7 @@ class Email:
     body: str
     depends_on: list[Edge] = field(default_factory=list)
     answer: Answer = field(default_factory=Answer)
+    tier: str | None = None      # author-tagged difficulty T1|T2|T3, for score-by-tier reporting
 
     # derived
     emits: dict[str, str] = field(default_factory=dict)    # name -> expr (body + answer.emits + obligation anchors)
@@ -200,6 +201,7 @@ def _build_email(node_id: str, raw: dict) -> Email:
         body=body,
         depends_on=[_parse_edge(e) for e in raw.get("depends_on", [])],
         answer=answer,
+        tier=raw.get("tier"),
         emits=emits,
         anchor_refs=set(),     # computed in _recompute_refs after obligation wiring
     )

@@ -17,6 +17,8 @@ export interface Edge {
   type: EdgeType;
 }
 
+export type Tier = "T1" | "T2" | "T3";
+
 export interface Email {
   id: string;
   from: string; // cast key
@@ -25,6 +27,7 @@ export interface Email {
   body: string; // prose with {tokens}
   depends_on: Edge[];
   answer: Answer;
+  tier?: Tier; // author-tagged difficulty, for score-by-tier
 }
 
 export interface CorpusNode {
