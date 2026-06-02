@@ -11,6 +11,7 @@ interface Props {
   anchors: string[];
   serveDate: string;
   onUpdateNode: (node: CorpusNode) => void;
+  onRenameNode: (oldId: string, newId: string) => boolean;
   onUpdateEmail: (email: Email) => void;
 }
 
@@ -18,9 +19,16 @@ function castKeys(node: CorpusNode): string[] {
   return Object.keys(node.cast ?? {});
 }
 
-export default function EmailEditor({ node, email, allNodes, anchors, serveDate, onUpdateNode, onUpdateEmail }: Props) {
+export default function EmailEditor({ node, email, allNodes, anchors, serveDate, onUpdateNode, onRenameNode, onUpdateEmail }: Props) {
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-5">
+      <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+        Node id
+        <input key={node.id} defaultValue={node.id} spellCheck={false}
+          onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+          onBlur={(e) => { if (!onRenameNode(node.id, e.target.value)) e.target.value = node.id; }}
+          className="flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 font-mono text-sm normal-case tracking-normal text-slate-100" />
+      </label>
       <CastManager node={node} onUpdateNode={onUpdateNode} />
       {email ? (
         <EmailPanel node={node} email={email} allNodes={allNodes} anchors={anchors} serveDate={serveDate} onUpdateEmail={onUpdateEmail} />
@@ -70,7 +78,7 @@ function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (
   );
 }
 
-function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail }: Omit<Props, "onUpdateNode"> & { email: Email }) {
+function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail }: Omit<Props, "onUpdateNode" | "onRenameNode"> & { email: Email }) {
   const keys = castKeys(node);
   const toValue = Array.isArray(email.to) ? email.to[0] ?? "" : email.to;
   const set = (p: Partial<Email>) => onUpdateEmail({ ...email, ...p });

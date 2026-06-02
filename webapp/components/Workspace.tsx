@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
 import { anchorsInCorpus, normalizeAnswer } from "@/lib/grammar";
-import type { CorpusNode, Email, LintResult, OracleResult } from "@/lib/types";
+import type { CorpusNode, Edge, Email, LintResult, OracleResult } from "@/lib/types";
 import Sidebar from "./Sidebar";
 import EmailEditor from "./EmailEditor";
 import DagCanvas from "./DagCanvas";
@@ -95,6 +95,29 @@ export default function Workspace() {
     if (selEmail === emailId) setSelEmail(null);
   }, [nodes, updateNode, selEmail]);
 
+  // Rename = change the node id (the corpus PK). Re-prefix this node's emails that follow the
+  // `${oldId}.` convention, then rewrite every depends_on / node_depends_on edge across the whole
+  // corpus so cross-node references stay valid. Returns false (a no-op) on empty/collision so the
+  // input can snap back. New rows are saved, then the old id is dropped from the store.
+  const renameNode = useCallback((oldId: string, raw: string): boolean => {
+    const newId = raw.trim();
+    if (!newId || newId === oldId || nodes.some((n) => n.id === newId)) return false;
+    const target = nodes.find((n) => n.id === oldId);
+    const emailMap = new Map<string, string>();
+    for (const e of target?.emails ?? []) if (e.id.startsWith(`${oldId}.`)) emailMap.set(e.id, `${newId}.${e.id.slice(oldId.length + 1)}`);
+    const fixEdge = (d: Edge): Edge => ({ ...d, email: d.email ? emailMap.get(d.email) ?? d.email : d.email, node: d.node === oldId ? newId : d.node });
+    const next = nodes.map((n) => {
+      const base = { ...n, emails: n.emails.map((e) => ({ ...e, id: emailMap.get(e.id) ?? e.id, depends_on: e.depends_on.map(fixEdge) })), node_depends_on: n.node_depends_on?.map(fixEdge) };
+      return n.id === oldId ? { ...base, id: newId } : base;
+    });
+    setNodes(next);
+    for (const n of next) saveNode(n).catch(() => {});
+    apiDelete(oldId).catch(() => {});
+    if (selNode === oldId) setSelNode(newId);
+    if (selEmail && emailMap.has(selEmail)) setSelEmail(emailMap.get(selEmail)!);
+    return true;
+  }, [nodes, selNode, selEmail]);
+
   const removeNode = useCallback((nodeId: string) => {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
     apiDelete(nodeId).catch(() => {});
@@ -140,7 +163,7 @@ export default function Workspace() {
             <EmailEditor
               key={`${node.id}/${email?.id ?? "node"}`}
               node={node} email={email} allNodes={nodes} anchors={anchors} serveDate={serveDate}
-              onUpdateNode={updateNode}
+              onUpdateNode={updateNode} onRenameNode={renameNode}
               onUpdateEmail={(e) => updateEmail(node.id, e)}
             />
           ) : (
