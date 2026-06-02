@@ -2,21 +2,20 @@
 sb.scale — build a SCALED corpus to drive retrieval span, and measure it offline.
 
 The base corpus keeps every needed fact in context (see `python -m sb.span`), so a
-model never has to retrieve. This tool copies the real corpus into a build dir and
-injects a haystack of no-action FYI "filler" emails — the distractors that push
+model rarely has to retrieve. This tool copies the real corpus into a build dir and
+injects a haystack of no-action FYI "filler" emails — the distractors that push the
 facts out of context and that search_inbox must sift through.
 
-The DISCRIMINATING needles (an early email emitting a date anchor + a later payoff
-whose answer needs it with a far deadline) are hand-authored in corpus/ via the web
-app, NOT generated — templated needles don't separate models. So the default run is
-JUNK-ONLY (--needles 0): it buries the authored needles in haystack. --needles N>0
-additionally injects N generated needles per reasoning tier, for span experiments.
+The needles themselves are NOT made here. A needle is an authored pair already in
+corpus/: an early email that emits a date anchor ({!name = ...}) and a later email
+whose answer key needs that anchor (@name). This tool just slips filler BETWEEN them
+so the span (gap from setup to payoff) grows until the fact scrolls out of context.
+More --filler => larger span => more retrieval forced.
 
-Everything here is OFFLINE (no API calls): generate -> plan -> span -> oracle. The
-real corpus/ and the test suite are untouched (we build into build/scaled/).
+Everything here is OFFLINE (no API calls): copy -> filler -> plan -> span -> oracle.
+The real corpus/ and the test suite are untouched (we build into build/scaled/).
 
-    python -m sb.scale --filler 200 --seed 42      # junk-only: bury authored needles
-    python -m sb.scale --filler 120 --needles 8    # + generated needles (span study)
+    python -m sb.scale --filler 200 --seed 42      # bury the authored needles in junk
 """
 from __future__ import annotations
 
@@ -82,100 +81,10 @@ def _filler_node(n: int, rng: random.Random) -> dict:
     return {"id": "gen-filler", "cast": {"CEO": "you"}, "emails": emails}
 
 
-# Distinct, searchable topics; each keyword is a lowercased word that appears in
-# its topic phrase, so a natural event title ("Datacenter migration review") always
-# contains it (no "pentest" vs "pen test" false negatives).
-_TOPICS = [
-    ("datacenter migration", "migration"), ("vendor security audit", "audit"),
-    ("quarterly budget review", "budget"), ("office relocation", "relocation"),
-    ("brand relaunch", "relaunch"), ("payroll system cutover", "cutover"),
-    ("warehouse inventory count", "inventory"), ("board offsite", "offsite"),
-    ("compliance training rollout", "compliance"), ("CRM upgrade", "upgrade"),
-    ("supplier renegotiation", "supplier"), ("data retention purge", "retention"),
-    ("network failover drill", "failover"), ("benefits open enrollment", "enrollment"),
-    ("annual pricing reset", "pricing"), ("customer summit", "summit"),
-    ("warehouse lease signing", "lease"), ("API deprecation", "deprecation"),
-    ("security penetration test", "penetration"), ("fiscal year close", "fiscal"),
-    ("product launch", "launch"), ("hiring freeze review", "freeze"),
-    ("server decommission", "decommission"), ("tax filing", "tax"),
-    ("insurance renewal", "insurance"), ("trademark registration", "trademark"),
-    ("facilities inspection", "inspection"), ("disaster recovery test", "recovery"),
-    ("marketing campaign", "campaign"), ("sales conference", "conference"),
-    ("investor briefing", "investor"), ("patent review", "patent"),
-    ("logistics overhaul", "logistics"), ("onboarding revamp", "onboarding"),
-    ("procurement freeze", "procurement"), ("analytics rollout", "analytics"),
-    ("cloud migration", "cloud"), ("partnership signing", "partnership"),
-    ("audit remediation", "remediation"), ("capacity planning", "capacity"),
-]
-
-_TIER_NAME = {"T1": "simple-offset", "T2": "business-day",
-              "T3": "anchor-weekday", "T4": "multi-fact"}
-_NUM = {2: "two", 3: "three", 4: "four"}
-_TIERS = ["T1", "T2", "T3", "T4"]
-
-
-def _needle(tier: str, idx: int, topic: str, kw: str, rng: random.Random) -> tuple[dict, dict]:
-    """One needle node + its manifest entry. Every tier states the event DATE only
-    in the SETUP email; the payoff requires a computation the payoff email does NOT
-    spell out, so the model must retrieve the fact (high span) and reason:
-      T1 simple offset    -> @date + 1 week
-      T2 business-day     -> last business day before @date (crosses weekends)
-      T3 anchor-weekday   -> first Monday after @date (uses `next:MON from @date`)
-      T4 multi-fact       -> @date + an interval stated in a SEPARATE policy email
-    """
-    weeks = rng.choice([4, 5, 6, 7, 8, 9, 10])     # setup date offset -> varies span
-    anc = f"d{tier.lower()}{idx:02d}"
-    base = f"gen.needle.{tier.lower()}.{idx:02d}"
-    setup = {"id": f"{base}.setup", "from": "OPS", "to": "CEO",
-             "subject": f"{topic.capitalize()} date confirmed",
-             "body": f"For the record: the {topic} is scheduled for {{!{anc} = serve+{weeks}w}}. No action needed yet.",
-             "depends_on": [], "answer": {"expect": []}}
-    deps = [{"email": f"{base}.setup", "type": "date"}]
-    emails = [setup]
-
-    # `noun` is the distinctive action word in the payoff title; including it in
-    # title_match (alongside the topic kw) means the count:1 check matches only the
-    # payoff's event, not any stray event the model created from the setup announcement.
-    if tier == "T1":
-        instr, start, noun = f"Please put the {topic} review on the calendar for one week after the {topic}.", f"@{anc}+1w", "review"
-    elif tier == "T2":
-        instr, start, noun = f"Please put the {topic} go/no-go review on the calendar for the last business day before the {topic}.", f"@{anc}-1bd", "review"
-    elif tier == "T3":
-        instr, start, noun = f"Please put the {topic} kickoff on the calendar for the first Monday after the {topic}.", f"next:MON from @{anc}", "kickoff"
-    else:  # T4 — the interval lives in a SEPARATE policy email the model must also find
-        r = rng.choice([2, 3, 4])
-        emails.append({"id": f"{base}.policy", "from": "OPS", "to": "CEO",
-                       "subject": "Operations playbook reminder",
-                       "body": f"Reminder from the operations playbook: the retrospective for the {topic} is always held {_NUM[r]} weeks after the {topic} itself. Filing for reference; no action needed.",
-                       "depends_on": [], "answer": {"expect": []}})
-        deps.append({"email": f"{base}.policy", "type": "static"})
-        instr, start, noun = f"Please schedule the {topic} retrospective per the interval in the operations playbook.", f"@{anc}+{r}w", "retrospective"
-
-    emails.append({"id": f"{base}.payoff", "from": "OPS", "to": "CEO",
-                   "subject": f"{topic.capitalize()} follow-up", "body": instr,
-                   "depends_on": deps,
-                   "answer": {"expect": [{"action": "create_event", "title_match": [kw, noun],
-                                          "start": {"eq": start}, "count": 1}]}})
-    node = {"id": f"gen-needle-{tier.lower()}-{idx:02d}",
-            "cast": {"OPS": "Operations", "CEO": "you"}, "emails": emails}
-    entry = {"payoff_id": f"{base}.payoff", "reasoning_tier": tier,
-             "tier_name": _TIER_NAME[tier], "anchor": anc}
-    return node, entry
-
-
-def _needle_nodes(n_per_tier: int, rng: random.Random) -> tuple[list[dict], list[dict]]:
-    nodes, manifest, gid = [], [], 0
-    for tier in _TIERS:
-        for idx in range(n_per_tier):
-            topic, kw = _TOPICS[gid % len(_TOPICS)]
-            gid += 1
-            node, entry = _needle(tier, idx, topic, kw, rng)
-            nodes.append(node)
-            manifest.append(entry)
-    return nodes, manifest
-
-
-def build_scaled(dst: Path, n_filler: int, seed: int, n_per_tier: int = 8) -> None:
+def build_scaled(dst: Path, n_filler: int, seed: int) -> None:
+    """Copy the authored corpus into dst/ and add one node of n_filler junk emails.
+    The needles are whatever the authored corpus already contains; we only add the
+    haystack that spaces their setup and payoff apart."""
     nodes = dst / "nodes"
     if dst.exists():
         shutil.rmtree(dst)
@@ -184,35 +93,25 @@ def build_scaled(dst: Path, n_filler: int, seed: int, n_per_tier: int = 8) -> No
         shutil.copy(f, nodes / f.name)
     rng = random.Random(seed)
     (nodes / "gen_filler.json").write_text(json.dumps(_filler_node(n_filler, rng), indent=2))
-    needle_nodes, manifest = _needle_nodes(n_per_tier, rng)
-    for nd in needle_nodes:
-        (nodes / f"{nd['id'].replace('-', '_')}.json").write_text(json.dumps(nd, indent=2))
-    (dst / "needles.json").write_text(json.dumps(manifest, indent=2))
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--filler", type=int, default=120)
-    # Default 0: the discriminating needles are hand-authored in the corpus (via the
-    # web app), not generated. Generated needles are templated and don't separate
-    # models, so the production use of this tool is junk-only — bury the real,
-    # authored needles in haystack. Pass --needles N>0 only for span experiments.
-    ap.add_argument("--needles", type=int, default=0, help="GENERATED needles per reasoning tier (x4); 0 = junk-only around the authored corpus")
+    ap.add_argument("--filler", type=int, default=120, help="no-action junk emails to bury the authored needles under")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--days", type=int, default=200)
     ap.add_argument("--dst", default="build/scaled")
     a = ap.parse_args()
 
     dst = REPO / a.dst
-    build_scaled(dst, a.filler, a.seed, a.needles)
+    build_scaled(dst, a.filler, a.seed)
     corpus = load_corpus(str(dst))
     plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=a.seed, n_days=a.days)
     served = [e for b in plan.per_day for e in b]
 
     recs = sorted(spans(corpus, plan), key=lambda r: r["email_span"], reverse=True)
     print(f"\nscaled corpus: {len(corpus.emails)} emails, {len(served)} served over {plan.n_days} days")
-    kind = f"{a.needles} per tier x4 ({', '.join(_TIERS)})" if a.needles else "0 generated — burying the authored corpus needles in junk"
-    print(f"needles: {kind}")
+    print(f"filler: {a.filler} junk emails burying {len(recs)} authored needle(s)")
     es = [r["email_span"] for r in recs]
     if es:
         print(f"needle span: max {max(es)}, mean {sum(es)/len(es):.1f}  (n={len(es)})")
