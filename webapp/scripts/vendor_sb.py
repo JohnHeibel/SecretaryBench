@@ -45,6 +45,59 @@ def snapshot_corpus() -> int:
     return len(nodes)
 
 
+GEN_TS = WEBAPP / "lib" / "schema.generated.ts"
+
+
+def generate_ts_types() -> None:
+    """Emit lib/schema.generated.ts from sb.schema's grammar constants, so the answer-key
+    types the editor uses cannot drift from the grammar the grader enforces (the ADR-0001
+    bug, where the UI kept the dead expect/forbid model while the backend moved to ops/verbs).
+    Reads the VENDORED copy (always present after the copy/fallback in main), and is
+    deterministic so the committed file stays diff-clean. A build never fails on codegen — if
+    sb can't be imported we keep the committed file and warn."""
+    try:
+        sys.path.insert(0, str(DST.parent))            # api/_lib, so `import sb.schema` resolves
+        import importlib
+        schema = importlib.import_module("sb.schema")
+        importlib.reload(schema)
+        union = lambda vals: " | ".join(f'"{v}"' for v in vals)
+        verb_keys = "\n".join(f"  {v}?: string;" for v in schema.VERB_ORDER)
+        pred_keys = "\n".join(f"  {k}?: {'string[]' if k == 'any_of' else 'string'};" for k in schema.PREDICATE_OPS)
+        ts = f'''// AUTO-GENERATED from sb/schema.py by scripts/vendor_sb.py — DO NOT EDIT BY HAND.
+// Regenerated on every `npm run vendor` / `npm run build`. To change the answer-key grammar,
+// edit the Python grammar lists (VERB_ORDER / KIND_ORDER / EDGE_ORDER / PREDICATE_OPS) and
+// rebuild; the editor then fails typecheck if it still uses a field the grammar dropped.
+
+export type Verb = {union(schema.VERB_ORDER)};
+export type ObjKind = {union(schema.KIND_ORDER)};
+export type EdgeType = {union(schema.EDGE_ORDER)};
+
+// Date predicate over an answer-key slot. Exactly one key is set; any_of takes a list.
+export interface Predicate {{
+{pred_keys}
+}}
+
+// One verb on a named obligation. Serializes 1:1 to corpus JSON: the verb is the KEY and its
+// value is the obligation name, e.g. {{ "create": "kickoff", "kind": "event", "on": {{...}} }}.
+export interface Op {{
+{verb_keys}
+  kind?: ObjKind;
+  on?: Predicate;
+  match?: string[];
+  tolerance?: string;
+}}
+
+export interface Answer {{
+  ops: Op[];
+  emits?: Record<string, string>;
+}}
+'''
+        GEN_TS.write_text(ts)
+        print(f"generated {GEN_TS.relative_to(WEBAPP)} from sb.schema")
+    except Exception as exc:                            # never block a build on codegen
+        print(f"WARN: could not regenerate {GEN_TS.name} ({exc}); keeping committed copy")
+
+
 def check() -> int:
     """Anti-drift gate: fail (nonzero) if the vendored copy differs from sb/. The
     whole app exists to validate with the SAME code the grader uses, so a stale
@@ -70,6 +123,7 @@ def main() -> None:
             raise SystemExit(f"cannot find sb/ at {SRC} and the vendored copy is incomplete "
                              f"(missing: {missing or ['seed/nodes.json']}) — run `npm run vendor` from a full checkout")
         print(f"sb/ not present (archive deploy) — using the pre-vendored {len(MODULES)} modules + seed already in webapp/")
+        generate_ts_types()
         return
     DST.mkdir(parents=True, exist_ok=True)
     for name in MODULES:
@@ -79,6 +133,7 @@ def main() -> None:
         shutil.copy2(src, DST / name)
     n = snapshot_corpus()
     print(f"vendored {len(MODULES)} sb modules -> {DST.relative_to(REPO)}; seeded {n} nodes -> {SEED.relative_to(REPO)}")
+    generate_ts_types()
 
 
 if __name__ == "__main__":

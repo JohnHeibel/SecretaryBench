@@ -26,10 +26,17 @@ _ANCHOR_REF_RE = re.compile(r"@([A-Za-z_][A-Za-z0-9_]*)")
 _EMIT_IN_BODY_RE = re.compile(r"\{\s*!\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^{}]*)\}")
 _TOKEN_RE = re.compile(r"\{([^{}]*)\}")
 
-VERBS = {"create", "move", "cancel"}
-OBJ_KINDS = {"event", "todo"}
-EDGE_TYPES = {"static", "date"}
-_PREDICATE_KEYS = {"eq", "by", "in", "not_in", "any_of", "start"}
+# Canonical ordered grammar lists — the SINGLE source both the parser below and the
+# webapp's generated TS types (scripts/vendor_sb.py -> lib/schema.generated.ts) read, so the
+# editor's shape can't drift from what the grader accepts. Sets are kept for membership.
+VERB_ORDER = ("create", "move", "cancel")
+KIND_ORDER = ("event", "todo")
+EDGE_ORDER = ("static", "date")
+PREDICATE_OPS = ("eq", "by", "in", "not_in", "any_of")   # author-facing date predicate keys
+VERBS = set(VERB_ORDER)
+OBJ_KINDS = set(KIND_ORDER)
+EDGE_TYPES = set(EDGE_ORDER)
+_PREDICATE_KEYS = set(PREDICATE_OPS) | {"start"}         # "start" is an internal emission alias
 
 
 class CorpusError(ValueError):
@@ -120,7 +127,7 @@ def _parse_edge(raw: dict) -> Edge:
 
 
 def _parse_op(raw: dict) -> Op:
-    verbs_present = [v for v in ("create", "move", "cancel") if v in raw]
+    verbs_present = [v for v in VERB_ORDER if v in raw]
     if len(verbs_present) != 1:
         raise CorpusError(f"op must have exactly one of create/move/cancel: {raw!r}")
     verb = verbs_present[0]
