@@ -15,7 +15,9 @@ if _LIB not in sys.path:
 
 # Cap request bodies so an oversized payload can't be read wholesale into memory
 # (defense-in-depth: these functions are passcode-gated, but the solver is CPU-heavy).
-_MAX_BODY = 2 * 1024 * 1024  # 2 MB — a corpus of authored emails is far smaller
+# Sized just under Vercel's ~4.5 MB function-payload limit so a large SCALED corpus
+# (needles buried in a long-filler haystack) still fits the in-memory oracle path.
+_MAX_BODY = 4 * 1024 * 1024  # 4 MB
 
 
 class RequestTooLarge(ValueError):
