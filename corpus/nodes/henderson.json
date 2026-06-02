@@ -13,7 +13,7 @@
       "subject": "Henderson acquisition — moving forward",
       "body": "Hi — just a heads up that we're moving forward on the Henderson acquisition. Paperwork and dates to follow shortly. Nothing needed from you yet.",
       "depends_on": [],
-      "answer": { "expect": [] }
+      "answer": { "ops": [] }
     },
     {
       "id": "henderson.signing",
@@ -23,13 +23,8 @@
       "body": "The Henderson contract signing is locked for {!signing = serve+5d}. Please put it on Marcus's calendar.",
       "depends_on": [ { "email": "henderson.intro", "type": "static" } ],
       "answer": {
-        "expect": [
-          {
-            "action": "create_event",
-            "title_match": ["signing"],
-            "start": { "eq": "@signing" },
-            "tolerance": "exact_day"
-          }
+        "ops": [
+          { "create": "signing", "kind": "event", "on": { "eq": "@signing" } }
         ]
       }
     },
@@ -41,12 +36,8 @@
       "body": "Once Henderson signs, get the project kickoff on the calendar for two weeks after the signing.",
       "depends_on": [ { "email": "henderson.signing", "type": "date" } ],
       "answer": {
-        "expect": [
-          {
-            "action": "create_event",
-            "title_match": ["kickoff"],
-            "start": { "eq": "@signing+2w" }
-          }
+        "ops": [
+          { "create": "kickoff", "kind": "event", "on": { "eq": "@signing+2w" } }
         ]
       }
     }

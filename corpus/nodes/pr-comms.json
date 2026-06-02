@@ -13,12 +13,8 @@
       "body": "The Globex announcement embargo lifts the morning after we sign. Put 'Press release goes live' on the calendar for that day.",
       "depends_on": [ { "email": "globex.loi", "type": "date" } ],
       "answer": {
-        "expect": [
-          {
-            "action": "create_event",
-            "title_match": ["press"],
-            "start": { "eq": "@globex_signing+1d" }
-          }
+        "ops": [
+          { "create": "press", "kind": "event", "on": { "eq": "@globex_signing+1d" } }
         ]
       }
     }

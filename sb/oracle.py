@@ -15,7 +15,7 @@ from datetime import datetime, time
 
 from sb.engine import Store
 from sb.resolver import Context, Interval, Value, resolve
-from sb.schema import Email
+from sb.schema import Email, Op
 
 
 def _target(predicate: dict, ctx: Context) -> Value:
@@ -40,30 +40,32 @@ def _as_dt(v: Value, default_hour: int) -> datetime:
 
 
 def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -> None:
-    ans = email.answer
-    if not ans.expect and not ans.forbid:
-        return  # correctly take no action
+    for op in email.answer.ops:
+        title = " ".join(op.match) if op.match else op.name
 
-    for entry in ans.expect:
-        # title must contain ALL match keywords (the grader requires all of them)
-        title = " ".join(entry.title_match) if entry.title_match else "task"
+        if op.verb == "cancel":
+            while (oid := store.find_in_node(email.node, op.kind, title)) is not None:
+                store.delete(oid)
+            continue
 
-        if entry.action in ("create_event", "reschedule"):
-            if entry.count == 0:  # cancellation
-                while (oid := store.find_in_node(email.node, "event", title)) is not None:
-                    store.delete(oid)
-                continue
-            start = _as_dt(_target(entry.start, ctx), 9)   # default 9am; only the DAY is graded
-            existing = store.find_in_node(email.node, "event", title)
-            if existing is not None:                      # reschedule in place
-                store.update_event(existing, start=start)
+        when = _as_dt(_target(op.on, ctx), 9 if op.kind == "event" else 17)
+        existing = store.find_in_node(email.node, op.kind, title)
+
+        if op.verb == "move":
+            # reschedule in place so the obligation stays a single object
+            if existing is not None and op.kind == "event":
+                store.update_event(existing, start=when)
+            elif existing is not None:
+                store.delete(existing)
+                store.create_todo(email.id, title, when)
             else:
-                store.create_event(email.id, title, start)
+                _create(store, email.id, op.kind, title, when)
+        else:  # create
+            _create(store, email.id, op.kind, title, when)
 
-        elif entry.action == "create_todo":
-            if entry.count == 0:
-                while (oid := store.find_in_node(email.node, "todo", title)) is not None:
-                    store.delete(oid)
-                continue
-            due = _as_dt(_target(entry.due or entry.start, ctx), 17)
-            store.create_todo(email.id, title, due)
+
+def _create(store: Store, email_id: str, kind: str, title: str, when: datetime) -> None:
+    if kind == "event":
+        store.create_event(email_id, title, when)
+    else:
+        store.create_todo(email_id, title, when)

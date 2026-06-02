@@ -50,8 +50,8 @@ def test_cycle_rejected(tmp_path):
     _write_node(tmp_path, "n", {
         "id": "n",
         "emails": [
-            {"id": "n.a", "depends_on": [{"email": "n.b", "type": "static"}], "answer": {"expect": []}},
-            {"id": "n.b", "depends_on": [{"email": "n.a", "type": "static"}], "answer": {"expect": []}},
+            {"id": "n.a", "depends_on": [{"email": "n.b", "type": "static"}], "answer": {"ops": []}},
+            {"id": "n.b", "depends_on": [{"email": "n.a", "type": "static"}], "answer": {"ops": []}},
         ],
     })
     with pytest.raises(CorpusError, match="cycle"):
@@ -63,7 +63,7 @@ def test_undefined_anchor_rejected(tmp_path):
         "id": "n",
         "emails": [
             {"id": "n.a", "body": "meet on {@ghost+1d}", "depends_on": [],
-             "answer": {"expect": []}},
+             "answer": {"ops": []}},
         ],
     })
     with pytest.raises(CorpusError, match="undefined anchor"):
@@ -75,10 +75,10 @@ def test_anchor_without_date_edge_rejected(tmp_path):
     _write_node(tmp_path, "n", {
         "id": "n",
         "emails": [
-            {"id": "n.a", "body": "set {!x = serve+3d}", "depends_on": [], "answer": {"expect": []}},
+            {"id": "n.a", "body": "set {!x = serve+3d}", "depends_on": [], "answer": {"ops": []}},
             {"id": "n.b", "depends_on": [{"email": "n.a", "type": "static"}],
-             "answer": {"expect": [
-                 {"action": "create_event", "title_match": ["k"], "start": {"eq": "@x+1w"}}]}},
+             "answer": {"ops": [
+                 {"create": "k", "kind": "event", "on": {"eq": "@x+1w"}}]}},
         ],
     })
     with pytest.raises(CorpusError, match="serve-by window"):
@@ -89,11 +89,29 @@ def test_anchor_in_answer_with_date_edge_ok(tmp_path):
     _write_node(tmp_path, "n", {
         "id": "n",
         "emails": [
-            {"id": "n.a", "body": "set {!x = serve+3d}", "depends_on": [], "answer": {"expect": []}},
+            {"id": "n.a", "body": "set {!x = serve+3d}", "depends_on": [], "answer": {"ops": []}},
             {"id": "n.b", "depends_on": [{"email": "n.a", "type": "date"}],
-             "answer": {"expect": [
-                 {"action": "create_event", "title_match": ["k"], "start": {"eq": "@x+1w"}}]}},
+             "answer": {"ops": [
+                 {"create": "k", "kind": "event", "on": {"eq": "@x+1w"}}]}},
         ],
     })
     c = load_corpus(tmp_path)
     assert c.emission_map["x"] == "n.a"
+
+
+def test_move_derives_edge_to_creator(tmp_path):
+    # a move references its obligation by name; the dependency edge auto-derives.
+    _write_node(tmp_path, "n", {
+        "id": "n",
+        "emails": [
+            {"id": "n.make", "depends_on": [],
+             "answer": {"ops": [{"create": "call", "kind": "event", "on": {"eq": "next:THU"}}]}},
+            {"id": "n.move", "depends_on": [],
+             "answer": {"ops": [{"move": "call", "on": {"eq": "next:MON"}}]}},
+        ],
+    })
+    c = load_corpus(tmp_path)
+    # no explicit depends_on, yet n.move must follow n.make
+    assert any(d.email == "n.make" for d in c.emails["n.move"].depends_on)
+    order = c.topo_order()
+    assert order.index("n.make") < order.index("n.move")

@@ -17,23 +17,22 @@ START = date(2026, 6, 1)
 def imperfect_model(email: Email, rendered: str, ctx: Context, store: Store) -> None:
     """A plausible-but-wrong model:
       - over-acts on no-action mail (creates a stray todo on every FYI)
-      - 'reschedules' by creating a second event instead of moving the first,
-        so any move leaves a duplicate (more than the expected single event)
+      - 'moves' by creating a second object instead of moving the first,
+        so any move leaves a duplicate (more than the expected single object)
     """
-    ans = email.answer
-    if not ans.expect and not ans.forbid:
+    ops = email.answer.ops
+    if not ops:
         store.create_todo(email.id, "follow up", _as_dt(ctx.serve, 17))   # over-action
         return
-    for e in ans.expect:
-        title = e.title_match[0] if e.title_match else "task"
-        if e.action in ("create_event", "reschedule"):
-            if e.count == 0:
-                continue
-            start = _as_dt(_target(e.start, ctx), 9)
-            store.create_event(email.id, title, start)   # always creates -> double-books on a move
-        elif e.action == "create_todo":
-            due = _as_dt(_target(e.due or e.start, ctx), 17)
-            store.create_todo(email.id, title, due)
+    for op in ops:
+        title = " ".join(op.match) if op.match else op.name
+        if op.verb == "cancel":
+            continue                                       # never cancels -> leaves the object
+        when = _as_dt(_target(op.on, ctx), 9 if op.kind == "event" else 17)
+        if op.kind == "event":
+            store.create_event(email.id, title, when)      # always creates -> double-books on a move
+        else:
+            store.create_todo(email.id, title, when)
 
 
 def _run(model):

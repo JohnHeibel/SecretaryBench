@@ -5,14 +5,23 @@ Grades one email against its answer key by inspecting the calendar/todo STATE
 (not the model's edit), so a reschedule done as update-in-place and one done as
 delete-then-recreate score identically (ANSWER_KEY_GRAMMAR.md §8).
 
+The answer key is a list of `ops` (create / move / cancel) on named obligations.
+Grading reconciles each obligation against the cumulative node state:
+
+  - create / move : exactly ONE object matching the obligation, on the right day.
+                    Uniqueness is inherent to an obligation, so a reschedule that
+                    leaves a stale duplicate fails (the old `count: 1` job).
+  - cancel        : NO object matching the obligation may survive.
+  - no ops        : a no-action / FYI / bait email — the turn must create nothing.
+                    (Per-email until the day-loop lands; ADR 0001 stage note.)
+
 Inputs per email:
-  - answer:   the Answer (expect / forbid / emits)
+  - answer:   the Answer (ops)
   - ctx:      resolver.Context (this email's serve date + the live anchor table)
   - state:    NodeState — cumulative objects belonging to this email's NODE
-  - turn:     TurnDelta — objects CREATED during this email's turn (for forbid / no-action)
+  - turn:     TurnDelta — objects CREATED during this email's turn (for no-action)
 
-Output: EmailResult(passed, max=1, details[]). Binary per email, with a
-"right-action-wrong-time" flag surfaced in details for error analysis (B3).
+Output: EmailResult(passed, max=1, details[]). Binary per email.
 """
 from __future__ import annotations
 
@@ -22,7 +31,7 @@ from typing import Optional
 
 from sb import resolver
 from sb.resolver import Context, Interval, Value
-from sb.schema import Answer, ExpectEntry, ForbidEntry
+from sb.schema import Answer, Op
 
 
 @dataclass
@@ -54,9 +63,6 @@ class EmailResult:
     max: int
     details: list[dict] = field(default_factory=list)
     headline: str = ""
-
-
-_EVENT_ACTIONS = {"create_event", "reschedule"}
 
 
 def _title_hit(obj: Obj, keywords: list[str]) -> bool:
@@ -140,67 +146,45 @@ def _describe_predicate(predicate: Optional[dict], ctx: Context) -> str:
     return "(any time)"
 
 
-def _grade_expect(entry: ExpectEntry, ctx: Context, state: NodeState) -> dict:
-    kind = "event" if entry.action in _EVENT_ACTIONS else "to-do"
-    pool = state.events if entry.action in _EVENT_ACTIONS else state.todos
-    title_set = [o for o in pool if _title_hit(o, entry.title_match)]
-    predicate = entry.start if entry.action in _EVENT_ACTIONS else (entry.due or entry.start)
+def _grade_op(op: Op, ctx: Context, state: NodeState) -> dict:
+    obj_word = "event" if op.kind == "event" else "to-do"
+    pool = state.events if op.kind == "event" else state.todos
+    title_set = [o for o in pool if _title_hit(o, op.match)]
+    kw = "/".join(op.match) or op.name
 
-    def date_ok(o: Obj) -> bool:
-        return _predicate_ok(o, predicate, ctx, entry.tolerance)
+    if op.verb == "cancel":
+        passed = len(title_set) == 0
+        actual = "; ".join(_fmt_obj(o) for o in title_set) if title_set else "(nothing — cancelled)"
+        reason = "cancelled" if passed else f"should be cancelled, but {len(title_set)} still on the calendar"
+        return {"passed": passed, "label": f"cancel ~{kw}",
+                "expected": f'{obj_word} ~"{kw}" cancelled', "actual": actual, "reason": reason}
 
-    matched = [o for o in title_set if date_ok(o)]
-    # Cardinality defaults to exactly one: an obligation is a single thing, so a
-    # reschedule that leaves a stale duplicate fails with no annotation. Authors set
-    # `count` only for the exceptions — 0 (must be cancelled) or N (genuinely several).
-    want = entry.count if entry.count is not None else 1
-    count_ok = len(title_set) == want
-    passed = count_ok and len(matched) >= want
+    # create / move: exactly one object matching the obligation, on the right day.
+    matched = [o for o in title_set if _predicate_ok(o, op.on, ctx, op.tolerance)]
+    count_ok = len(title_set) == 1
+    passed = count_ok and len(matched) >= 1
 
-    kw = "/".join(entry.title_match) or "any"
-    expected = f'{kind} ~"{kw}" @ {_describe_predicate(predicate, ctx)}'
-    if want != 1:
-        expected += f" · exactly {want}"
-
+    expected = f'{obj_word} ~"{kw}" @ {_describe_predicate(op.on, ctx)}'
     actual = "; ".join(_fmt_obj(o) for o in title_set) if title_set else "(nothing matching created)"
 
     if passed:
         reason = "matched"
-    elif want == 0:
-        reason = f"should be cancelled, but {len(title_set)} still on the calendar"
     elif not title_set:
-        reason = f'no {kind} titled like "{kw}" was created'
+        reason = f'no {obj_word} titled like "{kw}" was {"moved" if op.verb == "move" else "created"}'
     elif not count_ok:
-        extra = " (duplicate / double-booked)" if len(title_set) > want else ""
-        reason = f"created {len(title_set)}, expected exactly {want}{extra}"
-    elif not any(date_ok(o) for o in title_set):
-        reason = "created, but on the wrong day"
+        reason = f"found {len(title_set)} matching, expected exactly 1 (duplicate / double-booked)"
+    elif not matched:
+        reason = "on the wrong day"
     else:
         reason = "did not match the expected action"
 
-    return {"passed": passed, "label": f"{kind} ~{kw}",
+    return {"passed": passed, "label": f"{op.verb} ~{kw}",
             "expected": expected, "actual": actual, "reason": reason}
 
 
-def _grade_forbid(entry: ForbidEntry, turn: TurnDelta) -> dict:
-    objs: list[Obj] = []
-    if entry.action is None or entry.action in _EVENT_ACTIONS:
-        objs += turn.events
-    if entry.action is None or entry.action == "create_todo":
-        objs += turn.todos
-    if entry.title_match:
-        objs = [o for o in objs if _title_hit(o, entry.title_match)]
-    passed = len(objs) == 0
-    what = entry.action or "any action"
-    return {"passed": passed, "label": f"forbid {what}",
-            "expected": f"do NOT {what}",
-            "actual": "; ".join(_fmt_obj(o) for o in objs) if objs else "(nothing)",
-            "reason": "respected" if passed else f"created {len(objs)} forbidden object(s)"}
-
-
 def grade_email(answer: Answer, ctx: Context, state: NodeState, turn: TurnDelta) -> EmailResult:
-    # No-action email: empty expect AND empty forbid means "do nothing this turn".
-    if not answer.expect and not answer.forbid:
+    # No-action email: no ops means "do nothing this turn" (FYI / bait / no scheduling).
+    if not answer.ops:
         created = turn.events + turn.todos
         passed = not created
         actual = "; ".join(_fmt_obj(o) for o in created) if created else "(nothing)"
@@ -210,8 +194,7 @@ def grade_email(answer: Answer, ctx: Context, state: NodeState, turn: TurnDelta)
             "expected": "take no action (FYI / no scheduling needed)",
             "actual": actual, "reason": reason}])
 
-    details = [_grade_expect(e, ctx, state) for e in answer.expect]
-    details += [_grade_forbid(f, turn) for f in answer.forbid]
+    details = [_grade_op(op, ctx, state) for op in answer.ops]
     passed = all(d["passed"] for d in details)
     if passed:
         headline = "; ".join(d["expected"] for d in details)

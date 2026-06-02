@@ -14,7 +14,7 @@
       "subject": "Globex LOI executed",
       "body": "Quick update: we executed the Globex letter of intent this morning. The definitive signing is now locked in for {!globex_signing = serve+2w}. Nothing to action yet — I'll send the diligence and post-close logistics as we get closer.",
       "depends_on": [],
-      "answer": { "expect": [] }
+      "answer": { "ops": [] }
     },
     {
       "id": "globex.diligence",
@@ -24,12 +24,8 @@
       "body": "Before we sign I need a final diligence review on the calendar for the last business day before the signing — it's our go / no-go.",
       "depends_on": [ { "email": "globex.loi", "type": "date" } ],
       "answer": {
-        "expect": [
-          {
-            "action": "create_event",
-            "title_match": ["diligence"],
-            "start": { "eq": "@globex_signing-1bd" }
-          }
+        "ops": [
+          { "create": "diligence", "kind": "event", "on": { "eq": "@globex_signing-1bd" } }
         ]
       }
     },
@@ -41,12 +37,8 @@
       "body": "Assuming we sign, get the integration kickoff on the books for ten business days after the signing.",
       "depends_on": [ { "email": "globex.loi", "type": "date" } ],
       "answer": {
-        "expect": [
-          {
-            "action": "create_event",
-            "title_match": ["kickoff"],
-            "start": { "eq": "@globex_signing+10bd" }
-          }
+        "ops": [
+          { "create": "kickoff", "kind": "event", "on": { "eq": "@globex_signing+10bd" } }
         ]
       }
     },
@@ -56,14 +48,10 @@
       "to": "CEO",
       "subject": "Re: Integration kickoff",
       "body": "Change of plans — push the integration kickoff back by three more business days.",
-      "depends_on": [ { "email": "globex.kickoff", "type": "date" } ],
+      "depends_on": [],
       "answer": {
-        "expect": [
-          {
-            "action": "create_event",
-            "title_match": ["kickoff"],
-            "start": { "eq": "@globex_signing+10bd+3bd" }
-          }
+        "ops": [
+          { "move": "kickoff", "on": { "eq": "@kickoff+3bd" } }
         ]
       }
     },
@@ -74,7 +62,7 @@
       "subject": "Visitor lot repaving",
       "body": "Heads up: the HQ visitor lot will be repaved {week_of:(serve+1w)}. Please use the parking garage that week. No meeting changes are needed on your end.",
       "depends_on": [],
-      "answer": { "expect": [] }
+      "answer": { "ops": [] }
     },
     {
       "id": "globex.filing",
@@ -84,12 +72,8 @@
       "body": "Post-close housekeeping: we must file the HSR notification within five business days of the signing. Please add it as a task so it doesn't slip.",
       "depends_on": [ { "email": "globex.loi", "type": "date" } ],
       "answer": {
-        "expect": [
-          {
-            "action": "create_todo",
-            "title_match": ["HSR"],
-            "due": { "by": "@globex_signing+5bd" }
-          }
+        "ops": [
+          { "create": "HSR", "kind": "todo", "on": { "by": "@globex_signing+5bd" } }
         ]
       }
     }

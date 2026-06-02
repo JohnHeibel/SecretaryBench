@@ -4,8 +4,13 @@ sb.schema — the corpus data model, JSON loader, and linter.
 A corpus is a set of node files (corpus/nodes/*.json). A node groups emails that
 share a cast and emitted anchors, but all scheduling is computed from a single
 FLAT email-level DAG (see SERVING_AND_SCHEMA.md §0). This module loads the files,
-flattens node-level sugar into email edges, derives the anchor emission map, and
-lints the result (acyclic, anchors reachable, every token parses).
+flattens node-level sugar into email edges, wires up obligations, derives the
+anchor emission map, and lints the result (acyclic, anchors reachable, tokens parse).
+
+Answer keys are VERB-based (ADR 0001): an email's answer is a list of `ops`, each a
+`create` / `move` / `cancel` on a NAMED obligation. The name is the obligation's
+identity AND a node-scoped anchor — so a later `move`/`cancel` references it by name,
+its dependency edge derives, and its date is reusable as `@name`. No `count` field.
 """
 from __future__ import annotations
 
@@ -21,8 +26,10 @@ _ANCHOR_REF_RE = re.compile(r"@([A-Za-z_][A-Za-z0-9_]*)")
 _EMIT_IN_BODY_RE = re.compile(r"\{\s*!\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^{}]*)\}")
 _TOKEN_RE = re.compile(r"\{([^{}]*)\}")
 
-VALID_ACTIONS = {"create_event", "create_todo", "reschedule", "reply", "delegate"}
+VERBS = {"create", "move", "cancel"}
+OBJ_KINDS = {"event", "todo"}
 EDGE_TYPES = {"static", "date"}
+_PREDICATE_KEYS = {"eq", "by", "in", "not_in", "any_of", "start"}
 
 
 class CorpusError(ValueError):
@@ -36,26 +43,21 @@ class Edge:
 
 
 @dataclass
-class ExpectEntry:
-    action: str
-    title_match: list[str] = field(default_factory=list)
-    start: Optional[dict] = None          # predicate: {"eq"|"in"|"by"|"any_of"|"not_in": expr}
-    due: Optional[dict] = None            # predicate (todos)
-    count: Optional[int] = None
-    tolerance: str = "exact_day"          # exact_day | within:Nd  (whole-day granularity)
-    recurrence: Optional[dict] = None
-
-
-@dataclass
-class ForbidEntry:
-    action: Optional[str] = None          # None = any action
-    title_match: list[str] = field(default_factory=list)
+class Op:
+    """One verb on a named obligation. The name is the obligation's identity and a
+    node-scoped anchor; `match` is the fuzzy title keyword set the grader uses to
+    tie the model's calendar object to this obligation (defaults to [name])."""
+    verb: str                                   # "create" | "move" | "cancel"
+    name: str                                   # obligation identity (also a @name anchor)
+    kind: Optional[str] = None                  # "event" | "todo" (set on create; filled in for move/cancel)
+    match: list[str] = field(default_factory=list)   # title keywords; defaults to [name]
+    on: Optional[dict] = None                   # date predicate {"eq"|"by"|"in"|"any_of"|"not_in": expr}
+    tolerance: str = "exact_day"                # exact_day | within:Nd  (whole-day granularity)
 
 
 @dataclass
 class Answer:
-    expect: list[ExpectEntry] = field(default_factory=list)
-    forbid: list[ForbidEntry] = field(default_factory=list)
+    ops: list[Op] = field(default_factory=list)
     emits: dict[str, str] = field(default_factory=dict)   # name -> expr (explicit, non-rendered)
 
 
@@ -71,7 +73,7 @@ class Email:
     answer: Answer = field(default_factory=Answer)
 
     # derived
-    emits: dict[str, str] = field(default_factory=dict)    # name -> expr (body + answer.emits)
+    emits: dict[str, str] = field(default_factory=dict)    # name -> expr (body + answer.emits + obligation anchors)
     anchor_refs: set[str] = field(default_factory=set)
 
 
@@ -117,48 +119,59 @@ def _parse_edge(raw: dict) -> Edge:
     raise CorpusError(f"edge missing 'email' or 'node': {raw!r}")
 
 
-def _parse_expect(raw: dict) -> ExpectEntry:
-    action = raw.get("action")
-    if action not in VALID_ACTIONS:
-        raise CorpusError(f"bad action {action!r} (expected one of {sorted(VALID_ACTIONS)})")
-    return ExpectEntry(
-        action=action,
-        title_match=list(raw.get("title_match", [])),
-        start=raw.get("start"),
-        due=raw.get("due"),
-        count=raw.get("count"),
-        tolerance=raw.get("tolerance", "exact_day"),
-        recurrence=raw.get("recurrence"),
-    )
+def _parse_op(raw: dict) -> Op:
+    verbs_present = [v for v in ("create", "move", "cancel") if v in raw]
+    if len(verbs_present) != 1:
+        raise CorpusError(f"op must have exactly one of create/move/cancel: {raw!r}")
+    verb = verbs_present[0]
+    name = raw[verb]
+    if not isinstance(name, str) or not name:
+        raise CorpusError(f"op {verb} needs a non-empty obligation name: {raw!r}")
+    kind = raw.get("kind")
+    on = raw.get("on")
+    if verb == "create":
+        if kind not in OBJ_KINDS:
+            raise CorpusError(f"create op {name!r} needs kind {sorted(OBJ_KINDS)}, got {kind!r}")
+        if not on:
+            raise CorpusError(f"create op {name!r} needs an 'on' date predicate")
+    if verb == "move" and not on:
+        raise CorpusError(f"move op {name!r} needs an 'on' date predicate")
+    if verb == "cancel" and (on or kind):
+        raise CorpusError(f"cancel op {name!r} takes neither 'on' nor 'kind'")
+    return Op(verb=verb, name=name, kind=kind,
+              match=list(raw.get("match", [])) or [name],
+              on=on, tolerance=raw.get("tolerance", "exact_day"))
 
 
 def _parse_answer(raw: dict) -> Answer:
     return Answer(
-        expect=[_parse_expect(e) for e in raw.get("expect", [])],
-        forbid=[ForbidEntry(action=f.get("action"), title_match=list(f.get("title_match", [])))
-                for f in raw.get("forbid", [])],
+        ops=[_parse_op(o) for o in raw.get("ops", [])],
         emits=dict(raw.get("emits", {})),
     )
 
 
 def _refs_in(text: str) -> set[str]:
-    return set(_ANCHOR_REF_RE.findall(text))
+    return set(_ANCHOR_REF_RE.findall(str(text)))
+
+
+def _predicate_exprs(predicate: Optional[dict]) -> list[str]:
+    """Every expression string in a single date predicate."""
+    if not predicate:
+        return []
+    out: list[str] = []
+    for v in predicate.values():
+        if isinstance(v, list):
+            out.extend(str(x) for x in v)
+        else:
+            out.append(str(v))
+    return out
 
 
 def _email_predicates(ans: Answer) -> list[str]:
-    """Every expression string that appears in an answer's predicates."""
+    """Every date expression that appears in an answer's ops (used by the scheduler)."""
     exprs: list[str] = []
-    for e in ans.expect:
-        for pred in (e.start, e.due):
-            if not pred:
-                continue
-            for v in pred.values():
-                if isinstance(v, list):
-                    exprs.extend(str(x) for x in v)
-                else:
-                    exprs.append(str(v))
-        if e.recurrence and "start" in e.recurrence:
-            exprs.append(str(e.recurrence["start"]))
+    for op in ans.ops:
+        exprs.extend(_predicate_exprs(op.on))
     return exprs
 
 
@@ -166,16 +179,9 @@ def _build_email(node_id: str, raw: dict) -> Email:
     body = raw.get("body", "")
     answer = _parse_answer(raw.get("answer", {}))
 
-    # emissions: body {!name=expr} tokens + explicit answer.emits
+    # emissions: body {!name=expr} tokens + explicit answer.emits (obligation anchors added in _wire_obligations)
     emits: dict[str, str] = {name: expr.strip() for name, expr in _EMIT_IN_BODY_RE.findall(body)}
     emits.update(answer.emits)
-
-    # anchor references: body tokens (minus the emission target) + answer predicates
-    refs: set[str] = set()
-    for tok in _TOKEN_RE.findall(body):
-        refs |= _refs_in(tok)
-    for expr in _email_predicates(answer):
-        refs |= _refs_in(expr)
 
     return Email(
         id=raw["id"],
@@ -188,7 +194,7 @@ def _build_email(node_id: str, raw: dict) -> Email:
         depends_on=[_parse_edge(e) for e in raw.get("depends_on", [])],
         answer=answer,
         emits=emits,
-        anchor_refs=refs,
+        anchor_refs=set(),     # computed in _recompute_refs after obligation wiring
     )
 
 
@@ -245,6 +251,9 @@ def build_corpus(raw_nodes: list[dict], sources: Optional[list[str]] = None) -> 
         nodes[node_id] = node
 
     _expand_node_edges(nodes, emails)
+    body_anchors = {name for em in emails.values() for name in em.emits}   # before obligation wiring
+    _wire_obligations(nodes, emails, body_anchors)
+    _recompute_refs(emails)
     emission_map = _build_emission_map(emails)
     corpus = Corpus(nodes=nodes, emails=emails, emission_map=emission_map)
     lint(corpus)
@@ -277,6 +286,123 @@ def _expand_node_edges(nodes: dict[str, Node], emails: dict[str, Email]) -> None
             else:
                 expanded.append(dep)
         email.depends_on = expanded
+
+
+# --- obligations -----------------------------------------------------------
+
+def _obl_anchor(node_id: str, name: str) -> str:
+    """The internal, globally-unique anchor name an obligation publishes. Authors
+    write the bare name (@kickoff); this node-qualifies it so two nodes can both
+    have a 'kickoff' without colliding in the global anchor table."""
+    slug = re.sub(r"[^A-Za-z0-9_]", "_", node_id)
+    return f"__obl_{slug}__{name}"
+
+
+def _rewrite_expr(expr: object, rename: dict[str, str]) -> object:
+    if not isinstance(expr, str):
+        return expr
+    return _ANCHOR_REF_RE.sub(lambda m: f"@{rename.get(m.group(1), m.group(1))}", expr)
+
+
+def _rewrite_predicate(predicate: dict, rename: dict[str, str]) -> dict:
+    out: dict = {}
+    for k, v in predicate.items():
+        if isinstance(v, list):
+            out[k] = [_rewrite_expr(x, rename) for x in v]
+        elif k in _PREDICATE_KEYS:
+            out[k] = _rewrite_expr(v, rename)
+        else:
+            out[k] = v
+    return out
+
+
+def _predicate_target_expr(predicate: dict) -> Optional[object]:
+    """The single expression that anchors an obligation's date (for @name emission)."""
+    for key in ("eq", "by", "start", "in"):
+        if key in predicate:
+            return predicate[key]
+    if "any_of" in predicate and predicate["any_of"]:
+        return predicate["any_of"][0]
+    return None
+
+
+def _wire_obligations(nodes: dict[str, Node], emails: dict[str, Email], body_anchors: set[str]) -> None:
+    """Resolve the verb model into anchors + edges the scheduler/grader already speak:
+
+      - each `create: X` registers obligation X (node-scoped) and, if a sibling op
+        references @X, publishes @X as a node-qualified anchor at the creator's serve;
+      - `move`/`cancel: X` inherit X's kind/match, and derive a depends_on edge to X's
+        creator (a `date` edge when the op references an anchor, else `static`);
+      - bare @X references to a sibling obligation are rewritten to the qualified name.
+    """
+    for node in nodes.values():
+        registry: dict[str, dict] = {}   # name -> {creator, kind, match, on}
+        for em in node.emails:
+            for op in em.answer.ops:
+                if op.verb == "create":
+                    if op.name in registry:
+                        raise CorpusError(f"node {node.id!r}: obligation {op.name!r} created twice")
+                    registry[op.name] = {"creator": em.id, "kind": op.kind, "match": op.match, "on": op.on}
+
+        # move/cancel must target an existing obligation; inherit its kind + match
+        for em in node.emails:
+            for op in em.answer.ops:
+                if op.verb in ("move", "cancel"):
+                    info = registry.get(op.name)
+                    if info is None:
+                        raise CorpusError(
+                            f"email {em.id!r}: {op.verb} of unknown obligation {op.name!r} "
+                            f"(no create in node {node.id!r})")
+                    op.kind = info["kind"]
+                    if op.match == [op.name]:
+                        op.match = info["match"]
+
+        # which sibling obligations are referenced as @name (and aren't a body anchor)?
+        siblings = set(registry)
+        referenced: set[str] = set()
+        for em in node.emails:
+            for op in em.answer.ops:
+                for expr in _predicate_exprs(op.on):
+                    referenced |= {r for r in _refs_in(expr) if r in siblings and r not in body_anchors}
+
+        rename = {name: _obl_anchor(node.id, name) for name in referenced}
+
+        # rewrite op predicates so @name resolves to the obligation's published anchor
+        if rename:
+            for em in node.emails:
+                for op in em.answer.ops:
+                    if op.on:
+                        op.on = _rewrite_predicate(op.on, rename)
+
+        # the creator publishes @name = its obligation's date (only when referenced)
+        for name in referenced:
+            info = registry[name]
+            target = _predicate_target_expr(info["on"])
+            if target is not None:
+                creator = emails[info["creator"]]
+                creator.emits[rename[name]] = str(_rewrite_expr(target, rename)).strip()
+
+        # derive the dependency edge from each move/cancel to its obligation's creator
+        for em in node.emails:
+            for op in em.answer.ops:
+                if op.verb not in ("move", "cancel"):
+                    continue
+                creator_id = registry[op.name]["creator"]
+                if creator_id == em.id or any(d.email == creator_id for d in em.depends_on):
+                    continue
+                has_anchor = any(_refs_in(expr) for expr in _predicate_exprs(op.on))
+                em.depends_on.append(Edge(email=creator_id, type="date" if has_anchor else "static"))
+
+
+def _recompute_refs(emails: dict[str, Email]) -> None:
+    """Anchor references = body tokens + (post-rewrite) answer predicate expressions."""
+    for email in emails.values():
+        refs: set[str] = set()
+        for tok in _TOKEN_RE.findall(email.body):
+            refs |= _refs_in(tok)
+        for expr in _email_predicates(email.answer):
+            refs |= _refs_in(expr)
+        email.anchor_refs = refs
 
 
 def _build_emission_map(emails: dict[str, Email]) -> dict[str, str]:
@@ -359,8 +485,8 @@ def lint(corpus: Corpus) -> None:
                 )
 
     # 4. an email that references an ancestor's anchor in its ANSWER should carry a
-    #    'date' edge to that ancestor (so a serve-by window is derived). Warn-level:
-    #    enforce it, since it's the only way the scheduler learns the deadline.
+    #    'date' edge to that ancestor (so a serve-by window is derived). Move/cancel
+    #    edges are auto-derived; this still catches a create that forgot its date edge.
     for email in emails.values():
         answer_refs: set[str] = set()
         for expr in _email_predicates(email.answer):
