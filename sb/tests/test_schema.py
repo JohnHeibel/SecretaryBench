@@ -1,42 +1,43 @@
 """Tests for the corpus loader, node-edge expansion, and linter."""
 import json
+from pathlib import Path
 
 import pytest
 
 from sb.schema import CorpusError, build_corpus, load_corpus
 
-CORPUS = "corpus"
+FIXTURE = str(Path(__file__).parent / "fixtures")
 
 
-def test_pilot_corpus_loads_and_lints():
-    c = load_corpus(CORPUS)
-    assert set(c.nodes) == {"henderson", "hr-policy", "acme-client", "globex-acq", "pr-comms"}
-    assert len(c.emails) == 13
+def test_fixture_corpus_loads_and_lints():
+    c = load_corpus(FIXTURE)
+    assert set(c.nodes) == {"alpha", "beta", "gamma"}
+    assert len(c.emails) == 6
 
 
 def test_emission_map_built():
-    c = load_corpus(CORPUS)
-    assert c.emission_map["signing"] == "henderson.signing"
+    c = load_corpus(FIXTURE)
+    assert c.emission_map["brief"] == "alpha.brief"
 
 
 def test_node_sugar_expands_to_email_edges():
-    c = load_corpus(CORPUS)
-    # acme-client node_depends_on hr-policy -> every acme email depends on the memo.
-    req = c.emails["acme-client.request"]
-    assert any(d.email == "hr-policy.memo" and d.type == "static" for d in req.depends_on)
+    c = load_corpus(FIXTURE)
+    # beta node_depends_on gamma -> every beta email depends on the gamma notice.
+    book = c.emails["beta.book"]
+    assert any(d.email == "gamma.notice" and d.type == "static" for d in book.depends_on)
 
 
 def test_ancestors_transitive():
-    c = load_corpus(CORPUS)
-    anc = c.ancestors("henderson.kickoff")
-    assert anc == {"henderson.signing", "henderson.intro"}
+    c = load_corpus(FIXTURE)
+    anc = c.ancestors("alpha.review")
+    assert anc == {"alpha.brief", "alpha.intro"}
 
 
 def test_topo_order_respects_dependencies():
-    c = load_corpus(CORPUS)
+    c = load_corpus(FIXTURE)
     order = c.topo_order()
-    assert order.index("henderson.intro") < order.index("henderson.signing")
-    assert order.index("henderson.signing") < order.index("henderson.kickoff")
+    assert order.index("alpha.intro") < order.index("alpha.brief")
+    assert order.index("alpha.brief") < order.index("alpha.review")
 
 
 # --- linter rejects bad corpora --------------------------------------------

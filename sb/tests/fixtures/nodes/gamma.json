@@ -1,0 +1,18 @@
+{
+  "id": "gamma",
+  "cast": {
+    "SENDER": "Lee Okafor (Facilities)",
+    "YOU": "you"
+  },
+  "emails": [
+    {
+      "id": "gamma.notice",
+      "from": "SENDER",
+      "to": "YOU",
+      "subject": "Facilities notice",
+      "body": "FYI only: the east wing reopens next month. No action required.",
+      "depends_on": [],
+      "answer": { "ops": [] }
+    }
+  ]
+}

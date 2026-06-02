@@ -4,6 +4,7 @@ with mock models standing in for the harness. Proves the whole pipeline works
 and that the grader distinguishes a correct model from a broken one.
 """
 from datetime import date
+from pathlib import Path
 
 from sb.engine import Store, run
 from sb.oracle import _as_dt, _target, oracle_model as perfect_model
@@ -12,6 +13,7 @@ from sb.schema import Email, load_corpus
 from sb.scheduler import build_plan
 
 START = date(2026, 6, 1)
+FIXTURE = str(Path(__file__).parent / "fixtures")
 
 
 def imperfect_model(email: Email, rendered: str, ctx: Context, store: Store) -> None:
@@ -36,14 +38,14 @@ def imperfect_model(email: Email, rendered: str, ctx: Context, store: Store) -> 
 
 
 def _run(model):
-    corpus = load_corpus("corpus")
+    corpus = load_corpus(FIXTURE)
     plan = build_plan(corpus, start_date=START, seed=42, n_days=60)
     return corpus, run(corpus, plan, model)
 
 
 def test_perfect_model_scores_full_marks():
     _corpus, res = _run(perfect_model)
-    assert res.total == 13
+    assert res.total == 6
     failures = {eid for eid, r in res.results.items() if not r.passed}
     assert failures == set(), f"perfect model should pass everything, failed: {failures}"
     assert res.score() == 1.0
@@ -52,18 +54,18 @@ def test_perfect_model_scores_full_marks():
 def test_imperfect_model_is_caught():
     _corpus, res = _run(imperfect_model)
     # over-action on a no-action FYI, and a reschedule done as a duplicate, must fail.
-    assert not res.results["hr-policy.memo"].passed          # no-action violated
-    assert not res.results["acme-client.move"].passed        # double-booked (not the expected single event)
+    assert not res.results["gamma.notice"].passed           # no-action violated
+    assert not res.results["beta.shift"].passed             # double-booked (not the expected single event)
     # a plain single create on the right day still passes (day-level grading)
-    assert res.results["henderson.signing"].passed
-    assert res.results["henderson.kickoff"].passed
+    assert res.results["alpha.brief"].passed
+    assert res.results["alpha.review"].passed
     assert 0.0 < res.score() < 1.0
 
 
 def test_reschedule_via_update_keeps_count_one():
-    corpus = load_corpus("corpus")
+    corpus = load_corpus(FIXTURE)
     plan = build_plan(corpus, start_date=START, seed=42, n_days=60)
     store = Store(corpus)
     run(corpus, plan, perfect_model, store=store)
-    acme_events = store.node_state("acme-client").events
-    assert len(acme_events) == 1               # moved, not duplicated
+    beta_events = store.node_state("beta").events
+    assert len(beta_events) == 1               # moved, not duplicated
