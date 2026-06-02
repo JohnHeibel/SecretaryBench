@@ -29,7 +29,7 @@ from pathlib import Path
 from sb.engine import Store, run
 from sb.oracle import oracle_model
 from sb.schema import load_corpus
-from sb.scheduler import build_plan
+from sb.scheduler import InfeasibleSchedule, build_plan
 from sb.span import spans
 
 REPO = Path(__file__).resolve().parents[1]
@@ -65,19 +65,20 @@ _PARAS = [
 
 
 def _filler_node(n: int, rng: random.Random) -> dict:
-    emails = []
-    for i in range(1, n + 1):
-        k = rng.randint(16, 22)                    # long, realistic emails => context overflows
-        body = "\n\n".join(rng.choices(_PARAS, k=k))   # at ~150 emails, not ~600
-        emails.append({
-            "id": f"gen.filler.{i:04d}",
-            "from": rng.choice(_SENDERS),
-            "to": "CEO",
-            "subject": f"{rng.choice(_SUBJECTS)} #{i}",
-            "body": body,
-            "depends_on": [],
-            "answer": {"ops": []},
-        })
+    """One node of n no-action FYI emails — the haystack. Each is {"ops": []} (a
+    no-action answer in the verb model) and carries no anchors or edges, so the
+    needles' setup->payoff span is what grows as n grows."""
+    emails = [{
+        "id": f"gen.filler.{i:04d}",
+        "from": rng.choice(_SENDERS),
+        "to": "CEO",
+        "subject": f"{rng.choice(_SUBJECTS)} #{i}",
+        # 16-22 paragraphs => realistically long mail, so context overflows at a few
+        # hundred emails instead of thousands (keeps brute-scale overflow affordable).
+        "body": "\n\n".join(rng.choices(_PARAS, k=rng.randint(16, 22))),
+        "depends_on": [],
+        "answer": {"ops": []},
+    } for i in range(1, n + 1)]
     return {"id": "gen-filler", "cast": {"CEO": "you"}, "emails": emails}
 
 
@@ -89,8 +90,8 @@ def build_scaled(dst: Path, n_filler: int, seed: int) -> None:
     if dst.exists():
         shutil.rmtree(dst)
     nodes.mkdir(parents=True)
-    for f in (REPO / "corpus" / "nodes").glob("*.json"):
-        shutil.copy(f, nodes / f.name)
+    for src in (REPO / "corpus" / "nodes").glob("*.json"):
+        shutil.copy(src, nodes / src.name)
     rng = random.Random(seed)
     (nodes / "gen_filler.json").write_text(json.dumps(_filler_node(n_filler, rng), indent=2))
 
@@ -99,27 +100,30 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--filler", type=int, default=120, help="no-action junk emails to bury the authored needles under")
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--days", type=int, default=200)
+    ap.add_argument("--days", type=int, default=200, help="serve window; the scheduler serves ~3 emails/day, so allow >= filler/3 days")
     ap.add_argument("--dst", default="build/scaled")
-    a = ap.parse_args()
+    args = ap.parse_args()
 
-    dst = REPO / a.dst
-    build_scaled(dst, a.filler, a.seed)
+    dst = REPO / args.dst
+    build_scaled(dst, args.filler, args.seed)
     corpus = load_corpus(str(dst))
-    plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=a.seed, n_days=a.days)
-    served = [e for b in plan.per_day for e in b]
+    try:
+        plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=args.seed, n_days=args.days)
+    except InfeasibleSchedule as exc:
+        raise SystemExit(f"can't serve {args.filler} filler in {args.days} days: {exc}\n"
+                         f"raise --days (the scheduler serves ~3 emails/day, so try >= {args.filler // 3 + 30}).")
+    served = [eid for batch in plan.per_day for eid in batch]
 
-    recs = sorted(spans(corpus, plan), key=lambda r: r["email_span"], reverse=True)
+    needles = sorted(spans(corpus, plan), key=lambda r: r["email_span"], reverse=True)
     print(f"\nscaled corpus: {len(corpus.emails)} emails, {len(served)} served over {plan.n_days} days")
-    print(f"filler: {a.filler} junk emails burying {len(recs)} authored needle(s)")
-    es = [r["email_span"] for r in recs]
-    if es:
-        print(f"needle span: max {max(es)}, mean {sum(es)/len(es):.1f}  (n={len(es)})")
+    print(f"filler: {args.filler} junk emails burying {len(needles)} authored needle(s)")
+    email_spans = [r["email_span"] for r in needles]
+    if email_spans:
+        print(f"needle span: max {max(email_spans)}, mean {sum(email_spans)/len(email_spans):.1f}  (n={len(email_spans)})")
     else:
         print("needle span: no answer-key anchor references in this corpus")
 
-    store = Store(corpus)
-    res = run(corpus, plan, oracle_model, store=store)
+    res = run(corpus, plan, oracle_model, store=Store(corpus))
     print(f"oracle: {res.passed}/{res.total} = {res.score():.0%} (must be 100% — corpus is valid at scale)\n")
 
 
