@@ -76,10 +76,21 @@ def build_plan(
     def has_date_edge(eid: str) -> bool:
         return any(d.type == "date" for d in emails[eid].depends_on)
 
+    # Static across the whole run — the DAG never changes — so compute the topological
+    # serve order and the deadline-bearing set once, not once per simulated day. Without
+    # this, topo_order() re-sorts every email every day, which dominates at scale.
+    order = corpus.topo_order()
+    date_edge_ids = {eid for eid in emails if has_date_edge(eid)}
+
     def update_deadlines(today: date) -> None:
-        for eid, email in emails.items():
-            if eid in served or eid in deadlines or not has_date_edge(eid):
+        # Only date-edge emails ever get a deadline, and only until one is set. Iterate
+        # that (small) set rather than rescanning the whole corpus — the filler haystack
+        # has no deadline and would otherwise be walked every day for nothing. A served
+        # date-edge email is always already deadlined, so `in deadlines` subsumes `served`.
+        for eid in date_edge_ids:
+            if eid in deadlines:
                 continue
+            email = emails[eid]
             if not email.anchor_refs.issubset(anchors.keys()):
                 continue
             ctx = Context(today, anchors)
@@ -92,7 +103,7 @@ def build_plan(
         for dep in email.depends_on:
             if served.get(dep.email) is None or served[dep.email] >= day:
                 return False
-        if has_date_edge(eid):
+        if eid in date_edge_ids:
             dl = deadlines.get(eid)
             if dl is None or (start_date + timedelta(days=day)) > dl:
                 return False
@@ -105,7 +116,7 @@ def build_plan(
         if len(served) == len(emails):
             break
 
-        ready = [eid for eid in corpus.topo_order() if eid not in served and is_ready(eid, day)]
+        ready = [eid for eid in order if eid not in served and is_ready(eid, day)]
         if not ready:
             per_day.append([])
             continue

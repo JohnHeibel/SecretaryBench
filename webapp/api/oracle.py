@@ -6,9 +6,13 @@ key — through the real serve/grade loop. If the oracle can't score 1.0, some
 answer key is unsatisfiable: the linter would happily pass it, but no model could.
 
 corpus = schema.build_corpus(nodes) → plan = scheduler.build_plan(seed=42,
-start_date 2026-06-01, n_days=120) → engine.run(.., oracle_model). ok = score==1.0.
+start_date 2026-06-01, n_days=...) → engine.run(.., oracle_model). ok = score==1.0.
 
-Request:  { "nodes": [ {...}, ... ] }
+The serve window scales with the corpus: the scheduler serves a few emails a day, so
+a fixed 120-day window strands anything past ~350 emails. Default n_days to comfortably
+cover the corpus (>= emails + slack), and let a caller override via "n_days".
+
+Request:  { "nodes": [ {...}, ... ], "n_days"?: 500 }
 Response (ok):   { "ok": true,  "score": 1.0, "passed": N, "total": N, "failures": [] }
 Response (bad):  { "ok": false, "score": 0.8, "passed": 4, "total": 5,
                    "failures": ["node-1.e2", ...] }
@@ -30,9 +34,12 @@ from sb.oracle import oracle_model
 from sb.scheduler import InfeasibleSchedule, build_plan
 
 
-def _oracle(raw_nodes: list) -> dict:
+def _oracle(raw_nodes: list, n_days: int | None = None) -> dict:
     corpus = schema.build_corpus(raw_nodes)            # raises CorpusError
-    plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=42, n_days=120)  # raises InfeasibleSchedule
+    # ~daily_max serves/day means feasibility needs days on the order of the email count;
+    # default generously (the scheduler is cheap now) and honor an explicit override.
+    days = n_days if n_days else max(120, len(corpus.emails) + 120)
+    plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=42, n_days=days)  # raises InfeasibleSchedule
     res = engine.run(corpus, plan, oracle_model)
     failures = sorted(eid for eid, r in res.results.items() if not r.passed)
     return {
@@ -51,7 +58,8 @@ class handler(BaseHTTPRequestHandler):
             nodes = body.get("nodes")
             if not isinstance(nodes, list):
                 return apihelp.send_json(self, 400, {"ok": False, "error": "expected 'nodes': []"})
-            apihelp.send_json(self, 200, _oracle(nodes))
+            n_days = body.get("n_days")
+            apihelp.send_json(self, 200, _oracle(nodes, n_days if isinstance(n_days, int) else None))
         except (schema.CorpusError, InfeasibleSchedule) as exc:
             apihelp.send_json(self, 200, {"ok": False, "error": str(exc)})
         except Exception as exc:
