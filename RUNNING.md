@@ -3,6 +3,23 @@
 Two steps: build a corpus, then run a model on it. Everything is reproducible.
 Same seed in, same result out.
 
+## Glossary (every email is one of these, and all three are graded)
+
+- **needle** — a test whose answer needs a fact from an **earlier email** (an
+  `@anchor` reference), so the model has to retrieve it. Example: setup says
+  `{!signing = +5d}`, a later email's answer wants `@signing+2w`. This is the
+  retrieval kind, and the **only** kind whose difficulty grows as you add filler
+  (the gap between setup and payoff is the "span").
+- **test (self-contained)** — a test whose answer is computable from **that email
+  alone** (e.g. "meet next Thursday" → `next:THU`). Graded, but no retrieval, so
+  filler doesn't make it harder.
+- **filler / distractor** — an email with **no expected action**: pure haystack
+  noise. Still graded — the model must correctly do nothing; over-acting on it
+  fails that email.
+
+"Not a needle" does **not** mean "not valuable": self-contained tests probe
+reasoning and distractors punish over-acting. The needle is just the retrieval axis.
+
 ## How it fits together
 
 ```
