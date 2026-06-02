@@ -116,6 +116,34 @@ export async function upsertNode(node: CorpusNode, by = "anon"): Promise<CorpusN
   return node;
 }
 
+// Bulk ingest, the mirror of /api/export. `mode: "upsert"` (default) merges the
+// incoming nodes over what's already stored; `mode: "replace"` wipes the store first
+// so the corpus becomes exactly the imported set. Postgres does it in one round-trip
+// (a single multi-row INSERT for the batch, plus a TRUNCATE up front when replacing)
+// rather than N awaits; the file backend reads once, mutates the map, writes once.
+export async function importNodes(nodes: CorpusNode[], by = "anon", mode: "upsert" | "replace" = "upsert"): Promise<number> {
+  if (usePg) {
+    await ensurePg();
+    const sql = await pg();
+    if (mode === "replace") await sql`TRUNCATE nodes`;
+    if (nodes.length) {
+      const ids = nodes.map((n) => n.id);
+      const datas = nodes.map((n) => JSON.stringify(n));
+      const bys = nodes.map(() => by);
+      // unnest the three parallel arrays into rows, then one upsert for the whole batch
+      await sql`INSERT INTO nodes (id, data, updated_by)
+        SELECT id, data::jsonb, updated_by
+        FROM unnest(${ids as any}::text[], ${datas as any}::text[], ${bys as any}::text[]) AS t(id, data, updated_by)
+        ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_by = EXCLUDED.updated_by, updated_at = now()`;
+    }
+    return nodes.length;
+  }
+  const all = mode === "replace" ? {} : fileReadAll();
+  for (const node of nodes) all[node.id] = node;
+  fileWriteAll(all);
+  return nodes.length;
+}
+
 export async function deleteNode(id: string): Promise<void> {
   if (usePg) {
     await ensurePg();

@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
+import { deleteNode as apiDelete, fetchNodes, importCorpus, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
 import { anchorsInCorpus, normalizeAnswer } from "@/lib/grammar";
 import type { CorpusNode, Edge, Email, LintResult, OracleResult } from "@/lib/types";
 import Sidebar from "./Sidebar";
@@ -25,18 +25,36 @@ export default function Workspace() {
   const lintTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const oracleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const importInput = useRef<HTMLInputElement>(null);
+  const altHeld = useRef(false); // captured at click so the file dialog's async return knows replace-vs-merge
 
-  useEffect(() => {
-    fetchNodes().then((raw) => {
-      // Normalize each stored answer into the verb-model shape at the data boundary, so a
-      // legacy/partial row can never crash the editor downstream.
-      const n = raw.map((node) => ({ ...node, emails: node.emails.map((e) => ({ ...e, answer: normalizeAnswer(e.answer) })) }));
-      setNodes(n);
-      setSelNode(n[0]?.id ?? null);
-      setSelEmail(n[0]?.emails[0]?.id ?? null);
-      setLoaded(true);
-    });
+  // Pull the whole corpus from the store and seat it in state. Normalize each stored
+  // answer into the verb-model shape at the data boundary, so a legacy/partial row can
+  // never crash the editor downstream. Reused on first mount and after an import.
+  const reload = useCallback(async () => {
+    const raw = await fetchNodes();
+    const n = raw.map((node) => ({ ...node, emails: node.emails.map((e) => ({ ...e, answer: normalizeAnswer(e.answer) })) }));
+    setNodes(n);
+    setSelNode(n[0]?.id ?? null);
+    setSelEmail(n[0]?.emails[0]?.id ?? null);
+    setLoaded(true);
   }, []);
+
+  useEffect(() => { reload(); }, [reload]);
+
+  // Import an export .zip into the store, then reload. Replace vs merge is the author's
+  // call: hold a modifier (alt/⌥) while picking the file to replace the whole corpus.
+  const onImportFile = useCallback(async (file: File, replace: boolean) => {
+    try {
+      const { imported, mode } = await importCorpus(file, replace ? "replace" : "upsert");
+      await reload();
+      // eslint-disable-next-line no-alert
+      alert(`Imported ${imported} node(s) (${mode}).`);
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      alert(`Import failed: ${(e as Error).message}`);
+    }
+  }, [reload]);
 
   // Re-lint the whole corpus (debounced) whenever it changes — the same gate the runner uses.
   useEffect(() => {
@@ -141,6 +159,11 @@ export default function Workspace() {
           <label className="flex items-center gap-1">preview serve date
             <input type="date" value={serveDate} onChange={(e) => setServeDate(e.target.value)} className="rounded border border-slate-700 bg-slate-800 px-2 py-0.5 text-slate-200" />
           </label>
+          <input ref={importInput} type="file" accept=".zip,application/zip" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) onImportFile(f, altHeld.current); e.target.value = ""; }} />
+          <button onClick={(e) => { altHeld.current = e.altKey; importInput.current?.click(); }}
+            title="Import an export .zip (merge). Hold ⌥/Alt to replace the whole corpus."
+            className="rounded-md border border-slate-700 px-3 py-1 text-slate-200 hover:bg-slate-800">Import corpus ⬆</button>
           <a href="/api/export" className="rounded-md border border-slate-700 px-3 py-1 text-slate-200 hover:bg-slate-800">Export corpus ⬇</a>
         </div>
       </header>
