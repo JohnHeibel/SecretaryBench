@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
-import { anchorsInCorpus } from "@/lib/grammar";
+import { anchorsInCorpus, normalizeAnswer } from "@/lib/grammar";
 import type { CorpusNode, Email, LintResult, OracleResult } from "@/lib/types";
 import Sidebar from "./Sidebar";
 import EmailEditor from "./EmailEditor";
@@ -9,7 +9,7 @@ import DagCanvas from "./DagCanvas";
 import ValidateBar from "./ValidateBar";
 
 const EMPTY_EMAIL = (id: string): Email => ({
-  id, from: "", to: "", subject: "", body: "", depends_on: [], answer: { expect: [], forbid: [] },
+  id, from: "", to: "", subject: "", body: "", depends_on: [], answer: { ops: [] },
 });
 
 export default function Workspace() {
@@ -27,7 +27,10 @@ export default function Workspace() {
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
-    fetchNodes().then((n) => {
+    fetchNodes().then((raw) => {
+      // Normalize each stored answer into the verb-model shape at the data boundary, so a
+      // legacy/partial row can never crash the editor downstream.
+      const n = raw.map((node) => ({ ...node, emails: node.emails.map((e) => ({ ...e, answer: normalizeAnswer(e.answer) })) }));
       setNodes(n);
       setSelNode(n[0]?.id ?? null);
       setSelEmail(n[0]?.emails[0]?.id ?? null);

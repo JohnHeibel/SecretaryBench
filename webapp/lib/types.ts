@@ -19,24 +19,28 @@ export interface Predicate {
   not_in?: string;
 }
 
-export interface ExpectEntry {
-  action: "create_event" | "create_todo" | "reschedule" | "reply" | "delegate";
-  title_match?: string[];
-  start?: Predicate; // events
-  due?: Predicate; // todos
-  count?: number;
-  tolerance?: string; // "exact_day" | "within:Nd"
-  recurrence?: Record<string, unknown>;
-}
+export type Verb = "create" | "move" | "cancel";
+export type ObjKind = "event" | "todo";
 
-export interface ForbidEntry {
-  action?: string; // omitted = any action
-  title_match?: string[];
+// One verb on a named obligation. Serializes 1:1 to corpus JSON: the verb is the KEY
+// and its value is the obligation's name, e.g.
+//   { "create": "kickoff", "kind": "event", "on": { "eq": "@signing+2w" }, "match": ["kickoff"] }
+// Exactly one of create/move/cancel is set. `kind` + `on` apply to create (and `on` to
+// move); a cancel carries neither — the grader inherits them from the obligation's create.
+// `match` defaults to [name] when omitted, so leave it blank unless the natural calendar
+// title wouldn't contain the name.
+export interface Op {
+  create?: string;
+  move?: string;
+  cancel?: string;
+  kind?: ObjKind;
+  on?: Predicate;
+  match?: string[];
+  tolerance?: string; // "exact_day" | "within:Nd"
 }
 
 export interface Answer {
-  expect: ExpectEntry[];
-  forbid?: ForbidEntry[];
+  ops: Op[];
   emits?: Record<string, string>; // anchor name -> expr (non-rendered)
 }
 

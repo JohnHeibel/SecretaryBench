@@ -58,7 +58,7 @@ export default function DagCanvas({ nodes, lint, serveDate, onSelectEmail }: Pro
               <div className="font-mono text-[10px] text-slate-400">{e.id}</div>
               <div className="text-xs font-medium text-slate-100">{e.subject || "(no subject)"}</div>
               {emits.length > 0 && <div className="mt-0.5 text-[10px] text-violet-300">emits @{emits.join(", @")}</div>}
-              {(e.answer?.expect?.length ?? 0) === 0 && <div className="text-[10px] text-slate-500">no-action</div>}
+              {(e.answer?.ops?.length ?? 0) === 0 && <div className="text-[10px] text-slate-500">no-action</div>}
             </div>
           ),
         },
