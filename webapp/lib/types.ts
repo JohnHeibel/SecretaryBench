@@ -19,6 +19,12 @@ export interface Edge {
 
 export type Tier = "T1" | "T2" | "T3";
 
+// Email role in the AUTHORING_GUIDE taxonomy (§2). Action is implied by a non-empty
+// answer; no_action / junk are the two flavours of an empty answer (ops: []) — both
+// grade as "do nothing", but they test different things (recognition vs filtering),
+// so we tag which is which for composition reporting.
+export type EmailType = "action" | "no_action" | "junk";
+
 export interface Email {
   id: string;
   from: string; // cast key
@@ -28,6 +34,7 @@ export interface Email {
   depends_on: Edge[];
   answer: Answer;
   tier?: Tier; // author-tagged difficulty, for score-by-tier
+  type?: EmailType; // author-tagged role, for composition reporting
 }
 
 export interface CorpusNode {

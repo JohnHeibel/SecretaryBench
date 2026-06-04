@@ -1,6 +1,8 @@
 "use client";
 import type { CorpusNode, LintResult } from "@/lib/types";
+import { ROLE_META, classifyEmail } from "@/lib/composition";
 import { TIER_STYLE } from "./EmailEditor";
+import CompositionPanel from "./CompositionPanel";
 
 interface Props {
   nodes: CorpusNode[];
@@ -28,6 +30,7 @@ export default function Sidebar({ nodes, selNode, selEmail, onSelectNode, onSele
           <span className="block text-[11px] font-normal text-sky-200/65">A storyline is a group of related emails.</span>
         </button>
       </div>
+      <CompositionPanel nodes={nodes} />
       <div className="min-h-0 flex-1 overflow-auto py-1">
         {nodes.map((node) => (
           <div key={node.id} className="px-2 py-1">
@@ -38,15 +41,19 @@ export default function Sidebar({ nodes, selNode, selEmail, onSelectNode, onSele
               <button onClick={() => onRemoveNode(node.id)} className="hidden px-1 text-xs text-slate-500 hover:text-rose-400 group-hover:block">✕</button>
             </div>
             <div className="ml-3 border-l border-slate-800 pl-2">
-              {node.emails.map((email) => (
-                <div key={email.id} className={`group flex items-center justify-between rounded-md px-2 py-1 ${selEmail === email.id ? "bg-sky-600/20 text-sky-200" : "hover:bg-slate-800/50"}`}>
+              {node.emails.map((email) => {
+                const role = classifyEmail(email);
+                return (
+                <div key={email.id} className={`group flex items-center gap-1 rounded-md px-2 py-1 ${selEmail === email.id ? "bg-sky-600/20 text-sky-200" : "hover:bg-slate-800/50"}`}>
                   <button onClick={() => onSelectEmail(node.id, email.id)} className="min-w-0 flex-1 truncate text-left text-xs text-slate-300">
                     {email.subject || email.id}
                   </button>
-                  {email.tier && <span className={`rounded px-1 text-[10px] font-medium ${TIER_STYLE[email.tier]}`}>{email.tier}</span>}
+                  {role === "action"
+                    ? email.tier && <span className={`rounded px-1 text-[10px] font-medium ${TIER_STYLE[email.tier]}`}>{email.tier}</span>
+                    : <span className={`rounded px-1 text-[10px] font-medium ${ROLE_META[role].badge}`}>{ROLE_META[role].short}</span>}
                   <button onClick={() => onRemoveEmail(node.id, email.id)} className="hidden px-1 text-xs text-slate-500 hover:text-rose-400 group-hover:block">✕</button>
                 </div>
-              ))}
+              ); })}
               <button onClick={() => onAddEmail(node.id)} className="mt-1 w-full rounded border border-dashed border-slate-700 px-2 py-1.5 text-left text-xs text-slate-400 hover:border-sky-600 hover:text-sky-200">+ Add email</button>
             </div>
           </div>

@@ -87,17 +87,11 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, onChange 
 
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-3">
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Answer key</h3>
-        <label className="flex items-center gap-1.5 text-xs text-slate-400">
-          <input type="checkbox" checked={noAction} onChange={(e) => setOps(e.target.checked ? [] : [{ create: "", kind: "event", on: { eq: "" } }])} />
-          this email needs no action
-        </label>
-      </div>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Answer key</h3>
 
       {noAction ? (
         <p className="rounded bg-slate-800/60 px-3 py-2 text-xs text-slate-400">
-          This email is graded as <strong>do nothing</strong> — any event/todo the model creates for it counts as a failure.
+          This is an <strong>FYI / Junk</strong> email — graded as <strong>do nothing</strong>. Any event or to-do the model creates for it counts as a failure. To give it an action instead, set its type to <strong>Action</strong> at the top.
         </p>
       ) : (
         <div className="space-y-3">

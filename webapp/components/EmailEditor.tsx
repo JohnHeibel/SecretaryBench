@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { CorpusNode, Edge, EdgeType, Email, Tier } from "@/lib/types";
+import type { CorpusNode, Edge, EdgeType, Email, EmailType, Op, Tier } from "@/lib/types";
+import { ROLE_HINT, ROLE_META, classifyEmail } from "@/lib/composition";
 import BodyEditor from "./BodyEditor";
 import AnswerKeyBuilder from "./AnswerKeyBuilder";
 
@@ -81,7 +82,7 @@ function Primer() {
       <ol className="ml-4 mt-1 list-decimal space-y-0.5">
         <li>Write the email (who it&apos;s from, the subject, the body). Use <span className="font-mono text-sky-300">+ insert date</span> for any date so it stays exact.</li>
         <li>In <strong>Answer key</strong>, say what to do: name the thing, pick its date, or tick <em>&ldquo;this email needs no action.&rdquo;</em></li>
-        <li>Tag the <strong>difficulty</strong> (T1 easy → T3 hard) so we can score models by tier.</li>
+        <li>Mark the <strong>type</strong> — Action, FYI, or Junk — and, for actions, the <strong>difficulty</strong> (T1 easy → T3 hard). The sidebar&apos;s <em>Corpus mix</em> shows how your inbox compares to the guide.</li>
         <li>The bar at the bottom must read <span className="text-emerald-400">Ready for export</span> and <span className="text-emerald-400">oracle solves 100%</span> — that means a perfect assistant could actually do it.</li>
       </ol>
       <p className="mt-1 text-slate-400">Want more? <a href="/guide" className="text-sky-400 underline hover:text-sky-300">Open the full walkthrough →</a> (worked examples, the date builder, how to build a needle)</p>
@@ -136,14 +137,19 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
     <div className="space-y-4">
       <section className="space-y-3">
         <StepTitle n={1} title="Write the email" note="Use normal email prose. Add any date with the date builder." />
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
         <span className="truncate font-medium text-slate-300">{email.subject || "(untitled email — set a subject below)"}</span>
         <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="corpus id — derived from the subject, used by dependency edges">{email.id}</span>
-        <span className="ml-auto flex shrink-0 items-center gap-1">difficulty
-          {(["T1", "T2", "T3"] as const).map((t) => (
-            <button key={t} onClick={() => set({ tier: email.tier === t ? undefined : t })}
-              className={`rounded px-1.5 py-0.5 font-medium ${email.tier === t ? TIER_STYLE[t] : "bg-slate-800 text-slate-500 hover:text-slate-300"}`}>{t}</button>
-          ))}
+        <span className="ml-auto flex shrink-0 items-center gap-3">
+          <RoleControl email={email} set={set} />
+          {classifyEmail(email) === "action" && (
+            <span className="flex items-center gap-1" title="How hard is this action email? (AUTHORING_GUIDE §3)">difficulty
+              {(["T1", "T2", "T3"] as const).map((t) => (
+                <button key={t} onClick={() => set({ tier: email.tier === t ? undefined : t })}
+                  className={`rounded px-1.5 py-0.5 font-medium ${email.tier === t ? TIER_STYLE[t] : "bg-slate-800 text-slate-500 hover:text-slate-300"}`}>{t}</button>
+              ))}
+            </span>
+          )}
         </span>
       </div>
 
@@ -182,6 +188,34 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
       <AnswerKeyBuilder answer={email.answer} anchors={anchors} serveDate={serveDate} onChange={(answer) => set({ answer })} />
       </section>
     </div>
+  );
+}
+
+// The email's role in the corpus mix (AUTHORING_GUIDE §2). Action keeps an answer key;
+// switching to FYI/Junk clears the ops (both grade as "do nothing") and drops the difficulty
+// tier, since tiers only apply to action emails. classifyEmail derives the active role from
+// the answer, so this stays in sync with edits made down in the answer-key builder.
+const ROLES: EmailType[] = ["action", "no_action", "junk"];
+
+function RoleControl({ email, set }: { email: Email; set: (p: Partial<Email>) => void }) {
+  const role = classifyEmail(email);
+  function pick(r: EmailType) {
+    if (r === role) return;
+    if (r === "action") {
+      const seed: Op = { create: "", kind: "event", on: { eq: "" } };
+      const ops = email.answer.ops.length ? email.answer.ops : [seed];
+      set({ type: "action", answer: { ...email.answer, ops } });
+    } else {
+      set({ type: r, tier: undefined, answer: { ...email.answer, ops: [] } });
+    }
+  }
+  return (
+    <span className="flex items-center gap-1">
+      {ROLES.map((r) => (
+        <button key={r} onClick={() => pick(r)} title={ROLE_HINT[r]}
+          className={`rounded px-1.5 py-0.5 font-medium ${role === r ? ROLE_META[r].badge : "bg-slate-800 text-slate-500 hover:text-slate-300"}`}>{ROLE_META[r].short}</button>
+      ))}
+    </span>
   );
 }
 
