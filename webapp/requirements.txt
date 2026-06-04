@@ -1,0 +1,4 @@
+# Python serverless functions under webapp/api/*.py (Vercel @vercel/python runtime).
+# The validation functions vendor sb/{resolver,schema}.py (pure stdlib) into
+# api/_lib/sb via scripts/vendor_sb.py, so there are NO third-party deps.
+# This file's presence is what makes Vercel enable the Python builder.

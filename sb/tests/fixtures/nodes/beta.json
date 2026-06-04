@@ -1,0 +1,36 @@
+{
+  "id": "beta",
+  "cast": {
+    "SENDER": "Sam Reyes (Scheduling)",
+    "YOU": "you"
+  },
+  "node_depends_on": [ { "node": "gamma", "type": "static" } ],
+  "emails": [
+    {
+      "id": "beta.book",
+      "from": "SENDER",
+      "to": "YOU",
+      "subject": "Book the sync",
+      "body": "Please book the planning sync for next Thursday.",
+      "depends_on": [],
+      "answer": {
+        "ops": [
+          { "create": "sync", "kind": "event", "on": { "eq": "next:THU" } }
+        ]
+      }
+    },
+    {
+      "id": "beta.shift",
+      "from": "SENDER",
+      "to": "YOU",
+      "subject": "Move the sync",
+      "body": "Actually, move the planning sync to the following Monday.",
+      "depends_on": [],
+      "answer": {
+        "ops": [
+          { "move": "sync", "on": { "eq": "next:MON" } }
+        ]
+      }
+    }
+  ]
+}

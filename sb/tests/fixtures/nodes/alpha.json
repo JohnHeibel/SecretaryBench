@@ -1,0 +1,44 @@
+{
+  "id": "alpha",
+  "cast": {
+    "SENDER": "Robin Vance (Partner Ops)",
+    "YOU": "you"
+  },
+  "emails": [
+    {
+      "id": "alpha.intro",
+      "from": "SENDER",
+      "to": "YOU",
+      "subject": "Project Alpha — heads up",
+      "body": "Just flagging that Project Alpha is spinning up. Dates to follow. Nothing needed from you yet.",
+      "depends_on": [],
+      "answer": { "ops": [] }
+    },
+    {
+      "id": "alpha.brief",
+      "from": "SENDER",
+      "to": "YOU",
+      "subject": "Alpha briefing date",
+      "body": "The Alpha kickoff briefing is locked for {!brief = serve+5d}. Please put it on the calendar.",
+      "depends_on": [ { "email": "alpha.intro", "type": "static" } ],
+      "answer": {
+        "ops": [
+          { "create": "brief", "kind": "event", "on": { "eq": "@brief" } }
+        ]
+      }
+    },
+    {
+      "id": "alpha.review",
+      "from": "SENDER",
+      "to": "YOU",
+      "subject": "Alpha review",
+      "body": "Once the briefing is set, schedule the review for two weeks after the briefing.",
+      "depends_on": [ { "email": "alpha.brief", "type": "date" } ],
+      "answer": {
+        "ops": [
+          { "create": "review", "kind": "event", "on": { "eq": "@brief+2w" } }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "secretarybench-authoring",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Corpus authoring web app for SecretaryBench — Scratch-style date-token blocks, answer-key builder, DAG canvas, validated against the real sb.resolver.",
+  "scripts": {
+    "vendor": "python3 scripts/vendor_sb.py",
+    "dev": "node scripts/dev.mjs",
+    "dev:next": "next dev",
+    "validator": "python3 scripts/validator_server.py",
+    "build": "npm run vendor && next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "npm run typecheck"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0",
+    "@xyflow/react": "^12.3.5",
+    "blockly": "^11.2.1",
+    "jszip": "^3.10.1",
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.3"
+  }
+}
