@@ -12,22 +12,34 @@ Public surface:
     human(value)                  -> str            (natural-language rendering)
     Context(serve, anchors)       -> evaluation context
 
-Only DATES vary with serve order, so the grammar encodes dates only. Times of day,
-durations, counts, and names are static prose / answer-key fields, never tokens —
-the benchmark grades at whole-day granularity (a token resolves to a day, and the
-grader checks the day an event/todo lands on, not the clock time).
+Dates vary with serve order, so the grammar computes them. A date may carry an
+optional time-of-day suffix — `@HH:MM` (a point) or `@HH:MM-HH:MM` (a within-day
+span) — which is static (it does not shift with serve order) but rides INSIDE the
+one governed expression, so the email body and the answer key still render from a
+single source and cannot drift. Clock times are bounded by the CEO's work hours
+(WORK_START..WORK_END); a token resolving outside them is a grammar error, since
+such a slot can never be booked. A bare date still resolves to a whole DAY and is
+graded day-level; a timed expression resolves to a datetime / TimeInterval and is
+graded at minute granularity (start, and end/duration for an interval).
 """
 from __future__ import annotations
 
 import calendar as _calmod
 import re
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import Union
 
-Value = Union[date, datetime, "Interval"]
+Value = Union[date, datetime, "Interval", "TimeInterval"]
 
 _WEEKDAYS = {"MON": 0, "TUE": 1, "WED": 2, "THU": 3, "FRI": 4, "SAT": 5, "SUN": 6}
+
+# The CEO's bookable window. A clock time outside it is never schedulable, so a
+# time token resolving outside [WORK_START, WORK_END] is rejected at parse time
+# (and therefore at lint). Phase-2 free-slot search treats this window as the
+# per-day universe of bookable time.
+WORK_START = time(5, 0)
+WORK_END = time(23, 0)
 
 
 class ResolverError(ValueError):
@@ -44,6 +56,19 @@ class Interval:
         if isinstance(d, datetime):
             d = d.date()
         return self.start <= d <= self.end
+
+
+@dataclass(frozen=True)
+class TimeInterval:
+    """A within-day span [start, end) with clock times — what a timed obligation
+    occupies. Distinct from Interval (whole days). start and end are datetimes on
+    the same calendar day, with start < end."""
+    start: datetime
+    end: datetime
+
+    def overlaps(self, other: "TimeInterval") -> bool:
+        # half-open [start, end): touching edges (end == other.start) do NOT overlap.
+        return self.start < other.end and other.start < self.end
 
 
 @dataclass
@@ -63,6 +88,8 @@ class RenderResult:
 def _as_date(v: Value) -> date:
     if isinstance(v, datetime):
         return v.date()
+    if isinstance(v, TimeInterval):
+        return v.start.date()
     if isinstance(v, Interval):
         return v.start
     return v
@@ -190,6 +217,20 @@ class _WeekOf:
         return _week_of(_as_date(self.inner.eval(ctx)))
 
 
+def _apply_offset(d: date, amount: int, unit: str) -> date:
+    if unit == "d":
+        return d + timedelta(days=amount)
+    if unit == "w":
+        return d + timedelta(weeks=amount)
+    if unit == "bd":
+        return add_business_days(d, amount)
+    if unit == "m":
+        return add_months(d, amount)
+    if unit == "y":
+        return add_months(d, amount * 12)
+    raise ResolverError(f"bad offset unit {unit!r}")
+
+
 @dataclass
 class _Offset:
     base: object
@@ -198,28 +239,65 @@ class _Offset:
 
     def eval(self, ctx: Context) -> Value:
         v = self.base.eval(ctx)
+        if isinstance(v, TimeInterval):       # offset an anchored time-span by whole days, keep clock
+            nd = _apply_offset(v.start.date(), self.amount, self.unit)
+            return TimeInterval(datetime.combine(nd, v.start.time()),
+                                datetime.combine(nd, v.end.time()))
         d = _as_date(v)
-        if self.unit == "d":
-            nd = d + timedelta(days=self.amount)
-        elif self.unit == "w":
-            nd = d + timedelta(weeks=self.amount)
-        elif self.unit == "bd":
-            nd = add_business_days(d, self.amount)
-        elif self.unit == "m":
-            nd = add_months(d, self.amount)
-        elif self.unit == "y":
-            nd = add_months(d, self.amount * 12)
-        else:
-            raise ResolverError(f"bad offset unit {self.unit!r}")
+        nd = _apply_offset(d, self.amount, self.unit)
         if isinstance(v, datetime):
             return datetime.combine(nd, v.time())
         return nd
+
+
+@dataclass
+class _TimeAttach:
+    """A date expression with a clock time attached: `<dateexpr> @HH:MM` -> datetime,
+    `<dateexpr> @HH:MM-HH:MM` -> TimeInterval. The date part is serve-relative; the
+    clock time is a static literal validated against work hours at parse time."""
+    base: object
+    start: tuple            # (hour, minute)
+    end: tuple | None       # (hour, minute) for an interval, else None
+
+    def eval(self, ctx: Context) -> Value:
+        d = _as_date(self.base.eval(ctx))
+        start_dt = datetime.combine(d, time(self.start[0], self.start[1]))
+        if self.end is None:
+            return start_dt
+        return TimeInterval(start_dt, datetime.combine(d, time(self.end[0], self.end[1])))
 
 
 # --- parser ----------------------------------------------------------------
 
 _OFFSET_RE = re.compile(r"\s*([+-]\d+)(bd|d|w|m|y)")
 _FROM_RE = re.compile(r"\s+from\s+", re.I)
+_TIME_RE = re.compile(r"\s*@(\d{1,2}):(\d{2})(?:\s*-\s*(\d{1,2}):(\d{2}))?")
+
+
+def _parse_time(hh: str, mm: str) -> tuple:
+    h, m = int(hh), int(mm)
+    if not (0 <= h <= 23 and 0 <= m <= 59):
+        raise ResolverError(f"bad clock time {h:02d}:{m:02d} (expected 00:00–23:59)")
+    return (h, m)
+
+
+def _hhmm(t: tuple) -> str:
+    return f"{t[0]:02d}:{t[1]:02d}"
+
+
+def _check_work_hours(start: tuple, end: tuple | None) -> None:
+    st = time(start[0], start[1])
+    if st < WORK_START or st > WORK_END:
+        raise ResolverError(
+            f"time {_hhmm(start)} is outside work hours "
+            f"{WORK_START.strftime('%H:%M')}–{WORK_END.strftime('%H:%M')}")
+    if end is not None:
+        et = time(end[0], end[1])
+        if et <= st:
+            raise ResolverError(f"end {_hhmm(end)} must be after start {_hhmm(start)}")
+        if et > WORK_END:
+            raise ResolverError(
+                f"end {_hhmm(end)} is past work hours end {WORK_END.strftime('%H:%M')}")
 
 
 def _parse_from_clause(rest: str) -> tuple[object, str]:
@@ -307,6 +385,14 @@ def _parse_expr(s: str) -> object:
             break
         node = _Offset(node, int(m.group(1)), m.group(2))
         rest = rest[m.end():]
+    # optional trailing time-of-day suffix: @HH:MM or @HH:MM-HH:MM
+    m = _TIME_RE.match(rest)
+    if m:
+        start = _parse_time(m.group(1), m.group(2))
+        end = _parse_time(m.group(3), m.group(4)) if m.group(3) else None
+        _check_work_hours(start, end)
+        node = _TimeAttach(node, start, end)
+        rest = rest[m.end():]
     if rest.strip():
         raise ResolverError(f"trailing junk {rest!r} in expression")
     return node
@@ -322,6 +408,8 @@ def resolve(expr: str, ctx: Context) -> Value:
 def value_kind(v: Value) -> str:
     if isinstance(v, datetime):
         return "datetime"
+    if isinstance(v, TimeInterval):
+        return "timeinterval"
     if isinstance(v, Interval):
         return "interval"
     return "date"
@@ -365,14 +453,23 @@ def _ordinal(n: int) -> str:
     return f"{n}{suffix}"
 
 
+def _clock(dt: datetime) -> str:
+    h = dt.hour % 12 or 12
+    ampm = "AM" if dt.hour < 12 else "PM"
+    mm = "" if dt.minute == 0 else f":{dt.minute:02d}"
+    return f"{h}{mm} {ampm}"
+
+
+def _full_day(d) -> str:
+    return f"{d.strftime('%A, %B')} {_ordinal(d.day)}, {d.year}"
+
+
 def human(value: Value) -> str:
     """Natural-language rendering used in email bodies."""
     if isinstance(value, Interval):
         return f"the week of {value.start.strftime('%B')} {_ordinal(value.start.day)}, {value.start.year}"
+    if isinstance(value, TimeInterval):
+        return f"{_full_day(value.start)}, {_clock(value.start)}–{_clock(value.end)}"
     if isinstance(value, datetime):
-        h = value.hour % 12 or 12
-        ampm = "AM" if value.hour < 12 else "PM"
-        mm = "" if value.minute == 0 else f":{value.minute:02d}"
-        day = f"{value.strftime('%A, %B')} {_ordinal(value.day)}, {value.year}"
-        return f"{day} at {h}{mm} {ampm}"
-    return f"{value.strftime('%A, %B')} {_ordinal(value.day)}, {value.year}"
+        return f"{_full_day(value)} at {_clock(value)}"
+    return _full_day(value)

@@ -30,7 +30,7 @@ from datetime import date, datetime
 from typing import Optional
 
 from sb import resolver
-from sb.resolver import Context, Interval, Value
+from sb.resolver import Context, Interval, TimeInterval, Value
 from sb.schema import Answer, Op
 
 
@@ -71,26 +71,41 @@ def _title_hit(obj: Obj, keywords: list[str]) -> bool:
 
 
 def _to_date(v: Value) -> date:
-    return v.date() if isinstance(v, datetime) else (v.start if isinstance(v, Interval) else v)
+    if isinstance(v, datetime):
+        return v.date()
+    if isinstance(v, TimeInterval):
+        return v.start.date()
+    if isinstance(v, Interval):
+        return v.start
+    return v
 
 
-def _matches_value(obj_when: datetime, expected: Value, tolerance: str) -> bool:
+def _matches_value(obj: Obj, expected: Value, tolerance: str) -> bool:
+    # Timed expectations compare at clock granularity (the email dictated a time).
+    if isinstance(expected, TimeInterval):
+        if obj.when != expected.start:
+            return False
+        # an object that carries an end (an event) must match it too — this is what
+        # grades duration; a point object (a todo, end=None) matches on start alone.
+        return obj.end is None or obj.end == expected.end
+    if isinstance(expected, datetime):
+        return obj.when == expected
     if isinstance(expected, Interval):
-        return expected.contains(obj_when)
+        return expected.contains(obj.when)
     if tolerance.startswith("within:"):
         n = int(tolerance.split(":", 1)[1].rstrip("d"))
-        return abs((obj_when.date() - _to_date(expected)).days) <= n
-    # day equality (the benchmark grades at whole-day granularity)
-    return obj_when.date() == _to_date(expected)
+        return abs((obj.when.date() - _to_date(expected)).days) <= n
+    # day equality (a bare date grades at whole-day granularity)
+    return obj.when.date() == _to_date(expected)
 
 
 def _predicate_ok(obj: Obj, predicate: Optional[dict], ctx: Context, tolerance: str) -> bool:
     if not predicate:
         return True
     if "eq" in predicate:
-        return _matches_value(obj.when, resolver.resolve(predicate["eq"], ctx), tolerance)
+        return _matches_value(obj, resolver.resolve(predicate["eq"], ctx), tolerance)
     if "any_of" in predicate:
-        return any(_matches_value(obj.when, resolver.resolve(e, ctx), tolerance)
+        return any(_matches_value(obj, resolver.resolve(e, ctx), tolerance)
                    for e in predicate["any_of"])
     if "by" in predicate:
         return ctx.serve <= obj.when.date() <= _to_date(resolver.resolve(predicate["by"], ctx))
@@ -115,6 +130,8 @@ def _h12(dt: datetime) -> str:
 
 
 def _fmt_value(v: Value) -> str:
+    if isinstance(v, TimeInterval):
+        return f"{v.start.strftime('%a %b %d')} {_h12(v.start)}–{_h12(v.end)}"
     if isinstance(v, Interval):
         return f"{v.start.strftime('%a %b %d')}–{v.end.strftime('%b %d')}"
     if isinstance(v, datetime):
@@ -146,6 +163,25 @@ def _describe_predicate(predicate: Optional[dict], ctx: Context) -> str:
     return "(any time)"
 
 
+def _wrong_when_reason(op: Op, ctx: Context, title_set: list) -> str:
+    """A timed obligation that landed on the right DAY but the wrong clock time (or
+    the wrong length) should say so, instead of the day-level 'on the wrong day'."""
+    exprs = ([op.on["eq"]] if op.on and "eq" in op.on
+             else op.on["any_of"] if op.on and "any_of" in op.on else [])
+    for e in exprs:
+        val = resolver.resolve(e, ctx)
+        if isinstance(val, TimeInterval):
+            for o in title_set:
+                if o.when == val.start and o.end is not None and o.end != val.end:
+                    return "the wrong length"
+            if any(o.when.date() == val.start.date() for o in title_set):
+                return "at the wrong time"
+        elif isinstance(val, datetime):
+            if any(o.when.date() == val.date() for o in title_set):
+                return "at the wrong time"
+    return "on the wrong day"
+
+
 def _grade_op(op: Op, ctx: Context, state: NodeState) -> dict:
     obj_word = "event" if op.kind == "event" else "to-do"
     pool = state.events if op.kind == "event" else state.todos
@@ -174,7 +210,7 @@ def _grade_op(op: Op, ctx: Context, state: NodeState) -> dict:
     elif not count_ok:
         reason = f"found {len(title_set)} matching, expected exactly 1 (duplicate / double-booked)"
     elif not matched:
-        reason = "on the wrong day"
+        reason = _wrong_when_reason(op, ctx, title_set)
     else:
         reason = "did not match the expected action"
 

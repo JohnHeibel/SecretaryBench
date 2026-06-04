@@ -1,5 +1,5 @@
 """Unit tests for the date grammar evaluator (the keystone)."""
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 
@@ -7,6 +7,7 @@ from sb.resolver import (
     Context,
     Interval,
     ResolverError,
+    TimeInterval,
     human,
     render_body,
     resolve,
@@ -172,6 +173,66 @@ def test_from_does_not_change_serve_relative_forms():
     # No from clause: identical to current serve-relative behavior.
     assert resolve("next:THU", ctx()) == date(2026, 6, 11)
     assert resolve("this:FRI", ctx()) == date(2026, 6, 12)
+
+
+# --- time-of-day suffix ----------------------------------------------------
+
+def test_time_attach_single_is_datetime():
+    # next THU after Tue Jun 9 -> Thu Jun 11, at 2 PM.
+    assert resolve("next:THU @14:00", ctx()) == datetime(2026, 6, 11, 14, 0)
+
+
+def test_time_attach_interval():
+    assert resolve("next:THU @14:00-15:00", ctx()) == TimeInterval(
+        datetime(2026, 6, 11, 14, 0), datetime(2026, 6, 11, 15, 0))
+
+
+def test_time_after_offsets():
+    # serve+3bd = Fri Jun 12, 9:30-11:00.
+    assert resolve("serve+3bd @09:30-11:00", ctx()) == TimeInterval(
+        datetime(2026, 6, 12, 9, 30), datetime(2026, 6, 12, 11, 0))
+
+
+def test_time_on_anchor_then_offset_keeps_clock():
+    # an anchor holding a timed span, shifted a day, keeps its clock time.
+    anchors = {"board": TimeInterval(datetime(2026, 6, 12, 14, 0), datetime(2026, 6, 12, 15, 0))}
+    assert resolve("@board+1d", Context(SERVE, anchors)) == TimeInterval(
+        datetime(2026, 6, 13, 14, 0), datetime(2026, 6, 13, 15, 0))
+
+
+def test_time_human_rendering():
+    assert human(resolve("next:THU @14:00-15:00", ctx())) == "Thursday, June 11th, 2026, 2 PM–3 PM"
+    assert human(resolve("next:THU @09:30", ctx())) == "Thursday, June 11th, 2026 at 9:30 AM"
+
+
+def test_time_outside_work_hours_rejected():
+    with pytest.raises(ResolverError):
+        resolve("next:THU @04:30", ctx())            # before 5 AM
+    with pytest.raises(ResolverError):
+        resolve("next:THU @22:00-23:30", ctx())      # end past 11 PM
+
+
+def test_time_end_before_start_rejected():
+    with pytest.raises(ResolverError):
+        resolve("next:THU @15:00-14:00", ctx())
+
+
+def test_bad_clock_rejected():
+    with pytest.raises(ResolverError):
+        resolve("next:THU @25:00", ctx())
+
+
+def test_time_within_work_hours_boundary_ok():
+    # 5 AM start and 11 PM end are inclusive bounds.
+    assert resolve("serve @05:00-23:00", ctx()) == TimeInterval(
+        datetime(2026, 6, 9, 5, 0), datetime(2026, 6, 9, 23, 0))
+
+
+def test_render_timed_emission():
+    r = render_body("Board is locked for {!board = nth:3,FRI,+1m @14:00-15:00}.", ctx())
+    assert r.emissions["board"] == TimeInterval(
+        datetime(2026, 7, 17, 14, 0), datetime(2026, 7, 17, 15, 0))
+    assert "2 PM–3 PM" in r.text
 
 
 # --- error handling --------------------------------------------------------

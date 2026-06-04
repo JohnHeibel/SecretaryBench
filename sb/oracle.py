@@ -14,7 +14,7 @@ from __future__ import annotations
 from datetime import datetime, time, timedelta
 
 from sb.engine import Store
-from sb.resolver import Context, Interval, Value, resolve
+from sb.resolver import Context, Interval, TimeInterval, Value, resolve
 from sb.schema import Email, Op
 
 
@@ -40,11 +40,28 @@ def _target(predicate: dict, ctx: Context) -> Value:
 
 
 def _as_dt(v: Value, default_hour: int) -> datetime:
+    """Collapse a target value to a single datetime at a default hour (used by tests /
+    mock models that don't care about duration)."""
+    if isinstance(v, TimeInterval):
+        return v.start
     if isinstance(v, datetime):
         return v
     if isinstance(v, Interval):
         v = v.start
     return datetime.combine(v, time(default_hour, 0))
+
+
+def _placement(v: Value, kind: str) -> tuple[datetime, datetime | None]:
+    """Resolve an obligation's target value to a concrete (start, end) for the store.
+    A TimeInterval places start..end exactly; a datetime places that start (events get
+    a default 1h end); a bare date / Interval lands at the default work hour, day-level."""
+    if isinstance(v, TimeInterval):
+        return v.start, v.end
+    if isinstance(v, datetime):
+        return v, (v + timedelta(hours=1) if kind == "event" else None)
+    day = v.start if isinstance(v, Interval) else v
+    start = datetime.combine(day, time(9 if kind == "event" else 17, 0))
+    return start, (start + timedelta(hours=1) if kind == "event" else None)
 
 
 def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -> None:
@@ -56,24 +73,25 @@ def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -
                 store.delete(oid)
             continue
 
-        when = _as_dt(_target(op.on, ctx), 9 if op.kind == "event" else 17)
+        start, end = _placement(_target(op.on, ctx), op.kind)
         existing = store.find_in_node(email.node, op.kind, title)
 
         if op.verb == "move":
             # reschedule in place so the obligation stays a single object
             if existing is not None and op.kind == "event":
-                store.update_event(existing, start=when)
+                store.update_event(existing, start=start, end=end)
             elif existing is not None:
                 store.delete(existing)
-                store.create_todo(email.id, title, when)
+                store.create_todo(email.id, title, start)
             else:
-                _create(store, email.id, op.kind, title, when)
+                _create(store, email.id, op.kind, title, start, end)
         else:  # create
-            _create(store, email.id, op.kind, title, when)
+            _create(store, email.id, op.kind, title, start, end)
 
 
-def _create(store: Store, email_id: str, kind: str, title: str, when: datetime) -> None:
+def _create(store: Store, email_id: str, kind: str, title: str,
+            start: datetime, end: datetime | None) -> None:
     if kind == "event":
-        store.create_event(email_id, title, when)
+        store.create_event(email_id, title, start, end)
     else:
-        store.create_todo(email_id, title, when)
+        store.create_todo(email_id, title, start)
