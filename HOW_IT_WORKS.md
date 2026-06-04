@@ -61,6 +61,10 @@ it to 4 PM." "Cancel it." The model just does it, and we check the calendar matc
 There is no "find an open slot yourself" — naming the time keeps every answer crisp and
 gradeable. (Work hours are 5 AM–11 PM, and every time an email gives is inside that.)
 
+The match is **exact** — the model has to land on the precise day and time, no "close
+enough." (The one deliberate exception is a deadline like "file the report **by**
+Friday," where any day up to Friday counts. It's rare, and you choose it on purpose.)
+
 ## Conflicts
 
 We absolutely test the CEO's calendar getting crowded — we just **write the fix into
@@ -92,6 +96,58 @@ slip can never damage another scenario's score.
 - **Can see:** the inbox (all emails, searchable), the calendar (all events), its tools.
 - **Cannot see:** the answer key, how it's scored, the scenario boundaries, or the
   fence. It just gets emails and does the work, like a real assistant.
+
+## Building a scenario: a worked example
+
+A scenario is just a short email thread with an answer for each email. Here's a full
+one — "Project Helios" — to show the shape:
+
+**Email 1** (from the COO) — *the day it arrives is the model's "now"*
+> **Helios kickoff.** "We're starting Project Helios. Put the kickoff on the calendar
+> for next Thursday, 10–11 AM."
+
+*Answer:* create an event **"Helios kickoff"** at `next:THU @10:00-11:00`. Because a
+later email refers back to this date, also publish it as an **anchor** so it can be
+reused: `{!helios_kickoff = next:THU @10:00-11:00}`.
+
+**Email 2** (from the COO, a week or so later) — *the long-horizon part*
+> **Helios review.** "Two weeks after the kickoff, let's do a review, 2–3 PM."
+
+*Answer:* create **"Helios review"** at `@helios_kickoff+2w @14:00-15:00`. The model
+has to recall the kickoff date — possibly served weeks ago — and compute two weeks out.
+That recall-and-compute over a long gap is exactly what we're testing.
+
+**Email 3** (from the board's office) — *a reschedule conflict*
+> **Re: Helios review.** "The board needs that review moved up a week, same time."
+
+*Answer:* `move` **"Helios review"** to `@helios_kickoff+1w @14:00-15:00`. The model
+must find the event it already made and move it. One exact new time.
+
+**Email 4** (from a teammate) — *an FYI, no action*
+> "FedEx is dropping the Helios mockups Thursday — nothing for you to do."
+
+*Answer:* no ops. The model should create nothing. This tests **restraint** (not
+over-acting on chatter).
+
+That single scenario exercises the whole benchmark: fixed times, an **anchor reused
+across a long gap** (the temporal-reasoning core), a **reschedule**, and a
+**no-action distractor**. Run it on its own and the reference solver should score it
+**1.0** before you add it to the corpus — that's your safety check.
+
+**Want anti-gaming variety?** Write the offset as a list: `@helios_kickoff+[2,3]w`. One
+run the review is 2 weeks out, another it's 3, picked by the run's seed — and the email
+the model reads *and* the grader both use the same value, so it's still exactly one
+right answer per run. The model can't memorize a fixed date; it has to actually reason.
+
+### Rules of thumb for authors
+- **Name it like the email calls it** ("Helios kickoff") and you're done — no keyword
+  fiddling.
+- **Give an exact time** for every meeting. The model must hit it exactly.
+- **Use an anchor** (`{!name = ...}`) whenever a later email refers back to an earlier
+  date — that's what makes it a long-horizon test instead of a one-shot.
+- **Conflicts = reschedules:** a later email moves or cancels an earlier event.
+- **Add FYI / no-action emails** so the model is tested on *not* over-acting.
+- **Check it solves alone** before shipping it.
 
 ## Naming events (a note for authors)
 

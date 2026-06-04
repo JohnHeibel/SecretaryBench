@@ -56,6 +56,11 @@ from arrival through the deadline; "either Tuesday or Thursday" passes on either
 grader checks "is this a valid member of the deterministic acceptable set," not "is
 this THE answer." The set is still fixed by the answer key, never by the random batch.
 
+Otherwise **matching is exact** — exactly one day and time. The old `within:Nd`
+tolerance knob is dropped (default and only setting: exact). The *only* deliberate
+multi-day answers are the `by` (deadline) and `any_of` (options) predicates above; an
+author picks those on purpose, they are not a fuzzy slider.
+
 ## The grading contract (binary, per email, scored at the scene)
 
 Each email scores **1** iff, on its turn, the model:
