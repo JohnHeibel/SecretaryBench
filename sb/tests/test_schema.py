@@ -40,6 +40,22 @@ def test_topo_order_respects_dependencies():
     assert order.index("alpha.brief") < order.index("alpha.review")
 
 
+def test_email_type_roundtrips():
+    # the author-tagged role (action|no_action|junk) loads as a first-class field and is
+    # preserved for composition reporting; the grader ignores it, and absent stays None.
+    c = build_corpus([{"id": "n", "emails": [
+        {"id": "n.fyi", "type": "no_action", "answer": {"ops": []}},
+        {"id": "n.noise", "type": "junk", "answer": {"ops": []}},
+        {"id": "n.act", "type": "action", "answer": {"ops": [
+            {"create": "kickoff", "kind": "event", "on": {"eq": "serve+1w"}}]}},
+    ]}])
+    assert c.emails["n.fyi"].type == "no_action"
+    assert c.emails["n.noise"].type == "junk"
+    assert c.emails["n.act"].type == "action"
+    c2 = build_corpus([{"id": "m", "emails": [{"id": "m.a", "answer": {"ops": []}}]}])
+    assert c2.emails["m.a"].type is None
+
+
 # --- linter rejects bad corpora --------------------------------------------
 
 def _write_node(tmp_path, name, obj):
