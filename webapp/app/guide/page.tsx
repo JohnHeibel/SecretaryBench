@@ -46,7 +46,7 @@ export default function GuidePage() {
       <ol className="mb-6 grid gap-2 sm:grid-cols-2">
         {[
           ["1 · Write the email", "Who it's from, a subject, a short body."],
-          ["2 · Add any dates with blocks", "Click + insert date token — never type a date by hand."],
+          ["2 · Add any dates with the date builder", "Click + insert date and pick the pieces — the resolved day shows live."],
           ["3 · Fill the answer key", "Say what to do, or tick “needs no action.”"],
           ["4 · Watch the bar go green", "Green = a perfect assistant could solve it. Done."],
         ].map(([h, d]) => (
@@ -68,9 +68,9 @@ export default function GuidePage() {
           </ul>
         </Card>
 
-        <Card title="Writing a date" teaser="use the block builder, never type it">
-          <p>If you type &ldquo;next Thursday&rdquo; as plain text, the grader can&apos;t line it up with your answer. So dates are built from snap-together blocks (like Scratch).</p>
-          <p>Click <span className={chip}>+ insert date token</span>. Drag blocks, snap them, watch the live preview turn <span className="text-emerald-400">green</span>, hit Insert. The same blocks build the body <em>and</em> the answer key, so they can never disagree.</p>
+        <Card title="Writing a date" teaser="build it from choices — shown resolved live">
+          <p>Our dates are <em>relative</em> (&ldquo;5 days after this email arrives,&rdquo; &ldquo;two weeks after the signing&rdquo;), so you don&apos;t pick a day on a calendar — you <strong>build</strong> it from a short sentence of choices: a starting point, then any offsets.</p>
+          <p>In the answer key the builder is right there inline; in the email body, click <span className={chip}>+ insert date</span>. Either way the resolved day shows live (e.g. <span className="text-emerald-400">→ Monday, Aug 17, 2026</span>). The <em>same</em> built date drives the body <em>and</em> the answer key, so they can never disagree. You can also type the expression directly — it&apos;s checked against the real grader as you type.</p>
         </Card>
 
         <Card title="The answer key" teaser="what a perfect assistant should do">
@@ -119,8 +119,8 @@ export default function GuidePage() {
 
         <Card title="Words we use" teaser="node · cast · anchor · …">
           <ul className="space-y-1">
-            <li><span className={chip}>node</span> one storyline — a folder grouping related emails. Make one per scenario.</li>
-            <li><span className={chip}>cast</span> the people in that storyline. Every node starts with <span className={chip}>CEO → you</span> (the AI works for you).</li>
+            <li><span className={chip}>storyline</span> a group of related emails — one scenario. Make one per thread. (Saved as a <em>node</em> file under the hood.)</li>
+            <li><span className={chip}>cast</span> the people in that storyline. Every storyline starts with <span className={chip}>CEO → you</span> (the AI works for you).</li>
             <li><span className={chip}>anchor</span> a date set in one email and reused in a later one (e.g. &ldquo;the close date&rdquo;).</li>
             <li><span className={chip}>edge</span> &ldquo;this email comes after that one.&rdquo; A <em>date</em> edge also carries a deadline.</li>
             <li><span className={chip}>span</span> how far back the needed fact is — the main thing that makes an email hard.</li>
@@ -129,7 +129,7 @@ export default function GuidePage() {
 
         <Card title="Quick gotchas" teaser="things that trip people up">
           <ul className="space-y-1">
-            <li>Never type a date by hand — always the block builder, in both the body and the answer key.</li>
+            <li>Build dates with the date builder (or type the expression — it&apos;s checked live). The same date drives the body and the answer key, so they can&apos;t drift.</li>
             <li>Don&apos;t worry about ids — they auto-name from the subject. Leave them alone.</li>
             <li>The <strong>To</strong> field is one person.</li>
             <li>Two things in one storyline need different names (not two &ldquo;reviews&rdquo; — call them &ldquo;board&rdquo; and &ldquo;client&rdquo;).</li>
@@ -139,7 +139,7 @@ export default function GuidePage() {
       </div>
 
       <div className="mt-6 rounded-lg border border-slate-800 bg-slate-900/40 px-4 py-3 text-sm text-slate-400">
-        That&apos;s it. Make a node, warm up with a couple of easy tests, sprinkle in tempting filler, then try a real needle.
+        That&apos;s it. Make a storyline, warm up with a couple of easy tests, sprinkle in tempting filler, then try a real needle.
         <Link href="/" className="ml-1 text-sky-400 hover:text-sky-300">Start authoring →</Link>
       </div>
     </div>

@@ -14,7 +14,7 @@ body {
   @apply bg-slate-950 text-slate-100;
 }
 
-/* React Flow + Blockly inject their own stylesheets at runtime; keep a dark base. */
+/* React Flow injects its own stylesheet at runtime; keep a dark base. */
 .react-flow__attribution {
   display: none;
 }

@@ -1,9 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import { resolveExpr } from "@/lib/api";
+import { useState } from "react";
 import { OP_CHOICES, opChoiceId, opName, opVerb } from "@/lib/grammar";
 import type { Answer, Op, Predicate } from "@/lib/types";
-import TokenBlockly from "./blockly/TokenBlockly";
+import DateBuilder from "./DateBuilder";
 
 interface Props {
   answer: Answer;
@@ -23,54 +22,30 @@ const TOLERANCE_CHOICES: { value: string; label: string }[] = [
 ];
 
 const PRED_OPS: { key: keyof Predicate; label: string }[] = [
-  { key: "eq", label: "on exactly (eq)" },
-  { key: "by", label: "on or before (by)" },
-  { key: "in", label: "within interval (in)" },
-  { key: "any_of", label: "any of (any_of)" },
-  { key: "not_in", label: "not within (not_in)" },
+  { key: "eq", label: "on exactly" },
+  { key: "by", label: "on or before" },
+  { key: "in", label: "within" },
+  { key: "any_of", label: "any of" },
+  { key: "not_in", label: "not within" },
 ];
-
-// Live, debounced preview of a typed date expression — mirrors BodyEditor's chips.
-// A comma-joined string (the any_of case) is previewed part-by-part. @anchor exprs
-// resolve at serve time, so we don't try to resolve them here.
-function DatePreview({ expr, serveDate }: { expr: string; serveDate: string }) {
-  const [chips, setChips] = useState<{ expr: string; ok: boolean; text: string }[]>([]);
-  useEffect(() => {
-    const parts = expr.split(",").map((s) => s.trim()).filter(Boolean);
-    if (!parts.length) { setChips([]); return; }
-    let alive = true;
-    const t = setTimeout(async () => {
-      const out: { expr: string; ok: boolean; text: string }[] = [];
-      for (const p of parts) {
-        if (/@\w/.test(p)) { out.push({ expr: p, ok: true, text: "resolves at serve time" }); continue; }
-        const r = await resolveExpr(p, serveDate, {});
-        out.push({ expr: p, ok: !!r.ok, text: r.ok ? (r.human ?? "") : (r.error ?? "invalid") });
-      }
-      if (alive) setChips(out);
-    }, 250);
-    return () => { alive = false; clearTimeout(t); };
-  }, [expr, serveDate]);
-  if (!chips.length) return null;
-  return (
-    <div className="flex flex-col gap-0.5 text-[11px] leading-snug">
-      {chips.map((c, k) => <span key={k} className={c.ok ? "text-emerald-400" : "text-rose-400"}>{c.ok ? "→" : "⚠"} {c.text}</span>)}
-    </div>
-  );
-}
 
 function predOp(p?: Predicate): keyof Predicate {
   if (!p) return "eq";
   return (Object.keys(p)[0] as keyof Predicate) ?? "eq";
 }
-function predExpr(p?: Predicate): string {
+// The single date expression for a non-any_of predicate (or the first option of an any_of).
+function firstExpr(p?: Predicate): string {
   if (!p) return "";
   const v = Object.values(p)[0];
-  return Array.isArray(v) ? v.join(", ") : (v ?? "");
+  return Array.isArray(v) ? (v[0] ?? "") : (v ?? "");
+}
+// The list of expressions for an any_of predicate (folding a single-expr predicate to a 1-list).
+function anyOfList(p?: Predicate): string[] {
+  if (!p) return [];
+  return Array.isArray(p.any_of) ? p.any_of : (firstExpr(p) ? [firstExpr(p)] : []);
 }
 
 export default function AnswerKeyBuilder({ answer, anchors, serveDate, onChange }: Props) {
-  // which op index is currently picking a date via the block builder
-  const [picking, setPicking] = useState<number | null>(null);
   // which op indices have the (advanced) keyword override revealed
   const [showMatch, setShowMatch] = useState<Record<number, boolean>>({});
   const ops = answer.ops ?? [];
@@ -149,23 +124,29 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, onChange 
                 </p>
 
                 {!isCancel && (
-                  <div className="mb-2 space-y-1 text-xs">
+                  <div className="mb-2 space-y-1.5 text-xs">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-slate-500">{op.kind === "todo" ? "due date" : "date"}</span>
-                      <select value={predOp(pred)} onChange={(e) => setPredicate(i, e.target.value as keyof Predicate, predExpr(pred))}
-                        className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
+                      <select value={predOp(pred)} onChange={(e) => {
+                        const newOp = e.target.value as keyof Predicate;
+                        if (newOp === "any_of") patch(i, { on: { any_of: anyOfList(pred) } });
+                        else setPredicate(i, newOp, firstExpr(pred));
+                      }} className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
                         {PRED_OPS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
                       </select>
-                      <input value={predExpr(pred)} onChange={(e) => setPredicate(i, predOp(pred), e.target.value)}
-                        placeholder="e.g. next:TUE, serve+5d, or @signing+2w"
-                        className="min-w-[14rem] flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 font-mono text-sky-300 outline-none focus:border-sky-500" />
-                      <button onClick={() => setPicking(i)} className="rounded bg-emerald-600/90 px-2 py-1 font-medium text-white hover:bg-emerald-500">build date</button>
                     </div>
-                    <DatePreview expr={predExpr(pred)} serveDate={serveDate} />
+                    {predOp(pred) === "any_of" ? (
+                      <AnyOfBuilder values={anyOfList(pred)} anchors={anchors} serveDate={serveDate}
+                        onChange={(list) => patch(i, { on: { any_of: list } })} />
+                    ) : (
+                      <DateBuilder value={firstExpr(pred)} anchors={anchors} serveDate={serveDate}
+                        intervalOnly={predOp(pred) === "in" || predOp(pred) === "not_in"}
+                        onChange={(expr) => setPredicate(i, predOp(pred), expr)} />
+                    )}
                   </div>
                 )}
 
-                {!isCancel && /@\w/.test(predExpr(pred)) && (
+                {!isCancel && anyOfList(pred).some((e) => /@\w/.test(e)) && (
                   <div className="mb-2 rounded bg-violet-500/10 px-2 py-1 text-[11px] leading-snug text-violet-300">
                     ↳ this date uses an <code className="font-mono">@anchor</code> from another email, so this email is a <strong>needle</strong> — a retrieval test. The model has to find that earlier email to answer it, and it gets harder the more filler sits between the two.
                   </div>
@@ -197,17 +178,29 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, onChange 
                   </label>
                 )}
 
-                {picking === i && !isCancel && (
-                  <TokenBlockly anchors={anchors} serveDate={serveDate} mode="predicate"
-                    onInsert={(expr) => { setPredicate(i, predOp(pred), predOp(pred) === "any_of" ? `${predExpr(pred)}${predExpr(pred) ? ", " : ""}${expr}` : expr); setPicking(null); }}
-                    onClose={() => setPicking(null)} />
-                )}
               </div>
             );
           })}
           <button onClick={addOp} className="rounded-md border border-dashed border-slate-700 px-3 py-1.5 text-xs text-slate-400 hover:border-sky-600 hover:text-sky-300">+ another action</button>
         </div>
       )}
+    </div>
+  );
+}
+
+// "any of" = a list of acceptable dates (the model may land on any one). Each is its own
+// DateBuilder; an empty list shows a single blank builder to start from.
+function AnyOfBuilder({ values, anchors, serveDate, onChange }: { values: string[]; anchors: string[]; serveDate: string; onChange: (list: string[]) => void }) {
+  const list = values.length ? values : [""];
+  return (
+    <div className="space-y-1.5">
+      {list.map((v, k) => (
+        <div key={k} className="flex items-start gap-2">
+          <div className="flex-1"><DateBuilder value={v} anchors={anchors} serveDate={serveDate} onChange={(e) => onChange(list.map((x, j) => j === k ? e : x))} /></div>
+          {list.length > 1 && <button type="button" onClick={() => onChange(list.filter((_, j) => j !== k))} className="mt-1 px-1 text-slate-500 hover:text-rose-400">✕</button>}
+        </div>
+      ))}
+      <button type="button" onClick={() => onChange([...list, ""])} className="text-[11px] text-slate-500 hover:text-sky-300">+ add option</button>
     </div>
   );
 }

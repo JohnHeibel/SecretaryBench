@@ -234,7 +234,7 @@ function StartEmpty({ onAddNode }: { onAddNode: () => void }) {
       <div className="max-w-md rounded-lg border border-slate-800 bg-slate-900/50 p-6 text-center">
         <p className="text-xs font-semibold uppercase tracking-wide text-sky-300">First step</p>
         <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is just a folder for related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
+        <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is a group of related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
         <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
       </div>
     </div>

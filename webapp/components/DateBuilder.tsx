@@ -1,0 +1,270 @@
+"use client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { resolveExpr } from "@/lib/api";
+import { NTH, UNITS, WEEKDAYS } from "@/lib/grammar";
+import {
+  type Base, type BaseKind, type Expr, type MonthRef,
+  emptyBase, isInterval, parseExpr, serializeExpr, serveExpr,
+} from "@/lib/dateExpr";
+
+// The inline "fill-in-the-blank" date builder (design doc Direction A). An author composes a
+// date from a short sentence of recognition-based choices — a starting point, then any offsets —
+// instead of dragging Scratch blocks. ExprEditor edits the structured Expr (lib/dateExpr.ts)
+// recursively (the `from` reference and `week of` inner are sub-editors on the SAME structure, so
+// an in-progress pick is never lost to a string round-trip). DateBuilder wraps it for the string
+// the answer key/body store, shows the day resolved by the REAL grader live, and offers a raw-text
+// escape hatch (validated the same way) for anything the sentence can't express.
+
+interface Props {
+  value: string;                       // current grammar expression (predicate slot)
+  anchors: string[];                   // @anchor names other emails publish
+  serveDate: string;                   // preview "now"
+  onChange: (expr: string) => void;
+  intervalOnly?: boolean;              // within / not-within slots want an INTERVAL (week / month)
+}
+
+// dropdown order/labels for the first blank — reads as the start of the sentence
+const BASE_OPTIONS: { kind: BaseKind; label: string }[] = [
+  { kind: "serve", label: "the day this email arrives" },
+  { kind: "anchor", label: "a date another email set" },
+  { kind: "next", label: "next weekday" },
+  { kind: "this", label: "a weekday this week" },
+  { kind: "nth", label: "the Nth weekday of a month" },
+  { kind: "dom", label: "a day of the month" },
+  { kind: "weekOf", label: "the week of a date" },
+  { kind: "month", label: "a whole month" },
+];
+
+const WD_LABEL: Record<string, string> = { MON: "Monday", TUE: "Tuesday", WED: "Wednesday", THU: "Thursday", FRI: "Friday", SAT: "Saturday", SUN: "Sunday" };
+const NTH_LABEL: Record<string, string> = { "1": "1st", "2": "2nd", "3": "3rd", "4": "4th", "5": "5th", last: "last" };
+
+const sel = "rounded border border-slate-700 bg-slate-800 px-1.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-500";
+const numField = "w-12 rounded border border-slate-700 bg-slate-800 px-1.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-500";
+
+// Is the expression still missing a required pick (so we shouldn't try to resolve it yet)?
+function incomplete(e: Expr): boolean { return baseIncomplete(e.base); }
+function baseIncomplete(b: Base): boolean {
+  if (b.kind === "anchor") return !b.name;
+  if (b.kind === "next" || b.kind === "this") return b.from !== null && incomplete(b.from);
+  if (b.kind === "weekOf") return incomplete(b.inner);
+  return false;
+}
+const hasAnchorRef = (s: string) => /@[A-Za-z_]/.test(s);
+
+export default function DateBuilder({ value, anchors, serveDate, onChange, intervalOnly }: Props) {
+  // Local structured state is the source of truth while editing; seeded from `value`. A non-empty
+  // value that can't be represented (legacy / hand-typed exotic expr) opens in raw mode.
+  const [expr, setExpr] = useState<Expr | null>(() => (value ? parseExpr(value) : null));
+  const [raw, setRaw] = useState(value);
+  const [mode, setMode] = useState<"builder" | "raw">(() => (value && parseExpr(value) === null ? "raw" : "builder"));
+  const lastEmit = useRef(value);   // the last string WE emitted, so an external change is distinguishable from our own
+
+  const serialized = mode === "raw" ? raw : expr ? serializeExpr(expr) : "";
+
+  // Re-seed on an EXTERNAL value change (op switch, any_of reorder). We compare against our own last
+  // emit (not the live serialization) so an in-progress incomplete pick — which we emit as "" — isn't
+  // clobbered when that empty value comes back as the prop.
+  useEffect(() => {
+    if (value === lastEmit.current) return;
+    const p = value ? parseExpr(value) : null;
+    lastEmit.current = value;
+    setRaw(value); setExpr(p); setMode(value && p === null ? "raw" : "builder");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  const emit = (s: string) => { lastEmit.current = s; onChange(s); };
+  // An incomplete pick (anchor with no name, an empty `from`, …) serializes to invalid grammar; emit ""
+  // instead so the slot reads as simply unset (clean "add the date" guidance) rather than persisting "@".
+  const commit = (next: Expr) => { setExpr(next); setRaw(serializeExpr(next)); emit(incomplete(next) ? "" : serializeExpr(next)); };
+
+  return (
+    <div className="space-y-1">
+      {mode === "raw" ? (
+        <RawField value={raw} onChange={(v) => { setRaw(v); emit(v); setExpr(parseExpr(v)); }}
+          onUseBuilder={() => { setMode("builder"); setExpr(parseExpr(raw)); }} />
+      ) : (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <ExprEditor expr={expr} onChange={commit} anchors={anchors} serveDate={serveDate} />
+          <button type="button" onClick={() => { setRaw(serialized); setMode("raw"); }}
+            className="ml-auto text-[11px] text-slate-500 hover:text-sky-300" title="Type the expression directly — still checked live.">type it</button>
+        </div>
+      )}
+      <Preview serialized={serialized} serveDate={serveDate}
+        incomplete={mode === "builder" && (!expr || incomplete(expr))}
+        intervalParsed={!!expr && isInterval(expr)} intervalOnly={intervalOnly} />
+    </div>
+  );
+}
+
+// --- the recursive structured editor (no strings) --------------------------
+
+function ExprEditor({ expr, onChange, anchors, serveDate }: { expr: Expr | null; onChange: (e: Expr) => void; anchors: string[]; serveDate: string }) {
+  const setBaseKind = (kind: BaseKind) => {
+    const keepOffsets = kind !== "weekOf" && kind !== "month" && expr ? expr.offsets : [];
+    onChange({ base: emptyBase(kind), offsets: keepOffsets });
+  };
+  const isIntervalBase = expr && (expr.base.kind === "weekOf" || expr.base.kind === "month");
+  return (
+    <span className="flex flex-wrap items-center gap-1.5 text-xs text-slate-300">
+      <select value={expr?.base.kind ?? ""} onChange={(e) => setBaseKind(e.target.value as BaseKind)} className={sel}>
+        <option value="" disabled>start from…</option>
+        {BASE_OPTIONS.map((o) => <option key={o.kind} value={o.kind}>{o.label}</option>)}
+      </select>
+      {expr && <BaseControls base={expr.base} anchors={anchors} serveDate={serveDate} onChange={(b) => onChange({ ...expr, base: b })} />}
+      {expr && !isIntervalBase && <OffsetRows offsets={expr.offsets} onChange={(offsets) => onChange({ ...expr, offsets })} />}
+    </span>
+  );
+}
+
+function BaseControls({ base, anchors, serveDate, onChange }: { base: Base; anchors: string[]; serveDate: string; onChange: (b: Base) => void }) {
+  switch (base.kind) {
+    case "serve":
+      return null;
+    case "anchor":
+      return (
+        <select value={base.name} onChange={(e) => onChange({ kind: "anchor", name: e.target.value })} className={sel}>
+          <option value="">pick a published date…</option>
+          {anchors.map((a) => <option key={a} value={a}>@{a}</option>)}
+          {base.name && !anchors.includes(base.name) && <option value={base.name}>@{base.name}</option>}
+        </select>
+      );
+    case "next":
+    case "this": {
+      const b = base;
+      return (
+        <span className="flex flex-wrap items-center gap-1.5">
+          <WeekdaySelect wd={b.wd} onChange={(wd) => onChange({ ...b, wd })} />
+          {b.from === null ? (
+            <button type="button" onClick={() => onChange({ ...b, from: serveExpr() })}
+              className="text-[11px] text-slate-500 hover:text-sky-300">+ counting from another date</button>
+          ) : (
+            <span className="flex flex-wrap items-center gap-1.5 rounded border border-slate-700/70 bg-slate-900/60 px-1.5 py-1">
+              <span className="text-[11px] text-slate-500">from</span>
+              <ExprEditor expr={b.from} anchors={anchors} serveDate={serveDate} onChange={(from) => onChange({ ...b, from })} />
+              <button type="button" onClick={() => onChange({ ...b, from: null })} className="text-[11px] text-slate-500 hover:text-rose-400">✕</button>
+            </span>
+          )}
+        </span>
+      );
+    }
+    case "nth":
+      return (
+        <span className="flex items-center gap-1.5">
+          <select value={base.n} onChange={(e) => onChange({ ...base, n: e.target.value })} className={sel}>
+            {NTH.map((n) => <option key={n} value={n}>{NTH_LABEL[n]}</option>)}
+          </select>
+          <WeekdaySelect wd={base.wd} onChange={(wd) => onChange({ ...base, wd })} />
+          <span className="text-slate-500">of</span>
+          <MonthRefSelect month={base.month} onChange={(month) => onChange({ ...base, month })} />
+        </span>
+      );
+    case "dom":
+      return (
+        <span className="flex items-center gap-1.5">
+          <input type="number" min={1} max={31} value={base.day} onChange={(e) => onChange({ ...base, day: clampInt(e.target.value, 1, 31) })} className={numField} />
+          <span className="text-slate-500">of</span>
+          <MonthRefSelect month={base.month} onChange={(month) => onChange({ ...base, month })} />
+        </span>
+      );
+    case "weekOf":
+      return (
+        <span className="flex flex-wrap items-center gap-1.5 rounded border border-slate-700/70 bg-slate-900/60 px-1.5 py-1">
+          <ExprEditor expr={base.inner} anchors={anchors} serveDate={serveDate} onChange={(inner) => onChange({ kind: "weekOf", inner })} />
+        </span>
+      );
+    case "month":
+      return <MonthRefSelect month={base.month} onChange={(month) => onChange({ kind: "month", month })} />;
+  }
+}
+
+function WeekdaySelect({ wd, onChange }: { wd: string; onChange: (wd: string) => void }) {
+  return (
+    <select value={wd} onChange={(e) => onChange(e.target.value)} className={sel}>
+      {WEEKDAYS.map((d) => <option key={d} value={d}>{WD_LABEL[d]}</option>)}
+    </select>
+  );
+}
+
+function MonthRefSelect({ month, onChange }: { month: MonthRef; onChange: (m: MonthRef) => void }) {
+  return (
+    <span className="flex items-center gap-1.5">
+      <select value={month.sign} onChange={(e) => onChange(e.target.value === "0" ? { sign: "0", n: 0 } : { sign: e.target.value as "+" | "-", n: month.n || 1 })} className={sel}>
+        <option value="0">this month</option>
+        <option value="+">months ahead</option>
+        <option value="-">months back</option>
+      </select>
+      {month.sign !== "0" && (
+        <input type="number" min={1} value={month.n} onChange={(e) => onChange({ ...month, n: clampInt(e.target.value, 1, 120) })} className={numField} />
+      )}
+    </span>
+  );
+}
+
+function OffsetRows({ offsets, onChange }: { offsets: Expr["offsets"]; onChange: (o: Expr["offsets"]) => void }) {
+  const set = (i: number, patch: Partial<Expr["offsets"][number]>) => onChange(offsets.map((o, j) => (j === i ? { ...o, ...patch } : o)));
+  return (
+    <span className="flex flex-wrap items-center gap-1.5">
+      {offsets.map((o, i) => (
+        <span key={i} className="flex items-center gap-1 rounded border border-slate-700/70 bg-slate-900/60 px-1 py-0.5">
+          <select value={o.sign} onChange={(e) => set(i, { sign: e.target.value as "+" | "-" })} className={sel}>
+            <option value="+">+</option>
+            <option value="-">−</option>
+          </select>
+          <input type="number" min={0} value={o.n} onChange={(e) => set(i, { n: clampInt(e.target.value, 0, 9999) })} className={numField} />
+          <select value={o.unit} onChange={(e) => set(i, { unit: e.target.value as Expr["offsets"][number]["unit"] })} className={sel}>
+            {UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
+          </select>
+          <button type="button" onClick={() => onChange(offsets.filter((_, j) => j !== i))} className="px-0.5 text-slate-500 hover:text-rose-400">✕</button>
+        </span>
+      ))}
+      <button type="button" onClick={() => onChange([...offsets, { sign: "+", n: 1, unit: "d" }])}
+        className="text-[11px] text-slate-500 hover:text-sky-300">+ offset</button>
+    </span>
+  );
+}
+
+// --- raw escape hatch + live preview ---------------------------------------
+
+function RawField({ value, onChange, onUseBuilder }: { value: string; onChange: (v: string) => void; onUseBuilder: () => void }) {
+  return (
+    <div className="flex items-center gap-2">
+      <input value={value} onChange={(e) => onChange(e.target.value)} spellCheck={false}
+        placeholder="e.g. @signing+2w, next:THU, week_of:(serve+1w)"
+        className="min-w-[16rem] flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 font-mono text-xs text-sky-300 outline-none focus:border-sky-500" />
+      <button type="button" onClick={onUseBuilder} className="text-[11px] text-slate-500 hover:text-sky-300">use builder</button>
+    </div>
+  );
+}
+
+function Preview({ serialized, serveDate, incomplete, intervalParsed, intervalOnly }: { serialized: string; serveDate: string; incomplete: boolean; intervalParsed: boolean; intervalOnly?: boolean }) {
+  const [res, setRes] = useState<{ ok: boolean; text: string } | null>(null);
+  const anchorRef = useMemo(() => hasAnchorRef(serialized), [serialized]);
+
+  useEffect(() => {
+    if (incomplete || !serialized.trim() || anchorRef) { setRes(null); return; }
+    let alive = true;
+    const t = setTimeout(async () => {
+      const r = await resolveExpr(serialized, serveDate, {});
+      if (alive) setRes({ ok: !!r.ok, text: r.ok ? (r.human ?? "") : (r.error ?? "invalid") });
+    }, 200);
+    return () => { alive = false; clearTimeout(t); };
+  }, [serialized, serveDate, incomplete, anchorRef]);
+
+  const intervalWarn = intervalOnly && serialized.trim() && !incomplete && !intervalParsed;
+
+  return (
+    <div className="min-h-[1rem] text-[11px] leading-snug">
+      {incomplete || !serialized.trim() ? <span className="text-slate-500">build a date…</span>
+        : anchorRef ? <span className="text-amber-400">→ uses a published date; resolves when this email is sent</span>
+        : res ? <span className={res.ok ? "text-emerald-400" : "text-rose-400"}>{res.ok ? "→ " : "⚠ "}{res.text}</span>
+        : <span className="text-slate-500">…</span>}
+      {intervalWarn ? <span className="ml-2 text-amber-400">this slot wants a week/month, not a single day</span> : null}
+    </div>
+  );
+}
+
+function clampInt(v: string, lo: number, hi: number): number {
+  const n = parseInt(v, 10);
+  if (Number.isNaN(n)) return lo;
+  return Math.min(hi, Math.max(lo, n));
+}

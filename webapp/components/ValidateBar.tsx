@@ -19,8 +19,8 @@ function friendlyError(error = ""): { title: string; body: string } {
     body: "This answer uses a date from an earlier email, so add that earlier email in Depends on as a date edge.",
   };
   if (/bad body token/.test(error)) return {
-    title: "Fix a date token in the email body",
-    body: "One token cannot be resolved. Rebuild it with the date builder so the email and answer key stay in sync.",
+    title: "Fix a date in the email body",
+    body: "One date can’t be resolved. Rebuild it with the date builder so the email and answer key stay in sync.",
   };
   return { title: "Fix before export", body: error || "The corpus is not ready for the benchmark yet." };
 }

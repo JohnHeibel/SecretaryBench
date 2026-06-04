@@ -25,7 +25,7 @@ export default function Sidebar({ nodes, selNode, selEmail, onSelectNode, onSele
         </div>
         <button onClick={onAddNode} className="w-full rounded-md border border-sky-700/70 bg-sky-600/15 px-3 py-2 text-left text-sm font-medium text-sky-100 hover:bg-sky-600/25">
           + New storyline
-          <span className="block text-[11px] font-normal text-sky-200/65">A node is one related email thread.</span>
+          <span className="block text-[11px] font-normal text-sky-200/65">A storyline is a group of related emails.</span>
         </button>
       </div>
       <div className="min-h-0 flex-1 overflow-auto py-1">

@@ -33,8 +33,8 @@ export default function EmailEditor({ node, email, allNodes, anchors, serveDate,
     <div className="mx-auto max-w-3xl space-y-5 p-5">
       <Primer />
       <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400"
-        title="A node is one storyline — a folder of related emails (one scenario). This is its name; rename it freely.">
-        Node id
+        title="A storyline is a group of related emails (one scenario). This is its name; rename it freely.">
+        Storyline name
         <input key={node.id} defaultValue={node.id} spellCheck={false}
           onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
           onBlur={(e) => { if (!onRenameNode(node.id, e.target.value)) e.target.value = node.id; }}
@@ -77,14 +77,14 @@ function Primer() {
         <button onClick={close} className="text-slate-500 hover:text-slate-300">hide ✕</button>
       </div>
       <p>You&apos;re writing an email to a busy exec&apos;s <strong>AI assistant</strong>, then saying what a <em>perfect</em> assistant should do with it. Each email either needs an action — put something on the calendar, add a to-do, move or cancel one — or it&apos;s just an FYI that needs <strong>nothing</strong>.</p>
-      <p className="mt-1 text-slate-400">You&apos;re inside a <strong className="text-slate-300">node</strong> — one storyline (a folder of related emails). Its <strong className="text-slate-300">cast</strong> is the people in it; it starts with <span className="font-mono text-sky-300">CEO → you</span>, the person the AI works for.</p>
+      <p className="mt-1 text-slate-400">You&apos;re inside a <strong className="text-slate-300">storyline</strong> — a group of related emails. Its <strong className="text-slate-300">cast</strong> is the people in it; it starts with <span className="font-mono text-sky-300">CEO → you</span>, the person the AI works for.</p>
       <ol className="ml-4 mt-1 list-decimal space-y-0.5">
-        <li>Write the email (who it&apos;s from, the subject, the body). Use <span className="font-mono text-sky-300">+ insert date token</span> for any date so it stays exact.</li>
+        <li>Write the email (who it&apos;s from, the subject, the body). Use <span className="font-mono text-sky-300">+ insert date</span> for any date so it stays exact.</li>
         <li>In <strong>Answer key</strong>, say what to do: name the thing, pick its date, or tick <em>&ldquo;this email needs no action.&rdquo;</em></li>
         <li>Tag the <strong>difficulty</strong> (T1 easy → T3 hard) so we can score models by tier.</li>
         <li>The bar at the bottom must read <span className="text-emerald-400">Ready for export</span> and <span className="text-emerald-400">oracle solves 100%</span> — that means a perfect assistant could actually do it.</li>
       </ol>
-      <p className="mt-1 text-slate-400">Want more? <a href="/guide" className="text-sky-400 underline hover:text-sky-300">Open the full walkthrough →</a> (worked examples, the date blocks, how to build a needle)</p>
+      <p className="mt-1 text-slate-400">Want more? <a href="/guide" className="text-sky-400 underline hover:text-sky-300">Open the full walkthrough →</a> (worked examples, the date builder, how to build a needle)</p>
     </div>
   );
 }
@@ -135,7 +135,7 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
   return (
     <div className="space-y-4">
       <section className="space-y-3">
-        <StepTitle n={1} title="Write the email" note="Use normal email prose. Use date tokens only for dates." />
+        <StepTitle n={1} title="Write the email" note="Use normal email prose. Add any date with the date builder." />
       <div className="flex items-center gap-2 text-xs text-slate-500">
         <span className="truncate font-medium text-slate-300">{email.subject || "(untitled email — set a subject below)"}</span>
         <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="corpus id — derived from the subject, used by dependency edges">{email.id}</span>
@@ -220,8 +220,8 @@ function DependencyPicker({ email, allNodes, onChange }: { email: Email; allNode
             <code className="flex-1 truncate rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">{d.email ?? `@node:${d.node}`}</code>
             <select value={d.type} onChange={(e) => d.email && setType(d.email, e.target.value as EdgeType)}
               className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
-              <option value="static">static (fact, no deadline)</option>
-              <option value="date">date (carries a deadline)</option>
+              <option value="static">static — comes after, no deadline</option>
+              <option value="date">date — comes after, carries a deadline</option>
             </select>
             <button onClick={() => onChange(email.depends_on.filter((_, j) => j !== i))} className="px-1 text-slate-500 hover:text-rose-400">✕</button>
           </div>
