@@ -46,6 +46,8 @@ A **node** is one complete storyline (a deal, an acquisition, a project, a launc
 
 ## 2. Email Types
 
+_Tooling note: this type mix is authoring guidance only — the webapp no longer asks you to tag an email as action / FYI / junk. Whether an email needs an action is inferred from its answer key (an empty answer = no-action)._
+
 ### A. Junk Emails (5-10% of total)
 
 **Purpose:** Add noise, test distraction/filtering.
@@ -127,6 +129,8 @@ Action emails split into three tiers by difficulty:
 ---
 
 ## 3. Difficulty Tiers (T1, T2, T3)
+
+_Tooling note: difficulty tiers are authoring guidance only — the webapp no longer asks you to tag T1/T2/T3._
 
 ### T1 — Easy (Self-Contained, ~30% of action emails)
 

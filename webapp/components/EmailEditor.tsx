@@ -1,17 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { CorpusNode, Edge, EdgeType, Email, EmailType, Op, Tier } from "@/lib/types";
+import type { CorpusNode, Edge, EdgeType, Email } from "@/lib/types";
 import { obligationKinds, obligationNames } from "@/lib/grammar";
-import { ROLE_HINT, ROLE_META, classifyEmail } from "@/lib/composition";
 import BodyEditor from "./BodyEditor";
 import AnswerKeyBuilder from "./AnswerKeyBuilder";
-
-// T1 easy / T2 medium / T3 hard — green -> amber -> rose, matching the Sidebar badge.
-export const TIER_STYLE: Record<Tier, string> = {
-  T1: "bg-emerald-600/30 text-emerald-300",
-  T2: "bg-amber-600/30 text-amber-300",
-  T3: "bg-rose-600/30 text-rose-300",
-};
 
 interface Props {
   node: CorpusNode;
@@ -78,13 +70,12 @@ function Primer() {
         <span className="font-semibold text-sky-300">How this works</span>
         <button onClick={close} className="text-slate-500 hover:text-slate-300">hide ✕</button>
       </div>
-      <p>You&apos;re writing an email to a busy exec&apos;s <strong>AI assistant</strong>, then saying what a <em>perfect</em> assistant should do with it. Each email either needs an action — put something on the calendar, add a to-do, move or cancel one — or it&apos;s just an FYI that needs <strong>nothing</strong>.</p>
-      <p className="mt-1 text-slate-400">You&apos;re inside a <strong className="text-slate-300">storyline</strong> — a group of related emails. Its <strong className="text-slate-300">cast</strong> is the people in it; it starts with <span className="font-mono text-sky-300">CEO → you</span>, the person the AI works for.</p>
+      <p>You&apos;re writing an email to a busy exec&apos;s <strong>AI assistant</strong>, then saying what a <em>perfect</em> assistant should do with it. Some emails need an action, like putting something on the calendar, adding a to-do, or moving or canceling one. Others need <strong>nothing</strong> done at all.</p>
+      <p className="mt-1 text-slate-400">You&apos;re inside a <strong className="text-slate-300">storyline</strong>, a group of related emails. The <strong className="text-slate-300">cast</strong> is the people in it. It starts with <span className="font-mono text-sky-300">CEO → you</span>, the person the AI works for.</p>
       <ol className="ml-4 mt-1 list-decimal space-y-0.5">
         <li>Write the email (who it&apos;s from, the subject, the body). Use <span className="font-mono text-sky-300">+ insert date</span> for any date so it stays exact.</li>
         <li>In <strong>Answer key</strong>, say what to do: name the thing, pick its date, or tick <em>&ldquo;this email needs no action.&rdquo;</em></li>
-        <li>Mark the <strong>type</strong> — Action, FYI, or Junk — and, for actions, the <strong>difficulty</strong> (T1 easy → T3 hard). The sidebar&apos;s <em>Corpus mix</em> shows how your inbox compares to the guide.</li>
-        <li>The bar at the bottom must read <span className="text-emerald-400">Ready for export</span> and <span className="text-emerald-400">oracle solves 100%</span> — that means a perfect assistant could actually do it.</li>
+        <li>The bar at the bottom should read <span className="text-emerald-400">Ready for export</span> and <span className="text-emerald-400">oracle solves 100%</span>. That means a perfect assistant could actually do it.</li>
       </ol>
       <p className="mt-1 text-slate-400">Want more? <a href="/guide" className="text-sky-400 underline hover:text-sky-300">Open the full walkthrough →</a> (worked examples, the date builder, how to build a needle)</p>
     </div>
@@ -106,7 +97,7 @@ function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/40">
       <button onClick={() => setOpen(!open)} className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-        <span>Cast — {node.id} <span className="font-normal lowercase text-slate-500">({entries.length} people)</span></span>
+        <span>Cast for {node.id} <span className="font-normal lowercase text-slate-500">({entries.length} people)</span></span>
         <span>{open ? "▾" : "▸"}</span>
       </button>
       {open && (
@@ -139,33 +130,22 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
       <section className="space-y-3">
         <StepTitle n={1} title="Write the email" note="Use normal email prose. Add any date with the date builder." />
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-        <span className="truncate font-medium text-slate-300">{email.subject || "(untitled email — set a subject below)"}</span>
-        <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="corpus id — derived from the subject, used by dependency edges">{email.id}</span>
-        <span className="ml-auto flex shrink-0 items-center gap-3">
-          <RoleControl email={email} set={set} />
-          {classifyEmail(email) === "action" && (
-            <span className="flex items-center gap-1" title="How hard is this action email? (AUTHORING_GUIDE §3)">difficulty
-              {(["T1", "T2", "T3"] as const).map((t) => (
-                <button key={t} onClick={() => set({ tier: email.tier === t ? undefined : t })}
-                  className={`rounded px-1.5 py-0.5 font-medium ${email.tier === t ? TIER_STYLE[t] : "bg-slate-800 text-slate-500 hover:text-slate-300"}`}>{t}</button>
-              ))}
-            </span>
-          )}
-        </span>
+        <span className="truncate font-medium text-slate-300">{email.subject || "(no subject yet, add one below)"}</span>
+        <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="id for this email, made from the subject and used by dependency links">{email.id}</span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <label className="text-xs text-slate-400">From
           <select value={email.from} onChange={(e) => set({ from: e.target.value })}
             className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-slate-100">
-            <option value="">—</option>
+            <option value="">pick a person</option>
             {keys.map((k) => <option key={k} value={k}>{k} · {node.cast[k]}</option>)}
           </select>
         </label>
         <label className="text-xs text-slate-400">To
           <select value={toValue} onChange={(e) => set({ to: e.target.value })}
             className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-slate-100">
-            <option value="">—</option>
+            <option value="">pick a person</option>
             {keys.map((k) => <option key={k} value={k}>{k} · {node.cast[k]}</option>)}
           </select>
         </label>
@@ -192,34 +172,6 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
   );
 }
 
-// The email's role in the corpus mix (AUTHORING_GUIDE §2). Action keeps an answer key;
-// switching to FYI/Junk clears the ops (both grade as "do nothing") and drops the difficulty
-// tier, since tiers only apply to action emails. classifyEmail derives the active role from
-// the answer, so this stays in sync with edits made down in the answer-key builder.
-const ROLES: EmailType[] = ["action", "no_action", "junk"];
-
-function RoleControl({ email, set }: { email: Email; set: (p: Partial<Email>) => void }) {
-  const role = classifyEmail(email);
-  function pick(r: EmailType) {
-    if (r === role) return;
-    if (r === "action") {
-      const seed: Op = { create: "", kind: "event", on: { eq: "" } };
-      const ops = email.answer.ops.length ? email.answer.ops : [seed];
-      set({ type: "action", answer: { ...email.answer, ops } });
-    } else {
-      set({ type: r, tier: undefined, answer: { ...email.answer, ops: [] } });
-    }
-  }
-  return (
-    <span className="flex items-center gap-1">
-      {ROLES.map((r) => (
-        <button key={r} onClick={() => pick(r)} title={ROLE_HINT[r]}
-          className={`rounded px-1.5 py-0.5 font-medium ${role === r ? ROLE_META[r].badge : "bg-slate-800 text-slate-500 hover:text-slate-300"}`}>{ROLE_META[r].short}</button>
-      ))}
-    </span>
-  );
-}
-
 function StepTitle({ n, title, note }: { n: number; title: string; note: string }) {
   return (
     <div className="mb-3 flex items-start gap-2">
@@ -235,12 +187,13 @@ function StepTitle({ n, title, note }: { n: number; title: string; note: string 
 function DependencyPicker({ email, allNodes, onChange }: { email: Email; allNodes: CorpusNode[]; onChange: (edges: Edge[]) => void }) {
   const others = allNodes.flatMap((n) => n.emails).filter((e) => e.id !== email.id);
   const chosen = new Set(email.depends_on.map((d) => d.email).filter(Boolean) as string[]);
-  const [addId, setAddId] = useState("");
-
-  function add(type: EdgeType) {
-    if (!addId || chosen.has(addId)) return;
-    onChange([...email.depends_on, { email: addId, type }]);
-    setAddId("");
+  // New dependencies start as `static` (plain ordering — comes after, no deadline); the per-row
+  // dropdown is the one place to switch to `date` when a deadline matters. Needles (an answer reusing
+  // an @anchor) get their `date` edge wired automatically by withDerivedDateEdges, so authors rarely
+  // set it by hand. Picking from the add-select adds it immediately — no separate confirm button.
+  function add(emailId: string) {
+    if (!emailId || chosen.has(emailId)) return;
+    onChange([...email.depends_on, { email: emailId, type: "static" }]);
   }
   function setType(emailId: string, type: EdgeType) {
     onChange(email.depends_on.map((d) => d.email === emailId ? { ...d, type } : d));
@@ -255,20 +208,16 @@ function DependencyPicker({ email, allNodes, onChange }: { email: Email; allNode
             <code className="flex-1 truncate rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">{d.email ?? `@node:${d.node}`}</code>
             <select value={d.type} onChange={(e) => d.email && setType(d.email, e.target.value as EdgeType)}
               className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
-              <option value="static">static — comes after, no deadline</option>
-              <option value="date">date — comes after, carries a deadline</option>
+              <option value="static">comes after (no deadline)</option>
+              <option value="date">comes after, with a deadline</option>
             </select>
             <button onClick={() => onChange(email.depends_on.filter((_, j) => j !== i))} className="px-1 text-slate-500 hover:text-rose-400">✕</button>
           </div>
         ))}
-        <div className="flex items-center gap-2 text-xs">
-          <select value={addId} onChange={(e) => setAddId(e.target.value)} className="flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
-            <option value="">add a prerequisite email…</option>
-            {others.filter((e) => !chosen.has(e.id)).map((e) => <option key={e.id} value={e.id}>{e.id} — {e.subject}</option>)}
-          </select>
-          <button onClick={() => add("static")} disabled={!addId} className="rounded bg-slate-800 px-2 py-1 text-slate-200 hover:bg-slate-700 disabled:opacity-40">+ static</button>
-          <button onClick={() => add("date")} disabled={!addId} className="rounded bg-slate-800 px-2 py-1 text-slate-200 hover:bg-slate-700 disabled:opacity-40">+ date</button>
-        </div>
+        <select value="" onChange={(e) => add(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200">
+          <option value="">+ add a prerequisite email…</option>
+          {others.filter((e) => !chosen.has(e.id)).map((e) => <option key={e.id} value={e.id}>{e.id} · {e.subject}</option>)}
+        </select>
       </div>
     </div>
   );

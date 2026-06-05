@@ -19,10 +19,9 @@ export interface Edge {
 
 export type Tier = "T1" | "T2" | "T3";
 
-// Email role in the AUTHORING_GUIDE taxonomy (§2). Action is implied by a non-empty
-// answer; no_action / junk are the two flavours of an empty answer (ops: []) — both
-// grade as "do nothing", but they test different things (recognition vs filtering),
-// so we tag which is which for composition reporting.
+// Email role in the AUTHORING_GUIDE taxonomy (§2): action / no_action / junk. Whether an email
+// needs an action is derived live from its answer (non-empty ops = action), so this tag is no
+// longer set or surfaced in the tool — kept only so older corpus data still loads.
 export type EmailType = "action" | "no_action" | "junk";
 
 export interface Email {
@@ -33,8 +32,8 @@ export interface Email {
   body: string; // prose with {tokens}
   depends_on: Edge[];
   answer: Answer;
-  tier?: Tier; // author-tagged difficulty, for score-by-tier
-  type?: EmailType; // author-tagged role, for composition reporting
+  tier?: Tier; // legacy difficulty tag (T1/T2/T3) — no longer set or shown; kept so old data loads
+  type?: EmailType; // legacy role tag — no longer set or shown; kept so old data loads
 }
 
 export interface CorpusNode {

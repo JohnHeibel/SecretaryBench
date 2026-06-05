@@ -89,10 +89,10 @@ export default function DagCanvas({ nodes, lint, serveDate, onSelectEmail }: Pro
   return (
     <div className="h-full w-full">
       <div className="flex items-center gap-4 border-b border-slate-800 bg-slate-900/60 px-4 py-1.5 text-[11px] text-slate-400">
-        <span>serve preview {serveDate}</span>
-        <span className="flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "#f59e0b" }} /> static — comes after, no deadline</span>
-        <span className="flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "#38bdf8" }} /> date — comes after, carries a deadline</span>
-        <span className="text-violet-300">@anchor = published date</span>
+        <span>preview date {serveDate}</span>
+        <span className="flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "#f59e0b" }} /> comes after</span>
+        <span className="flex items-center gap-1"><span className="inline-block h-0.5 w-4" style={{ background: "#38bdf8" }} /> comes after, with a deadline</span>
+        <span className="text-violet-300">@anchor = a published date</span>
       </div>
       <div style={{ height: "calc(100% - 30px)" }}>
         <ReactFlow nodes={rfNodes} edges={rfEdges} fitView minZoom={0.2}

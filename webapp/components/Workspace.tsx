@@ -189,7 +189,7 @@ export default function Workspace() {
         <div className="flex min-w-0 items-center gap-3">
           <div className="min-w-0">
             <h1 className="text-sm font-semibold">SecretaryBench authoring</h1>
-            <p className="hidden text-[11px] text-slate-500 md:block">Write emails, tell the grader the perfect action, then export when the bottom bar is green.</p>
+            <p className="hidden text-[11px] text-slate-500 md:block">Write an email, say the perfect action, then export once the bottom bar is green.</p>
           </div>
           <div className="flex overflow-hidden rounded-md border border-slate-700 text-xs">
             <button onClick={() => setView("editor")} className={`px-3 py-1 ${view === "editor" ? "bg-sky-600 text-white" : "text-slate-300 hover:bg-slate-800"}`}>Editor</button>
@@ -200,7 +200,7 @@ export default function Workspace() {
           <span className={`hidden sm:inline ${saveState === "error" ? "text-rose-300" : saveState === "saving" ? "text-amber-300" : "text-slate-500"}`}>
             {saveState === "saving" ? "saving…" : saveState === "saved" ? "autosaved" : saveState === "error" ? "save failed" : "autosaves"}
           </span>
-          <label className="flex items-center gap-1" title="A what-if: pretend this email arrived on this day, so the date chips show real dates while you author. It is NOT saved and does NOT change what you export — the real run picks its own send date.">
+          <label className="flex items-center gap-1" title="Pretend this email arrived on this day, so the date chips show real dates while you write. It is not saved and does not change your export. The real run picks its own send date.">
             <span className="hidden md:inline">preview date</span>
             <input type="date" value={serveDate} onChange={(e) => setServeDate(e.target.value)} className="rounded border border-slate-700 bg-slate-800 px-2 py-0.5 text-slate-200" />
           </label>
@@ -250,7 +250,7 @@ function StartEmpty({ onAddNode, onAddExample }: { onAddNode: () => void; onAddE
         <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
         <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is a group of related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
         <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
-        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Helios example</button> — a worked thread with a needle and a reschedule.</p>
+        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Helios example</button>. It is a finished thread with a needle and a reschedule.</p>
       </div>
     </div>
   );

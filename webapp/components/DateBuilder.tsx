@@ -4,7 +4,7 @@ import { resolveExpr } from "@/lib/api";
 import { NTH, UNITS, WEEKDAYS } from "@/lib/grammar";
 import {
   type Base, type BaseKind, type Expr, type MonthRef, type TimeHM, type TimeOfDay,
-  addHour, canCarryTime, emptyBase, hhmm, humanTime, isInterval, parseExpr, parseHHMM, serializeExpr, serveExpr, timeError,
+  addHour, canCarryTime, emptyBase, hhmm, humanTime, parseExpr, parseHHMM, serializeExpr, serveExpr, timeError,
 } from "@/lib/dateExpr";
 
 // The inline "fill-in-the-blank" date builder (design doc Direction A). An author composes a
@@ -20,21 +20,21 @@ interface Props {
   anchors: string[];                   // @anchor names other emails publish
   serveDate: string;                   // preview "now"
   onChange: (expr: string) => void;
-  intervalOnly?: boolean;              // within / not-within slots want an INTERVAL (week / month)
-  allowTime?: boolean;                 // offer a clock suffix (events on an exact day); off for to-dos / deadlines / intervals
+  allowTime?: boolean;                 // offer a clock suffix (events on an exact day); off for to-dos / deadlines
 }
 
-// dropdown order/labels for the first blank — reads as the start of the sentence
+// dropdown order/labels for the first blank — reads as the start of the sentence. The interval
+// bases (week_of / month) are intentionally not offered here; they remain in the grammar and the
+// raw "type it" escape hatch, just not in the common-case builder.
 const BASE_OPTIONS: { kind: BaseKind; label: string }[] = [
   { kind: "serve", label: "the day this email arrives" },
-  { kind: "anchor", label: "a date another email set" },
-  { kind: "next", label: "next weekday" },
-  { kind: "this", label: "a weekday this week" },
-  { kind: "nth", label: "the Nth weekday of a month" },
-  { kind: "dom", label: "a day of the month" },
-  { kind: "weekOf", label: "the week of a date" },
-  { kind: "month", label: "a whole month" },
+  { kind: "anchor", label: "a date from an earlier email" },
+  { kind: "next", label: "the next weekday (e.g. next Thursday)" },
+  { kind: "this", label: "a weekday this week (e.g. this Friday)" },
+  { kind: "nth", label: "the Nth weekday of a month (e.g. 3rd Friday)" },
+  { kind: "dom", label: "a specific day of the month (e.g. the 25th)" },
 ];
+const OFFERED_BASE = new Set<BaseKind>(BASE_OPTIONS.map((o) => o.kind));
 
 const WD_LABEL: Record<string, string> = { MON: "Monday", TUE: "Tuesday", WED: "Wednesday", THU: "Thursday", FRI: "Friday", SAT: "Saturday", SUN: "Sunday" };
 const NTH_LABEL: Record<string, string> = { "1": "1st", "2": "2nd", "3": "3rd", "4": "4th", "5": "5th", last: "last" };
@@ -53,7 +53,7 @@ function baseIncomplete(b: Base): boolean {
 }
 const hasAnchorRef = (s: string) => /@[A-Za-z_]/.test(s);
 
-export default function DateBuilder({ value, anchors, serveDate, onChange, intervalOnly, allowTime }: Props) {
+export default function DateBuilder({ value, anchors, serveDate, onChange, allowTime }: Props) {
   // Local structured state is the source of truth while editing; seeded from `value`. A non-empty
   // value that can't be represented (legacy / hand-typed exotic expr) opens in raw mode.
   const [expr, setExpr] = useState<Expr | null>(() => (value ? parseExpr(value) : null));
@@ -82,7 +82,7 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, inter
     const next = raw.time && !canCarryTime(raw) ? { ...raw, time: undefined } : raw;
     setExpr(next); setRaw(serializeExpr(next)); emit(incomplete(next) ? "" : serializeExpr(next));
   };
-  const showTime = allowTime !== false && !intervalOnly && canCarryTime(expr);
+  const showTime = allowTime !== false && canCarryTime(expr);
 
   return (
     <div className="space-y-1">
@@ -94,13 +94,12 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, inter
           <ExprEditor expr={expr} onChange={commit} anchors={anchors} serveDate={serveDate} />
           {showTime && expr && <TimeControl time={expr.time ?? null} onChange={(time) => commit({ ...expr, time })} />}
           <button type="button" onClick={() => { setRaw(serialized); setMode("raw"); }}
-            className="ml-auto text-[11px] text-slate-500 hover:text-sky-300" title="Type the expression directly — still checked live.">type it</button>
+            className="ml-auto text-[11px] text-slate-500 hover:text-sky-300" title="Type the expression yourself. It is still checked live.">type it</button>
         </div>
       )}
       <Preview serialized={serialized} serveDate={serveDate}
         incomplete={mode === "builder" && (!expr || incomplete(expr))}
-        time={mode === "builder" ? expr?.time ?? null : null}
-        intervalParsed={!!expr && isInterval(expr)} intervalOnly={intervalOnly} />
+        time={mode === "builder" ? expr?.time ?? null : null} />
     </div>
   );
 }
@@ -149,6 +148,7 @@ function ExprEditor({ expr, onChange, anchors, serveDate }: { expr: Expr | null;
       <select value={expr?.base.kind ?? ""} onChange={(e) => setBaseKind(e.target.value as BaseKind)} className={sel}>
         <option value="" disabled>start from…</option>
         {BASE_OPTIONS.map((o) => <option key={o.kind} value={o.kind}>{o.label}</option>)}
+        {expr && !OFFERED_BASE.has(expr.base.kind) && <option value={expr.base.kind}>advanced: {expr.base.kind}</option>}
       </select>
       {expr && <BaseControls base={expr.base} anchors={anchors} serveDate={serveDate} onChange={(b) => onChange({ ...expr, base: b })} />}
       {expr && !isIntervalBase && <OffsetRows offsets={expr.offsets} onChange={(offsets) => onChange({ ...expr, offsets })} />}
@@ -276,7 +276,7 @@ function RawField({ value, onChange, onUseBuilder }: { value: string; onChange: 
   );
 }
 
-function Preview({ serialized, serveDate, incomplete, time, intervalParsed, intervalOnly }: { serialized: string; serveDate: string; incomplete: boolean; time: TimeOfDay | null; intervalParsed: boolean; intervalOnly?: boolean }) {
+function Preview({ serialized, serveDate, incomplete, time }: { serialized: string; serveDate: string; incomplete: boolean; time: TimeOfDay | null }) {
   const [res, setRes] = useState<{ ok: boolean; text: string } | null>(null);
   const anchorRef = useMemo(() => hasAnchorRef(serialized), [serialized]);
 
@@ -290,7 +290,6 @@ function Preview({ serialized, serveDate, incomplete, time, intervalParsed, inte
     return () => { alive = false; clearTimeout(t); };
   }, [serialized, serveDate, incomplete, anchorRef]);
 
-  const intervalWarn = intervalOnly && serialized.trim() && !incomplete && !intervalParsed;
   const timeWarn = time ? timeError(time) : null;     // client-side, so it shows even on anchor exprs
 
   return (
@@ -300,7 +299,6 @@ function Preview({ serialized, serveDate, incomplete, time, intervalParsed, inte
         : res ? <span className={res.ok ? "text-emerald-400" : "text-rose-400"}>{res.ok ? "→ " : "⚠ "}{res.text}</span>
         : <span className="text-slate-500">…</span>}
       {timeWarn ? <span className="ml-2 text-amber-400">⚠ {timeWarn}</span> : null}
-      {intervalWarn ? <span className="ml-2 text-amber-400">this slot wants a week/month, not a single day</span> : null}
     </div>
   );
 }

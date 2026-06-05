@@ -19,9 +19,7 @@ const ANCHOR_ID = /^[A-Za-z_][A-Za-z0-9_]*$/;   // a name usable as @NAME in the
 const PRED_OPS: { key: keyof Predicate; label: string }[] = [
   { key: "eq", label: "on exactly" },
   { key: "by", label: "on or before" },
-  { key: "in", label: "within" },
   { key: "any_of", label: "any of" },
-  { key: "not_in", label: "not within" },
 ];
 
 function predOp(p?: Predicate): keyof Predicate {
@@ -46,7 +44,7 @@ function predExprs(p?: Predicate): string[] {
 }
 const usesAnchor = (p?: Predicate) => predExprs(p).some((e) => /@[A-Za-z_]/.test(e));
 // Drop any clock suffix from an expr string — used when a date moves to a slot that grades day-level
-// (a `by` deadline, an `in`/`not_in` window), so a stale, now-uneditable time can't linger.
+// (a `by` deadline), so a stale, now-uneditable time can't linger.
 const dropTime = (expr: string) => { const p = parseExpr(expr); return p?.time ? serializeExpr({ ...p, time: undefined }) : expr; };
 
 export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligations, obligationKinds, onChange }: Props) {
@@ -96,11 +94,19 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
 
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-3">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Answer key</h3>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Answer key</h3>
+        <label className="flex items-center gap-1.5 text-xs text-slate-400" title="Tick this for an FYI or distractor the assistant should NOT act on. A correct assistant does nothing; anything it creates counts as a failure.">
+          <input type="checkbox" checked={noAction}
+            onChange={(e) => setOps(e.target.checked ? [] : [{ create: "", kind: "event", on: { eq: "" } }])}
+            className="h-3.5 w-3.5 accent-sky-500" />
+          This email needs no action
+        </label>
+      </div>
 
       {noAction ? (
         <p className="rounded bg-slate-800/60 px-3 py-2 text-xs text-slate-400">
-          This is an <strong>FYI / Junk</strong> email — graded as <strong>do nothing</strong>. Any event or to-do the model creates for it counts as a failure. To give it an action instead, set its type to <strong>Action</strong> at the top.
+          This email is graded on the assistant doing <strong>nothing</strong>. If it creates any event or to-do here, that counts as a failure. To give it an action instead, untick <strong>needs no action</strong> above.
         </p>
       ) : (
         <div className="space-y-3">
@@ -139,7 +145,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                 <p className="-mt-1 mb-2 text-[11px] leading-snug text-slate-500">
                   {isCreate
                     ? <>The name the email uses for it. A <em>later</em> email can move or cancel it by this name (&ldquo;move the {name || "kickoff"}&rdquo;) and reuse its date.</>
-                    : <>{verb === "move" ? "Reschedules" : "Cancels"} the {kindWord} an earlier email created — pick it by name above.</>}
+                    : <>{verb === "move" ? "Reschedules" : "Cancels"} the {kindWord} an earlier email created. Pick it by name above.</>}
                 </p>
 
                 {!isCancel && (
@@ -152,6 +158,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                         else setPredicate(i, newOp, newOp === "eq" ? firstExpr(pred) : dropTime(firstExpr(pred)));
                       }} className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
                         {PRED_OPS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
+                        {!PRED_OPS.some((o) => o.key === po) && <option value={po}>{po}</option>}
                       </select>
                     </div>
                     {po === "any_of" ? (
@@ -159,7 +166,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                         onChange={(list) => patch(i, { on: { any_of: list } })} />
                     ) : (
                       <DateBuilder value={firstExpr(pred)} anchors={anchorsFor(name)} serveDate={serveDate}
-                        intervalOnly={po === "in" || po === "not_in"} allowTime={ek === "event" && po === "eq"}
+                        allowTime={ek === "event" && po === "eq"}
                         onChange={(expr) => setPredicate(i, po, expr)} />
                     )}
                   </div>
@@ -167,14 +174,14 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
 
                 {!isCancel && usesAnchor(pred) && (
                   <div className="mb-2 rounded bg-violet-500/10 px-2 py-1 text-[11px] leading-snug text-violet-300">
-                    ↳ this date reuses an <code className="font-mono">@anchor</code> from an earlier email, so this is a <strong>needle</strong> — a retrieval test. The model has to recall that earlier email to answer it, and it gets harder the more filler sits between the two. (The dependency link is added for you.)
+                    ↳ this date reuses an <code className="font-mono">@anchor</code> from an earlier email, so this is a <strong>needle</strong>. The assistant has to find that earlier email to answer this one, and it gets harder the more filler sits between the two. (The link back to it is added for you.)
                   </div>
                 )}
 
                 {isCreate && ((showMatch[i] ?? !!op.match?.length) ? (
                   <div className="space-y-1 text-xs">
                     <input value={(op.match ?? []).join(", ")} onChange={(e) => setMatch(i, e.target.value)}
-                      placeholder={name ? `title keywords (optional — defaults to "${name}")` : "title keywords (optional)"}
+                      placeholder={name ? `title keywords (optional, defaults to "${name}")` : "title keywords (optional)"}
                       className="w-full rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200" />
                     <p className="text-[11px] leading-snug text-slate-500">
                       Advanced: we find the AI&apos;s {kindWord} by checking its title contains {effMatch.length ? <code className="font-mono text-slate-400">{effMatch.join(" + ")}</code> : "this name"} (any capitalization). Only set this if the AI&apos;s natural title wouldn&apos;t contain the name (e.g. name <code className="font-mono text-slate-400">filing</code> → keyword <code className="font-mono text-slate-400">HSR</code>).

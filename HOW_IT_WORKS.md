@@ -123,15 +123,23 @@ That recall-and-compute over a long gap is exactly what we're testing.
 *Answer:* `move` **"Helios review"** to `@helios_kickoff+1w @14:00-15:00`. The model
 must find the event it already made and move it. One exact new time.
 
-**Email 4** (from a teammate) — *an FYI, no action*
-> "FedEx is dropping the Helios mockups Thursday — nothing for you to do."
+**Email 4** (from the COO) — *a to-do with a deadline*
+> **Helios board filing.** "The board filing needs to be submitted within ten business
+> days of the kickoff."
+
+*Answer:* create a **to-do** "Helios board filing" due `by @helios_kickoff+10bd`. A to-do
+has no clock, and `by` means any day up to the deadline counts. It reuses the kickoff
+anchor, so it is also a needle.
+
+**Email 5** (from a teammate) — *an FYI, no action*
+> "FedEx is dropping the Helios mockups Thursday, nothing for you to do."
 
 *Answer:* no ops. The model should create nothing. This tests **restraint** (not
 over-acting on chatter).
 
 That single scenario exercises the whole benchmark: fixed times, an **anchor reused
-across a long gap** (the temporal-reasoning core), a **reschedule**, and a
-**no-action distractor**. Run it on its own and the reference solver should score it
+across a long gap** (the temporal-reasoning core), a **reschedule**, a **to-do with a
+due-date deadline**, and a **no-action distractor**. Run it on its own and the reference solver should score it
 **1.0** before you add it to the corpus — that's your safety check.
 
 **Want anti-gaming variety?** Write the offset as a list: `@helios_kickoff+[2,3]w`. One
