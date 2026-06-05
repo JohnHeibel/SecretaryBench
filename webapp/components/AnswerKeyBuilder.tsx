@@ -3,7 +3,7 @@ import { useState } from "react";
 import { OP_CHOICES, opChoiceId, opName, opVerb } from "@/lib/grammar";
 import { parseExpr, serializeExpr } from "@/lib/dateExpr";
 import type { Answer, ObjKind, Op, Predicate } from "@/lib/types";
-import DateBuilder from "./DateBuilder";
+import DateBuilder, { type AnchorOrigins } from "./DateBuilder";
 
 interface Props {
   answer: Answer;
@@ -11,6 +11,9 @@ interface Props {
   serveDate: string;
   obligations: string[];                          // obligation names created across this node — what a move/cancel targets, and reuses as @anchors
   obligationKinds: Record<string, ObjKind>;       // name -> kind, so a move/cancel (which stores no kind) knows it targets an event vs to-do
+  reuseAnchors?: string[];                         // every date published in an email body — one-click "reuse this date" chips
+  bodyAnchors?: string[];                          // dates written in THIS email's own body — the "scaffold an action per date" source
+  anchorOrigins?: AnchorOrigins;                  // name -> the email that published it, for provenance labels
   onChange: (answer: Answer) => void;
 }
 
@@ -43,17 +46,30 @@ function predExprs(p?: Predicate): string[] {
   return Object.values(p).flatMap((v) => Array.isArray(v) ? v : [v]).filter(Boolean) as string[];
 }
 const usesAnchor = (p?: Predicate) => predExprs(p).some((e) => /@[A-Za-z_]/.test(e));
+const ANCHOR_REF = /@([A-Za-z_][A-Za-z0-9_]*)/g;
+// The distinct @anchor names a predicate references — used to name the source email(s) in the needle note.
+const anchorRefsIn = (p?: Predicate) => [...new Set(predExprs(p).flatMap((e) => [...e.matchAll(ANCHOR_REF)].map((m) => m[1])))];
 // Drop any clock suffix from an expr string — used when a date moves to a slot that grades day-level
 // (a `by` deadline), so a stale, now-uneditable time can't linger.
 const dropTime = (expr: string) => { const p = parseExpr(expr); return p?.time ? serializeExpr({ ...p, time: undefined }) : expr; };
 
-export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligations, obligationKinds, onChange }: Props) {
+const BLANK_OP: Op = { create: "", kind: "event", on: { eq: "" } };
+
+export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligations, obligationKinds, reuseAnchors = [], bodyAnchors = [], anchorOrigins, onChange }: Props) {
   // which op indices have the (advanced) keyword override revealed
   const [showMatch, setShowMatch] = useState<Record<number, boolean>>({});
+  // The answer key the author had before ticking "needs no action", so unticking restores it instead
+  // of wiping their work. Safe as local state because EmailEditor is keyed per-email (Workspace), so
+  // this builder remounts — and the stash resets — whenever the selected email changes.
+  const [stashed, setStashed] = useState<Op[]>([]);
   const ops = answer.ops ?? [];
   const noAction = ops.length === 0;
 
   function setOps(next: Op[]) { onChange({ ...answer, ops: next }); }
+  function toggleNoAction(checked: boolean) {
+    if (checked) { setStashed(ops); setOps([]); }                          // stash the current ops, then clear
+    else setOps(stashed.length ? stashed : [{ ...BLANK_OP }]);             // restore what was stashed (or a fresh op)
+  }
   function patch(i: number, p: Partial<Op>) { setOps(ops.map((o, j) => j === i ? { ...o, ...p } : o)); }
   function replaceAt(i: number, op: Op) { setOps(ops.map((o, j) => j === i ? op : o)); }
 
@@ -90,7 +106,19 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
     patch(i, { on: pred });
   }
 
-  function addOp() { setOps([...ops, { create: "", kind: "event", on: { eq: "" } }]); }
+  function addOp() { setOps([...ops, { ...BLANK_OP }]); }
+
+  // Dates this email's body already wrote that no op cites yet — the rows "scaffold" would add. Turning
+  // each into a create-event op with its date pre-filled removes the tedious part of a many-action email
+  // (re-typing each date); the author just names each. Self-emitted anchors need no date edge (schema.py).
+  const usedAnchors = new Set(ops.flatMap((o) => anchorRefsIn(o.on)));
+  const scaffoldable = bodyAnchors.filter((a) => !usedAnchors.has(a));
+  const isBlankOp = (o: Op) => opVerb(o) === "create" && !opName(o) && !firstExpr(o.on);
+  function scaffoldFromBody() {
+    if (!scaffoldable.length) return;
+    const fresh: Op[] = scaffoldable.map((a) => ({ create: "", kind: "event", on: { eq: `@${a}` } }));
+    setOps([...ops.filter((o) => !isBlankOp(o)), ...fresh]);
+  }
 
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-3">
@@ -98,7 +126,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
         <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Answer key</h3>
         <label className="flex items-center gap-1.5 text-xs text-slate-400" title="Tick this for an FYI or distractor the assistant should NOT act on. A correct assistant does nothing; anything it creates counts as a failure.">
           <input type="checkbox" checked={noAction}
-            onChange={(e) => setOps(e.target.checked ? [] : [{ create: "", kind: "event", on: { eq: "" } }])}
+            onChange={(e) => toggleNoAction(e.target.checked)}
             className="h-3.5 w-3.5 accent-sky-500" />
           This email needs no action
         </label>
@@ -110,6 +138,9 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
         </p>
       ) : (
         <div className="space-y-3">
+          <p className="text-[11px] leading-snug text-slate-500">
+            An assistant can do only four things, and you tell it which: <strong>create an event</strong>, <strong>create a to-do</strong>, <strong>move / reschedule</strong> one, or <strong>cancel</strong> one. (For an FYI it should ignore, tick &ldquo;needs no action&rdquo; above.) Add one row per action.
+          </p>
           {ops.map((op, i) => {
             const verb = opVerb(op);
             const name = opName(op);
@@ -160,23 +191,46 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                         {PRED_OPS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
                         {!PRED_OPS.some((o) => o.key === po) && <option value={po}>{po}</option>}
                       </select>
+                      <span className="text-[11px] leading-snug text-slate-500">
+                        {po === "eq" ? <>must land on <strong>exactly</strong> this {ek === "event" ? "day and time" : "day"}</>
+                          : po === "by" ? <>a <strong>deadline</strong>: any day up to and including this one is correct</>
+                          : po === "any_of" ? <>the assistant may land on <strong>any one</strong> of these dates</>
+                          : null}
+                      </span>
                     </div>
                     {po === "any_of" ? (
-                      <AnyOfBuilder values={anyOfList(pred)} anchors={anchorsFor(name)} serveDate={serveDate} allowTime={ek === "event"}
+                      <AnyOfBuilder values={anyOfList(pred)} anchors={anchorsFor(name)} anchorOrigins={anchorOrigins} serveDate={serveDate} allowTime={ek === "event"}
                         onChange={(list) => patch(i, { on: { any_of: list } })} />
                     ) : (
-                      <DateBuilder value={firstExpr(pred)} anchors={anchorsFor(name)} serveDate={serveDate}
+                      <DateBuilder value={firstExpr(pred)} anchors={anchorsFor(name)} anchorOrigins={anchorOrigins} serveDate={serveDate}
                         allowTime={ek === "event" && po === "eq"}
                         onChange={(expr) => setPredicate(i, po, expr)} />
+                    )}
+                    {reuseAnchors.length > 0 && (
+                      <ReuseFromEmail anchors={reuseAnchors} origins={anchorOrigins} onPick={(a) => {
+                        if (po === "any_of") patch(i, { on: { any_of: [...anyOfList(pred).filter(Boolean), `@${a}`] } });
+                        else setPredicate(i, po, `@${a}`);
+                      }} />
                     )}
                   </div>
                 )}
 
-                {!isCancel && usesAnchor(pred) && (
-                  <div className="mb-2 rounded bg-violet-500/10 px-2 py-1 text-[11px] leading-snug text-violet-300">
-                    ↳ this date reuses an <code className="font-mono">@anchor</code> from an earlier email, so this is a <strong>needle</strong>. The assistant has to find that earlier email to answer this one, and it gets harder the more filler sits between the two. (The link back to it is added for you.)
-                  </div>
-                )}
+                {!isCancel && usesAnchor(pred) && (() => {
+                  // A date pointing at THIS email's own body anchor isn't a long-horizon needle (no earlier
+                  // email to find) — only a reference to ANOTHER email's date is.
+                  const crossRefs = anchorRefsIn(pred).filter((n) => !bodyAnchors.includes(n));
+                  if (!crossRefs.length) return (
+                    <div className="mb-2 rounded bg-slate-800/60 px-2 py-1 text-[11px] leading-snug text-slate-400">
+                      ↳ uses a date you wrote in this email&apos;s body; it resolves to a real day/time when the email is sent.
+                    </div>
+                  );
+                  const sources = crossRefs.map((n) => anchorOrigins?.[n]?.subject || `@${n}`);
+                  return (
+                    <div className="mb-2 rounded bg-violet-500/10 px-2 py-1 text-[11px] leading-snug text-violet-300">
+                      ↳ this date reuses a published date from <strong>{sources.join(", ")}</strong>, so this is a <strong>needle</strong>. The assistant has to find that earlier email to answer this one, and it gets harder the more filler sits between the two. (The link back to it is added for you.)
+                    </div>
+                  );
+                })()}
 
                 {isCreate && ((showMatch[i] ?? !!op.match?.length) ? (
                   <div className="space-y-1 text-xs">
@@ -194,22 +248,45 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
               </div>
             );
           })}
-          <button onClick={addOp} className="rounded-md border border-dashed border-slate-700 px-3 py-1.5 text-xs text-slate-400 hover:border-sky-600 hover:text-sky-300">+ another action</button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={addOp} className="rounded-md border border-dashed border-slate-700 px-3 py-1.5 text-xs text-slate-400 hover:border-sky-600 hover:text-sky-300">+ another action</button>
+            {scaffoldable.length > 0 && (
+              <button onClick={scaffoldFromBody} title="One create-an-event row per date you wrote in this email's body. The dates are filled in; you just name each (and switch any to a to-do or cancel)."
+                className="rounded-md border border-dashed border-violet-700/70 px-3 py-1.5 text-xs text-violet-300 hover:border-violet-500">
+                + scaffold an action for each date in the email ({scaffoldable.length})
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
   );
 }
 
+// A one-click strip of dates the author already wrote in OTHER emails' bodies ({!name=...}). Clicking a
+// chip drops @name into this op's date instead of re-entering it, which stitches the answer key to the
+// emails (and auto-wires the needle's date edge). Origins label each chip with its source email.
+function ReuseFromEmail({ anchors, origins, onPick }: { anchors: string[]; origins?: AnchorOrigins; onPick: (name: string) => void }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
+      <span title="Dates you already wrote in an email. Click one to reuse it here instead of re-typing the date.">↩ reuse a date from an email:</span>
+      {anchors.map((a) => (
+        <button key={a} type="button" onClick={() => onPick(a)} title={origins?.[a]?.subject ? `from "${origins[a].subject}"` : undefined}
+          className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 font-mono text-violet-300 hover:border-violet-500">@{a}</button>
+      ))}
+    </div>
+  );
+}
+
 // "any of" = a list of acceptable dates (the model may land on any one). Each is its own
 // DateBuilder; an empty list shows a single blank builder to start from.
-function AnyOfBuilder({ values, anchors, serveDate, allowTime, onChange }: { values: string[]; anchors: string[]; serveDate: string; allowTime?: boolean; onChange: (list: string[]) => void }) {
+function AnyOfBuilder({ values, anchors, anchorOrigins, serveDate, allowTime, onChange }: { values: string[]; anchors: string[]; anchorOrigins?: AnchorOrigins; serveDate: string; allowTime?: boolean; onChange: (list: string[]) => void }) {
   const list = values.length ? values : [""];
   return (
     <div className="space-y-1.5">
       {list.map((v, k) => (
         <div key={k} className="flex items-start gap-2">
-          <div className="flex-1"><DateBuilder value={v} anchors={anchors} serveDate={serveDate} allowTime={allowTime} onChange={(e) => onChange(list.map((x, j) => j === k ? e : x))} /></div>
+          <div className="flex-1"><DateBuilder value={v} anchors={anchors} anchorOrigins={anchorOrigins} serveDate={serveDate} allowTime={allowTime} onChange={(e) => onChange(list.map((x, j) => j === k ? e : x))} /></div>
           {list.length > 1 && <button type="button" onClick={() => onChange(list.filter((_, j) => j !== k))} className="mt-1 px-1 text-slate-500 hover:text-rose-400">✕</button>}
         </div>
       ))}

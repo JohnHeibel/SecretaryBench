@@ -21,7 +21,13 @@ interface Props {
   serveDate: string;                   // preview "now"
   onChange: (expr: string) => void;
   allowTime?: boolean;                 // offer a clock suffix (events on an exact day); off for to-dos / deadlines
+  anchorOrigins?: AnchorOrigins;       // name -> the email that published it, so the picker can show provenance
 }
+
+// name -> the email that published an anchor (subject for display). Threaded down to the anchor
+// <select> so each option reads "@kickoff · from 'Project kickoff'" instead of a bare name.
+export type AnchorOrigins = Record<string, { email: string; subject: string }>;
+const anchorLabel = (name: string, origins?: AnchorOrigins) => { const o = origins?.[name]; return o?.subject ? `@${name} · ${o.subject}` : `@${name}`; };
 
 // dropdown order/labels for the first blank — reads as the start of the sentence. The interval
 // bases (week_of / month) are intentionally not offered here; they remain in the grammar and the
@@ -53,7 +59,7 @@ function baseIncomplete(b: Base): boolean {
 }
 const hasAnchorRef = (s: string) => /@[A-Za-z_]/.test(s);
 
-export default function DateBuilder({ value, anchors, serveDate, onChange, allowTime }: Props) {
+export default function DateBuilder({ value, anchors, serveDate, onChange, allowTime, anchorOrigins }: Props) {
   // Local structured state is the source of truth while editing; seeded from `value`. A non-empty
   // value that can't be represented (legacy / hand-typed exotic expr) opens in raw mode.
   const [expr, setExpr] = useState<Expr | null>(() => (value ? parseExpr(value) : null));
@@ -91,7 +97,7 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, allow
           onUseBuilder={() => { setMode("builder"); setExpr(parseExpr(raw)); }} />
       ) : (
         <div className="flex flex-wrap items-center gap-1.5">
-          <ExprEditor expr={expr} onChange={commit} anchors={anchors} serveDate={serveDate} />
+          <ExprEditor expr={expr} onChange={commit} anchors={anchors} serveDate={serveDate} anchorOrigins={anchorOrigins} />
           {showTime && expr && <TimeControl time={expr.time ?? null} onChange={(time) => commit({ ...expr, time })} />}
           <button type="button" onClick={() => { setRaw(serialized); setMode("raw"); }}
             className="ml-auto text-[11px] text-slate-500 hover:text-sky-300" title="Type the expression yourself. It is still checked live.">type it</button>
@@ -140,7 +146,7 @@ function TimeControl({ time, onChange }: { time: TimeOfDay | null; onChange: (t:
 
 // --- the recursive structured editor (no strings) --------------------------
 
-function ExprEditor({ expr, onChange, anchors, serveDate }: { expr: Expr | null; onChange: (e: Expr) => void; anchors: string[]; serveDate: string }) {
+function ExprEditor({ expr, onChange, anchors, serveDate, anchorOrigins }: { expr: Expr | null; onChange: (e: Expr) => void; anchors: string[]; serveDate: string; anchorOrigins?: AnchorOrigins }) {
   const setBaseKind = (kind: BaseKind) => {
     const keep = kind !== "weekOf" && kind !== "month";   // interval bases can't carry offsets or a clock
     onChange({ base: emptyBase(kind), offsets: keep && expr ? expr.offsets : [], time: keep ? expr?.time : undefined });
@@ -153,13 +159,13 @@ function ExprEditor({ expr, onChange, anchors, serveDate }: { expr: Expr | null;
         {BASE_OPTIONS.map((o) => <option key={o.kind} value={o.kind}>{o.label}</option>)}
         {expr && !OFFERED_BASE.has(expr.base.kind) && <option value={expr.base.kind}>advanced: {expr.base.kind}</option>}
       </select>
-      {expr && <BaseControls base={expr.base} anchors={anchors} serveDate={serveDate} onChange={(b) => onChange({ ...expr, base: b })} />}
+      {expr && <BaseControls base={expr.base} anchors={anchors} serveDate={serveDate} anchorOrigins={anchorOrigins} onChange={(b) => onChange({ ...expr, base: b })} />}
       {expr && !isIntervalBase && <OffsetRows offsets={expr.offsets} onChange={(offsets) => onChange({ ...expr, offsets })} />}
     </span>
   );
 }
 
-function BaseControls({ base, anchors, serveDate, onChange }: { base: Base; anchors: string[]; serveDate: string; onChange: (b: Base) => void }) {
+function BaseControls({ base, anchors, serveDate, anchorOrigins, onChange }: { base: Base; anchors: string[]; serveDate: string; anchorOrigins?: AnchorOrigins; onChange: (b: Base) => void }) {
   switch (base.kind) {
     case "serve":
       return null;
@@ -167,8 +173,8 @@ function BaseControls({ base, anchors, serveDate, onChange }: { base: Base; anch
       return (
         <select value={base.name} onChange={(e) => onChange({ kind: "anchor", name: e.target.value })} className={sel}>
           <option value="">pick a published date…</option>
-          {anchors.map((a) => <option key={a} value={a}>@{a}</option>)}
-          {base.name && !anchors.includes(base.name) && <option value={base.name}>@{base.name}</option>}
+          {anchors.map((a) => <option key={a} value={a}>{anchorLabel(a, anchorOrigins)}</option>)}
+          {base.name && !anchors.includes(base.name) && <option value={base.name}>{anchorLabel(base.name, anchorOrigins)}</option>}
         </select>
       );
     case "next":
@@ -183,7 +189,7 @@ function BaseControls({ base, anchors, serveDate, onChange }: { base: Base; anch
           ) : (
             <span className="flex flex-wrap items-center gap-1.5 rounded border border-slate-700/70 bg-slate-900/60 px-1.5 py-1">
               <span className="text-[11px] text-slate-500">from</span>
-              <ExprEditor expr={b.from} anchors={anchors} serveDate={serveDate} onChange={(from) => onChange({ ...b, from })} />
+              <ExprEditor expr={b.from} anchors={anchors} serveDate={serveDate} anchorOrigins={anchorOrigins} onChange={(from) => onChange({ ...b, from })} />
               <button type="button" onClick={() => onChange({ ...b, from: null })} className="text-[11px] text-slate-500 hover:text-rose-400">✕</button>
             </span>
           )}
@@ -212,7 +218,7 @@ function BaseControls({ base, anchors, serveDate, onChange }: { base: Base; anch
     case "weekOf":
       return (
         <span className="flex flex-wrap items-center gap-1.5 rounded border border-slate-700/70 bg-slate-900/60 px-1.5 py-1">
-          <ExprEditor expr={base.inner} anchors={anchors} serveDate={serveDate} onChange={(inner) => onChange({ kind: "weekOf", inner })} />
+          <ExprEditor expr={base.inner} anchors={anchors} serveDate={serveDate} anchorOrigins={anchorOrigins} onChange={(inner) => onChange({ kind: "weekOf", inner })} />
         </span>
       );
     case "month":

@@ -15,7 +15,7 @@ cover the corpus (>= emails + slack), and let a caller override via "n_days".
 Request:  { "nodes": [ {...}, ... ], "n_days"?: 500 }
 Response (ok):   { "ok": true,  "score": 1.0, "passed": N, "total": N, "failures": [] }
 Response (bad):  { "ok": false, "score": 0.8, "passed": 4, "total": 5,
-                   "failures": ["node-1.e2", ...] }
+                   "failures": [{"id": "node-1.e2", "node": "node-1", "reason": "on the wrong day"}, ...] }
 Response (err):  { "ok": false, "error": "..." }   on a malformed/infeasible corpus
 """
 from __future__ import annotations
@@ -41,7 +41,14 @@ def _oracle(raw_nodes: list, n_days: int | None = None) -> dict:
     days = n_days if n_days else max(120, len(corpus.emails) + 120)
     plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=42, n_days=days)  # raises InfeasibleSchedule
     res = engine.run(corpus, plan, oracle_model)
-    failures = sorted(eid for eid, r in res.results.items() if not r.passed)
+    # Carry the grader's own reason (EmailResult.headline) and owning node for each failing email, so the
+    # UI can say WHICH email and WHY ("on the wrong day", "over-acted — created ...") and link straight to it,
+    # instead of dumping bare ids the author then has to hunt down.
+    failures = [
+        {"id": eid, "node": corpus.emails[eid].node if eid in corpus.emails else "", "reason": r.headline}
+        for eid, r in res.results.items() if not r.passed
+    ]
+    failures.sort(key=lambda f: f["id"])
     return {
         "ok": res.score() == 1.0,
         "score": res.score(),

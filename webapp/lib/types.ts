@@ -72,12 +72,14 @@ export interface LintResult {
 }
 
 // /api/oracle — satisfiability: did the reference solver score 1.0? `failures`
-// lists email ids whose answer key the perfect secretary could NOT satisfy.
+// lists the emails whose answer key the perfect secretary could NOT satisfy, each
+// with the grader's reason so the bar can say which email is wrong and why.
+export interface OracleFailure { id: string; node: string; reason: string }
 export interface OracleResult {
   ok: boolean;
   error?: string;
   score?: number;
   passed?: number;
   total?: number;
-  failures?: string[];
+  failures?: OracleFailure[];
 }

@@ -61,12 +61,33 @@ export function anchorsInCorpus(nodes: CorpusNode[]): string[] {
   return [...names].sort();
 }
 
+// Anchor names THIS email publishes in its own body ({!name=...}). The answer key may reuse these
+// directly (schema.py exempts a self-emitted anchor from the date-edge rule), which is what powers the
+// "scaffold an action per date" button and the same-email reuse chips.
+export function bodyAnchorNames(body: string): string[] {
+  return [...new Set([...body.matchAll(EMIT_IN_BODY)].map((m) => m[1]))];
+}
+
 // Obligation names CREATEd anywhere in a node — what a move/cancel can target, and what a later
 // email may reuse as an @anchor date. (Distinct from anchorsInCorpus, which is body/emit anchors.)
 export function obligationNames(node: CorpusNode): string[] {
   const names = new Set<string>();
   for (const e of node.emails) for (const op of e.answer?.ops ?? []) if (op.create) names.add(op.create);
   return [...names].sort();
+}
+
+// name -> the email that published it (a body {!=}/emits anchor, or an obligation create-name),
+// so the answer-key builder can show an author WHERE a reusable date came from ("@kickoff · from
+// 'Project kickoff'"). Scans the same way emitters() does; last writer wins (lint forbids collisions).
+export function anchorOrigins(nodes: CorpusNode[]): Record<string, { email: string; subject: string }> {
+  const out: Record<string, { email: string; subject: string }> = {};
+  for (const node of nodes) for (const e of node.emails) {
+    const tag = { email: e.id, subject: e.subject };
+    for (const m of e.body.matchAll(EMIT_IN_BODY)) out[m[1]] = tag;
+    for (const n of Object.keys(e.answer?.emits ?? {})) out[n] = tag;
+    for (const op of e.answer?.ops ?? []) if (op.create) out[op.create] = tag;
+  }
+  return out;
 }
 
 // name -> kind for the node's created obligations. A move/cancel op carries no `kind` in the stored
@@ -129,6 +150,34 @@ export function withDerivedDateEdges(email: Email, nodeId: string, nodes: Corpus
     deps = stat ? deps.map((d) => (d === stat ? { ...d, type: "date" } : d)) : [...deps, { email: src, type: "date" } as Edge];
   }
   return deps === email.depends_on ? email : { ...email, depends_on: deps };
+}
+
+// The set of nodes needed to validate `rootId` on its own: the storyline itself plus any other it
+// actually reaches through a cross-node dependency — a depends_on edge into another node, a whole-node
+// edge, or an answer @anchor whose only emitter lives elsewhere. Self-contained storylines (the norm)
+// return just [root], so per-author (focus-mode) validation stays O(one scenario). Transitive: A->B->C
+// pulls all three. Used to scope lint/oracle to one author's link without missing a real dependency.
+export function focusClosure(nodes: CorpusNode[], rootId: string): CorpusNode[] {
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const emailNode = new Map<string, string>();
+  for (const n of nodes) for (const e of n.emails) emailNode.set(e.id, n.id);
+  const { global } = emitters(nodes); // anchor name -> emitting email id (body {!=}/emits are corpus-wide)
+  const seen = new Set<string>();
+  const stack = [rootId];
+  while (stack.length) {
+    const id = stack.pop()!;
+    if (seen.has(id) || !byId.has(id)) continue;
+    seen.add(id);
+    const push = (nid?: string) => { if (nid && !seen.has(nid)) stack.push(nid); };
+    const fromEdge = (d: Edge) => { push(d.node); if (d.email) push(emailNode.get(d.email)); };
+    const node = byId.get(id)!;
+    for (const d of node.node_depends_on ?? []) fromEdge(d);
+    for (const e of node.emails) {
+      for (const d of e.depends_on) fromEdge(d);
+      for (const name of answerAnchorRefs(e.answer)) push(emailNode.get(global[name] ?? ""));
+    }
+  }
+  return nodes.filter((n) => seen.has(n.id));
 }
 
 // Split a body into literal text and {token} spans so we can render chips.

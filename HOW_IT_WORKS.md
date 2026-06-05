@@ -99,63 +99,103 @@ slip can never damage another scenario's score.
 
 ## Building a scenario: a worked example
 
-A scenario is just a short email thread with an answer for each email. Here's a full
-one — "Project Helios" — to show the shape:
+A scenario is just a short email thread with an answer for each email. "Project Helios"
+is the loadable example in the authoring tool ("Load the Project Helios example"); it is
+one storyline that tours every kind of email you'll ever write, in the order you tend to
+meet them. Here is the whole thing, with the question each email answers:
 
-**Email 1** (from the COO) — *the day it arrives is the model's "now"*
+**Email 1** (from the COO) — *the basics: one event, one exact time*
 > **Helios kickoff.** "We're starting Project Helios. Put the kickoff on the calendar
 > for next Thursday, 10–11 AM."
 
-*Answer:* create an event **"Helios kickoff"** at `next:THU @10:00-11:00`. Because a
-later email refers back to this date, also publish it as an **anchor** so it can be
-reused: `{!helios_kickoff = next:THU @10:00-11:00}`.
+*Answer:* create an event **"Helios kickoff"** at `next:THU @10:00-11:00`. The date is
+written once in the body as an **anchor** — `{!helios_kickoff = next:THU @10:00-11:00}` —
+and the answer reuses the same expression, so the email and the answer can never disagree.
+Predicate **on exactly** (`eq`): the assistant must hit this day *and* time.
 
-**Email 2** (from the COO, a week or so later) — *the long-horizon part*
+**Email 2** (from the COO, a week or so later) — *connecting an earlier fact (a needle)*
 > **Helios review.** "Two weeks after the kickoff, let's do a review, 2–3 PM."
 
-*Answer:* create **"Helios review"** at `@helios_kickoff+2w @14:00-15:00`. The model
-has to recall the kickoff date — possibly served weeks ago — and compute two weeks out.
-That recall-and-compute over a long gap is exactly what we're testing.
+*Answer:* create **"Helios review"** at `@helios_kickoff+2w @14:00-15:00`. "Two weeks after
+the kickoff" is just the kickoff anchor plus two weeks. Because the answer reuses an earlier
+date, this is a **needle** — the assistant has to recall the kickoff (served weeks ago) and
+compute from it. Reusing the anchor wires the dependency for you.
 
 **Email 3** (from the board's office) — *a reschedule conflict*
 > **Re: Helios review.** "The board needs that review moved up a week, same time."
 
-*Answer:* `move` **"Helios review"** to `@helios_kickoff+1w @14:00-15:00`. The model
-must find the event it already made and move it. One exact new time.
+*Answer:* `move` **"Helios review"** to `@helios_kickoff+1w @14:00-15:00`. Conflicts are
+always authored as a later email that moves (or cancels) an earlier thing by name — never
+"find an open slot." `move` inherits the event kind from the original.
 
-**Email 4** (from the COO) — *a to-do with a deadline*
+**Email 4** (from the COO) — *a to-do with a deadline (on exactly vs on or before)*
 > **Helios board filing.** "The board filing needs to be submitted within ten business
 > days of the kickoff."
 
-*Answer:* create a **to-do** "Helios board filing" due `by @helios_kickoff+10bd`. A to-do
-has no clock, and `by` means any day up to the deadline counts. It reuses the kickoff
-anchor, so it is also a needle.
+*Answer:* create a **to-do** "Helios board filing" due `by @helios_kickoff+10bd`. Two things
+differ from an event: a to-do has no clock, and it's graded **on or before** (`by`) instead
+of **on exactly** (`eq`) — landing on *any* day up to and including the deadline is correct.
+(`+10bd` = ten *business* days.) It reuses the kickoff anchor, so it's also a needle.
 
-**Email 5** (from a teammate) — *an FYI, no action*
+**Email 5** (from BizDev) — *many actions in one email*
+> **Three partner intros to schedule.** "Acme can do [a slot], Globex prefers [another],
+> Initech offered [a third]. Please get all three on the calendar."
+
+*Answer:* three `create` events, one per partner, at `@acme_slot` / `@globex_slot` /
+`@initech_slot`. Each slot is written once in this email's body as an anchor and reused in
+the answer — so you don't re-type three dates. In the tool, the **"scaffold an action for
+each date in the email"** button builds these three rows for you from the body; you just
+name each. (An anchor a single email both defines *and* reuses needs no dependency edge.)
+
+**Email 6** (from BizDev) — *taking something back off*
+> **Re: Globex meeting cancelled.** "Globex had to back out. Take it off the calendar."
+
+*Answer:* `cancel` **"Meet with Globex"**. A cancel names the thing only — no date, no kind
+(both inherited). After this email, that one meeting is gone and the other two remain.
+
+**Email 7** (from the COO) — *more than one day is fine*
+> **Helios offsite, pick a day.** "Either next Monday or next Wednesday works — put it on
+> whichever."
+
+*Answer:* create **"Helios offsite"** with **any of** `[next:MON, next:WED]`. The assistant
+is correct if it lands on *any one* of the listed days. `any_of` (and the `by` deadline) are
+the only deliberately multi-day answers — there is still no "find a free slot."
+
+**Email 8** (from Design) — *an FYI, no action*
 > "FedEx is dropping the Helios mockups Thursday, nothing for you to do."
 
-*Answer:* no ops. The model should create nothing. This tests **restraint** (not
-over-acting on chatter).
+*Answer:* no ops (the **"this email needs no action"** box). The assistant should create
+nothing; anything it does here is a failure. This tests restraint, and a real corpus is
+mostly emails like this so the action emails aren't obvious.
 
-That single scenario exercises the whole benchmark: fixed times, an **anchor reused
-across a long gap** (the temporal-reasoning core), a **reschedule**, a **to-do with a
-due-date deadline**, and a **no-action distractor**. Run it on its own and the reference solver should score it
-**1.0** before you add it to the corpus — that's your safety check.
+That one storyline exercises the whole benchmark: an exact event, an **anchor reused across a
+long gap** (the temporal core), a **reschedule**, a **to-do on a deadline**, **several actions
+in one email**, a **cancel**, an **any-of**, and a **no-action distractor**. Load it, run the
+reference solver, and it scores **1.0** — which is the bar every scenario you write must clear
+before it joins the corpus.
 
-**Want anti-gaming variety?** Write the offset as a list: `@helios_kickoff+[2,3]w`. One
-run the review is 2 weeks out, another it's 3, picked by the run's seed — and the email
-the model reads *and* the grader both use the same value, so it's still exactly one
-right answer per run. The model can't memorize a fixed date; it has to actually reason.
+### Questions authors ask
+- **"The answer key feels like a different tool from the email."** It's the same dates, just
+  named. Write a date once in the body with the date builder (`{!name = ...}`), then reuse it
+  in the answer as `@name` (the "reuse a date from an email" chips, or the scaffold button). The
+  email and the grader point at the same instant by construction.
+- **"What's the difference between *on exactly* and *on or before*?"** *On exactly* (`eq`) means
+  the assistant must land on that exact day (and time, for an event). *On or before* (`by`) is a
+  deadline: any day up to and including it counts — used for to-dos and "submit by" tasks.
+- **"How many kinds of action are there?"** Four: create an event, create a to-do, move/reschedule,
+  cancel — or tick "needs no action." That's the whole vocabulary.
+- **"Writing an op per line for a busy email is tedious."** Put each date in the body as an anchor
+  and use the scaffold button: it adds one create-event row per date with the date filled in.
 
 ### Rules of thumb for authors
-- **Name it like the email calls it** ("Helios kickoff") and you're done — no keyword
-  fiddling.
-- **Give an exact time** for every meeting. The model must hit it exactly.
-- **Use an anchor** (`{!name = ...}`) whenever a later email refers back to an earlier
-  date — that's what makes it a long-horizon test instead of a one-shot.
-- **Conflicts = reschedules:** a later email moves or cancels an earlier event.
+- **Name it like the email calls it** ("Helios kickoff") and you're done — no keyword fiddling.
+- **Give an exact time** for every meeting; use **on or before** for "submit by" to-dos.
+- **Use an anchor** (`{!name = ...}`) for any date a later email refers back to — that's what
+  makes it a long-horizon test instead of a one-shot — and for several dates in one busy email.
+- **Conflicts = reschedules:** a later email moves or cancels an earlier thing by name.
 - **Add FYI / no-action emails** so the model is tested on *not* over-acting.
-- **Check it solves alone** before shipping it.
+- **Check it solves alone** before shipping it (`npx tsx scripts/checkTemplate.mts` does this for
+  the example; the bottom-bar check does it for what you author).
 
 ## Naming events (a note for authors)
 

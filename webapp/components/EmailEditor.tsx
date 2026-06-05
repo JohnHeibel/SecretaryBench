@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { CorpusNode, Edge, EdgeType, Email } from "@/lib/types";
-import { obligationKinds, obligationNames } from "@/lib/grammar";
+import { anchorOrigins, bodyAnchorNames, obligationKinds, obligationNames } from "@/lib/grammar";
 import BodyEditor from "./BodyEditor";
 import AnswerKeyBuilder from "./AnswerKeyBuilder";
 
@@ -130,6 +130,11 @@ function asList(v: string | string[] | undefined): string[] {
 function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, onAutoSlugEmail }: Omit<Props, "onUpdateNode" | "onRenameNode" | "onAddEmail"> & { email: Email }) {
   const keys = castKeys(node);
   const set = (p: Partial<Email>) => onUpdateEmail({ ...email, ...p });
+  // Where each published date came from (provenance labels), every date written in any email body
+  // (one-click "reuse" chips — same-email reuse is valid and the common case), and this email's OWN
+  // body anchors (the "scaffold an action per date" source).
+  const origins = anchorOrigins(allNodes);
+  const ownBodyAnchors = bodyAnchorNames(email.body);
 
   return (
     <div className="space-y-4">
@@ -164,12 +169,12 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
 
       <section className="space-y-3">
       <StepTitle n={2} title="Connect earlier facts" note="Only add a dependency if this email relies on a previous email." />
-      <DependencyPicker email={email} allNodes={allNodes} onChange={(depends_on) => set({ depends_on })} />
+      <DependencyPicker email={email} node={node} onChange={(depends_on) => set({ depends_on })} />
       </section>
 
       <section className="space-y-3">
       <StepTitle n={3} title="Tell the grader the perfect answer" note="This is the answer key, not text the model sees." />
-      <AnswerKeyBuilder answer={email.answer} anchors={anchors} serveDate={serveDate} obligations={obligationNames(node)} obligationKinds={obligationKinds(node)} onChange={(answer) => set({ answer })} />
+      <AnswerKeyBuilder answer={email.answer} anchors={anchors} serveDate={serveDate} obligations={obligationNames(node)} obligationKinds={obligationKinds(node)} reuseAnchors={anchors} bodyAnchors={ownBodyAnchors} anchorOrigins={origins} onChange={(answer) => set({ answer })} />
       </section>
     </div>
   );
@@ -223,13 +228,17 @@ function StepTitle({ n, title, note }: { n: number; title: string; note: string 
   );
 }
 
-function DependencyPicker({ email, allNodes, onChange }: { email: Email; allNodes: CorpusNode[]; onChange: (edges: Edge[]) => void }) {
-  const others = allNodes.flatMap((n) => n.emails).filter((e) => e.id !== email.id);
+function DependencyPicker({ email, node, onChange }: { email: Email; node: CorpusNode; onChange: (edges: Edge[]) => void }) {
+  // Only offer OTHER emails in THIS storyline. A prerequisite from an unrelated node would just be
+  // confusing noise to an author scoped to one storyline (cross-node edges are an advanced, rarely-used
+  // case; any that already exist in the data still render below as their raw id / @node).
+  const others = node.emails.filter((e) => e.id !== email.id);
   const chosen = new Set(email.depends_on.map((d) => d.email).filter(Boolean) as string[]);
-  // New dependencies start as `static` (plain ordering — comes after, no deadline); the per-row
-  // dropdown is the one place to switch to `date` when a deadline matters. Needles (an answer reusing
-  // an @anchor) get their `date` edge wired automatically by withDerivedDateEdges, so authors rarely
-  // set it by hand. Picking from the add-select adds it immediately — no separate confirm button.
+  // The deadline distinction (static vs date edge) is an advanced detail most authors never touch:
+  // new edges start as `static` (plain "comes after"), and needles auto-upgrade to `date` via
+  // withDerivedDateEdges. So we hide the type dropdown behind an Advanced toggle and just show the
+  // current setting as a muted word; opening Advanced reveals the editable selects.
+  const [showTypes, setShowTypes] = useState(false);
   function add(emailId: string) {
     if (!emailId || chosen.has(emailId)) return;
     onChange([...email.depends_on, { email: emailId, type: "static" }]);
@@ -245,11 +254,15 @@ function DependencyPicker({ email, allNodes, onChange }: { email: Email; allNode
         {email.depends_on.map((d, i) => (
           <div key={i} className="flex items-center gap-2 text-xs">
             <code className="flex-1 truncate rounded bg-slate-800 px-2 py-1 font-mono text-slate-300">{d.email ?? `@node:${d.node}`}</code>
-            <select value={d.type} onChange={(e) => d.email && setType(d.email, e.target.value as EdgeType)}
-              className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
-              <option value="static">comes after (no deadline)</option>
-              <option value="date">comes after, with a deadline</option>
-            </select>
+            {showTypes ? (
+              <select value={d.type} onChange={(e) => d.email && setType(d.email, e.target.value as EdgeType)}
+                className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
+                <option value="static">comes after (no deadline)</option>
+                <option value="date">comes after, with a deadline</option>
+              </select>
+            ) : (
+              <span className="text-slate-500" title="Most links just mean this email comes later. Open Advanced to set a deadline.">{d.type === "date" ? "deadline" : "comes after"}</span>
+            )}
             <button onClick={() => onChange(email.depends_on.filter((_, j) => j !== i))} className="px-1 text-slate-500 hover:text-rose-400">✕</button>
           </div>
         ))}
@@ -257,6 +270,11 @@ function DependencyPicker({ email, allNodes, onChange }: { email: Email; allNode
           <option value="">+ add a prerequisite email…</option>
           {others.filter((e) => !chosen.has(e.id)).map((e) => <option key={e.id} value={e.id}>{e.id} · {e.subject}</option>)}
         </select>
+        {email.depends_on.length > 0 && (
+          <button type="button" onClick={() => setShowTypes((s) => !s)} className="text-[11px] text-slate-500 hover:text-sky-300">
+            {showTypes ? "▾ hide deadline settings" : "▸ Advanced: set deadlines"}
+          </button>
+        )}
       </div>
     </div>
   );

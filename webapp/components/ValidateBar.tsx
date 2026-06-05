@@ -25,18 +25,31 @@ function friendlyError(error = ""): { title: string; body: string } {
   return { title: "Fix before export", body: error || "The corpus is not ready for the benchmark yet." };
 }
 
+// Pull the offending email id out of a lint error so we can point right at it. Most CorpusError
+// messages name it as `email 'some.id'`; the blank-name/blank-date cases don't, and then there's
+// nothing precise to link to (returns null and we just show the friendly guidance).
+function errorEmailId(error = ""): string | null { return error.match(/email '([^']+)'/)?.[1] ?? null; }
+
+// A small clickable "→ id" pill that jumps the editor to the named email.
+function JumpPill({ id, onJump }: { id: string; onJump?: (id: string) => void }) {
+  if (!onJump) return <span className="font-mono text-rose-100">{id}</span>;
+  return <button onClick={() => onJump(id)} title="Open this email" className="rounded bg-rose-900/70 px-1.5 py-0.5 font-mono text-rose-100 hover:bg-rose-800">→ {id}</button>;
+}
+
 // The gate, mirrored from the runner: green only when the real sb.schema.lint passes.
 // Once lint is green we ALSO show the oracle (satisfiability) result — green when the
-// reference solver scores 1.0, red listing the email ids whose answer key is unsolvable.
-export default function ValidateBar({ lint, oracle }: { lint: LintResult | null; oracle: OracleResult | null }) {
+// reference solver scores 1.0, red naming each email whose answer key is unsolvable and why.
+export default function ValidateBar({ lint, oracle, onJump }: { lint: LintResult | null; oracle: OracleResult | null; onJump?: (emailId: string) => void }) {
   if (!lint) {
     return <footer className="border-t border-slate-800 bg-slate-900 px-4 py-2 text-xs text-slate-500">Checking the corpus…</footer>;
   }
   if (!lint.ok) {
     const msg = friendlyError(lint.error);
+    const where = errorEmailId(lint.error);
     return (
       <footer className="border-t border-rose-900 bg-rose-950/55 px-4 py-2 text-xs text-rose-200">
         <span className="font-semibold">{msg.title}:</span> <span>{msg.body}</span>
+        {where && <span className="ml-2"><JumpPill id={where} onJump={onJump} /></span>}
         <span className="ml-2 font-mono text-rose-300/70" title={lint.error}>details</span>
       </footer>
     );
@@ -70,8 +83,16 @@ export default function ValidateBar({ lint, oracle }: { lint: LintResult | null;
     }
     return (
       <footer className="border-t border-rose-900 bg-rose-950/55 px-4 py-2 text-xs text-rose-200">
-        <span className="font-semibold">Answer key cannot be solved yet.</span>
-        <span className="ml-2 text-rose-300/80">Oracle {oracle.passed}/{oracle.total}; fix: <span className="font-mono">{oracle.failures!.join(", ")}</span></span>
+        <span className="font-semibold">Answer key cannot be solved yet</span>
+        <span className="ml-2 text-rose-300/80">— the perfect secretary scored {oracle.passed}/{oracle.total}. Each line is what went wrong:</span>
+        <ul className="mt-1 space-y-0.5">
+          {oracle.failures!.map((f) => (
+            <li key={f.id} className="flex items-baseline gap-1.5">
+              <JumpPill id={f.id} onJump={onJump} />
+              <span className="text-rose-200/90">{f.reason}</span>
+            </li>
+          ))}
+        </ul>
       </footer>
     );
   }

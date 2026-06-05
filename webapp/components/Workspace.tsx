@@ -1,7 +1,8 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
-import { anchorsInCorpus, normalizeAnswer, withDerivedDateEdges } from "@/lib/grammar";
+import { anchorsInCorpus, focusClosure, normalizeAnswer, withDerivedDateEdges } from "@/lib/grammar";
 import { projectHeliosNode } from "@/lib/templates";
 import type { CorpusNode, Edge, Email, LintResult, OracleResult } from "@/lib/types";
 import Sidebar from "./Sidebar";
@@ -35,38 +36,51 @@ export default function Workspace() {
   const oracleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
+  // Deep-link focus mode: ?node=<id> scopes one author to a single storyline (see
+  // docs/AUTHORING_WALKTHROUGH.md). No param = the full "coordinator" view (assign storylines,
+  // copy each author a focused link, run the whole-corpus check, export).
+  const params = useSearchParams();
+  const focusId = params.get("node");
+  const focused = focusId != null;
+
   // Pull the whole corpus from the store and seat it in state. Normalize each stored
   // answer into the verb-model shape at the data boundary, so a legacy/partial row can
-  // never crash the editor downstream.
+  // never crash the editor downstream. In focus mode, open straight to the linked storyline.
   const reload = useCallback(async () => {
     const raw = await fetchNodes();
     const n = raw.map((node) => ({ ...node, emails: node.emails.map((e) => ({ ...e, answer: normalizeAnswer(e.answer) })) }));
     setNodes(n);
-    setSelNode(n[0]?.id ?? null);
-    setSelEmail(n[0]?.emails[0]?.id ?? null);
+    if (focusId) { setSelNode(n.some((x) => x.id === focusId) ? focusId : null); setSelEmail(null); }
+    else { setSelNode(n[0]?.id ?? null); setSelEmail(n[0]?.emails[0]?.id ?? null); }
     setLoaded(true);
-  }, []);
+  }, [focusId]);
 
   useEffect(() => { reload(); }, [reload]);
 
-  // Re-lint the whole corpus (debounced) whenever it changes — the same gate the runner uses.
+  // What lint/oracle run on: in focus mode just the open storyline (+ any it truly references, rare),
+  // otherwise the whole corpus. Same real sb gate either way — focus mode just narrows the scope so one
+  // author's keystrokes don't re-validate everyone else's in-flight work, and the bottom bar reflects
+  // their storyline alone (in the common self-contained case the closure is exactly that one node).
+  const validateNodes = useMemo(() => (focusId ? focusClosure(nodes, focusId) : nodes), [nodes, focusId]);
+
+  // Re-lint (debounced) whenever the scoped corpus changes — the same gate the runner uses.
   useEffect(() => {
     if (!loaded) return;
     clearTimeout(lintTimer.current);
-    lintTimer.current = setTimeout(() => { lintCorpus(nodes).then(setLint); }, 350);
-  }, [nodes, loaded]);
+    lintTimer.current = setTimeout(() => { lintCorpus(validateNodes).then(setLint); }, 350);
+  }, [validateNodes, loaded]);
 
-  // Once a corpus LINTS clean, prove it is also SOLVABLE: run the reference oracle
-  // (perfect secretary acting from the answer key). Red here = an unsatisfiable answer
-  // key the linter cannot catch. Gated on lint.ok since the oracle needs a build-able corpus.
+  // Once it LINTS clean, prove it is also SOLVABLE: run the reference oracle (perfect secretary acting
+  // from the answer key). Red here = an unsatisfiable answer key the linter cannot catch. Gated on
+  // lint.ok since the oracle needs a build-able corpus.
   useEffect(() => {
     if (!loaded) return;
     clearTimeout(oracleTimer.current);
     if (!lint?.ok) { setOracle(null); return; }
-    oracleTimer.current = setTimeout(() => { oracleCorpus(nodes).then(setOracle); }, 350);
-  }, [nodes, loaded, lint?.ok]);
+    oracleTimer.current = setTimeout(() => { oracleCorpus(validateNodes).then(setOracle); }, 350);
+  }, [validateNodes, loaded, lint?.ok]);
 
-  const anchors = useMemo(() => anchorsInCorpus(nodes), [nodes]);
+  const anchors = useMemo(() => anchorsInCorpus(validateNodes), [validateNodes]);
 
   const persist = useCallback((node: CorpusNode) => {
     clearTimeout(saveTimers.current[node.id]);
@@ -92,7 +106,7 @@ export default function Workspace() {
 
   // Change an email's id (the corpus PK) and rewrite every depends_on edge across the whole corpus
   // that pointed at the old id, so cross-node references stay valid. Mirrors renameNode's edge-fix
-  // pass. No-ops on collision so the caller can fall back. All touched nodes are re-saved.
+  // pass. No-ops on collision so the caller can fall back. Only rows that actually changed are re-saved.
   const renameEmail = useCallback((oldId: string, newId: string): boolean => {
     if (!newId || newId === oldId || nodes.some((n) => n.emails.some((e) => e.id === newId))) return false;
     const fixEdge = (d: Edge): Edge => ({ ...d, email: d.email === oldId ? newId : d.email });
@@ -101,7 +115,10 @@ export default function Workspace() {
       node_depends_on: n.node_depends_on?.map(fixEdge),
     }));
     setNodes(next);
-    for (const n of next) saveNode(n).catch(() => {});
+    // Save only the rows that actually changed — a self-contained rename then touches just this storyline,
+    // so one author's edit can't clobber a concurrent author's in-flight node with a stale snapshot.
+    const before = new Map(nodes.map((n) => [n.id, JSON.stringify(n)]));
+    for (const n of next) if (JSON.stringify(n) !== before.get(n.id)) saveNode(n).catch(() => {});
     if (selEmail === oldId) setSelEmail(newId);
     return true;
   }, [nodes, selEmail]);
@@ -167,12 +184,22 @@ export default function Workspace() {
       return n.id === oldId ? { ...base, id: newId } : base;
     });
     setNodes(next);
-    for (const n of next) saveNode(n).catch(() => {});
+    // Save only rows that changed (see renameEmail) — the renamed node has a new id so it always saves;
+    // an untouched sibling storyline is left alone, protecting a concurrent author's edits.
+    const before = new Map(nodes.map((n) => [n.id, JSON.stringify(n)]));
+    for (const n of next) if (JSON.stringify(n) !== before.get(n.id)) saveNode(n).catch(() => {});
     apiDelete(oldId).catch(() => {});
     if (selNode === oldId) setSelNode(newId);
     if (selEmail && emailMap.has(selEmail)) setSelEmail(emailMap.get(selEmail)!);
     return true;
   }, [nodes, selNode, selEmail]);
+
+  // Jump the editor straight to an email by id — used by the validation bar so a lint/oracle failure
+  // links to exactly the email it's about. Resolves the owning node so a click lands on the right one.
+  const jumpToEmail = useCallback((emailId: string) => {
+    const owner = nodes.find((n) => n.emails.some((e) => e.id === emailId)); if (!owner) return;
+    setSelNode(owner.id); setSelEmail(emailId); setView("editor");
+  }, [nodes]);
 
   const removeNode = useCallback((nodeId: string) => {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
@@ -182,6 +209,9 @@ export default function Workspace() {
 
   const node = nodes.find((n) => n.id === selNode) ?? null;
   const email = node?.emails.find((e) => e.id === selEmail) ?? null;
+  const focusNode = focusId ? nodes.find((n) => n.id === focusId) ?? null : null;
+  // In focus mode the sidebar, DAG, and "depends on" picker see only the author's own storyline.
+  const viewNodes = focused ? (focusNode ? [focusNode] : []) : nodes;
 
   return (
     <div className="flex h-screen flex-col">
@@ -189,7 +219,7 @@ export default function Workspace() {
         <div className="flex min-w-0 items-center gap-3">
           <div className="min-w-0">
             <h1 className="text-sm font-semibold">SecretaryBench authoring</h1>
-            <p className="hidden text-[11px] text-slate-500 md:block">Write an email, say the perfect action, then export once the bottom bar is green.</p>
+            <p className="hidden text-[11px] text-slate-500 md:block">{focused ? "You're editing one storyline. Write the email, say the perfect action, get the bottom bar green." : "Write an email, say the perfect action, then export once the bottom bar is green."}</p>
           </div>
           <div className="flex overflow-hidden rounded-md border border-slate-700 text-xs">
             <button onClick={() => setView("editor")} className={`px-3 py-1 ${view === "editor" ? "bg-sky-600 text-white" : "text-slate-300 hover:bg-slate-800"}`}>Editor</button>
@@ -204,13 +234,13 @@ export default function Workspace() {
             <span className="hidden md:inline">preview date</span>
             <input type="date" value={serveDate} onChange={(e) => setServeDate(e.target.value)} className="rounded border border-slate-700 bg-slate-800 px-2 py-0.5 text-slate-200" />
           </label>
-          <a href="/api/export" className="rounded-md border border-emerald-700/70 bg-emerald-600/10 px-3 py-1.5 font-medium text-emerald-100 hover:bg-emerald-600/20" title="Export when the bottom validation bar says Ready for export.">Export corpus</a>
+          {!focused && <a href="/api/export" className="rounded-md border border-emerald-700/70 bg-emerald-600/10 px-3 py-1.5 font-medium text-emerald-100 hover:bg-emerald-600/20" title="Export when the bottom validation bar says Ready for export.">Export corpus</a>}
         </div>
       </header>
 
       <div className="flex min-h-0 flex-1">
         <Sidebar
-          nodes={nodes} selNode={selNode} selEmail={selEmail}
+          nodes={viewNodes} selNode={selNode} selEmail={selEmail} focused={focused}
           onSelectNode={(id) => { setSelNode(id); setSelEmail(null); }}
           onSelectEmail={(nid, eid) => { setSelNode(nid); setSelEmail(eid); }}
           onAddNode={addNode} onAddEmail={addEmail} onAddExample={addExample}
@@ -220,12 +250,14 @@ export default function Workspace() {
 
         <main className="min-w-0 flex-1 overflow-auto">
           {view === "dag" ? (
-            <DagCanvas nodes={nodes} lint={lint} serveDate={serveDate}
+            <DagCanvas nodes={viewNodes} lint={lint} serveDate={serveDate}
               onSelectEmail={(nid, eid) => { setSelNode(nid); setSelEmail(eid); setView("editor"); }} />
+          ) : focused && !focusNode ? (
+            <FocusNotFound focusId={focusId} loaded={loaded} />
           ) : node ? (
             <EmailEditor
               key={`${node.id}/${email?.id ?? "node"}`}
-              node={node} email={email} allNodes={nodes} anchors={anchors} serveDate={serveDate}
+              node={node} email={email} allNodes={viewNodes} anchors={anchors} serveDate={serveDate}
               onUpdateNode={updateNode} onRenameNode={renameNode}
               onAddEmail={() => addEmail(node.id)}
               onUpdateEmail={(e) => updateEmail(node.id, e)}
@@ -237,7 +269,7 @@ export default function Workspace() {
         </main>
       </div>
 
-      <ValidateBar lint={lint} oracle={oracle} />
+      <ValidateBar lint={lint} oracle={oracle} onJump={jumpToEmail} />
     </div>
   );
 }
@@ -250,7 +282,22 @@ function StartEmpty({ onAddNode, onAddExample }: { onAddNode: () => void; onAddE
         <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
         <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is a group of related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
         <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
-        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Helios example</button>. It is a finished thread with a needle and a reschedule.</p>
+        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Helios example</button>. It is a finished storyline that tours every kind of email, in order, so you can see how each is built.</p>
+      </div>
+    </div>
+  );
+}
+
+// Shown when ?node=<id> points at a storyline that isn't in the store. While the corpus is still
+// loading we say nothing definitive — the id may just not be seated in state yet.
+function FocusNotFound({ focusId, loaded }: { focusId: string | null; loaded: boolean }) {
+  if (!loaded) return <div className="grid h-full place-items-center p-6 text-sm text-slate-500">Loading your storyline…</div>;
+  return (
+    <div className="grid h-full place-items-center p-6">
+      <div className="max-w-md rounded-lg border border-slate-800 bg-slate-900/50 p-6 text-center">
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Storyline not found</p>
+        <h2 className="mt-2 text-xl font-semibold text-slate-100">No storyline named <span className="font-mono text-amber-200">{focusId}</span>.</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">Double-check the link you were given, or ask whoever shared it to create this storyline and send you a fresh link.</p>
       </div>
     </div>
   );
