@@ -35,7 +35,7 @@ export default function Sidebar({ nodes, selNode, selEmail, focused, onSelectNod
             + New storyline
             <span className="block text-[11px] font-normal text-sky-200/65">A storyline is a group of related emails.</span>
           </button>
-          <button onClick={onAddExample} className="mt-1.5 w-full text-left text-[11px] text-slate-500 hover:text-sky-300" title="A finished storyline that tours every kind of email: an event, a needle (reuse an earlier date), a reschedule, a to-do with a deadline, many actions in one email, a cancel, an any-of, and a no-action FYI.">✨ Load the Project Helios example</button>
+          <button onClick={onAddExample} className="mt-1.5 w-full text-left text-[11px] text-slate-500 hover:text-sky-300" title="A finished acquisition saga that tours every kind of email and every feature: an event, a needle (reuse an earlier date), a reschedule, a to-do with a deadline, many actions in one email, a cancel, an any-of, a CEO-sent email, and no-action FYIs. Its dates pay off far from where they're set, so the long-horizon test shows up at scale.">✨ Load the Project Atlas example</button>
         </div>
       )}
       <div className="min-h-0 flex-1 overflow-auto py-1">

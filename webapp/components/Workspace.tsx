@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
 import { anchorsInCorpus, focusClosure, normalizeAnswer, withDerivedDateEdges } from "@/lib/grammar";
-import { projectHeliosNode } from "@/lib/templates";
+import { projectAtlasNode } from "@/lib/templates";
 import type { CorpusNode, Edge, Email, LintResult, OracleResult } from "@/lib/types";
 import Sidebar from "./Sidebar";
 import EmailEditor from "./EmailEditor";
@@ -80,7 +80,11 @@ export default function Workspace() {
     oracleTimer.current = setTimeout(() => { oracleCorpus(validateNodes).then(setOracle); }, 350);
   }, [validateNodes, loaded, lint?.ok]);
 
-  const anchors = useMemo(() => anchorsInCorpus(validateNodes), [validateNodes]);
+  // Anchors/variables offered to the editor are scoped to the SELECTED storyline only — an author
+  // can't pick another storyline's published dates (cross-node references are an advanced, error-prone
+  // case we don't surface). Lint/oracle still run on the full focus closure above, so a genuine
+  // cross-node reference that already exists in the data is still validated, just not offered as a choice.
+  const anchors = useMemo(() => anchorsInCorpus(nodes.filter((n) => n.id === selNode)), [nodes, selNode]);
 
   const persist = useCallback((node: CorpusNode) => {
     clearTimeout(saveTimers.current[node.id]);
@@ -143,13 +147,14 @@ export default function Workspace() {
     setNodes((prev) => [...prev, node]); setSelNode(node.id); setSelEmail(null); persist(node);
   }, [nodes, persist]);
 
-  // Load the worked "Project Helios" storyline (HOW_IT_WORKS.md) as a fully-authored, oracle-solvable
-  // starting point — the fastest way to see a needle + reschedule + no-action thread end to end.
+  // Load the fully-authored, oracle-solvable example storyline (Project Atlas) as a starting point. It
+  // tours every construct + every authoring-tool feature and shows the benchmark at scale (HOW_IT_WORKS.md).
+  // Collisions on the node id get a -2, -3… suffix so loading it twice never clobbers an existing one.
   const addExample = useCallback(() => {
     const ids = new Set(nodes.map((n) => n.id));
-    let id = "project_helios", i = 2;
-    while (ids.has(id)) id = `project_helios-${i++}`;
-    const node = projectHeliosNode(id);
+    let id = "project_atlas", i = 2;
+    while (ids.has(id)) id = `project_atlas-${i++}`;
+    const node = projectAtlasNode(id);
     setNodes((prev) => [...prev, node]); setSelNode(node.id); setSelEmail(node.emails[0]?.id ?? null); persist(node);
   }, [nodes, persist]);
 
@@ -164,6 +169,8 @@ export default function Workspace() {
 
   const removeEmail = useCallback((nodeId: string, emailId: string) => {
     const node = nodes.find((n) => n.id === nodeId); if (!node) return;
+    const label = node.emails.find((e) => e.id === emailId)?.subject?.trim() || emailId;
+    if (!window.confirm(`Delete the email "${label}"? This can't be undone.`)) return;
     updateNode({ ...node, emails: node.emails.filter((e) => e.id !== emailId) });
     if (selEmail === emailId) setSelEmail(null);
   }, [nodes, updateNode, selEmail]);
@@ -194,6 +201,16 @@ export default function Workspace() {
     return true;
   }, [nodes, selNode, selEmail]);
 
+  // Drag-connect from the DAG: make `targetId` depend on `prerequisiteId`. Same path the editor's
+  // picker uses (new edges default to `static`; updateEmail runs withDerivedDateEdges so a needle still
+  // auto-upgrades to `date`). No-ops if the edge already exists or they aren't in the named node.
+  const addEdge = useCallback((nodeId: string, targetId: string, prerequisiteId: string) => {
+    const node = nodes.find((n) => n.id === nodeId); if (!node) return;
+    const target = node.emails.find((e) => e.id === targetId); if (!target) return;
+    if (target.depends_on.some((d) => d.email === prerequisiteId)) return;
+    updateEmail(nodeId, { ...target, depends_on: [...target.depends_on, { email: prerequisiteId, type: "static" }] });
+  }, [nodes, updateEmail]);
+
   // Jump the editor straight to an email by id — used by the validation bar so a lint/oracle failure
   // links to exactly the email it's about. Resolves the owning node so a click lands on the right one.
   const jumpToEmail = useCallback((emailId: string) => {
@@ -202,10 +219,13 @@ export default function Workspace() {
   }, [nodes]);
 
   const removeNode = useCallback((nodeId: string) => {
+    const count = nodes.find((n) => n.id === nodeId)?.emails.length ?? 0;
+    const tail = count ? ` and its ${count} email${count === 1 ? "" : "s"}` : "";
+    if (!window.confirm(`Delete the storyline "${nodeId}"${tail}? This can't be undone.`)) return;
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
     apiDelete(nodeId).catch(() => {});
     if (selNode === nodeId) { setSelNode(null); setSelEmail(null); }
-  }, [selNode]);
+  }, [nodes, selNode]);
 
   const node = nodes.find((n) => n.id === selNode) ?? null;
   const email = node?.emails.find((e) => e.id === selEmail) ?? null;
@@ -251,7 +271,8 @@ export default function Workspace() {
         <main className="min-w-0 flex-1 overflow-auto">
           {view === "dag" ? (
             <DagCanvas nodes={viewNodes} lint={lint} serveDate={serveDate}
-              onSelectEmail={(nid, eid) => { setSelNode(nid); setSelEmail(eid); setView("editor"); }} />
+              onSelectEmail={(nid, eid) => { setSelNode(nid); setSelEmail(eid); setView("editor"); }}
+              onAddEdge={addEdge} />
           ) : focused && !focusNode ? (
             <FocusNotFound focusId={focusId} loaded={loaded} />
           ) : node ? (
@@ -282,7 +303,7 @@ function StartEmpty({ onAddNode, onAddExample }: { onAddNode: () => void; onAddE
         <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
         <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is a group of related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
         <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
-        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Helios example</button>. It is a finished storyline that tours every kind of email, in order, so you can see how each is built.</p>
+        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Atlas example</button>. A finished acquisition saga that tours every kind of email and every feature, with dates that pay off far from where they're set, so you can see how each is built and how the long-horizon test works at scale.</p>
       </div>
     </div>
   );

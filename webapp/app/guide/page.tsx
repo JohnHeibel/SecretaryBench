@@ -75,7 +75,7 @@ export default function GuidePage() {
         <Card title="Writing a date" teaser="build it, see the real day">
           <p>Our dates are <em>relative</em>, like &ldquo;5 days after this email arrives&rdquo; or &ldquo;two weeks after the signing.&rdquo; So you don&apos;t click a day on a calendar. You <strong>build</strong> the date from a few choices: pick a starting day, then optionally <strong>shift it</strong> forward or back, like &ldquo;+2 weeks.&rdquo; A shift is just plain calendar math on the starting day, so &ldquo;the kickoff, +2 weeks&rdquo; lands two weeks after the kickoff.</p>
           <p>In the answer key the builder is right there. In the email body, click <span className={chip}>+ insert date</span>. Either way the real day shows up as you build it, like <span className="text-emerald-400">→ Monday, Aug 17, 2026</span>.</p>
-          <p>The same date you build fills the body <em>and</em> the answer key, so they can never disagree. If you would rather type the date out yourself, you can, and it is checked live.</p>
+          <p>The same date you build fills the body <em>and</em> the answer key, so they can never disagree. Every date goes through the builder, so the format is always one the grader understands; there is no free-typing a date to get wrong.</p>
         </Card>
 
         <Card title="The answer key" teaser="the one right thing to do">
@@ -140,17 +140,19 @@ export default function GuidePage() {
 
         <Card title="Things that trip people up" teaser="quick gotchas">
           <ul className="space-y-1">
-            <li>Build dates with the date builder, or type the expression (it is checked live). The same date fills the body and the answer key, so they can&apos;t drift apart.</li>
+            <li>Build every date with the date builder. The same date fills the body and the answer key, so they can&apos;t drift apart.</li>
             <li>You don&apos;t need to touch the ids. They name themselves from the subject.</li>
+            <li>Build the <strong>cast</strong> from the standard roster so the same role is spelled the same way everywhere; use &ldquo;custom person&rdquo; for anyone it doesn&apos;t cover.</li>
             <li>The <strong>To</strong> and <strong>Cc</strong> fields can hold several people. Tap a name to add or remove it. Cc is optional, and the assistant can see who is copied.</li>
             <li>Two different things in one storyline need different names. Don&apos;t call both &ldquo;review.&rdquo; Call them &ldquo;board review&rdquo; and &ldquo;client review.&rdquo;</li>
+            <li>Anchors are <strong>scoped to your storyline</strong>: the <span className={chip}>@anchor</span> picker only shows dates from the emails in front of you, never another author&apos;s.</li>
             <li>A date built from an anchor shows up amber (&ldquo;resolves when this email is sent&rdquo;). That is expected, not an error.</li>
           </ul>
         </Card>
       </div>
 
       <div className="mt-6 rounded-lg border border-slate-800 bg-slate-900/40 px-4 py-3 text-sm text-slate-400">
-        That&apos;s it. Make a storyline, warm up with a couple of easy emails, add some tempting filler, then try a real needle. Or load the <strong>Project Helios</strong> example from the sidebar to read a finished storyline that uses every kind of email.
+        That&apos;s it. Make a storyline, warm up with a couple of easy emails, add some tempting filler, then try a real needle. Or load the <strong>Project Atlas</strong> example from the sidebar to read a finished storyline that uses every kind of email and every feature.
         <Link href="/" className="ml-1 text-sky-400 hover:text-sky-300">Start writing →</Link>
       </div>
     </div>

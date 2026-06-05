@@ -171,6 +171,6 @@ the skill under test.
 - **Maybe later (see `BACKLOG.md`):** per-seed ranged offsets (anti-memorization "random
   day"); global calendar + global grading; seed events (a pre-filled day-1 calendar).
 - **Done:** webapp builder UI (time-in-the-builder, plain-language naming, obligation
-  picker + auto-wired needle edges, Project Helios example) + re-vendor.
+  picker + auto-wired needle edges, the loadable Project Atlas example) + re-vendor.
 - **Pending:** grammar docs (document the `@HH:MM[-HH:MM]` time suffix in
   `ANSWER_KEY_GRAMMAR.md`).

@@ -39,7 +39,7 @@ stable anchor id → freeze into the spine/anchor table → tests (same seed rep
 body == grader every time) → webapp UI to enter the list → update the determinism-contract wording in
 `GRADING_MODEL.md` (the seed would then also pick ranged dates).
 
-## 2. Global calendar + global grading
+## 2. Global calendar + global grading (includes cross-storyline time conflicts)
 
 **What:** today grading is **scoped per scenario** (attribution-scoped) — two scenarios can both book
 Tue 2 PM and each passes on its own. A future, harder mode would grade against a single **global**
@@ -56,3 +56,38 @@ double-booking is already tracked **monitor-only** (never scored) in the current
 **If someone takes it on:** they need a *deterministic* global-coherence rule, or keep the global
 metrics monitor-only (unscored) while scoped grading stays the scored path. Keep scoped grading as the
 default either way — it is the property that makes the score clean.
+
+### 2a. Cross-storyline time conflicts (the "double-booking" sub-problem)
+
+An exec-meeting ask (2026-06-05) was to deal with two storylines' events colliding on the same clock
+slot — e.g. both book Tue 2–3 PM. **This lives here, not as a near-term fix, because under scoped
+grading a clash is purely cosmetic: it can never change a score.** It only becomes a real problem the
+day we grade against one global calendar (this epic). So we parked it here rather than complicate the
+serving algorithm for a non-scored artifact.
+
+**Measured, per the "measure before deciding" request.** The monitor is built and shipped:
+- `python -m sb.conflicts --corpus <dir>` — resolves every served event to its FINAL clock slot
+  (replaying create/move/cancel per obligation), then counts cross-storyline `TimeInterval` overlaps.
+  Same-storyline overlaps and ambiguous predicates (`any_of` / `by` / bare-day) are excluded; it also
+  reports peak concurrency. This *is* the "monitor-only" tracking the section above refers to.
+- `python -m sb.probe` — synthesizes a ~20-author stand-in corpus (the real corpus lives in the prod
+  store; `corpus/nodes/` is empty in git), so the monitor has something to run on offline.
+- `sb/tests/test_conflicts.py` — locks the replay (move supersedes, cancel vacates) + overlap rules.
+
+**Finding (probe, 20 authors × 3 timed events, 5 seeds each):** conflicts are **common, not rare** —
+**18%–49% of timed events** collide depending on how clustered the meeting times are (worst: everyone
+picks the same handful of times with no week-spread; best: varied times spread over 8 weeks). Peak
+concurrency stayed ~3. **Every regime still oracle-solves 1.0**, confirming conflicts never touch the
+score. The exec's two branches were *(a) resample the serve order when conflicts are rare* vs *(b) add
+non-overlap as a serving constraint when common*; the probe points at (b) — but the **decision must use
+the real number**, not the probe.
+
+**When this epic is picked up:**
+1. Pull the real corpus (`python -m sb.sync`) and run `python -m sb.conflicts --corpus corpus` for the
+   true rate.
+2. If still common and we want global coherence, add non-overlap as a *deterministic* serving
+   constraint (an event can't be placed on a slot another storyline already holds) — but note this
+   couples storylines that are otherwise independent, so it has to stay compatible with the
+   reproducible-plan guarantee.
+3. Keep scoped grading as the scored path regardless; the global calendar stays monitor-only unless a
+   deterministic global rule is found (see the parent section).

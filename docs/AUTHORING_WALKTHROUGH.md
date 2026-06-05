@@ -39,8 +39,11 @@ anyone else's work, and other authors editing at the same time cannot touch your
 Five emails about onboarding a new VP of Sales. This **exact** storyline scores **100% under the
 reference solver** (verified) — so it's a safe shape to copy.
 
-**Cast** (the people who can appear in From / To): `CEO` = you, `HR` = Dana Whitfield, `COO` =
-Marcus Lee, `IT` = Sam Okafor.
+**Cast** (the people who can appear in From / To / Cc): `CEO` = you, `HR` = Dana Whitfield, `COO` =
+Marcus Lee, `IT` = Sam Okafor. Build the cast from the **standard roster** ("+ add from standard
+roster" — CEO, COO, VP_SALES, CLIENT, …) so the same role is spelled the same way in every storyline;
+"+ custom person" covers anyone the roster doesn't. Names are length-capped and a person's short key is
+kept in a clean `UPPER_SNAKE` form; renaming a key updates every From / To / Cc that used it.
 
 ---
 
@@ -132,6 +135,11 @@ COO-sent note grade identically; pick whoever makes the story read true.
    anchor — but if the bottom bar complains about a missing date dependency, that's what it means.
 5. **Times outside work hours, or backwards.** Clocks must sit inside **05:00–23:00**, and the end
    must be after the start. `@14:00-13:00` or `@04:30-05:30` is rejected.
+
+Two things you *can't* get wrong, because the app won't let you: **every date goes through the date
+builder** (there's no free-typing a date — you pick a starting day, then shifts, and the real grader
+shows you the day it lands on), and **the `@anchor` pickers only show dates from the storyline you're
+in** — you can't accidentally reach into another author's storyline.
 
 ## You're done when
 

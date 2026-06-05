@@ -12,8 +12,10 @@ import {
 // instead of dragging Scratch blocks. ExprEditor edits the structured Expr (lib/dateExpr.ts)
 // recursively (the `from` reference and `week of` inner are sub-editors on the SAME structure, so
 // an in-progress pick is never lost to a string round-trip). DateBuilder wraps it for the string
-// the answer key/body store, shows the day resolved by the REAL grader live, and offers a raw-text
-// escape hatch (validated the same way) for anything the sentence can't express.
+// the answer key/body store, and shows the day resolved by the REAL grader live. Every date is
+// composed through the builder — there is no free-text date entry. The raw field only appears to
+// display/repair a legacy value the structured builder can't represent (e.g. an old in:/not_in
+// predicate), never as a typing entry point.
 
 interface Props {
   value: string;                       // current grammar expression (predicate slot)
@@ -29,9 +31,9 @@ interface Props {
 export type AnchorOrigins = Record<string, { email: string; subject: string }>;
 const anchorLabel = (name: string, origins?: AnchorOrigins) => { const o = origins?.[name]; return o?.subject ? `@${name} · ${o.subject}` : `@${name}`; };
 
-// dropdown order/labels for the first blank — reads as the start of the sentence. The interval
-// bases (week_of / month) are intentionally not offered here; they remain in the grammar and the
-// raw "type it" escape hatch, just not in the common-case builder.
+// dropdown order/labels for the first blank — reads as the start of the sentence. The builder now
+// covers every base (including the interval bases week_of / month), so every date can be composed
+// here without anyone hand-typing the grammar.
 const BASE_OPTIONS: { kind: BaseKind; label: string }[] = [
   { kind: "serve", label: "the day this email arrives" },
   { kind: "anchor", label: "a date from an earlier email" },
@@ -39,6 +41,8 @@ const BASE_OPTIONS: { kind: BaseKind; label: string }[] = [
   { kind: "this", label: "a weekday this week (e.g. this Friday)" },
   { kind: "nth", label: "the Nth weekday of a month (e.g. 3rd Friday)" },
   { kind: "dom", label: "a specific day of the month (e.g. the 25th)" },
+  { kind: "weekOf", label: "the week of another date" },
+  { kind: "month", label: "a whole month" },
 ];
 const OFFERED_BASE = new Set<BaseKind>(BASE_OPTIONS.map((o) => o.kind));
 
@@ -99,8 +103,6 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, allow
         <div className="flex flex-wrap items-center gap-1.5">
           <ExprEditor expr={expr} onChange={commit} anchors={anchors} serveDate={serveDate} anchorOrigins={anchorOrigins} />
           {showTime && expr && <TimeControl time={expr.time ?? null} onChange={(time) => commit({ ...expr, time })} />}
-          <button type="button" onClick={() => { setRaw(serialized); setMode("raw"); }}
-            className="ml-auto text-[11px] text-slate-500 hover:text-sky-300" title="Type the expression yourself. It is still checked live.">type it</button>
         </div>
       )}
       {mode === "builder" && (
@@ -278,13 +280,19 @@ function OffsetRows({ offsets, onChange }: { offsets: Expr["offsets"]; onChange:
 
 // --- raw escape hatch + live preview ---------------------------------------
 
+// Repair view for a saved value the structured builder can't represent (legacy in:/not_in, an
+// exotic hand-edited expr). It is NOT a general date-entry path — it only renders when a stored
+// value fails to parse, so authors can fix it and move it back into the builder.
 function RawField({ value, onChange, onUseBuilder }: { value: string; onChange: (v: string) => void; onUseBuilder: () => void }) {
   return (
-    <div className="flex items-center gap-2">
-      <input value={value} onChange={(e) => onChange(e.target.value)} spellCheck={false}
-        placeholder="e.g. @signing+2w, next:THU, week_of:(serve+1w)"
-        className="min-w-[16rem] flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 font-mono text-xs text-sky-300 outline-none focus:border-sky-500" />
-      <button type="button" onClick={onUseBuilder} className="text-[11px] text-slate-500 hover:text-sky-300">use builder</button>
+    <div className="space-y-1">
+      <p className="text-[11px] leading-snug text-amber-400">This saved date uses an older format the builder can&apos;t show. Fix it here, then switch back to the builder.</p>
+      <div className="flex items-center gap-2">
+        <input value={value} onChange={(e) => onChange(e.target.value)} spellCheck={false}
+          placeholder="e.g. @signing+2w, next:THU, week_of:(serve+1w)"
+          className="min-w-[16rem] flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 font-mono text-xs text-sky-300 outline-none focus:border-sky-500" />
+        <button type="button" onClick={onUseBuilder} className="text-[11px] text-slate-500 hover:text-sky-300">use builder</button>
+      </div>
     </div>
   );
 }

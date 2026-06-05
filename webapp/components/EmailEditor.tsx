@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import type { CorpusNode, Edge, EdgeType, Email } from "@/lib/types";
 import { anchorOrigins, bodyAnchorNames, obligationKinds, obligationNames } from "@/lib/grammar";
+import { MAX_PERSON_NAME, STANDARD_ROSTER, normalizeName } from "@/lib/people";
 import BodyEditor from "./BodyEditor";
 import AnswerKeyBuilder from "./AnswerKeyBuilder";
 
@@ -83,16 +84,27 @@ function Primer() {
 }
 
 function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (n: CorpusNode) => void }) {
-  const entries = Object.entries(node.cast ?? {});
+  const cast = node.cast ?? {};
+  const entries = Object.entries(cast);
+  const present = new Set(Object.keys(cast));
   const [open, setOpen] = useState(entries.length < 2);
 
-  function setCast(cast: Record<string, string>) { onUpdateNode({ ...node, cast }); }
-  function rename(oldKey: string, newKey: string) {
-    if (!newKey || newKey === oldKey || node.cast[newKey]) return;
-    const next: Record<string, string> = {};
-    for (const [k, v] of Object.entries(node.cast)) next[k === oldKey ? newKey : k] = v;
-    setCast(next);
+  function setCast(next: Record<string, string>) { onUpdateNode({ ...node, cast: next }); }
+
+  function addPerson(key: string, name: string) {
+    if (cast[key] !== undefined) return;        // already in this node's cast
+    setCast({ ...cast, [key]: name });
   }
+  function removePerson(key: string) {
+    const used = node.emails.some((e) => e.from === key || asList(e.to).includes(key) || asList(e.cc).includes(key));
+    const msg = used
+      ? `"${key}" appears in one or more emails (From / To / Cc). Remove them from the cast anyway?`
+      : `Remove "${key}" from the cast?`;
+    if (!window.confirm(msg)) return;
+    const c = { ...cast }; delete c[key]; setCast(c);
+  }
+
+  const available = STANDARD_ROSTER.filter((p) => !present.has(p.key));
 
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/40">
@@ -102,18 +114,25 @@ function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (
       </button>
       {open && (
         <div className="space-y-1.5 border-t border-slate-800 p-3">
-          <p className="text-xs leading-5 text-slate-500">Add everyone who can appear in From or To. Keep <code className="font-mono text-sky-300">CEO</code> as the assistant&apos;s boss.</p>
+          <p className="text-xs leading-5 text-slate-500">Add everyone who can appear in From, To, or Cc. Pick from the <strong>standard roster</strong> so the same role is spelled the same way across storylines. Keep <code className="font-mono text-sky-300">CEO</code> as the assistant&apos;s boss.</p>
           {entries.map(([key, name]) => (
             <div key={key} className="flex items-center gap-2">
-              <input defaultValue={key} onBlur={(e) => rename(key, e.target.value.trim())}
-                className="w-28 rounded border border-slate-700 bg-slate-800 px-2 py-1 font-mono text-xs text-slate-200" />
-              <input value={name} onChange={(e) => setCast({ ...node.cast, [key]: e.target.value })}
+              <code className="w-32 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-400 select-all">{key}</code>
+              <input value={name} maxLength={MAX_PERSON_NAME}
+                onChange={(e) => setCast({ ...cast, [key]: e.target.value.slice(0, MAX_PERSON_NAME) })}
+                onBlur={(e) => setCast({ ...cast, [key]: normalizeName(e.target.value) })}
                 placeholder="Display name (Role)" className="flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200" />
-              <button onClick={() => { const c = { ...node.cast }; delete c[key]; setCast(c); }} className="px-1 text-xs text-slate-500 hover:text-rose-400">✕</button>
+              <button onClick={() => removePerson(key)} className="px-1 text-xs text-slate-500 hover:text-rose-400">✕</button>
             </div>
           ))}
-          <button onClick={() => setCast({ ...node.cast, [`PERSON_${entries.length + 1}`]: "" })}
-            className="rounded border border-dashed border-slate-700 px-2 py-1 text-xs text-slate-400 hover:border-sky-600 hover:text-sky-300">+ Add person</button>
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+            <select value="" onChange={(e) => { const p = STANDARD_ROSTER.find((x) => x.key === e.target.value); if (p) addPerson(p.key, p.name); }}
+              disabled={available.length === 0}
+              className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200 disabled:opacity-40">
+              <option value="">{available.length ? "+ add from standard roster…" : "all standard people added"}</option>
+              {available.map((p) => <option key={p.key} value={p.key}>{p.key} · {p.name}</option>)}
+            </select>
+          </div>
         </div>
       )}
     </div>

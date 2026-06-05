@@ -5,16 +5,21 @@ it tells you where things live and what each part is responsible for.
 
 ## Main specs and history
 
+- `HOW_IT_WORKS.md`: the plain-language tour of the whole machine + the worked Project Atlas example. Read first.
+- `GRADING_MODEL.md`: the precise grading contract (scoped, binary, per email).
+- `ANSWER_KEY_GRAMMAR.md`: the token grammar and verb-based answer key contract.
+- `AUTHORING_GUIDE.md`: how to author scenarios (type mix, tiers, needles).
+- `docs/AUTHORING_WALKTHROUGH.md`: click-by-click "author one storyline" example (focus mode, CEO-sent emails).
+- `BACKLOG.md`: deferred features (ranged offsets; global calendar + grading, incl. cross-storyline time conflicts §2a) + triggers to revisit.
+- `OPEN_QUESTIONS.md`: design calls still being decided.
 - `RUNNING.md`: plain-language guide for building a corpus, running a model, and
   analyzing results.
-- `ANSWER_KEY_GRAMMAR.md`: the token grammar and verb-based answer key contract.
-- `RECAP.md`: latest working recap of the day loop, grading, and authoring risks.
 - `TIER_LIST.md`: authoring playbook for T1/T2/T3 email difficulty.
 - `RUN_RESULTS.md`: historical Haiku retrieval-span pilot results.
 - `docs/POTENTIAL_GAMING.md`: monitor-first notes for broad search and suspicious
   `email_id` attribution risks.
 - `DAY_LOOP_DESIGN_ISSUE.md`: historical design issue from before the day loop was
-  rebuilt.
+  rebuilt (resolved; kept as decision-record context for `adr/0001`).
 - `docs/design/BENCHMARK_REDESIGN.md`: why the project moved away from Excel and
   toward a governed DAG benchmark.
 - `docs/design/SERVING_AND_SCHEMA.md`: current serving model, edge types, and JSON

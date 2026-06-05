@@ -2,7 +2,7 @@
 
 This is the spec for what kind of email to write at each difficulty, so the work
 can be divided up and so the test set has a real easy → hard gradient. Read
-`RECAP.md` for the system and `ANSWER_KEY_GRAMMAR.md` for the grammar; this doc is
+`HOW_IT_WORKS.md` for the system and `ANSWER_KEY_GRAMMAR.md` for the grammar; this doc is
 only about *how hard to make each email and why.*
 
 ## The one thing to internalize first

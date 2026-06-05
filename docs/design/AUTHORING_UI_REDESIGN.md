@@ -9,9 +9,15 @@
 >
 > **Shipped:** `webapp/lib/dateExpr.ts` (structured parser/serializer, verified round-trip
 > against `sb/resolver.py` via `webapp/scripts/dateExpr.test.mts`) and
-> `webapp/components/DateBuilder.tsx` (the Direction-A fill-in-the-blank builder with a
-> validated raw escape hatch), wired into both the **answer key** (`AnswerKeyBuilder`) and the
-> **email body** (`BodyEditor`, via an inline insert panel that adds the `{!name=}` emission).
+> `webapp/components/DateBuilder.tsx` (the Direction-A fill-in-the-blank builder), wired into
+> both the **answer key** (`AnswerKeyBuilder`) and the **email body** (`BodyEditor`, via an
+> inline insert panel that adds the `{!name=}` emission).
+>
+> **Update (2026-06-05):** the author-facing raw "type it" escape hatch was REMOVED — every date
+> is now composed through the structured builder (all eight bases are in the dropdown, incl.
+> `week_of`/`month`). A raw text field survives only to display/repair a stored value the builder
+> can't represent (legacy `in:`/`not_in`), never as a typing entry point. This closes the
+> "two rules" friction §1 flags below: there is no longer any place that invites typing a date.
 > The whole §3 vocabulary pass is in. The `blockly` dependency and `components/blockly/` are
 > **deleted** — there is now one date UI everywhere. An incomplete pick (e.g. an anchor with no
 > name chosen) is stored as empty rather than as invalid grammar, so it reads as "add the date."
