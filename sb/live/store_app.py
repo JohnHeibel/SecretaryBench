@@ -62,6 +62,7 @@ class InboxIn(BaseModel):
     email_id: str
     sender: str
     recipients: list[str]
+    cc: list[str] = []
     subject: str
     body: str
     served_date: str
@@ -224,9 +225,14 @@ def list_new_emails():
 
 @app.get("/inbox/{email_id}")
 def get_email(email_id: str):
+    """The full text of one email. Returns the stored record plus human-labeled From / To /
+    Cc lines so the model always sees who it was sent to (recipients) and copied on (cc)."""
     for m in _inbox:
         if m["email_id"] == email_id:
-            return m
+            return {**m,
+                    "from": m["sender"],
+                    "to": ", ".join(m.get("recipients", [])),
+                    "cc": ", ".join(m.get("cc", []))}
     raise HTTPException(404, f"email {email_id} not found")
 
 

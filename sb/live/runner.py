@@ -284,7 +284,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                 rendered = resolver.render_body(email.body, Context(sd, plan.anchors)).text
                 httpx.post(f"{STORE_URL}/inbox", timeout=10, json={
                     "email_id": eid, "sender": email.sender, "recipients": email.recipients,
-                    "subject": email.subject, "body": rendered, "served_date": sd.isoformat()})
+                    "cc": email.cc, "subject": email.subject, "body": rendered, "served_date": sd.isoformat()})
 
             user_msg = (
                 f"Today: {sd.strftime('%A, %B %d, %Y')}\n"

@@ -28,6 +28,7 @@ export interface Email {
   id: string;
   from: string; // cast key
   to: string | string[]; // cast key(s)
+  cc?: string | string[]; // cast key(s) copied on the email — shown to the model, never graded
   subject: string;
   body: string; // prose with {tokens}
   depends_on: Edge[];

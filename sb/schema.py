@@ -76,6 +76,7 @@ class Email:
     recipients: list[str]
     subject: str
     body: str
+    cc: list[str] = field(default_factory=list)   # additional visible recipients (shown to the model, never graded)
     depends_on: list[Edge] = field(default_factory=list)
     answer: Answer = field(default_factory=Answer)
     tier: str | None = None      # author-tagged difficulty T1|T2|T3, for score-by-tier reporting
@@ -185,6 +186,14 @@ def _parse_answer(raw: dict) -> Answer:
     )
 
 
+def _as_recipient_list(value: object) -> list[str]:
+    """Normalize a string-or-list-or-missing recipient field (e.g. `cc`) to a list of
+    strings, dropping empties. A bare string becomes a one-element list; missing -> []."""
+    if isinstance(value, list):
+        return [str(v) for v in value if str(v)]
+    return [str(value)] if value else []
+
+
 def _refs_in(text: str) -> set[str]:
     return set(_ANCHOR_REF_RE.findall(str(text)))
 
@@ -226,6 +235,7 @@ def _build_email(node_id: str, raw: dict) -> Email:
                    else [raw.get("to", raw.get("recipients", ""))],
         subject=raw.get("subject", ""),
         body=body,
+        cc=_as_recipient_list(raw.get("cc", [])),
         depends_on=[_parse_edge(e) for e in raw.get("depends_on", [])],
         answer=answer,
         tier=raw.get("tier"),

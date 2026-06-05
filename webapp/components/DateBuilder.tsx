@@ -97,6 +97,9 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, allow
             className="ml-auto text-[11px] text-slate-500 hover:text-sky-300" title="Type the expression yourself. It is still checked live.">type it</button>
         </div>
       )}
+      {mode === "builder" && (
+        <p className="text-[11px] leading-snug text-slate-500">Pick a starting day, then optionally shift it forward or back, like &ldquo;+2 weeks&rdquo;. Think &ldquo;two weeks after the kickoff&rdquo;. The app fills in the real date.</p>
+      )}
       <Preview serialized={serialized} serveDate={serveDate}
         incomplete={mode === "builder" && (!expr || incomplete(expr))}
         time={mode === "builder" ? expr?.time ?? null : null} />
@@ -240,25 +243,29 @@ function MonthRefSelect({ month, onChange }: { month: MonthRef; onChange: (m: Mo
   );
 }
 
+// A date "shift" is plain calendar arithmetic on the starting day (e.g. "+2 weeks" = two weeks
+// after it). We never say "offset" to authors — the row reads "shift by [2] [weeks] [later]" and
+// the sign is a friendly later/earlier picker over the same +/- grammar.
 function OffsetRows({ offsets, onChange }: { offsets: Expr["offsets"]; onChange: (o: Expr["offsets"]) => void }) {
   const set = (i: number, patch: Partial<Expr["offsets"][number]>) => onChange(offsets.map((o, j) => (j === i ? { ...o, ...patch } : o)));
   return (
     <span className="flex flex-wrap items-center gap-1.5">
       {offsets.map((o, i) => (
         <span key={i} className="flex items-center gap-1 rounded border border-slate-700/70 bg-slate-900/60 px-1 py-0.5">
-          <select value={o.sign} onChange={(e) => set(i, { sign: e.target.value as "+" | "-" })} className={sel}>
-            <option value="+">+</option>
-            <option value="-">−</option>
-          </select>
+          <span className="text-[11px] text-slate-500">shift by</span>
           <input type="number" min={0} value={o.n} onChange={(e) => set(i, { n: clampInt(e.target.value, 0, 9999) })} className={numField} />
           <select value={o.unit} onChange={(e) => set(i, { unit: e.target.value as Expr["offsets"][number]["unit"] })} className={sel}>
             {UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
+          </select>
+          <select value={o.sign} onChange={(e) => set(i, { sign: e.target.value as "+" | "-" })} className={sel} title="later = after the starting day; earlier = before it">
+            <option value="+">later</option>
+            <option value="-">earlier</option>
           </select>
           <button type="button" onClick={() => onChange(offsets.filter((_, j) => j !== i))} className="px-0.5 text-slate-500 hover:text-rose-400">✕</button>
         </span>
       ))}
       <button type="button" onClick={() => onChange([...offsets, { sign: "+", n: 1, unit: "d" }])}
-        className="text-[11px] text-slate-500 hover:text-sky-300">+ offset</button>
+        className="text-[11px] text-slate-500 hover:text-sky-300" title="Shift the starting day forward or back, like +2 weeks.">+ shift the date (e.g. +1 week)</button>
     </span>
   );
 }

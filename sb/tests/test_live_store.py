@@ -24,6 +24,32 @@ def test_store_logs_potential_gaming_warnings():
     assert "invalid_email_id" in kinds
 
 
+def test_get_email_surfaces_from_to_and_cc():
+    client = TestClient(app)
+    client.post("/reset")
+    client.post("/day", json={"date": "2026-06-01"})
+    client.post("/inbox", json={
+        "email_id": "n.msg", "sender": "COO", "recipients": ["CEO", "EA"], "cc": ["BOARD"],
+        "subject": "sync", "body": "body", "served_date": "2026-06-01",
+    })
+    m = client.get("/inbox/n.msg").json()
+    assert m["from"] == "COO"
+    assert m["to"] == "CEO, EA"
+    assert m["cc"] == "BOARD"
+    assert m["recipients"] == ["CEO", "EA"]   # raw list still present for programmatic use
+
+
+def test_inbox_cc_defaults_to_empty():
+    client = TestClient(app)
+    client.post("/reset")
+    client.post("/day", json={"date": "2026-06-01"})
+    client.post("/inbox", json={   # no cc field -> defaults to []
+        "email_id": "n.nocc", "sender": "COO", "recipients": ["CEO"],
+        "subject": "fyi", "body": "body", "served_date": "2026-06-01",
+    })
+    assert client.get("/inbox/n.nocc").json()["cc"] == ""
+
+
 def test_store_logs_stale_email_id_warning():
     client = TestClient(app)
     client.post("/reset")

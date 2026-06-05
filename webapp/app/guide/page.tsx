@@ -73,7 +73,7 @@ export default function GuidePage() {
         </Card>
 
         <Card title="Writing a date" teaser="build it, see the real day">
-          <p>Our dates are <em>relative</em>, like &ldquo;5 days after this email arrives&rdquo; or &ldquo;two weeks after the signing.&rdquo; So you don&apos;t click a day on a calendar. You <strong>build</strong> the date from a few choices: a starting point, then any offsets like &ldquo;+ 1 week.&rdquo;</p>
+          <p>Our dates are <em>relative</em>, like &ldquo;5 days after this email arrives&rdquo; or &ldquo;two weeks after the signing.&rdquo; So you don&apos;t click a day on a calendar. You <strong>build</strong> the date from a few choices: pick a starting day, then optionally <strong>shift it</strong> forward or back, like &ldquo;+2 weeks.&rdquo; A shift is just plain calendar math on the starting day, so &ldquo;the kickoff, +2 weeks&rdquo; lands two weeks after the kickoff.</p>
           <p>In the answer key the builder is right there. In the email body, click <span className={chip}>+ insert date</span>. Either way the real day shows up as you build it, like <span className="text-emerald-400">→ Monday, Aug 17, 2026</span>.</p>
           <p>The same date you build fills the body <em>and</em> the answer key, so they can never disagree. If you would rather type the date out yourself, you can, and it is checked live.</p>
         </Card>
@@ -136,7 +136,7 @@ export default function GuidePage() {
           <ul className="space-y-1">
             <li>Build dates with the date builder, or type the expression (it is checked live). The same date fills the body and the answer key, so they can&apos;t drift apart.</li>
             <li>You don&apos;t need to touch the ids. They name themselves from the subject.</li>
-            <li>The <strong>To</strong> field is one person.</li>
+            <li>The <strong>To</strong> and <strong>Cc</strong> fields can hold several people. Tap a name to add or remove it. Cc is optional, and the assistant can see who is copied.</li>
             <li>Two different things in one storyline need different names. Don&apos;t call both &ldquo;review.&rdquo; Call them &ldquo;board review&rdquo; and &ldquo;client review.&rdquo;</li>
             <li>A date built from an anchor shows up amber (&ldquo;resolves when this email is sent&rdquo;). That is expected, not an error.</li>
           </ul>

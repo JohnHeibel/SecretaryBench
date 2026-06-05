@@ -120,9 +120,15 @@ function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (
   );
 }
 
+// A stored recipient field is a string OR a list (or missing). Normalize to a list so the
+// multi-recipient picker has one shape to work with; a legacy single string shows as one chip.
+function asList(v: string | string[] | undefined): string[] {
+  if (Array.isArray(v)) return v.filter(Boolean);
+  return v ? [v] : [];
+}
+
 function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, onAutoSlugEmail }: Omit<Props, "onUpdateNode" | "onRenameNode" | "onAddEmail"> & { email: Email }) {
   const keys = castKeys(node);
-  const toValue = Array.isArray(email.to) ? email.to[0] ?? "" : email.to;
   const set = (p: Partial<Email>) => onUpdateEmail({ ...email, ...p });
 
   return (
@@ -134,21 +140,18 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
         <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="id for this email, made from the subject and used by dependency links">{email.id}</span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <label className="text-xs text-slate-400">From
+      <div className="space-y-2">
+        <label className="block text-xs text-slate-400 sm:w-1/2 sm:pr-1.5">From
           <select value={email.from} onChange={(e) => set({ from: e.target.value })}
             className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-slate-100">
             <option value="">pick a person</option>
             {keys.map((k) => <option key={k} value={k}>{k} · {node.cast[k]}</option>)}
           </select>
         </label>
-        <label className="text-xs text-slate-400">To
-          <select value={toValue} onChange={(e) => set({ to: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-slate-100">
-            <option value="">pick a person</option>
-            {keys.map((k) => <option key={k} value={k}>{k} · {node.cast[k]}</option>)}
-          </select>
-        </label>
+        <RecipientPicker label="To" hint="who the email is sent to" cast={node.cast} keys={keys}
+          selected={asList(email.to)} onChange={(to) => set({ to })} />
+        <RecipientPicker label="Cc" hint="copied on the email (optional); the assistant can see this" cast={node.cast} keys={keys}
+          selected={asList(email.cc)} onChange={(cc) => set({ cc })} />
       </div>
 
       <label className="block text-xs text-slate-400">Subject
@@ -168,6 +171,42 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
       <StepTitle n={3} title="Tell the grader the perfect answer" note="This is the answer key, not text the model sees." />
       <AnswerKeyBuilder answer={email.answer} anchors={anchors} serveDate={serveDate} obligations={obligationNames(node)} obligationKinds={obligationKinds(node)} onChange={(answer) => set({ answer })} />
       </section>
+    </div>
+  );
+}
+
+// A dense multi-recipient picker over the node's cast: tap a chip to add/remove that person.
+// Stores the selection as an array (so To/Cc can hold several people). Used for both To and Cc;
+// From stays a single select. Empty selection is fine for Cc.
+function RecipientPicker({ label, hint, cast, keys, selected, onChange }: {
+  label: string; hint: string; cast: Record<string, string>; keys: string[]; selected: string[]; onChange: (v: string[]) => void;
+}) {
+  const chosen = new Set(selected);
+  const toggle = (k: string) => onChange(chosen.has(k) ? selected.filter((s) => s !== k) : [...selected, k]);
+  // A selected person no longer in the cast (renamed/removed) still shows so it's never silently lost.
+  const extra = selected.filter((s) => !keys.includes(s));
+  return (
+    <div className="text-xs text-slate-400">
+      <span title={hint}>{label}</span>
+      {keys.length === 0 && extra.length === 0 ? (
+        <p className="mt-1 text-slate-500">Add people to the cast above, then pick recipients here.</p>
+      ) : (
+        <div className="mt-1 flex flex-wrap gap-1.5">
+          {keys.map((k) => {
+            const on = chosen.has(k);
+            return (
+              <button key={k} type="button" onClick={() => toggle(k)} title={cast[k] || k}
+                className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${on ? "border-sky-500 bg-sky-600/20 text-sky-200" : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-500"}`}>
+                {on ? "✓ " : ""}{k}
+              </button>
+            );
+          })}
+          {extra.map((k) => (
+            <button key={k} type="button" onClick={() => toggle(k)} title="not in the cast; click to remove"
+              className="rounded-full border border-amber-600/70 bg-amber-900/20 px-2.5 py-1 text-xs text-amber-300">✓ {k} ⚠</button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

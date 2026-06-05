@@ -130,7 +130,8 @@ def search_inbox(query: Optional[str] = None, sender: Optional[str] = None,
 
 @mcp.tool()
 def get_email(email_id: str) -> dict:
-    """Fetch the full text of one past email by its id."""
+    """Fetch the full text of one past email by its id, including its From, To, and Cc
+    (the people it was sent to and copied on) and its body."""
     return _call("GET", f"/inbox/{email_id}")
 
 
