@@ -11,17 +11,23 @@ is **exactly one** to-do whose title+description contains the obligation's keywo
 single point (its **due date**) — day-level, no duration like an event. Predicates:
 `eq` (exact day) or `by` (on/before a deadline).
 
-Things to decide later:
-- **Exact day vs deadline as the norm.** `eq` for "do it that day," `by` for "by then."
-  Confirm which is the default authors reach for, and whether both stay.
-- **Should we grade the `completed` flag?** The store tracks it; the grader ignores it,
-  so today we *can't* test "the model marked the prep task done." Adding it = carry
-  `completed` into the grader's `Obj` + let an op assert it. Decide if that capability
-  is worth the surface.
-- **Day-level only, or can a to-do carry a time?** Leaning day-level ("due that day").
-  Confirm.
-- **Any determinism wrinkle vs events?** Don't think so (same machinery, simpler), but
-  double-check when we revisit.
+**Resolved 2026-06-04 — the settled design:**
+- **Grade on the due date, day-level.** A to-do is a single point (its due date); the model's
+  free-text title/description is *never* judged for meaning, only matched for the keyword
+  (attribution). So the grade is a fixed function `(exactly one to-do whose title contains the
+  keywords) AND (due date satisfies the predicate)` — deterministic, same machinery as events
+  minus duration. **No determinism wrinkle.**
+- **`by` is the default** ("do it by Friday" — any day up to the deadline passes, a fixed set),
+  with `eq` for "that exact day." Both stay.
+- **No clock on to-dos.** The builder hides the time control for to-dos; a due *time* adds no
+  deterministic signal and only complicates attribution. (Day-level confirmed.)
+
+Still open:
+- **Grade the `completed` flag?** Deferred. The store tracks it and the grader ignores it, so we
+  can't yet test "the model marked the task done." Worth adding only paired with a deadline
+  ("complete by Tue") so it still exercises timing; otherwise it's model-action surface for little
+  temporal gain.
+- **Keyword attribution at real-author scale** — the live worry. See §2.
 
 ## 2. Obligation keywords: make them painless for authors
 
@@ -47,3 +53,13 @@ Ideas to explore (mostly webapp, but #5 is a core idea):
 
 When we revisit: pick the smallest change that makes naming invisible to authors in the
 common case while keeping grading unambiguous.
+
+**Scale risk (2026-06-04, the live worry).** Keyword attribution is validated only against the
+oracle (which titles objects *exactly* with the keywords) and a couple of hand-authored scenarios.
+With ~20 real authors writing real emails — and real models choosing their own titles — keyword
+alignment is **untested at scale**. Today it holds via the oracle satisfiability check + the
+collision lint + forgiving substring matching, but that is "works in practice," not a guarantee.
+**The hardening is idea #5: attribute primarily by `email_id` + `kind`** (the tag the harness sets
+on every object, not the model's prose), with keywords only a fallback to split multiple same-kind
+objects from one email. That removes the model's word-choice from the common case entirely. It's a
+small grader change (the `Obj` already carries `email_id`); do it before the corpus gets large.

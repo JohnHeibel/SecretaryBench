@@ -168,7 +168,9 @@ the skill under test.
 - **Cut (deliberately):** free-slot / "find an open slot" / `no_overlap` / can't-fit.
   Non-deterministic and the bulk of the complexity; conflicts are authored as
   fixed-time reschedules instead.
-- **Maybe later:** seed events (a pre-filled day-1 calendar); per-seed ranged offsets
-  for anti-memorization variety.
-- **Pending:** webapp builder UI (time-in-the-builder, plain-language naming) +
-  re-vendor; grammar docs.
+- **Maybe later (see `BACKLOG.md`):** per-seed ranged offsets (anti-memorization "random
+  day"); global calendar + global grading; seed events (a pre-filled day-1 calendar).
+- **Done:** webapp builder UI (time-in-the-builder, plain-language naming, obligation
+  picker + auto-wired needle edges, Project Helios example) + re-vendor.
+- **Pending:** grammar docs (document the `@HH:MM[-HH:MM]` time suffix in
+  `ANSWER_KEY_GRAMMAR.md`).

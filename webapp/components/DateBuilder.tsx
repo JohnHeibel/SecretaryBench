@@ -3,8 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { resolveExpr } from "@/lib/api";
 import { NTH, UNITS, WEEKDAYS } from "@/lib/grammar";
 import {
-  type Base, type BaseKind, type Expr, type MonthRef,
-  emptyBase, isInterval, parseExpr, serializeExpr, serveExpr,
+  type Base, type BaseKind, type Expr, type MonthRef, type TimeHM, type TimeOfDay,
+  addHour, canCarryTime, emptyBase, hhmm, humanTime, isInterval, parseExpr, parseHHMM, serializeExpr, serveExpr, timeError,
 } from "@/lib/dateExpr";
 
 // The inline "fill-in-the-blank" date builder (design doc Direction A). An author composes a
@@ -21,6 +21,7 @@ interface Props {
   serveDate: string;                   // preview "now"
   onChange: (expr: string) => void;
   intervalOnly?: boolean;              // within / not-within slots want an INTERVAL (week / month)
+  allowTime?: boolean;                 // offer a clock suffix (events on an exact day); off for to-dos / deadlines / intervals
 }
 
 // dropdown order/labels for the first blank — reads as the start of the sentence
@@ -40,6 +41,7 @@ const NTH_LABEL: Record<string, string> = { "1": "1st", "2": "2nd", "3": "3rd", 
 
 const sel = "rounded border border-slate-700 bg-slate-800 px-1.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-500";
 const numField = "w-12 rounded border border-slate-700 bg-slate-800 px-1.5 py-1 text-xs text-slate-200 outline-none focus:border-sky-500";
+const timeField = "rounded border border-slate-700 bg-slate-800 px-1 py-0.5 text-xs text-slate-200 outline-none focus:border-sky-500 [color-scheme:dark]";
 
 // Is the expression still missing a required pick (so we shouldn't try to resolve it yet)?
 function incomplete(e: Expr): boolean { return baseIncomplete(e.base); }
@@ -51,7 +53,7 @@ function baseIncomplete(b: Base): boolean {
 }
 const hasAnchorRef = (s: string) => /@[A-Za-z_]/.test(s);
 
-export default function DateBuilder({ value, anchors, serveDate, onChange, intervalOnly }: Props) {
+export default function DateBuilder({ value, anchors, serveDate, onChange, intervalOnly, allowTime }: Props) {
   // Local structured state is the source of truth while editing; seeded from `value`. A non-empty
   // value that can't be represented (legacy / hand-typed exotic expr) opens in raw mode.
   const [expr, setExpr] = useState<Expr | null>(() => (value ? parseExpr(value) : null));
@@ -75,7 +77,12 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, inter
   const emit = (s: string) => { lastEmit.current = s; onChange(s); };
   // An incomplete pick (anchor with no name, an empty `from`, …) serializes to invalid grammar; emit ""
   // instead so the slot reads as simply unset (clean "add the date" guidance) rather than persisting "@".
-  const commit = (next: Expr) => { setExpr(next); setRaw(serializeExpr(next)); emit(incomplete(next) ? "" : serializeExpr(next)); };
+  // Drop a stale clock if the base can no longer carry one (switched to a week/month, or added a `from`).
+  const commit = (raw: Expr) => {
+    const next = raw.time && !canCarryTime(raw) ? { ...raw, time: undefined } : raw;
+    setExpr(next); setRaw(serializeExpr(next)); emit(incomplete(next) ? "" : serializeExpr(next));
+  };
+  const showTime = allowTime !== false && !intervalOnly && canCarryTime(expr);
 
   return (
     <div className="space-y-1">
@@ -85,14 +92,47 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, inter
       ) : (
         <div className="flex flex-wrap items-center gap-1.5">
           <ExprEditor expr={expr} onChange={commit} anchors={anchors} serveDate={serveDate} />
+          {showTime && expr && <TimeControl time={expr.time ?? null} onChange={(time) => commit({ ...expr, time })} />}
           <button type="button" onClick={() => { setRaw(serialized); setMode("raw"); }}
             className="ml-auto text-[11px] text-slate-500 hover:text-sky-300" title="Type the expression directly — still checked live.">type it</button>
         </div>
       )}
       <Preview serialized={serialized} serveDate={serveDate}
         incomplete={mode === "builder" && (!expr || incomplete(expr))}
+        time={mode === "builder" ? expr?.time ?? null : null}
         intervalParsed={!!expr && isInterval(expr)} intervalOnly={intervalOnly} />
     </div>
+  );
+}
+
+// The optional clock suffix. Collapsed to a "+ add a time" affordance by default (many dates are
+// day-level); when set, a start and an optional end (a within-day span), with the resolver's
+// work-hours rule surfaced live via timeError — important because the live preview skips resolving
+// anchor-based exprs, so this is the only place an out-of-hours time on a needle gets flagged.
+function TimeControl({ time, onChange }: { time: TimeOfDay | null; onChange: (t: TimeOfDay | undefined) => void }) {
+  if (!time) return (
+    <button type="button" onClick={() => onChange({ start: { h: 9, m: 0 }, end: { h: 10, m: 0 } })}
+      className="text-[11px] text-slate-500 hover:text-sky-300" title="Give this event a clock time (work hours 5 AM–11 PM).">+ add a time</button>
+  );
+  const err = timeError(time);
+  const setStart = (v: TimeHM | null) => v && onChange({ ...time, start: v });
+  const setEnd = (v: TimeHM | null) => v && onChange({ ...time, end: v });
+  return (
+    <span className="flex flex-wrap items-center gap-1 rounded border border-slate-700/70 bg-slate-900/60 px-1.5 py-1">
+      <span className="text-[11px] text-slate-500">at</span>
+      <input type="time" step={60} min="05:00" max="23:00" value={hhmm(time.start)} onChange={(e) => setStart(parseHHMM(e.target.value))} className={timeField} />
+      {time.end ? (
+        <>
+          <span className="text-slate-500">–</span>
+          <input type="time" step={60} min="05:00" max="23:00" value={hhmm(time.end)} onChange={(e) => setEnd(parseHHMM(e.target.value))} className={timeField} />
+          <button type="button" onClick={() => onChange({ ...time, end: null })} title="make it a single start time (no end)" className="px-0.5 text-[11px] text-slate-500 hover:text-sky-300">·pt</button>
+        </>
+      ) : (
+        <button type="button" onClick={() => onChange({ ...time, end: addHour(time.start) })} className="text-[11px] text-slate-500 hover:text-sky-300">+ end</button>
+      )}
+      <button type="button" onClick={() => onChange(undefined)} title="remove the time (grade at day level)" className="px-0.5 text-slate-500 hover:text-rose-400">✕</button>
+      {err && <span className="ml-0.5 text-[11px] text-amber-400" title="work hours are 5 AM–11 PM">{err}</span>}
+    </span>
   );
 }
 
@@ -100,8 +140,8 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, inter
 
 function ExprEditor({ expr, onChange, anchors, serveDate }: { expr: Expr | null; onChange: (e: Expr) => void; anchors: string[]; serveDate: string }) {
   const setBaseKind = (kind: BaseKind) => {
-    const keepOffsets = kind !== "weekOf" && kind !== "month" && expr ? expr.offsets : [];
-    onChange({ base: emptyBase(kind), offsets: keepOffsets });
+    const keep = kind !== "weekOf" && kind !== "month";   // interval bases can't carry offsets or a clock
+    onChange({ base: emptyBase(kind), offsets: keep && expr ? expr.offsets : [], time: keep ? expr?.time : undefined });
   };
   const isIntervalBase = expr && (expr.base.kind === "weekOf" || expr.base.kind === "month");
   return (
@@ -236,7 +276,7 @@ function RawField({ value, onChange, onUseBuilder }: { value: string; onChange: 
   );
 }
 
-function Preview({ serialized, serveDate, incomplete, intervalParsed, intervalOnly }: { serialized: string; serveDate: string; incomplete: boolean; intervalParsed: boolean; intervalOnly?: boolean }) {
+function Preview({ serialized, serveDate, incomplete, time, intervalParsed, intervalOnly }: { serialized: string; serveDate: string; incomplete: boolean; time: TimeOfDay | null; intervalParsed: boolean; intervalOnly?: boolean }) {
   const [res, setRes] = useState<{ ok: boolean; text: string } | null>(null);
   const anchorRef = useMemo(() => hasAnchorRef(serialized), [serialized]);
 
@@ -251,13 +291,15 @@ function Preview({ serialized, serveDate, incomplete, intervalParsed, intervalOn
   }, [serialized, serveDate, incomplete, anchorRef]);
 
   const intervalWarn = intervalOnly && serialized.trim() && !incomplete && !intervalParsed;
+  const timeWarn = time ? timeError(time) : null;     // client-side, so it shows even on anchor exprs
 
   return (
     <div className="min-h-[1rem] text-[11px] leading-snug">
       {incomplete || !serialized.trim() ? <span className="text-slate-500">build a date…</span>
-        : anchorRef ? <span className="text-amber-400">→ uses a published date; resolves when this email is sent</span>
+        : anchorRef ? <span className="text-amber-400">→ uses a published date{time ? ` (${humanTime(time)})` : ""}; resolves when this email is sent</span>
         : res ? <span className={res.ok ? "text-emerald-400" : "text-rose-400"}>{res.ok ? "→ " : "⚠ "}{res.text}</span>
         : <span className="text-slate-500">…</span>}
+      {timeWarn ? <span className="ml-2 text-amber-400">⚠ {timeWarn}</span> : null}
       {intervalWarn ? <span className="ml-2 text-amber-400">this slot wants a week/month, not a single day</span> : null}
     </div>
   );

@@ -13,11 +13,12 @@ interface Props {
   onSelectEmail: (nodeId: string, emailId: string) => void;
   onAddNode: () => void;
   onAddEmail: (nodeId: string) => void;
+  onAddExample: () => void;
   onRemoveNode: (nodeId: string) => void;
   onRemoveEmail: (nodeId: string, emailId: string) => void;
 }
 
-export default function Sidebar({ nodes, selNode, selEmail, onSelectNode, onSelectEmail, onAddNode, onAddEmail, onRemoveNode, onRemoveEmail }: Props) {
+export default function Sidebar({ nodes, selNode, selEmail, onSelectNode, onSelectEmail, onAddNode, onAddEmail, onAddExample, onRemoveNode, onRemoveEmail }: Props) {
   return (
     <aside className="flex w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-900/70">
       <div className="border-b border-slate-800 p-3">
@@ -29,6 +30,7 @@ export default function Sidebar({ nodes, selNode, selEmail, onSelectNode, onSele
           + New storyline
           <span className="block text-[11px] font-normal text-sky-200/65">A storyline is a group of related emails.</span>
         </button>
+        <button onClick={onAddExample} className="mt-1.5 w-full text-left text-[11px] text-slate-500 hover:text-sky-300" title="A fully-authored worked thread: a needle, a reschedule, and a no-action FYI.">✨ Load the Project Helios example</button>
       </div>
       <CompositionPanel nodes={nodes} />
       <div className="min-h-0 flex-1 overflow-auto py-1">

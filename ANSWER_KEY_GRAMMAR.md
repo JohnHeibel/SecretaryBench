@@ -10,12 +10,14 @@
 > name is the obligation's identity *and* a node-scoped anchor, so a later `move`/`cancel`
 > references it by name. There is no `count` field; "exactly one" is inherent to an obligation.
 >
-> **DECIDED (day-level grammar):** times-of-day and durations are **out**. Tokens resolve to
-> whole **days**; the grader checks the *day* an event/todo lands on, nothing finer. Times may
-> still appear as plain prose in an email ("at 2pm") but are never tokens and never graded.
-> Removed since the earlier draft: the `@HH:MM` time-attach, the `DATETIME` value type, the
-> `duration` answer field, and the `exact_time` tolerance. Within-day overlap/conflict is
-> therefore not represented — reintroduce times only if conflict-avoidance becomes a target.
+> **UPDATED 2026-06-04 (time-of-day RE-ADDED, Phase 1 done):** a date may carry an optional clock
+> suffix — `@HH:MM` (a point) or `@HH:MM-HH:MM` (a within-day span). It is static (does not shift
+> with serve order) but rides *inside* the one governed expr, so the email body and the answer key
+> still render from one source and cannot drift. Clock times are bounded by the CEO's work hours
+> (05:00–23:00); a token resolving outside them is a grammar error. A bare date still resolves to a
+> whole **day** (graded day-level); a timed expr resolves to a datetime / within-day interval and is
+> graded at **minute** granularity. The `within:Nd` / `exact_time` tolerance knob is retired
+> (matching is exact). Still out: a separate `duration` field (an interval's end gives it); recurrence (§6).
 
 ---
 
@@ -41,17 +43,19 @@ are an authoring + grading device, never shown raw.
 
 ---
 
-## 1. Value types (intentionally few)
+## 1. Value types
 
-| Type | Meaning | Resolved example |
-|------|---------|------------------|
-| `DATE` | a calendar day | 2026-08-03 |
-| `INTERVAL` | a date span | the week of 2026-08-03 |
+| Type | Meaning | Resolved example | Graded at |
+|------|---------|------------------|-----------|
+| `DATE` | a calendar day | 2026-08-03 | the day |
+| `DATETIME` | a day + clock point (`@HH:MM`) | 2026-08-03 14:00 | the minute (start) |
+| `TIMEINTERVAL` | a within-day span (`@HH:MM-HH:MM`) | 2026-08-03 14:00–15:00 | start + end |
+| `INTERVAL` | a whole-day span (week / month) | the week of 2026-08-03 | containment |
 
-Non-temporal values (`DURATION`, counts, names, clock times) are **static prose or
-answer-key fields, not token types.** Grading granularity follows the token: a
-`DATE` token matches the day, and an `INTERVAL` token matches containment in a
-date span.
+The clock suffix is **static** (it does not shift with serve order) but rides inside the one
+governed expr, so body and answer key can't drift. Other non-temporal values (counts, names) stay
+plain prose + static answer-key fields, never token types. Grading granularity follows the value:
+a bare `DATE` matches the day; a `DATETIME` / `TIMEINTERVAL` matches to the minute.
 
 ---
 
@@ -74,10 +78,11 @@ baked straight into the descendant's answer key).
 Same compact form serves as the in-email token `{ … }` and the answer-key expr.
 
 ```
-expr      := base (offset)*
+expr      := base (offset)* (time)?
 base      := "serve" | "@" NAME | selector
 offset    := ("+"|"-") INT unit
 unit      := "d" (calendar days) | "bd" (business days) | "w" | "m" | "y"
+time      := "@" HH ":" MM ("-" HH ":" MM)?  // clock point, or within-day span; work hours 05:00–23:00, end > start
 selector  := "next:" WD ("from" expr)?  // next WD strictly after serve, or after expr's date
            | "this:" WD ("from" expr)?  // WD in serve's (or expr's) Mon–Sun week
            | "nth:" N "," WD "," monthref   // Nth WD of a month (N = 1..5 or "last")
@@ -87,7 +92,8 @@ selector  := "next:" WD ("from" expr)?  // next WD strictly after serve, or afte
 monthref  := "0m" | ("+"|"-") INT "m"   // relative to serve's month
 WD        := MON|TUE|WED|THU|FRI|SAT|SUN
 ```
-(No time-of-day: tokens resolve to a DATE or INTERVAL only.)
+The clock suffix attaches to the whole date, after any offsets: `next:THU @10:00-11:00`,
+`@signing+2w @14:00-15:00`. With no suffix, an expr stays a DATE or INTERVAL.
 
 | Token | Resolves to |
 |-------|-------------|
@@ -101,6 +107,8 @@ WD        := MON|TUE|WED|THU|FRI|SAT|SUN
 | `{dom:25,0m}` | the 25th of this month |
 | `{week_of:(serve+1w)}` | next week's Mon–Sun interval |
 | `{@signing+2w}` | two weeks after the ancestor's signing date |
+| `{next:THU @10:00-11:00}` | next Thursday, 10–11 AM (a TIMEINTERVAL) |
+| `{@signing+2w @14:00}` | two weeks after signing, at 2 PM (a DATETIME) |
 
 **Date emission** (ancestor declares a named date anchor), inline or in node metadata:
 
@@ -140,9 +148,8 @@ on a named obligation. The verb's value *is* the obligation name.
     {
       "create": "kickoff",              // verb: create | move | cancel; value = obligation name
       "kind": "event",                  // event | todo  (create only)
-      "on": { "eq": "@signing+2w" },    // the date predicate (a DAY); create/move only
-      "match": ["kickoff"],             // OPTIONAL title keywords; defaults to [name]
-      "tolerance": "exact_day"          // OPTIONAL: exact_day (default) | within:Nd
+      "on": { "eq": "@signing+2w" },    // date predicate (a day; add a clock, e.g. "@signing+2w @14:00-15:00")
+      "match": ["kickoff"]              // OPTIONAL title keywords; defaults to [name] — matching is EXACT (within:Nd retired)
     }
   ]
 }
@@ -198,8 +205,8 @@ with a static cadence block resolving to N day-grained events. The grammar sketc
   "recurrence": { "every": "TUE", "count": 4 } }   // start token + static cadence
 ```
 
-No times-of-day (those are prose, not graded — see the header). Not built yet; the schema
-does not parse `recurrence`. Revisit if a recurring obligation becomes a target.
+Times-of-day are now supported on the start token (§1, §3); recurrence itself is still not built
+(the schema does not parse `recurrence`). Revisit if a recurring obligation becomes a target.
 
 ---
 
@@ -231,7 +238,9 @@ does not parse `recurrence`. Revisit if a recurring obligation becomes a target.
 - Match a model object to an obligation by `match` keywords within the email's node. Resolve
   date tokens against `(serve_date, anchor_table)` — **ground truth**, independent of the
   model's earlier actions.
-- Tokens resolve to a DATE (or INTERVAL) → **day equality**; `within:Nd` relaxes the window.
+- A bare token → DATE/INTERVAL → **day equality** (or containment). A timed token →
+  DATETIME/TIMEINTERVAL → **minute equality** (start, plus end for an interval). Matching is exact;
+  the only deliberate multi-day answers are `by` (deadline) and `any_of` (options).
 - **No-action / FYI / bait email** (`ops: []`) → the model must create nothing attributable
   to that email. The live runner now works by day, but created objects still carry an
   `email_id`, so bait emails stay discriminating.

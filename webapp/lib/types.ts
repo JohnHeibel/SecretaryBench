@@ -48,7 +48,7 @@ export interface CorpusNode {
 
 export interface ResolveResult {
   ok: boolean;
-  kind?: "date" | "datetime" | "interval";
+  kind?: "date" | "datetime" | "interval" | "timeinterval";   // timeinterval = @HH:MM-HH:MM within-day span
   iso?: string;
   human?: string;
   error?: string;

@@ -14,16 +14,21 @@ const CANON = [
   "dom:25,0m", "dom:1,+2m",
   "week_of:(serve+1w)", "week_of:(@signing)", "month:0m", "month:+1m", "month:-2m",
   "week_of:(next:MON from @signing)",
+  // time-of-day suffix: @HH:MM (point) and @HH:MM-HH:MM (within-day span), bounded by work hours
+  "serve @09:00", "serve @14:00-15:00", "@signing+2w @10:00-11:00", "next:THU @10:00-11:00", "dom:25,0m @08:30",
 ];
 
 // Strings the resolver accepts but that aren't our canonical serialization — must still parse,
 // and re-serialize to a semantically-equal canonical form (checked via the resolver below).
-// `+9d` canonicalizes to `serve+9d`; `month:1m` to `month:+1m` (explicit base / signed monthref).
-const NONCANON = ["serve +5d", "+9d", "+3bd", "month:1m"];
+// `+9d` canonicalizes to `serve+9d`; `month:1m` to `month:+1m` (explicit base / signed monthref);
+// the clock forms canonicalize whitespace (`serve@10:00` -> `serve @10:00`) and pad (`@9:00` -> `@09:00`).
+const NONCANON = ["serve +5d", "+9d", "+3bd", "month:1m", "serve@10:00", "serve @9:00", "serve @10:00 - 11:00"];
 
 // Strings the parser must REJECT (return null) so the UI falls back to raw mode. `1m` is a bare
-// monthref — the real resolver rejects it as a top-level expr too, so we must as well.
-const REJECT = ["", "garbage", "serve+5", "next:THURSDAY", "week_of:(serve", "@", "nth:9", "1m"];
+// monthref — the real resolver rejects it as a top-level expr too, so we must as well. The clock
+// forms are structurally malformed (bad hour/minute, missing minutes, missing colon).
+const REJECT = ["", "garbage", "serve+5", "next:THURSDAY", "week_of:(serve", "@", "nth:9", "1m",
+  "serve @25:00", "serve @10:99", "serve @10", "serve @1000"];
 
 let fail = 0;
 const note = (ok: boolean, msg: string) => { if (!ok) { fail++; console.error("  ✗ " + msg); } };

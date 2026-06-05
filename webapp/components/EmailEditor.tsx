@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { CorpusNode, Edge, EdgeType, Email, EmailType, Op, Tier } from "@/lib/types";
+import { obligationKinds, obligationNames } from "@/lib/grammar";
 import { ROLE_HINT, ROLE_META, classifyEmail } from "@/lib/composition";
 import BodyEditor from "./BodyEditor";
 import AnswerKeyBuilder from "./AnswerKeyBuilder";
@@ -185,7 +186,7 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
 
       <section className="space-y-3">
       <StepTitle n={3} title="Tell the grader the perfect answer" note="This is the answer key, not text the model sees." />
-      <AnswerKeyBuilder answer={email.answer} anchors={anchors} serveDate={serveDate} onChange={(answer) => set({ answer })} />
+      <AnswerKeyBuilder answer={email.answer} anchors={anchors} serveDate={serveDate} obligations={obligationNames(node)} obligationKinds={obligationKinds(node)} onChange={(answer) => set({ answer })} />
       </section>
     </div>
   );

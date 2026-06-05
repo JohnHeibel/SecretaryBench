@@ -6,6 +6,8 @@ Request:  { "expr": "@signing+2w", "serve_date": "2026-06-01",
             "anchors": { "signing": "2026-06-08" } }
 Response: { "ok": true, "kind": "date", "iso": "2026-06-22",
             "human": "Monday, June 22nd, 2026" }
+          { "ok": true, "kind": "timeinterval", "iso": "2026-06-04T14:00:00/2026-06-04T15:00:00",
+            "human": "Thursday, June 4th, 2026, 2–3 PM" }   for a @HH:MM-HH:MM expr
           { "ok": false, "error": "..." }   on a bad expression
 """
 from __future__ import annotations
@@ -28,11 +30,11 @@ def _evaluate(expr: str, serve_date: str, anchors: dict) -> dict:
     )
     value = resolver.resolve(expr, ctx)
     kind = resolver.value_kind(value)
-    if isinstance(value, resolver.Interval):
+    if isinstance(value, resolver.Interval):                     # whole-day span [start..end]
         iso = f"{value.start.isoformat()}..{value.end.isoformat()}"
-    elif kind == "datetime":
-        iso = value.isoformat()
-    else:
+    elif isinstance(value, resolver.TimeInterval):               # within-day clock span [start/end]
+        iso = f"{value.start.isoformat()}/{value.end.isoformat()}"
+    else:                                                        # date or datetime — both isoformat()
         iso = value.isoformat()
     return {"ok": True, "kind": kind, "iso": iso, "human": resolver.human(value)}
 

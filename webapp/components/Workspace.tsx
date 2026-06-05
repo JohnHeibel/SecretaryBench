@@ -1,7 +1,8 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
-import { anchorsInCorpus, normalizeAnswer } from "@/lib/grammar";
+import { anchorsInCorpus, normalizeAnswer, withDerivedDateEdges } from "@/lib/grammar";
+import { projectHeliosNode } from "@/lib/templates";
 import type { CorpusNode, Edge, Email, LintResult, OracleResult } from "@/lib/types";
 import Sidebar from "./Sidebar";
 import EmailEditor from "./EmailEditor";
@@ -81,9 +82,12 @@ export default function Workspace() {
   }, [persist]);
 
   const updateEmail = useCallback((nodeId: string, email: Email) => {
-    setNodes((prev) => prev.map((n) => n.id === nodeId ? { ...n, emails: n.emails.map((e) => e.id === email.id ? email : e) } : n));
+    // Auto-add the `date` dependency edge a needle (answer reusing an @anchor) requires, so authors
+    // never hand-wire it — point a later email's answer at an earlier date and the link appears.
+    const wired = withDerivedDateEdges(email, nodeId, nodes);
+    setNodes((prev) => prev.map((n) => n.id === nodeId ? { ...n, emails: n.emails.map((e) => e.id === wired.id ? wired : e) } : n));
     const node = nodes.find((n) => n.id === nodeId);
-    if (node) persist({ ...node, emails: node.emails.map((e) => e.id === email.id ? email : e) });
+    if (node) persist({ ...node, emails: node.emails.map((e) => e.id === wired.id ? wired : e) });
   }, [nodes, persist]);
 
   // Change an email's id (the corpus PK) and rewrite every depends_on edge across the whole corpus
@@ -120,6 +124,16 @@ export default function Workspace() {
     while (ids.has(`${base}-${i}`)) i++;
     const node: CorpusNode = { id: `${base}-${i}`, cast: { CEO: "you" }, emails: [] };
     setNodes((prev) => [...prev, node]); setSelNode(node.id); setSelEmail(null); persist(node);
+  }, [nodes, persist]);
+
+  // Load the worked "Project Helios" storyline (HOW_IT_WORKS.md) as a fully-authored, oracle-solvable
+  // starting point — the fastest way to see a needle + reschedule + no-action thread end to end.
+  const addExample = useCallback(() => {
+    const ids = new Set(nodes.map((n) => n.id));
+    let id = "project_helios", i = 2;
+    while (ids.has(id)) id = `project_helios-${i++}`;
+    const node = projectHeliosNode(id);
+    setNodes((prev) => [...prev, node]); setSelNode(node.id); setSelEmail(node.emails[0]?.id ?? null); persist(node);
   }, [nodes, persist]);
 
   const addEmail = useCallback((nodeId: string) => {
@@ -199,7 +213,7 @@ export default function Workspace() {
           nodes={nodes} selNode={selNode} selEmail={selEmail}
           onSelectNode={(id) => { setSelNode(id); setSelEmail(null); }}
           onSelectEmail={(nid, eid) => { setSelNode(nid); setSelEmail(eid); }}
-          onAddNode={addNode} onAddEmail={addEmail}
+          onAddNode={addNode} onAddEmail={addEmail} onAddExample={addExample}
           onRemoveNode={removeNode} onRemoveEmail={removeEmail}
           lint={lint}
         />
@@ -218,7 +232,7 @@ export default function Workspace() {
               onAutoSlugEmail={(e) => autoSlugEmail(node.id, e)}
             />
           ) : (
-            <StartEmpty onAddNode={addNode} />
+            <StartEmpty onAddNode={addNode} onAddExample={addExample} />
           )}
         </main>
       </div>
@@ -228,7 +242,7 @@ export default function Workspace() {
   );
 }
 
-function StartEmpty({ onAddNode }: { onAddNode: () => void }) {
+function StartEmpty({ onAddNode, onAddExample }: { onAddNode: () => void; onAddExample: () => void }) {
   return (
     <div className="grid h-full place-items-center p-6">
       <div className="max-w-md rounded-lg border border-slate-800 bg-slate-900/50 p-6 text-center">
@@ -236,6 +250,7 @@ function StartEmpty({ onAddNode }: { onAddNode: () => void }) {
         <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
         <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is a group of related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
         <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
+        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Helios example</button> — a worked thread with a needle and a reschedule.</p>
       </div>
     </div>
   );

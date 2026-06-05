@@ -1,7 +1,7 @@
 // Grammar constants + small pure helpers shared across the UI. The authoritative
 // parser/evaluator is the Python sb.resolver (via /api/resolve, /api/lint) — these
 // are only for building UI affordances (dropdowns, anchor lists, token scans).
-import type { Answer, CorpusNode, ObjKind, Op, Verb } from "./types";
+import type { Answer, CorpusNode, Edge, Email, ObjKind, Op, Verb } from "./types";
 
 export const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
 export const UNITS: { value: string; label: string }[] = [
@@ -59,6 +59,76 @@ export function anchorsInCorpus(nodes: CorpusNode[]): string[] {
     }
   }
   return [...names].sort();
+}
+
+// Obligation names CREATEd anywhere in a node — what a move/cancel can target, and what a later
+// email may reuse as an @anchor date. (Distinct from anchorsInCorpus, which is body/emit anchors.)
+export function obligationNames(node: CorpusNode): string[] {
+  const names = new Set<string>();
+  for (const e of node.emails) for (const op of e.answer?.ops ?? []) if (op.create) names.add(op.create);
+  return [...names].sort();
+}
+
+// name -> kind for the node's created obligations. A move/cancel op carries no `kind` in the stored
+// answer (sb.schema fills it in from the create at build time), so the editor derives it from here —
+// e.g. to know a reschedule targets an event and should offer a clock time.
+export function obligationKinds(node: CorpusNode): Record<string, ObjKind> {
+  const kinds: Record<string, ObjKind> = {};
+  for (const e of node.emails) for (const op of e.answer?.ops ?? []) if (op.create && op.kind) kinds[op.create] = op.kind;
+  return kinds;
+}
+
+// --- auto-wiring the needle's dependency edge ------------------------------
+// A "needle" is an email whose ANSWER reuses an @anchor from an earlier email. The grader requires a
+// `date` dependency edge to that earlier email (so the serve-by window is derived); sb.schema derives
+// it automatically only for move/cancel. We extend that to every op (e.g. a create citing @kickoff),
+// so authors never have to hand-add the edge — point at an anchor and it just works.
+
+const ANCHOR_REF_RE = /@([A-Za-z_][A-Za-z0-9_]*)/g;
+
+function answerAnchorRefs(answer?: Answer): Set<string> {
+  const refs = new Set<string>();
+  for (const op of answer?.ops ?? []) {
+    if (!op.on) continue;
+    for (const v of Object.values(op.on)) for (const s of Array.isArray(v) ? v : [v]) {
+      if (typeof s === "string") for (const m of s.matchAll(ANCHOR_REF_RE)) refs.add(m[1]);
+    }
+  }
+  return refs;
+}
+
+// name -> email id that emits it. Body {!name=}/answer.emits anchors are corpus-wide; obligation
+// create-names are node-scoped (preferred, since a needle usually lives inside one storyline).
+function emitters(nodes: CorpusNode[]): { global: Record<string, string>; byNode: Record<string, Record<string, string>> } {
+  const global: Record<string, string> = {};
+  const byNode: Record<string, Record<string, string>> = {};
+  for (const node of nodes) {
+    const local: Record<string, string> = (byNode[node.id] = {});
+    for (const email of node.emails) {
+      for (const m of email.body.matchAll(EMIT_IN_BODY)) global[m[1]] = email.id;
+      for (const n of Object.keys(email.answer?.emits ?? {})) global[n] = email.id;
+      for (const op of email.answer?.ops ?? []) if (op.create) local[op.create] = email.id;
+    }
+  }
+  return { global, byNode };
+}
+
+// Return `email` with any missing `date` edges its answer's anchor refs require. Add-only and
+// idempotent (upgrades a `static` edge to `date`; never deletes), so it's safe to run on every edit.
+export function withDerivedDateEdges(email: Email, nodeId: string, nodes: CorpusNode[]): Email {
+  const refs = answerAnchorRefs(email.answer);
+  if (!refs.size) return email;
+  const { global, byNode } = emitters(nodes);
+  const local = byNode[nodeId] ?? {};
+  let deps = email.depends_on;
+  for (const name of refs) {
+    const src = local[name] ?? global[name];
+    if (!src || src === email.id) continue;
+    if (deps.some((d) => d.email === src && d.type === "date")) continue;
+    const stat = deps.find((d) => d.email === src);
+    deps = stat ? deps.map((d) => (d === stat ? { ...d, type: "date" } : d)) : [...deps, { email: src, type: "date" } as Edge];
+  }
+  return deps === email.depends_on ? email : { ...email, depends_on: deps };
 }
 
 // Split a body into literal text and {token} spans so we can render chips.
