@@ -88,7 +88,7 @@ export default function GuidePage() {
           <p>A needle is two emails that point at each other:</p>
           <ol className="ml-4 list-decimal space-y-1">
             <li>In <strong>email A&apos;s body</strong>, insert a date and tick <span className={chip}>other emails can refer to this date as</span>, then name it (like <span className={chip}>signing</span>).</li>
-            <li>In <strong>email B&apos;s answer key</strong>, build the date from <span className={chip}>@signing</span> and add an offset like &ldquo;+ 1 week&rdquo; if you want.</li>
+            <li>In <strong>email B&apos;s answer key</strong>, build the date from <span className={chip}>@signing</span> and shift it if you want, like &ldquo;+ 1 week.&rdquo;</li>
             <li>The link from A to B is added for you.</li>
           </ol>
           <p>Now the assistant has to find email A to answer email B. The more filler you bury between them, the harder it gets. That gap is the whole point.</p>
