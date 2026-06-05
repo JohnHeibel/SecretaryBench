@@ -81,7 +81,8 @@ export default function GuidePage() {
         <Card title="The answer key" teaser="the one right thing to do">
           <p>The answer key sits under the body. It is your private answer, and the assistant never sees it.</p>
           <p>If the email needs no action, tick <span className={chip}>this email needs no action</span>. Now it is graded on the assistant doing nothing.</p>
-          <p>Otherwise pick an action: <strong>create</strong> an event or to-do, <strong>move</strong> one, or <strong>cancel</strong> one. Give it a short name like <span className={chip}>kickoff</span>. That name is how a later email can refer back to it, and it is the word we look for in the assistant&apos;s calendar. A to-do gets a due date, where <strong>on or before</strong> means any day up to the deadline counts.</p>
+          <p>Otherwise pick an action. There are only four: <strong>create</strong> an event, <strong>create</strong> a to-do, <strong>move</strong> one, or <strong>cancel</strong> one. Give it a short name like <span className={chip}>kickoff</span>. That name is how a later email can refer back to it, and it is the word we look for in the assistant&apos;s calendar.</p>
+          <p>Then say which day counts. <strong>On exactly</strong> means the assistant must land on that exact day, and the exact time too for an event. <strong>On or before</strong> is a deadline: any day up to and including it counts, which is how most to-dos work. And if more than one day is genuinely fine, choose <strong>any of</strong> and list them.</p>
         </Card>
 
         <Card title="Build a needle (the fun part)" teaser="two linked emails">
@@ -92,6 +93,11 @@ export default function GuidePage() {
             <li>The link from A to B is added for you.</li>
           </ol>
           <p>Now the assistant has to find email A to answer email B. The more filler you bury between them, the harder it gets. That gap is the whole point.</p>
+        </Card>
+
+        <Card title="An email with lots to do at once" teaser="write each date once, scaffold the rest">
+          <p>Some emails ask for several things, like three meeting times in one message. You do not have to type each date twice. Write each date in the <strong>body</strong> once (insert it and name it, the same way you make an anchor), then in the answer key press <span className={chip}>scaffold an action for each date in the email</span>. The app adds one &ldquo;create an event&rdquo; row per date, with the date already filled in. You just give each a name.</p>
+          <p>For a single date you already wrote in the body, the answer key also shows a <span className={chip}>reuse a date from an email</span> chip. One click drops that date into the answer instead of building it again. Either way the email and the answer key stay pointed at the same day.</p>
         </Card>
 
         <Card title="Three examples, easy to hard" teaser="see them">
@@ -144,7 +150,7 @@ export default function GuidePage() {
       </div>
 
       <div className="mt-6 rounded-lg border border-slate-800 bg-slate-900/40 px-4 py-3 text-sm text-slate-400">
-        That&apos;s it. Make a storyline, warm up with a couple of easy emails, add some tempting filler, then try a real needle.
+        That&apos;s it. Make a storyline, warm up with a couple of easy emails, add some tempting filler, then try a real needle. Or load the <strong>Project Helios</strong> example from the sidebar to read a finished storyline that uses every kind of email.
         <Link href="/" className="ml-1 text-sky-400 hover:text-sky-300">Start writing →</Link>
       </div>
     </div>
