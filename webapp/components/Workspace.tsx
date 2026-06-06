@@ -168,7 +168,7 @@ export default function Workspace() {
   }, [nodes, persist]);
 
   // Load the fully-authored, oracle-solvable example storyline (Project Atlas) as a starting point. It
-  // tours every construct + every authoring-tool feature and shows the benchmark at scale (HOW_IT_WORKS.md).
+  // tours the headline constructs and shows the benchmark at scale (HOW_IT_WORKS.md).
   // Collisions on the node id get a -2, -3… suffix so loading it twice never clobbers an existing one.
   const addExample = useCallback(() => {
     const ids = new Set(nodes.map((n) => n.id));
@@ -327,7 +327,7 @@ function StartEmpty({ onAddNode, onAddExample }: { onAddNode: () => void; onAddE
         <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
         <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is a group of related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
         <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
-        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Atlas example</button>. A finished product-launch saga that tours every kind of email and every feature, with dates that pay off far from where they're set, so you can see how each is built and how the long-horizon test works at scale.</p>
+        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Atlas example</button>. A compact product-launch saga with timed events, needles, a CEO-sent email, a no-action FYI, a timed deadline, a reschedule, and a cancel.</p>
       </div>
     </div>
   );

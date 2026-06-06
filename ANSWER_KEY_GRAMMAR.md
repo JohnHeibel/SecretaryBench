@@ -127,7 +127,7 @@ A date slot is matched by one of:
 |------|---------|----------|
 | `eq: <expr>` | exact (default) | "Tuesday at 3" |
 | `in: <interval>` | falls within | "sometime next week" |
-| `by: <expr>` | on or before (≥ serve) | "finish by Friday" (todo deadline) |
+| `by: <expr>` | on or before (≥ serve); timed exprs compare the object start to the cutoff | "finish by Friday" or "finish by Friday 5 PM" |
 | `in: <interval>, not_in: @anchor` | within a window, avoiding a blackout | the Tokyo case |
 | `any_of: [<expr>, …]` | matches any listed | "Mon, Tue, or Wed work" |
 
@@ -165,7 +165,7 @@ on a named obligation. The verb's value *is* the obligation name.
   model's object matches if its title contains every keyword.
 - **No-action / FYI / bait email** → `ops: []`. The turn must create nothing attributable
   to that email in the current day-loop grader.
-- **Todo with a deadline** → `"create": "...", "kind": "todo", "on": { "by": "@x+5bd" }`.
+- **Todo with a deadline** → `"create": "...", "kind": "todo", "on": { "by": "@x+5bd" }`, or add a clock for a minute-level cutoff: `{ "by": "@x+5bd @17:00" }`.
 - **Reply / delegate** verbs still TBD. **[OPEN]**
 
 ### 5.1 Move / cancel — reference an obligation by name
@@ -239,8 +239,9 @@ Times-of-day are now supported on the start token (§1, §3); recurrence itself 
   date tokens against `(serve_date, anchor_table)` — **ground truth**, independent of the
   model's earlier actions.
 - A bare token → DATE/INTERVAL → **day equality** (or containment). A timed token →
-  DATETIME/TIMEINTERVAL → **minute equality** (start, plus end for an interval). Matching is exact;
-  the only deliberate multi-day answers are `by` (deadline) and `any_of` (options).
+  DATETIME/TIMEINTERVAL → **minute equality** (start, plus end for an interval). Matching is exact.
+  For `by`, a bare date is a day-level deadline, and a timed expr is a start-only datetime cutoff.
+  The only deliberate multi-day answers are `by` (deadline) and `any_of` (options).
 - **No-action / FYI / bait email** (`ops: []`) → the model must create nothing attributable
   to that email. The live runner now works by day, but created objects still carry an
   `email_id`, so bait emails stay discriminating.

@@ -30,6 +30,40 @@ def test_by_predicate_accepts_due_date_between_serve_and_deadline():
     assert grade_email(answer, ctx, state, TurnDelta()).passed
 
 
+def test_timed_by_accepts_start_before_cutoff_on_deadline_day():
+    ctx = Context(serve=date(2026, 6, 9))
+    answer = Answer(ops=[Op(verb="create", name="deck", kind="event", match=["deck"], on={"by": "next:FRI @17:00"})])
+    state = NodeState(events=[Obj(kind="event", title="deck review", when=datetime(2026, 6, 12, 16, 30), email_id="n.a", end=datetime(2026, 6, 12, 18, 30))])
+
+    assert grade_email(answer, ctx, state, TurnDelta()).passed
+
+
+def test_timed_by_rejects_start_after_cutoff_on_deadline_day():
+    ctx = Context(serve=date(2026, 6, 9))
+    answer = Answer(ops=[Op(verb="create", name="deck", kind="event", match=["deck"], on={"by": "next:FRI @17:00"})])
+    state = NodeState(events=[Obj(kind="event", title="deck review", when=datetime(2026, 6, 12, 17, 30), email_id="n.a", end=datetime(2026, 6, 12, 18, 30))])
+    result = grade_email(answer, ctx, state, TurnDelta())
+
+    assert not result.passed
+    assert result.details[0]["reason"] == "after the deadline"
+
+
+def test_timed_by_accepts_any_start_time_on_earlier_day():
+    ctx = Context(serve=date(2026, 6, 9))
+    answer = Answer(ops=[Op(verb="create", name="deck", kind="event", match=["deck"], on={"by": "next:FRI @17:00"})])
+    state = NodeState(events=[Obj(kind="event", title="deck review", when=datetime(2026, 6, 11, 23, 0), email_id="n.a", end=datetime(2026, 6, 12, 0, 30))])
+
+    assert grade_email(answer, ctx, state, TurnDelta()).passed
+
+
+def test_bare_date_by_stays_day_level_on_deadline_day():
+    ctx = Context(serve=date(2026, 6, 9))
+    answer = Answer(ops=[Op(verb="create", name="deck", kind="event", match=["deck"], on={"by": "next:FRI"})])
+    state = NodeState(events=[Obj(kind="event", title="deck review", when=datetime(2026, 6, 12, 23, 30), email_id="n.a", end=datetime(2026, 6, 13, 0, 30))])
+
+    assert grade_email(answer, ctx, state, TurnDelta()).passed
+
+
 def test_oracle_target_avoids_not_in_blackout():
     ctx = Context(serve=date(2026, 6, 1), anchors={"blackout": Interval(date(2026, 6, 8), date(2026, 6, 10))})
 
@@ -107,3 +141,21 @@ def test_oracle_solves_a_timed_corpus():
     assert res.total == 1
     assert res.score() == 1.0
 
+
+def test_oracle_solves_a_timed_by_corpus():
+    node = {
+        "id": "timed_by",
+        "cast": {},
+        "emails": [{
+            "id": "timed_by.deck",
+            "from": "chief@co", "to": ["ceo@co"],
+            "subject": "Deck deadline",
+            "body": "Please get the board deck ready by {next:FRI @17:00}.",
+            "answer": {"ops": [{"create": "deck", "kind": "todo", "match": ["deck"], "on": {"by": "next:FRI @17:00"}}]},
+        }],
+    }
+    corpus = build_corpus([node])
+    plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=1, n_days=30)
+    res = run(corpus, plan, oracle_model)
+    assert res.total == 1
+    assert res.score() == 1.0

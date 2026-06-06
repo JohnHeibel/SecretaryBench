@@ -22,7 +22,7 @@ interface Props {
   anchors: string[];                   // @anchor names other emails publish
   serveDate: string;                   // preview "now"
   onChange: (expr: string) => void;
-  allowTime?: boolean;                 // offer a clock suffix (events on an exact day); off for to-dos / deadlines
+  allowTime?: boolean;                 // offer a clock suffix for slots that grade at minute granularity
   anchorOrigins?: AnchorOrigins;       // name -> the email that published it, so the picker can show provenance
 }
 

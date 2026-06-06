@@ -51,14 +51,15 @@ deterministic DAG ancestors)**. The random seed only shuffles *which* scenarios 
 ordering, the resolved dates, or the correct answer. Re-running a seed is
 byte-identical; a correct model scores the same on every seed.
 
-A correct answer need not be **unique** — a "due by Friday" to-do passes on any day
-from arrival through the deadline; "either Tuesday or Thursday" passes on either. The
-grader checks "is this a valid member of the deterministic acceptable set," not "is
-this THE answer." The set is still fixed by the answer key, never by the random batch.
+A correct answer need not be **unique** — a bare-date "due by Friday" to-do passes on any day
+from arrival through the deadline, while "due by Friday 5 PM" compares the object's start to
+that exact cutoff. "Either Tuesday or Thursday" passes on either. The grader checks "is this a
+valid member of the deterministic acceptable set," not "is this THE answer." The set is still
+fixed by the answer key, never by the random batch.
 
 Otherwise **matching is exact** — exactly one day and time. The old `within:Nd`
 tolerance knob is dropped (default and only setting: exact). The *only* deliberate
-multi-day answers are the `by` (deadline) and `any_of` (options) predicates above; an
+multi-day or bounded answers are the `by` (deadline) and `any_of` (options) predicates above; an
 author picks those on purpose, they are not a fuzzy slider.
 
 ## The grading contract (binary, per email, scored at the scene)

@@ -63,7 +63,7 @@ export function anchorsInCorpus(nodes: CorpusNode[]): string[] {
 
 // Anchor names THIS email publishes in its own body ({!name=...}). The answer key may reuse these
 // directly (schema.py exempts a self-emitted anchor from the date-edge rule), which is what powers the
-// "scaffold an action per date" button and the same-email reuse chips.
+// same-email reuse chips and cross-email needle notes.
 export function bodyAnchorNames(body: string): string[] {
   return [...new Set([...body.matchAll(EMIT_IN_BODY)].map((m) => m[1]))];
 }

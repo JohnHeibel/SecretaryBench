@@ -82,7 +82,7 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateNode, o
   const set = (p: Partial<Email>) => onUpdateEmail({ ...email, ...p });
   // Where each published date came from (provenance labels), every date written in any email body
   // (one-click "reuse" chips — same-email reuse is valid and the common case), and this email's OWN
-  // body anchors (the "scaffold an action per date" source).
+  // body anchors written in this email, used to distinguish same-email reuse from cross-email needles.
   const origins = anchorOrigins(allNodes);
   const ownBodyAnchors = bodyAnchorNames(email.body);
 

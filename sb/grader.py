@@ -26,7 +26,7 @@ Output: EmailResult(passed, max=1, details[]). Binary per email.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Optional
 
 from sb import resolver
@@ -108,7 +108,11 @@ def _predicate_ok(obj: Obj, predicate: Optional[dict], ctx: Context, tolerance: 
         return any(_matches_value(obj, resolver.resolve(e, ctx), tolerance)
                    for e in predicate["any_of"])
     if "by" in predicate:
-        return ctx.serve <= obj.when.date() <= _to_date(resolver.resolve(predicate["by"], ctx))
+        dl = resolver.resolve(predicate["by"], ctx)
+        if isinstance(dl, (datetime, TimeInterval)):
+            cutoff = dl.start if isinstance(dl, TimeInterval) else dl
+            return datetime.combine(ctx.serve, time.min) <= obj.when <= cutoff
+        return ctx.serve <= obj.when.date() <= _to_date(dl)
     if "in" in predicate:
         window = resolver.resolve(predicate["in"], ctx)
         ok = isinstance(window, Interval) and window.contains(obj.when)
@@ -166,6 +170,12 @@ def _describe_predicate(predicate: Optional[dict], ctx: Context) -> str:
 def _wrong_when_reason(op: Op, ctx: Context, title_set: list) -> str:
     """A timed obligation that landed on the right DAY but the wrong clock time (or
     the wrong length) should say so, instead of the day-level 'on the wrong day'."""
+    if op.on and "by" in op.on:
+        val = resolver.resolve(op.on["by"], ctx)
+        if isinstance(val, (TimeInterval, datetime)):
+            cutoff = val.start if isinstance(val, TimeInterval) else val
+            if any(o.when.date() == cutoff.date() and o.when > cutoff for o in title_set):
+                return "after the deadline"
     exprs = ([op.on["eq"]] if op.on and "eq" in op.on
              else op.on["any_of"] if op.on and "any_of" in op.on else [])
     for e in exprs:

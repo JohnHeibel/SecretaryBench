@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { OP_CHOICES, opChoiceId, opName, opVerb } from "@/lib/grammar";
-import { parseExpr, serializeExpr } from "@/lib/dateExpr";
 import type { Answer, ObjKind, Op, Predicate } from "@/lib/types";
 import DateBuilder, { type AnchorOrigins } from "./DateBuilder";
 
@@ -12,7 +11,7 @@ interface Props {
   obligations: string[];                          // obligation names created across this node — what a move/cancel targets, and reuses as @anchors
   obligationKinds: Record<string, ObjKind>;       // name -> kind, so a move/cancel (which stores no kind) knows it targets an event vs to-do
   reuseAnchors?: string[];                         // every date published in an email body — one-click "reuse this date" chips
-  bodyAnchors?: string[];                          // dates written in THIS email's own body — the "scaffold an action per date" source
+  bodyAnchors?: string[];                          // dates written in THIS email's own body, so same-email reuse is not labeled a needle
   anchorOrigins?: AnchorOrigins;                  // name -> the email that published it, for provenance labels
   onChange: (answer: Answer) => void;
 }
@@ -49,9 +48,6 @@ const usesAnchor = (p?: Predicate) => predExprs(p).some((e) => /@[A-Za-z_]/.test
 const ANCHOR_REF = /@([A-Za-z_][A-Za-z0-9_]*)/g;
 // The distinct @anchor names a predicate references — used to name the source email(s) in the needle note.
 const anchorRefsIn = (p?: Predicate) => [...new Set(predExprs(p).flatMap((e) => [...e.matchAll(ANCHOR_REF)].map((m) => m[1])))];
-// Drop any clock suffix from an expr string — used when a date moves to a slot that grades day-level
-// (a `by` deadline), so a stale, now-uneditable time can't linger.
-const dropTime = (expr: string) => { const p = parseExpr(expr); return p?.time ? serializeExpr({ ...p, time: undefined }) : expr; };
 
 const BLANK_OP: Op = { create: "", kind: "event", on: { eq: "" } };
 
@@ -107,18 +103,6 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
   }
 
   function addOp() { setOps([...ops, { ...BLANK_OP }]); }
-
-  // Dates this email's body already wrote that no op cites yet — the rows "scaffold" would add. Turning
-  // each into a create-event op with its date pre-filled removes the tedious part of a many-action email
-  // (re-typing each date); the author just names each. Self-emitted anchors need no date edge (schema.py).
-  const usedAnchors = new Set(ops.flatMap((o) => anchorRefsIn(o.on)));
-  const scaffoldable = bodyAnchors.filter((a) => !usedAnchors.has(a));
-  const isBlankOp = (o: Op) => opVerb(o) === "create" && !opName(o) && !firstExpr(o.on);
-  function scaffoldFromBody() {
-    if (!scaffoldable.length) return;
-    const fresh: Op[] = scaffoldable.map((a) => ({ create: "", kind: "event", on: { eq: `@${a}` } }));
-    setOps([...ops.filter((o) => !isBlankOp(o)), ...fresh]);
-  }
 
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-3">
@@ -186,14 +170,14 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                       <select value={po} onChange={(e) => {
                         const newOp = e.target.value as keyof Predicate;
                         if (newOp === "any_of") patch(i, { on: { any_of: anyOfList(pred) } });
-                        else setPredicate(i, newOp, newOp === "eq" ? firstExpr(pred) : dropTime(firstExpr(pred)));
+                        else setPredicate(i, newOp, firstExpr(pred));
                       }} className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-200">
                         {PRED_OPS.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
                         {!PRED_OPS.some((o) => o.key === po) && <option value={po}>{po}</option>}
                       </select>
                       <span className="text-[11px] leading-snug text-slate-500">
                         {po === "eq" ? <>must land on <strong>exactly</strong> this {ek === "event" ? "day and time" : "day"}</>
-                          : po === "by" ? <>a <strong>deadline</strong>: any day up to and including this one is correct</>
+                          : po === "by" ? <>a <strong>deadline</strong>: any day up to and including this one is correct{ek === "event" ? ", or by this exact time if you add one" : ""}</>
                           : po === "any_of" ? <>the assistant may land on <strong>any one</strong> of these dates</>
                           : null}
                       </span>
@@ -203,7 +187,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                         onChange={(list) => patch(i, { on: { any_of: list } })} />
                     ) : (
                       <DateBuilder value={firstExpr(pred)} anchors={anchorsFor(name)} anchorOrigins={anchorOrigins} serveDate={serveDate}
-                        allowTime={ek === "event" && po === "eq"}
+                        allowTime={ek === "event" && (po === "eq" || po === "by")}
                         onChange={(expr) => setPredicate(i, po, expr)} />
                     )}
                     {reuseAnchors.length > 0 && (
@@ -250,12 +234,6 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
           })}
           <div className="flex flex-wrap items-center gap-2">
             <button onClick={addOp} className="rounded-md border border-dashed border-slate-700 px-3 py-1.5 text-xs text-slate-400 hover:border-sky-600 hover:text-sky-300">+ another action</button>
-            {scaffoldable.length > 0 && (
-              <button onClick={scaffoldFromBody} title="One create-an-event row per date you wrote in this email's body. The dates are filled in; you just name each (and switch any to a to-do or cancel)."
-                className="rounded-md border border-dashed border-violet-700/70 px-3 py-1.5 text-xs text-violet-300 hover:border-violet-500">
-                + scaffold an action for each date in the email ({scaffoldable.length})
-              </button>
-            )}
           </div>
         </div>
       )}
