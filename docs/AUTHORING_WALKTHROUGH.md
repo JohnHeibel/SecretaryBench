@@ -39,16 +39,16 @@ anyone else's work, and other authors editing at the same time cannot touch your
 Five emails about onboarding a new VP of Sales. This **exact** storyline scores **100% under the
 reference solver** (verified) — so it's a safe shape to copy.
 
-**Cast** (the people who can appear in From / To / Cc): `CEO` = you, `HR` = Dana Whitfield, `COO` =
-Marcus Lee, `IT` = Sam Okafor. Build the cast from the **standard roster** ("+ add from standard
+**Cast** (the people who can appear in From): `CEO` = you, `HR` = Dana Whitfield, `COO` =
+Marcus Lee, `IT` = Sam Okafor. Every email is addressed to the CEO automatically. Build the cast from the **standard roster** ("+ add from standard
 roster" — CEO, COO, VP_SALES, CLIENT, …) so the same role is spelled the same way in every storyline;
 "+ custom person" covers anyone the roster doesn't. Names are length-capped and a person's short key is
-kept in a clean `UPPER_SNAKE` form; renaming a key updates every From / To / Cc that used it.
+kept in a clean `UPPER_SNAKE` form; renaming a key updates every email that used it.
 
 ---
 
 **Email 1 — the CEO sends it** *(a note from the boss to their assistant)*
-- **From:** `CEO`  **To:** `CEO`  **Subject:** Priya starts — please book her orientation
+- **From:** `CEO`  **Subject:** Priya starts — please book her orientation
 - **Body:** Heads up: Priya Rao joins us as VP Sales. Please block her first-morning orientation for `{!vp_first_day = next:MON @09:00-10:00}`.
 - **Answer key:** *Create an event* named **VP orientation**, date `next:MON @09:00-10:00`.
 
@@ -59,7 +59,7 @@ as an **anchor** named `vp_first_day` so later emails can refer back to "her fir
 ---
 
 **Email 2 — the long-horizon needle** *(arrives weeks later)*
-- **From:** `HR`  **To:** `CEO`  **Subject:** Onboarding review for Priya
+- **From:** `HR`  **Subject:** Onboarding review for Priya
 - **Body:** Two weeks after Priya's first day, let's hold her onboarding review on `{@vp_first_day+2w @14:00-15:00}`.
 - **Answer key:** *Create an event* named **onboarding review**, date `@vp_first_day+2w @14:00-15:00`.
 
@@ -70,7 +70,7 @@ Email 1, with a deadline" link for you — that's the long-horizon test working.
 ---
 
 **Email 3 — a reschedule (conflict)**
-- **From:** `COO`  **To:** `CEO`  **Subject:** Re: onboarding review — move it up a week
+- **From:** `COO`  **Subject:** Re: onboarding review — move it up a week
 - **Body:** The board wants Priya in a session that week, so move her onboarding review up by a week, same time: `{@vp_first_day+1w @14:00-15:00}`.
 - **Answer key:** *Move / reschedule* **onboarding review** to `@vp_first_day+1w @14:00-15:00`.
 
@@ -80,17 +80,18 @@ explicit move to one exact new time.
 ---
 
 **Email 4 — a to-do with a deadline** *(also a needle)*
-- **From:** `HR`  **To:** `CEO`  **Subject:** Priya's compliance paperwork
-- **Body:** One to-do: Priya's compliance paperwork must be filed within five business days of her start, i.e. by `{@vp_first_day+5bd}`.
-- **Answer key:** *Create a to-do* named **compliance paperwork**, date `by @vp_first_day+5bd`.
+- **From:** `HR`  **Subject:** Priya's compliance paperwork
+- **Body:** One to-do: Priya's compliance paperwork must be filed within five business days of her start, i.e. by `{@vp_first_day+5bd @17:00}`.
+- **Answer key:** *Create a to-do* named **compliance paperwork**, date `by @vp_first_day+5bd @17:00`.
 
-A to-do has **no clock** (no `@HH:MM`). `by` means a **deadline**: landing it on any day up to and
-including five business days after her start counts. `5bd` = five *business* days.
+A bare `by` deadline is day-level. If the email gives a cutoff time, add it: `by @vp_first_day+5bd @17:00`
+means any earlier day passes, but on the deadline day the to-do must land by 5 PM. `5bd` = five
+*business* days.
 
 ---
 
 **Email 5 — an FYI, nothing to do** *(tests restraint)*
-- **From:** `IT`  **To:** `CEO`  **Subject:** Priya's laptop & accounts ready for day one
+- **From:** `IT`  **Subject:** Priya's laptop & accounts ready for day one
 - **Body:** Sam from IT here — Priya's laptop and accounts will be ready on her first day. Nothing for you to do.
 - **Answer key:** tick **"this email needs no action."** (The assistant should create nothing.)
 
@@ -118,13 +119,14 @@ A common question: **can the CEO be the sender?** Yes. **From** can be any cast 
 `CEO` — that's the boss firing off an instruction to their assistant (Email 1 above). It's a normal,
 encouraged shape.
 
-One thing that's always true: **From / To / Cc are presentation only and are never graded.** Who
-sends an email (and who's copied) changes the realism, never the score. So a CEO-sent note and a
-COO-sent note grade identically; pick whoever makes the story read true.
+One thing that's always true: **From is presentation only and is never graded.** Who sends an email
+changes the realism, never the score. Every email is automatically addressed to the CEO, the person
+whose assistant is being tested. So a CEO-sent note and a COO-sent note grade identically; pick
+whoever makes the story read true.
 
 ## The five ways people break a storyline
 
-1. **No exact time on a meeting.** Events need a clock: `@09:00-10:00`. Only to-dos go without one.
+1. **No exact time on a meeting.** Events need a clock: `@09:00-10:00`. To-dos can be bare-date deadlines, or timed when the email says "by 5 PM."
 2. **A "refers back" date typed fresh instead of reusing the `@anchor`.** If Email 2 says "two weeks
    after her first day," its answer must be `@vp_first_day+2w`, *not* a re-typed `next:MON+2w`. Reusing
    the anchor is what makes it a real long-horizon test (and keeps the two dates from drifting apart).

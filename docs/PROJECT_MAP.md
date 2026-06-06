@@ -8,7 +8,8 @@ it tells you where things live and what each part is responsible for.
 - `HOW_IT_WORKS.md`: the plain-language tour of the whole machine + the worked Project Atlas example. Read first.
 - `GRADING_MODEL.md`: the precise grading contract (scoped, binary, per email).
 - `ANSWER_KEY_GRAMMAR.md`: the token grammar and verb-based answer key contract.
-- `AUTHORING_GUIDE.md`: how to author scenarios (type mix, tiers, needles).
+- `AUTHORING_GUIDE.md`: legacy low-level authoring pattern guide (type mix, tiers, needles); use
+  `HOW_IT_WORKS.md`, `docs/AUTHORING_WALKTHROUGH.md`, and `/guide` for the current webapp flow.
 - `docs/AUTHORING_WALKTHROUGH.md`: click-by-click "author one storyline" example (focus mode, CEO-sent emails).
 - `BACKLOG.md`: deferred features (ranged offsets; global calendar + grading, incl. cross-storyline time conflicts §2a) + triggers to revisit.
 - `OPEN_QUESTIONS.md`: design calls still being decided.
@@ -106,4 +107,3 @@ it tells you where things live and what each part is responsible for.
 - `webapp/components/AnswerKeyBuilder.tsx`: verb-op answer-key editor.
 - `webapp/components/DagCanvas.tsx`: dependency graph view.
 - `webapp/components/ValidateBar.tsx`: lint/oracle validation controls.
-- `webapp/components/blockly/*`: Scratch-style date-token block editor.

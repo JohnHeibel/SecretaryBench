@@ -82,7 +82,7 @@ export default function GuidePage() {
           <p>The answer key sits under the body. It is your private answer, and the assistant never sees it.</p>
           <p>If the email needs no action, tick <span className={chip}>this email needs no action</span>. Now it is graded on the assistant doing nothing.</p>
           <p>Otherwise pick an action. There are only four: <strong>create</strong> an event, <strong>create</strong> a to-do, <strong>move</strong> one, or <strong>cancel</strong> one. Give it a short name like <span className={chip}>kickoff</span>. That name is how a later email can refer back to it, and it is the word we look for in the assistant&apos;s calendar.</p>
-          <p>Then say which day counts. <strong>On exactly</strong> means the assistant must land on that exact day, and the exact time too for an event. <strong>On or before</strong> is a deadline: a bare date allows any day up to and including it, and an event deadline can include a clock cutoff. And if more than one day is genuinely fine, choose <strong>any of</strong> and list them.</p>
+          <p>Then say which day counts. <strong>On exactly</strong> means the assistant must land on that exact day, and the exact time too for an event. <strong>On or before</strong> is a deadline: a bare date allows any day up to and including it, and adding a clock makes it a cutoff like &ldquo;by 5 PM.&rdquo; And if more than one day is genuinely fine, choose <strong>any of</strong> and list them.</p>
         </Card>
 
         <Card title="Build a needle (the fun part)" teaser="two linked emails">

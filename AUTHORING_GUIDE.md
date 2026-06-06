@@ -2,6 +2,10 @@
 
 > **Purpose:** This guide ensures emails grade reliably while testing realistic long-horizon temporal reasoning. Follow these patterns to avoid grading surprises and support temporal randomization.
 
+> **Status:** Legacy low-level JSON playbook. The current webapp workflow is sender-only, builder-first,
+> and documented in `HOW_IT_WORKS.md`, `docs/AUTHORING_WALKTHROUGH.md`, and the in-app `/guide` page.
+> Use this file for pattern ideas and difficulty taxonomy, not as a click-by-click source of truth.
+
 ---
 
 ## 0. Core Principles (Read This First)
@@ -674,4 +678,3 @@ actual_signing_date = node_anchor_value + 14  # if email says @start+14d
 | **T3 emails** | Discrimination | 2+ hardeners: span, constraints, ambiguity |
 | **Temporal randomization** | Avoid time-constraint bias | Use node anchors; all offsets are relative |
 | **Grading safety** | Reliable scoring | One object per op, obvious match keywords, clear dependencies |
-

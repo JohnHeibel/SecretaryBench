@@ -177,7 +177,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                       </select>
                       <span className="text-[11px] leading-snug text-slate-500">
                         {po === "eq" ? <>must land on <strong>exactly</strong> this {ek === "event" ? "day and time" : "day"}</>
-                          : po === "by" ? <>a <strong>deadline</strong>: any day up to and including this one is correct{ek === "event" ? ", or by this exact time if you add one" : ""}</>
+                          : po === "by" ? <>a <strong>deadline</strong>: any day up to and including this one is correct, or by this exact time if you add one</>
                           : po === "any_of" ? <>the assistant may land on <strong>any one</strong> of these dates</>
                           : null}
                       </span>
@@ -187,7 +187,7 @@ export default function AnswerKeyBuilder({ answer, anchors, serveDate, obligatio
                         onChange={(list) => patch(i, { on: { any_of: list } })} />
                     ) : (
                       <DateBuilder value={firstExpr(pred)} anchors={anchorsFor(name)} anchorOrigins={anchorOrigins} serveDate={serveDate}
-                        allowTime={ek === "event" && (po === "eq" || po === "by")}
+                        allowTime={po === "by" || (ek === "event" && po === "eq")}
                         onChange={(expr) => setPredicate(i, po, expr)} />
                     )}
                     {reuseAnchors.length > 0 && (

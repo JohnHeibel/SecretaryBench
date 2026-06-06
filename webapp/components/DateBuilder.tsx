@@ -122,7 +122,7 @@ export default function DateBuilder({ value, anchors, serveDate, onChange, allow
 function TimeControl({ time, onChange }: { time: TimeOfDay | null; onChange: (t: TimeOfDay | undefined) => void }) {
   if (!time) return (
     <button type="button" onClick={() => onChange({ start: { h: 9, m: 0 }, end: { h: 10, m: 0 } })}
-      className="text-[11px] text-slate-500 hover:text-sky-300" title="Give this event a clock time (work hours 5 AM–11 PM).">+ add a time</button>
+      className="text-[11px] text-slate-500 hover:text-sky-300" title="Give this date a clock time (work hours 5 AM–11 PM).">+ add a time</button>
   );
   const err = timeError(time);
   const setStart = (v: TimeHM | null) => v && onChange({ ...time, start: v });

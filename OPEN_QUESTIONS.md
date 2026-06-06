@@ -7,20 +7,19 @@ Things we deliberately deferred while settling the grading model (`GRADING_MODEL
 
 **How they're graded today** (`sb/grader.py`): a to-do `create`/`move` passes iff there
 is **exactly one** to-do whose title+description contains the obligation's keywords,
-**due on a day that satisfies the predicate**. `cancel` = none survive. A to-do is a
-single point (its **due date**) — day-level, no duration like an event. Predicates:
-`eq` (exact day) or `by` (on/before a deadline).
+**due at a point that satisfies the predicate**. `cancel` = none survive. A to-do is a
+single point (its **due date/time**) with no duration like an event. Predicates:
+`eq` (exact day/time) or `by` (on/before a deadline).
 
 **Resolved 2026-06-04 — the settled design:**
-- **Grade on the due date, day-level.** A to-do is a single point (its due date); the model's
+- **Grade on the due date/time.** A to-do is a single point (its due date); the model's
   free-text title/description is *never* judged for meaning, only matched for the keyword
   (attribution). So the grade is a fixed function `(exactly one to-do whose title contains the
-  keywords) AND (due date satisfies the predicate)` — deterministic, same machinery as events
+  keywords) AND (due date/time satisfies the predicate)` — deterministic, same machinery as events
   minus duration. **No determinism wrinkle.**
 - **`by` is the default** ("do it by Friday" — any day up to the deadline passes, a fixed set),
-  with `eq` for "that exact day." Both stay.
-- **No clock on to-dos.** The builder hides the time control for to-dos; a due *time* adds no
-  deterministic signal and only complicates attribution. (Day-level confirmed.)
+  with `eq` for "that exact day." A timed `by` ("by Friday 5 PM") compares start/due time to the
+  cutoff; the live runner tells models that to-dos default to 5 PM when no time is specified.
 
 Still open:
 - **Grade the `completed` flag?** Deferred. The store tracks it and the grader ignores it, so we

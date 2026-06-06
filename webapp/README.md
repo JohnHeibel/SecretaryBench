@@ -2,11 +2,11 @@
 
 A hosted authoring tool so club members can write benchmark emails **without
 breaking the grammar or the grading criteria**. The old Excel workflow let the
-email body and the answer key drift apart (the "C19" bug) and people misread how
-emails depend on each other. This app removes both failure modes:
+email body and the answer key drift apart and people misread how emails depend
+on each other. This app removes both failure modes:
 
-- **Scratch-style date-token blocks** (Blockly) — you snap blocks together instead
-  of typing `{nth:3,FRI,+1m}`. The exact same blocks build the email body *and* the
+- **Structured date builder** — authors pick a starting day, shifts, anchors, and optional clock
+  times instead of typing grammar. The exact same date expressions build the email body *and* the
   answer-key dates, so they can never disagree.
 - **Live, real-grader preview** — every token resolves through the actual
   `sb.resolver` (vendored, not reimplemented), so what you see is what gets graded.
@@ -25,7 +25,7 @@ The app does authoring + validation + export. Running the benchmark stays local:
 | Layer | Choice | Why |
 |-------|--------|-----|
 | Frontend | Next.js (App Router, React, TS) + Tailwind | one-click Vercel deploy |
-| Block editor | Blockly (the engine behind Scratch), Zelos renderer | the "Scratch-like" ask |
+| Date editor | Inline structured builder | every expression stays parseable and previewable |
 | DAG | React Flow (`@xyflow/react`) | visualize emails + typed edges |
 | Validation | Python serverless fns in `api/` that import the **real** `sb` | zero drift with the grader |
 | Store | Neon Postgres (Vercel) — one `nodes` table, JSONB per node | corpus is small + document-shaped |
@@ -42,7 +42,7 @@ npm run dev        # vendors sb, starts the Python validator (:8090), runs next 
 ```
 
 No database needed locally: the store falls back to a JSON file under `.data/`,
-seeded from `../corpus/nodes/`. Open http://localhost:3000.
+seeded from `seed/nodes.json` when empty. Open http://localhost:3000.
 
 > Plain `next dev` won't have the validator. Use `npm run dev` (it launches both),
 > or run `npm run validator` and `npm run dev:next` in two terminals.
