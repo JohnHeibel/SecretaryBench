@@ -131,7 +131,7 @@ export default function GuidePage() {
         <Card title="Words we use" teaser="storyline, cast, anchor…">
           <ul className="space-y-1">
             <li><span className={chip}>storyline</span> a group of related emails, one scenario. Make one per thread.</li>
-            <li><span className={chip}>cast</span> the people in that storyline. Every storyline starts with <span className={chip}>CEO</span>, which is you, the person the assistant works for.</li>
+            <li><span className={chip}>from</span> who an email is from — a colleague, a client, or you (the CEO). Every email is always written <em>to</em> you, the person the assistant works for.</li>
             <li><span className={chip}>anchor</span> a date set in one email and reused in a later one, like &ldquo;the close date.&rdquo;</li>
             <li><span className={chip}>depends on</span> means &ldquo;this email comes after that one.&rdquo; The version with a deadline also passes a due date along.</li>
             <li><span className={chip}>needle</span> an email whose answer needs a fact from an earlier email.</li>
@@ -142,8 +142,7 @@ export default function GuidePage() {
           <ul className="space-y-1">
             <li>Build every date with the date builder. The same date fills the body and the answer key, so they can&apos;t drift apart.</li>
             <li>You don&apos;t need to touch the ids. They name themselves from the subject.</li>
-            <li>Build the <strong>cast</strong> from the standard roster so the same role is spelled the same way everywhere; use &ldquo;custom person&rdquo; for anyone it doesn&apos;t cover.</li>
-            <li>The <strong>To</strong> and <strong>Cc</strong> fields can hold several people. Tap a name to add or remove it. Cc is optional, and the assistant can see who is copied.</li>
+            <li>Set who each email is <strong>from</strong> with one dropdown. Pick a standard role so the same person is spelled the same way everywhere, or choose &ldquo;Someone else&rdquo; for a one-off. There is nothing to set for the recipient: every email goes <strong>to you, the CEO</strong>.</li>
             <li>Two different things in one storyline need different names. Don&apos;t call both &ldquo;review.&rdquo; Call them &ldquo;board review&rdquo; and &ldquo;client review.&rdquo;</li>
             <li>Anchors are <strong>scoped to your storyline</strong>: the <span className={chip}>@anchor</span> picker only shows dates from the emails in front of you, never another author&apos;s.</li>
             <li>A date built from an anchor shows up amber (&ldquo;resolves when this email is sent&rdquo;). That is expected, not an error.</li>

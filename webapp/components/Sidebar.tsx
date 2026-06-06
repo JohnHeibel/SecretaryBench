@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import type { CorpusNode, LintResult } from "@/lib/types";
 
 interface Props {
@@ -35,17 +34,16 @@ export default function Sidebar({ nodes, selNode, selEmail, focused, onSelectNod
             + New storyline
             <span className="block text-[11px] font-normal text-sky-200/65">A storyline is a group of related emails.</span>
           </button>
-          <button onClick={onAddExample} className="mt-1.5 w-full text-left text-[11px] text-slate-500 hover:text-sky-300" title="A finished acquisition saga that tours every kind of email and every feature: an event, a needle (reuse an earlier date), a reschedule, a to-do with a deadline, many actions in one email, a cancel, an any-of, a CEO-sent email, and no-action FYIs. Its dates pay off far from where they're set, so the long-horizon test shows up at scale.">✨ Load the Project Atlas example</button>
+          <button onClick={onAddExample} className="mt-1.5 w-full text-left text-[11px] text-slate-500 hover:text-sky-300" title="A finished product-launch saga that tours every kind of email and every feature: an event, a needle (reuse an earlier date), a reschedule, a to-do with a deadline, many actions in one email, a cancel, an any-of, a CEO-sent email, and no-action FYIs. Its dates pay off far from where they're set, so the long-horizon test shows up at scale.">✨ Load the Project Atlas example</button>
         </div>
       )}
       <div className="min-h-0 flex-1 overflow-auto py-1">
         {nodes.map((node) => (
           <div key={node.id} className="px-2 py-1">
             <div className={`group flex items-center justify-between rounded-md px-2 py-1.5 ${selNode === node.id && !selEmail ? "bg-slate-800" : "hover:bg-slate-800/50"}`}>
-              <button onClick={() => onSelectNode(node.id)} className="min-w-0 flex-1 truncate text-left text-sm font-medium text-slate-200">
+              <button onClick={() => onSelectNode(node.id)} className="min-w-0 flex-1 truncate text-left text-sm font-medium text-slate-200" title="Open this storyline's own page">
                 {node.id} <span className="text-xs text-slate-500">({node.emails.length})</span>
               </button>
-              {!focused && <CopyLink nodeId={node.id} />}
               {!focused && <button onClick={() => onRemoveNode(node.id)} className="hidden px-1 text-xs text-slate-500 hover:text-rose-400 group-hover:block">✕</button>}
             </div>
             <div className="ml-3 border-l border-slate-800 pl-2">
@@ -75,19 +73,5 @@ export default function Sidebar({ nodes, selNode, selEmail, focused, onSelectNod
         )}
       </div>
     </aside>
-  );
-}
-
-// Coordinator-view affordance: copy a focused deep link for this storyline (opens just it) to hand to
-// one author. Built from the live origin so it works in dev and on the deployed app alike.
-function CopyLink({ nodeId }: { nodeId: string }) {
-  const [done, setDone] = useState(false);
-  function copy() {
-    const url = `${window.location.origin}${window.location.pathname}?node=${encodeURIComponent(nodeId)}`;
-    navigator.clipboard?.writeText(url).then(() => { setDone(true); setTimeout(() => setDone(false), 1200); }).catch(() => {});
-  }
-  return (
-    <button onClick={copy} title="Copy this storyline's focused link (opens only this one)"
-      className="hidden shrink-0 px-1 text-[10px] text-slate-500 hover:text-sky-300 group-hover:block">{done ? "copied" : "link"}</button>
   );
 }

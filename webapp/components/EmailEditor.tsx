@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import type { CorpusNode, Edge, EdgeType, Email } from "@/lib/types";
 import { anchorOrigins, bodyAnchorNames, obligationKinds, obligationNames } from "@/lib/grammar";
-import { MAX_PERSON_NAME, STANDARD_ROSTER, normalizeName } from "@/lib/people";
+import { STANDARD_ROSTER, normalizeKey, normalizeName } from "@/lib/people";
 import BodyEditor from "./BodyEditor";
 import AnswerKeyBuilder from "./AnswerKeyBuilder";
 
@@ -19,10 +19,6 @@ interface Props {
   onAutoSlugEmail: (email: Email) => void;
 }
 
-function castKeys(node: CorpusNode): string[] {
-  return Object.keys(node.cast ?? {});
-}
-
 export default function EmailEditor({ node, email, allNodes, anchors, serveDate, onUpdateNode, onRenameNode, onAddEmail, onUpdateEmail, onAutoSlugEmail }: Props) {
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-5">
@@ -35,9 +31,8 @@ export default function EmailEditor({ node, email, allNodes, anchors, serveDate,
           onBlur={(e) => { if (!onRenameNode(node.id, e.target.value)) e.target.value = node.id; }}
           className="flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 font-mono text-sm normal-case tracking-normal text-slate-100" />
       </label>
-      <CastManager node={node} onUpdateNode={onUpdateNode} />
       {email ? (
-        <EmailPanel node={node} email={email} allNodes={allNodes} anchors={anchors} serveDate={serveDate} onUpdateEmail={onUpdateEmail} onAutoSlugEmail={onAutoSlugEmail} />
+        <EmailPanel node={node} email={email} allNodes={allNodes} anchors={anchors} serveDate={serveDate} onUpdateNode={onUpdateNode} onUpdateEmail={onUpdateEmail} onAutoSlugEmail={onAutoSlugEmail} />
       ) : (
         <FirstEmailEmpty nodeId={node.id} onAddEmail={onAddEmail} />
       )}
@@ -72,7 +67,7 @@ function Primer() {
         <button onClick={close} className="text-slate-500 hover:text-slate-300">hide ✕</button>
       </div>
       <p>You&apos;re writing an email to a busy exec&apos;s <strong>AI assistant</strong>, then saying what a <em>perfect</em> assistant should do with it. Some emails need an action, like putting something on the calendar, adding a to-do, or moving or canceling one. Others need <strong>nothing</strong> done at all.</p>
-      <p className="mt-1 text-slate-400">You&apos;re inside a <strong className="text-slate-300">storyline</strong>, a group of related emails. The <strong className="text-slate-300">cast</strong> is the people in it. It starts with <span className="font-mono text-sky-300">CEO → you</span>, the person the AI works for.</p>
+      <p className="mt-1 text-slate-400">You&apos;re inside a <strong className="text-slate-300">storyline</strong>, a group of related emails. Each email is <strong className="text-slate-300">from</strong> someone — a colleague, a client, or you (the CEO) — and it&apos;s always written <strong className="text-slate-300">to you</strong>, the boss the assistant works for.</p>
       <ol className="ml-4 mt-1 list-decimal space-y-0.5">
         <li>Write the email (who it&apos;s from, the subject, the body). Use <span className="font-mono text-sky-300">+ insert date</span> for any date so it stays exact.</li>
         <li>In <strong>Answer key</strong>, say what to do: name the thing, pick its date, or tick <em>&ldquo;this email needs no action.&rdquo;</em></li>
@@ -83,71 +78,7 @@ function Primer() {
   );
 }
 
-function CastManager({ node, onUpdateNode }: { node: CorpusNode; onUpdateNode: (n: CorpusNode) => void }) {
-  const cast = node.cast ?? {};
-  const entries = Object.entries(cast);
-  const present = new Set(Object.keys(cast));
-  const [open, setOpen] = useState(entries.length < 2);
-
-  function setCast(next: Record<string, string>) { onUpdateNode({ ...node, cast: next }); }
-
-  function addPerson(key: string, name: string) {
-    if (cast[key] !== undefined) return;        // already in this node's cast
-    setCast({ ...cast, [key]: name });
-  }
-  function removePerson(key: string) {
-    const used = node.emails.some((e) => e.from === key || asList(e.to).includes(key) || asList(e.cc).includes(key));
-    const msg = used
-      ? `"${key}" appears in one or more emails (From / To / Cc). Remove them from the cast anyway?`
-      : `Remove "${key}" from the cast?`;
-    if (!window.confirm(msg)) return;
-    const c = { ...cast }; delete c[key]; setCast(c);
-  }
-
-  const available = STANDARD_ROSTER.filter((p) => !present.has(p.key));
-
-  return (
-    <div className="rounded-lg border border-slate-800 bg-slate-900/40">
-      <button onClick={() => setOpen(!open)} className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-        <span>Cast for {node.id} <span className="font-normal lowercase text-slate-500">({entries.length} people)</span></span>
-        <span>{open ? "▾" : "▸"}</span>
-      </button>
-      {open && (
-        <div className="space-y-1.5 border-t border-slate-800 p-3">
-          <p className="text-xs leading-5 text-slate-500">Add everyone who can appear in From, To, or Cc. Pick from the <strong>standard roster</strong> so the same role is spelled the same way across storylines. Keep <code className="font-mono text-sky-300">CEO</code> as the assistant&apos;s boss.</p>
-          {entries.map(([key, name]) => (
-            <div key={key} className="flex items-center gap-2">
-              <code className="w-32 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-400 select-all">{key}</code>
-              <input value={name} maxLength={MAX_PERSON_NAME}
-                onChange={(e) => setCast({ ...cast, [key]: e.target.value.slice(0, MAX_PERSON_NAME) })}
-                onBlur={(e) => setCast({ ...cast, [key]: normalizeName(e.target.value) })}
-                placeholder="Display name (Role)" className="flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200" />
-              <button onClick={() => removePerson(key)} className="px-1 text-xs text-slate-500 hover:text-rose-400">✕</button>
-            </div>
-          ))}
-          <div className="flex flex-wrap items-center gap-2 pt-0.5">
-            <select value="" onChange={(e) => { const p = STANDARD_ROSTER.find((x) => x.key === e.target.value); if (p) addPerson(p.key, p.name); }}
-              disabled={available.length === 0}
-              className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200 disabled:opacity-40">
-              <option value="">{available.length ? "+ add from standard roster…" : "all standard people added"}</option>
-              {available.map((p) => <option key={p.key} value={p.key}>{p.key} · {p.name}</option>)}
-            </select>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// A stored recipient field is a string OR a list (or missing). Normalize to a list so the
-// multi-recipient picker has one shape to work with; a legacy single string shows as one chip.
-function asList(v: string | string[] | undefined): string[] {
-  if (Array.isArray(v)) return v.filter(Boolean);
-  return v ? [v] : [];
-}
-
-function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, onAutoSlugEmail }: Omit<Props, "onUpdateNode" | "onRenameNode" | "onAddEmail"> & { email: Email }) {
-  const keys = castKeys(node);
+function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateNode, onUpdateEmail, onAutoSlugEmail }: Omit<Props, "onRenameNode" | "onAddEmail"> & { email: Email }) {
   const set = (p: Partial<Email>) => onUpdateEmail({ ...email, ...p });
   // Where each published date came from (provenance labels), every date written in any email body
   // (one-click "reuse" chips — same-email reuse is valid and the common case), and this email's OWN
@@ -164,19 +95,7 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
         <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-500" title="id for this email, made from the subject and used by dependency links">{email.id}</span>
       </div>
 
-      <div className="space-y-2">
-        <label className="block text-xs text-slate-400 sm:w-1/2 sm:pr-1.5">From
-          <select value={email.from} onChange={(e) => set({ from: e.target.value })}
-            className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-slate-100">
-            <option value="">pick a person</option>
-            {keys.map((k) => <option key={k} value={k}>{k} · {node.cast[k]}</option>)}
-          </select>
-        </label>
-        <RecipientPicker label="To" hint="who the email is sent to" cast={node.cast} keys={keys}
-          selected={asList(email.to)} onChange={(to) => set({ to })} />
-        <RecipientPicker label="Cc" hint="copied on the email (optional); the assistant can see this" cast={node.cast} keys={keys}
-          selected={asList(email.cc)} onChange={(cc) => set({ cc })} />
-      </div>
+      <SenderPicker node={node} email={email} onUpdateNode={onUpdateNode} />
 
       <label className="block text-xs text-slate-400">Subject
         <input value={email.subject} onChange={(e) => set({ subject: e.target.value })} onBlur={() => onAutoSlugEmail(email)}
@@ -199,38 +118,52 @@ function EmailPanel({ node, email, allNodes, anchors, serveDate, onUpdateEmail, 
   );
 }
 
-// A dense multi-recipient picker over the node's cast: tap a chip to add/remove that person.
-// Stores the selection as an array (so To/Cc can hold several people). Used for both To and Cc;
-// From stays a single select. Empty selection is fine for Cc.
-function RecipientPicker({ label, hint, cast, keys, selected, onChange }: {
-  label: string; hint: string; cast: Record<string, string>; keys: string[]; selected: string[]; onChange: (v: string[]) => void;
-}) {
-  const chosen = new Set(selected);
-  const toggle = (k: string) => onChange(chosen.has(k) ? selected.filter((s) => s !== k) : [...selected, k]);
-  // A selected person no longer in the cast (renamed/removed) still shows so it's never silently lost.
-  const extra = selected.filter((s) => !keys.includes(s));
+// The only sender control: one dropdown for "who is this email from?". Every email in the benchmark
+// is written TO the CEO (the boss the assistant works for), so there is no recipient picker — To is
+// fixed and shown read-only. Picking a sender records `from`, pins `to: CEO`, and quietly materializes
+// the person into this storyline's cast (cast is inbox dressing, never graded) so the export stays
+// readable. Choices: you (the CEO) for self-notes, anyone already in this storyline, then the rest of
+// the standard roster, plus "Someone else…" for a one-off name.
+function SenderPicker({ node, email, onUpdateNode }: { node: CorpusNode; email: Email; onUpdateNode: (n: CorpusNode) => void }) {
+  const cast = node.cast ?? {};
+  const seen = new Set<string>();
+  const options: { key: string; label: string }[] = [];
+  const add = (key: string, label: string) => { if (!seen.has(key)) { seen.add(key); options.push({ key, label }); } };
+  add("CEO", "you (the CEO)");
+  if (email.from) add(email.from, cast[email.from] || email.from);   // keep the current sender selectable
+  for (const [k, name] of Object.entries(cast)) add(k, name || k);
+  for (const p of STANDARD_ROSTER) add(p.key, p.name);
+
+  function pick(key: string, name: string) {
+    const nextCast: Record<string, string> = { ...cast, CEO: cast.CEO ?? "you" };
+    if (nextCast[key] === undefined) nextCast[key] = name;
+    onUpdateNode({ ...node, cast: nextCast, emails: node.emails.map((e) => e.id === email.id ? { ...e, from: key, to: "CEO" } : e) });
+  }
+  function onChange(v: string) {
+    if (v === "__custom__") {
+      const raw = window.prompt('Who is this email from? Type a name or role, e.g. "Acme account manager".');
+      if (!raw) return;
+      const key = normalizeKey(raw); if (!key) return;
+      pick(key, normalizeName(raw));
+      return;
+    }
+    const p = options.find((o) => o.key === v); if (p) pick(p.key, cast[p.key] ?? p.label);
+  }
+
   return (
-    <div className="text-xs text-slate-400">
-      <span title={hint}>{label}</span>
-      {keys.length === 0 && extra.length === 0 ? (
-        <p className="mt-1 text-slate-500">Add people to the cast above, then pick recipients here.</p>
-      ) : (
-        <div className="mt-1 flex flex-wrap gap-1.5">
-          {keys.map((k) => {
-            const on = chosen.has(k);
-            return (
-              <button key={k} type="button" onClick={() => toggle(k)} title={cast[k] || k}
-                className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${on ? "border-sky-500 bg-sky-600/20 text-sky-200" : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-500"}`}>
-                {on ? "✓ " : ""}{k}
-              </button>
-            );
-          })}
-          {extra.map((k) => (
-            <button key={k} type="button" onClick={() => toggle(k)} title="not in the cast; click to remove"
-              className="rounded-full border border-amber-600/70 bg-amber-900/20 px-2.5 py-1 text-xs text-amber-300">✓ {k} ⚠</button>
-          ))}
-        </div>
-      )}
+    <div className="space-y-2">
+      <label className="block text-xs text-slate-400">From
+        <select value={email.from || ""} onChange={(e) => onChange(e.target.value)}
+          className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-slate-100">
+          {!email.from && <option value="">pick who it&apos;s from…</option>}
+          {options.map((o) => <option key={o.key} value={o.key}>{o.label}</option>)}
+          <option value="__custom__">Someone else…</option>
+        </select>
+      </label>
+      <div className="flex items-center gap-2 text-xs text-slate-400">To
+        <span className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-300">you (the CEO)</span>
+        <span className="text-slate-500">every email is written to the boss the assistant works for</span>
+      </div>
     </div>
   );
 }

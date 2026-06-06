@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { deleteNode as apiDelete, fetchNodes, lintCorpus, oracleCorpus, saveNode } from "@/lib/api";
 import { anchorsInCorpus, focusClosure, normalizeAnswer, withDerivedDateEdges } from "@/lib/grammar";
 import { projectAtlasNode } from "@/lib/templates";
@@ -11,7 +11,7 @@ import DagCanvas from "./DagCanvas";
 import ValidateBar from "./ValidateBar";
 
 const EMPTY_EMAIL = (id: string): Email => ({
-  id, from: "", to: "", subject: "", body: "", depends_on: [], answer: { ops: [{ create: "", kind: "event", on: { eq: "" } }] },
+  id, from: "", to: "CEO", subject: "", body: "", depends_on: [], answer: { ops: [{ create: "", kind: "event", on: { eq: "" } }] },
 });
 
 // A fresh email's id is `${node}.e${n}` — opaque. Once it has a subject we slug that into the id
@@ -40,8 +40,20 @@ export default function Workspace() {
   // docs/AUTHORING_WALKTHROUGH.md). No param = the full "coordinator" view (assign storylines,
   // copy each author a focused link, run the whole-corpus check, export).
   const params = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const focusId = params.get("node");
+  const focusEmail = params.get("email");
   const focused = focusId != null;
+
+  // Clicking a storyline (or one of its emails, or a failing email in the bottom bar) leaves the
+  // coordinator list and opens that storyline's own focused page (?node=<id>), so every author works
+  // on a page scoped to one storyline. exitFocus drops the query to come back to the full list.
+  const goFocus = useCallback((nodeId: string, emailId?: string) => {
+    const q = new URLSearchParams({ node: nodeId }); if (emailId) q.set("email", emailId);
+    router.push(`${pathname}?${q.toString()}`);
+  }, [router, pathname]);
+  const exitFocus = useCallback(() => router.push(pathname), [router, pathname]);
 
   // Pull the whole corpus from the store and seat it in state. Normalize each stored
   // answer into the verb-model shape at the data boundary, so a legacy/partial row can
@@ -50,10 +62,15 @@ export default function Workspace() {
     const raw = await fetchNodes();
     const n = raw.map((node) => ({ ...node, emails: node.emails.map((e) => ({ ...e, answer: normalizeAnswer(e.answer) })) }));
     setNodes(n);
-    if (focusId) { setSelNode(n.some((x) => x.id === focusId) ? focusId : null); setSelEmail(null); }
-    else { setSelNode(n[0]?.id ?? null); setSelEmail(n[0]?.emails[0]?.id ?? null); }
+    if (focusId) {
+      const hit = n.find((x) => x.id === focusId);
+      setSelNode(hit ? focusId : null);
+      // Honor ?email=<id> so a click that came from the coordinator list (or a bar "details" jump)
+      // lands on the exact email, not just the storyline. Falls back to no selection if it's gone.
+      setSelEmail(hit && focusEmail && hit.emails.some((e) => e.id === focusEmail) ? focusEmail : null);
+    } else { setSelNode(n[0]?.id ?? null); setSelEmail(n[0]?.emails[0]?.id ?? null); }
     setLoaded(true);
-  }, [focusId]);
+  }, [focusId, focusEmail]);
 
   useEffect(() => { reload(); }, [reload]);
 
@@ -71,14 +88,17 @@ export default function Workspace() {
   }, [validateNodes, loaded]);
 
   // Once it LINTS clean, prove it is also SOLVABLE: run the reference oracle (perfect secretary acting
-  // from the answer key). Red here = an unsatisfiable answer key the linter cannot catch. Gated on
-  // lint.ok since the oracle needs a build-able corpus.
+  // from the answer key). Red here = an unsatisfiable answer key the linter cannot catch. We run it ONLY
+  // in focus mode, on the one open storyline — in the coordinator list the bottom bar would show
+  // oracle-red caused by some OTHER author's scenario, which reads as "my storyline is broken" when it
+  // isn't. Scoped to the focused page, red here is always about THIS storyline. Gated on lint.ok too,
+  // since the oracle needs a build-able corpus.
   useEffect(() => {
     if (!loaded) return;
     clearTimeout(oracleTimer.current);
-    if (!lint?.ok) { setOracle(null); return; }
+    if (!focused || !lint?.ok) { setOracle(null); return; }
     oracleTimer.current = setTimeout(() => { oracleCorpus(validateNodes).then(setOracle); }, 350);
-  }, [validateNodes, loaded, lint?.ok]);
+  }, [validateNodes, loaded, lint?.ok, focused]);
 
   // Anchors/variables offered to the editor are scoped to the SELECTED storyline only — an author
   // can't pick another storyline's published dates (cross-node references are an advanced, error-prone
@@ -162,8 +182,9 @@ export default function Workspace() {
     const node = nodes.find((n) => n.id === nodeId); if (!node) return;
     let i = node.emails.length + 1; const ids = new Set(node.emails.map((e) => e.id));
     while (ids.has(`${nodeId}.e${i}`)) i++;
-    const email = { ...EMPTY_EMAIL(`${nodeId}.e${i}`), to: node.cast.CEO !== undefined ? "CEO" : "" };
-    const updated = { ...node, emails: [...node.emails, email] };
+    const email = EMPTY_EMAIL(`${nodeId}.e${i}`);   // always addressed to the CEO (the assistant's boss)
+    const cast = node.cast.CEO !== undefined ? node.cast : { ...node.cast, CEO: "you" };
+    const updated = { ...node, cast, emails: [...node.emails, email] };
     updateNode(updated); setSelEmail(email.id);
   }, [nodes, updateNode]);
 
@@ -211,12 +232,14 @@ export default function Workspace() {
     updateEmail(nodeId, { ...target, depends_on: [...target.depends_on, { email: prerequisiteId, type: "static" }] });
   }, [nodes, updateEmail]);
 
-  // Jump the editor straight to an email by id — used by the validation bar so a lint/oracle failure
-  // links to exactly the email it's about. Resolves the owning node so a click lands on the right one.
+  // Jump the editor straight to an email by id — used by the validation bar's "details" link so a
+  // lint/oracle failure routes to exactly the email it's about. From the coordinator list that means
+  // opening the owning storyline's focused page (where it gets fixed); in focus mode it just selects.
   const jumpToEmail = useCallback((emailId: string) => {
     const owner = nodes.find((n) => n.emails.some((e) => e.id === emailId)); if (!owner) return;
-    setSelNode(owner.id); setSelEmail(emailId); setView("editor");
-  }, [nodes]);
+    if (focused) { setSelNode(owner.id); setSelEmail(emailId); setView("editor"); }
+    else goFocus(owner.id, emailId);
+  }, [nodes, focused, goFocus]);
 
   const removeNode = useCallback((nodeId: string) => {
     const count = nodes.find((n) => n.id === nodeId)?.emails.length ?? 0;
@@ -237,6 +260,7 @@ export default function Workspace() {
     <div className="flex h-screen flex-col">
       <header className="flex flex-wrap items-center gap-3 border-b border-slate-800 bg-slate-900 px-4 py-2">
         <div className="flex min-w-0 items-center gap-3">
+          {focused && <button onClick={exitFocus} title="Back to the full storyline list" className="shrink-0 rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800">← All storylines</button>}
           <div className="min-w-0">
             <h1 className="text-sm font-semibold">SecretaryBench authoring</h1>
             <p className="hidden text-[11px] text-slate-500 md:block">{focused ? "You're editing one storyline. Write the email, say the perfect action, get the bottom bar green." : "Write an email, say the perfect action, then export once the bottom bar is green."}</p>
@@ -261,8 +285,8 @@ export default function Workspace() {
       <div className="flex min-h-0 flex-1">
         <Sidebar
           nodes={viewNodes} selNode={selNode} selEmail={selEmail} focused={focused}
-          onSelectNode={(id) => { setSelNode(id); setSelEmail(null); }}
-          onSelectEmail={(nid, eid) => { setSelNode(nid); setSelEmail(eid); }}
+          onSelectNode={focused ? (id) => { setSelNode(id); setSelEmail(null); } : (id) => goFocus(id)}
+          onSelectEmail={focused ? (nid, eid) => { setSelNode(nid); setSelEmail(eid); } : (nid, eid) => goFocus(nid, eid)}
           onAddNode={addNode} onAddEmail={addEmail} onAddExample={addExample}
           onRemoveNode={removeNode} onRemoveEmail={removeEmail}
           lint={lint}
@@ -271,7 +295,7 @@ export default function Workspace() {
         <main className="min-w-0 flex-1 overflow-auto">
           {view === "dag" ? (
             <DagCanvas nodes={viewNodes} lint={lint} serveDate={serveDate}
-              onSelectEmail={(nid, eid) => { setSelNode(nid); setSelEmail(eid); setView("editor"); }}
+              onSelectEmail={focused ? (nid, eid) => { setSelNode(nid); setSelEmail(eid); setView("editor"); } : (nid, eid) => goFocus(nid, eid)}
               onAddEdge={addEdge} />
           ) : focused && !focusNode ? (
             <FocusNotFound focusId={focusId} loaded={loaded} />
@@ -290,7 +314,7 @@ export default function Workspace() {
         </main>
       </div>
 
-      <ValidateBar lint={lint} oracle={oracle} onJump={jumpToEmail} />
+      <ValidateBar lint={lint} oracle={oracle} nodes={validateNodes} showOracle={focused} onJump={jumpToEmail} />
     </div>
   );
 }
@@ -303,7 +327,7 @@ function StartEmpty({ onAddNode, onAddExample }: { onAddNode: () => void; onAddE
         <h2 className="mt-2 text-xl font-semibold text-slate-100">Create one storyline.</h2>
         <p className="mt-2 text-sm leading-6 text-slate-400">A storyline is a group of related emails. Example: one deal, one client, one hiring process, or one office policy.</p>
         <button onClick={onAddNode} className="mt-5 rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">Create first storyline</button>
-        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Atlas example</button>. A finished acquisition saga that tours every kind of email and every feature, with dates that pay off far from where they're set, so you can see how each is built and how the long-horizon test works at scale.</p>
+        <p className="mt-3 text-xs text-slate-500">New here? <button onClick={onAddExample} className="text-sky-400 underline hover:text-sky-300">Load the Project Atlas example</button>. A finished product-launch saga that tours every kind of email and every feature, with dates that pay off far from where they're set, so you can see how each is built and how the long-horizon test works at scale.</p>
       </div>
     </div>
   );
