@@ -1,0 +1,38 @@
+# Off-platform corpus backup (added after the 2026-06-09 data loss).
+# Every 4 hours, pull the full storyline list from the production webapp and commit it to the
+# `backups` branch. Git history is the version archive: every state ever backed up stays
+# recoverable forever, far beyond Neon's 6-hour restore window. Restoring = re-POSTing each
+# node from the JSON to /api/nodes (see webapp/scripts/rescue-from-tab.js for the same idea).
+name: backup-corpus
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Snapshot the corpus to the backups branch
+        run: |
+          set -euo pipefail
+          git config user.name "corpus-backup"
+          git config user.email "actions@users.noreply.github.com"
+          git fetch origin backups:backups 2>/dev/null && git switch backups || git switch --orphan backups
+          curl -fsS --retry 3 https://secretarybench.vercel.app/api/nodes -o corpus-backup.json
+          # Refuse to commit anything that isn't a JSON array of {id, emails} nodes — a Vercel error
+          # page or empty response must never overwrite a good snapshot in the branch tip.
+          python3 - <<'EOF'
+          import json
+          nodes = json.load(open("corpus-backup.json"))
+          assert isinstance(nodes, list), "export is not a list"
+          assert all(isinstance(n, dict) and "id" in n and "emails" in n for n in nodes), "malformed node"
+          print(f"snapshot OK: {len(nodes)} storylines, {sum(len(n['emails']) for n in nodes)} emails")
+          EOF
+          git add corpus-backup.json
+          git commit -m "backup $(date -u +%Y-%m-%dT%H:%M:%SZ)" || { echo "no changes since last backup"; exit 0; }
+          git push origin backups
