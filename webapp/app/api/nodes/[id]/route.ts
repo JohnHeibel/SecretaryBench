@@ -17,7 +17,9 @@ export async function PUT(req: Request, { params }: Ctx) {
   const node = (await req.json()) as CorpusNode;
   if (node.id !== id) return NextResponse.json({ error: "id mismatch" }, { status: 400 });
   const by = req.headers.get("x-author") ?? "anon";
-  return NextResponse.json(await upsertNode(node, by));
+  const saved = await upsertNode(node, by);
+  if (!saved) return NextResponse.json({ error: "this storyline belongs to another author" }, { status: 403 });
+  return NextResponse.json(saved);
 }
 
 export async function DELETE(req: Request, { params }: Ctx) {

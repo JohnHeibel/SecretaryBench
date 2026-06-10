@@ -110,11 +110,20 @@ export default function Workspace() {
   // cross-node reference that already exists in the data is still validated, just not offered as a choice.
   const anchors = useMemo(() => anchorsInCorpus(nodes.filter((n) => n.id === selNode)), [nodes, selNode]);
 
+  // Edits are ownership-gated like deletes: the server 403s a save to another author's storyline.
+  // Tell the editor once per storyline (not on every autosave) that their keystrokes aren't landing.
+  const notMineWarned = useRef<Set<string>>(new Set());
   const persist = useCallback((node: CorpusNode) => {
     clearTimeout(saveTimers.current[node.id]);
     setSaveState("saving");
     saveTimers.current[node.id] = setTimeout(() => {
-      saveNode(node).then(() => setSaveState("saved")).catch(() => setSaveState("error"));
+      saveNode(node).then(() => setSaveState("saved")).catch((e) => {
+        setSaveState("error");
+        if (e instanceof Error && e.message === "not-owner" && !notMineWarned.current.has(node.id)) {
+          notMineWarned.current.add(node.id);
+          window.alert(`"${node.id}" belongs to another author, so your changes are NOT being saved. Ask them or the coordinator to make this edit.`);
+        }
+      });
     }, 500);
   }, []);
 

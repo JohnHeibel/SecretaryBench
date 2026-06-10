@@ -28,6 +28,7 @@ export async function saveNode(node: CorpusNode): Promise<CorpusNode> {
     headers: { "content-type": "application/json", "x-author": authorToken() },
     body: JSON.stringify(node),
   });
+  if (r.status === 403) throw new Error("not-owner");
   if (!r.ok) throw new Error(`save failed: ${r.status}`);
   return r.json();
 }

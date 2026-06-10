@@ -125,15 +125,20 @@ export async function getNode(id: string): Promise<CorpusNode | null> {
   return fileReadAll()[id] ?? null;
 }
 
-export async function upsertNode(node: CorpusNode, by = "anon"): Promise<CorpusNode> {
+// Returns the node on success, null when ownership rejected the write. A brand-new row is stamped
+// with its creator's token. An update goes through only for the owner, the admin, or an unowned row;
+// the author editing an unowned row claims it (admin edits never claim, so the real author still can).
+export async function upsertNode(node: CorpusNode, by = "anon"): Promise<CorpusNode | null> {
   if (usePg) {
     await ensurePg();
     const sql = await pg();
     const json = JSON.stringify(node);
-    // A brand-new row is stamped with its creator's token; an update never reassigns ownership.
-    await sql`INSERT INTO nodes (id, data, updated_by, owner) VALUES (${node.id}, ${json}::jsonb, ${by}, ${realOwner(by)})
-      ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_by = EXCLUDED.updated_by, updated_at = now()`;
-    return node;
+    const admin = isAdmin(by);
+    const { rowCount } = await sql`INSERT INTO nodes (id, data, updated_by, owner) VALUES (${node.id}, ${json}::jsonb, ${by}, ${realOwner(by)})
+      ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_by = EXCLUDED.updated_by, updated_at = now(),
+        owner = CASE WHEN ${admin} THEN nodes.owner ELSE COALESCE(nodes.owner, EXCLUDED.owner) END
+      WHERE ${admin} OR nodes.owner IS NULL OR nodes.owner = EXCLUDED.owner`;
+    return (rowCount ?? 0) > 0 ? node : null;
   }
   const all = fileReadAll();
   all[node.id] = node;
