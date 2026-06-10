@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
-import { listNodes, upsertNode } from "@/lib/store";
+import { listNodes, ownedIds, upsertNode } from "@/lib/store";
 import type { CorpusNode } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  return NextResponse.json(await listNodes());
+// With an x-author header (the webapp client): { nodes, mine } where `mine` lists the ids this
+// browser may delete. Without one (sb.sync, curl, the rescue script): the plain node array, unchanged.
+export async function GET(req: Request) {
+  const viewer = req.headers.get("x-author");
+  const nodes = await listNodes();
+  if (!viewer) return NextResponse.json(nodes);
+  return NextResponse.json({ nodes, mine: await ownedIds(viewer) });
 }
 
 export async function POST(req: Request) {

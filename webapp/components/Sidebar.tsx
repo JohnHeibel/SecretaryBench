@@ -7,6 +7,7 @@ interface Props {
   selEmail: string | null;
   lint: LintResult | null;
   focused?: boolean; // deep-link focus mode: only the author's own storyline is shown
+  mineIds: Set<string>; // storylines this browser created — the only ones it may delete (server-enforced too)
   onSelectNode: (id: string) => void;
   onSelectEmail: (nodeId: string, emailId: string) => void;
   onAddNode: () => void;
@@ -16,7 +17,7 @@ interface Props {
   onRemoveEmail: (nodeId: string, emailId: string) => void;
 }
 
-export default function Sidebar({ nodes, selNode, selEmail, focused, onSelectNode, onSelectEmail, onAddNode, onAddEmail, onAddExample, onRemoveNode, onRemoveEmail }: Props) {
+export default function Sidebar({ nodes, selNode, selEmail, focused, mineIds, onSelectNode, onSelectEmail, onAddNode, onAddEmail, onAddExample, onRemoveNode, onRemoveEmail }: Props) {
   return (
     <aside className="flex w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-900/70">
       {focused ? (
@@ -44,7 +45,7 @@ export default function Sidebar({ nodes, selNode, selEmail, focused, onSelectNod
               <button onClick={() => onSelectNode(node.id)} className="min-w-0 flex-1 truncate text-left text-sm font-medium text-slate-200" title="Open this storyline's own page">
                 {node.id} <span className="text-xs text-slate-500">({node.emails.length})</span>
               </button>
-              {!focused && <button onClick={() => onRemoveNode(node.id)} className="hidden px-1 text-xs text-slate-500 hover:text-rose-400 group-hover:block">✕</button>}
+              {!focused && mineIds.has(node.id) && <button onClick={() => onRemoveNode(node.id)} title="Delete this storyline (only its author can)" className="hidden px-1 text-xs text-slate-500 hover:text-rose-400 group-hover:block">✕</button>}
             </div>
             <div className="ml-3 border-l border-slate-800 pl-2">
               {node.emails.map((email) => (

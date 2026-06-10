@@ -31,6 +31,9 @@ export default function Workspace() {
   const [view, setView] = useState<"editor" | "dag">("editor");
   const [loaded, setLoaded] = useState(false);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  // Storyline ids this browser owns (created here, per the server's owner stamp) — the only ones it
+  // may delete. Server-enforced; this set just drives which delete buttons render.
+  const [mineIds, setMineIds] = useState<Set<string>>(new Set());
 
   const lintTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const oracleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -59,9 +62,10 @@ export default function Workspace() {
   // answer into the verb-model shape at the data boundary, so a legacy/partial row can
   // never crash the editor downstream. In focus mode, open straight to the linked storyline.
   const reload = useCallback(async () => {
-    const raw = await fetchNodes();
+    const { nodes: raw, mine } = await fetchNodes();
     const n = raw.map((node) => ({ ...node, emails: node.emails.map((e) => ({ ...e, answer: normalizeAnswer(e.answer) })) }));
     setNodes(n);
+    setMineIds(mine);
     if (focusId) {
       const hit = n.find((x) => x.id === focusId);
       setSelNode(hit ? focusId : null);
@@ -164,7 +168,7 @@ export default function Workspace() {
     const base = "node"; let i = 1; const ids = new Set(nodes.map((n) => n.id));
     while (ids.has(`${base}-${i}`)) i++;
     const node: CorpusNode = { id: `${base}-${i}`, cast: { CEO: "you" }, emails: [] };
-    setNodes((prev) => [...prev, node]); setSelNode(node.id); setSelEmail(null); persist(node);
+    setNodes((prev) => [...prev, node]); setMineIds((prev) => new Set(prev).add(node.id)); setSelNode(node.id); setSelEmail(null); persist(node);
   }, [nodes, persist]);
 
   // Load the fully-authored, oracle-solvable example storyline (Project Atlas) as a starting point. It
@@ -175,7 +179,7 @@ export default function Workspace() {
     let id = "project_atlas", i = 2;
     while (ids.has(id)) id = `project_atlas-${i++}`;
     const node = projectAtlasNode(id);
-    setNodes((prev) => [...prev, node]); setSelNode(node.id); setSelEmail(node.emails[0]?.id ?? null); persist(node);
+    setNodes((prev) => [...prev, node]); setMineIds((prev) => new Set(prev).add(id)); setSelNode(node.id); setSelEmail(node.emails[0]?.id ?? null); persist(node);
   }, [nodes, persist]);
 
   const addEmail = useCallback((nodeId: string) => {
@@ -216,7 +220,10 @@ export default function Workspace() {
     // an untouched sibling storyline is left alone, protecting a concurrent author's edits.
     const before = new Map(nodes.map((n) => [n.id, JSON.stringify(n)]));
     for (const n of next) if (JSON.stringify(n) !== before.get(n.id)) saveNode(n).catch(() => {});
-    apiDelete(oldId).catch(() => {});
+    // The new id is a fresh row stamped as ours. The old row only deletes if it was ours too; if not
+    // (renaming someone else's storyline), say so — otherwise a stale copy would linger invisibly.
+    setMineIds((prev) => { const s = new Set(prev); s.delete(oldId); s.add(newId); return s; });
+    apiDelete(oldId).then((ok) => { if (!ok) window.alert(`"${oldId}" belongs to another author, so the original copy was left in place under its old name.`); }).catch(() => {});
     if (selNode === oldId) setSelNode(newId);
     if (selEmail && emailMap.has(selEmail)) setSelEmail(emailMap.get(selEmail)!);
     return true;
@@ -241,12 +248,14 @@ export default function Workspace() {
     else goFocus(owner.id, emailId);
   }, [nodes, focused, goFocus]);
 
-  const removeNode = useCallback((nodeId: string) => {
+  const removeNode = useCallback(async (nodeId: string) => {
     const count = nodes.find((n) => n.id === nodeId)?.emails.length ?? 0;
     const tail = count ? ` and its ${count} email${count === 1 ? "" : "s"}` : "";
-    if (!window.confirm(`Delete the storyline "${nodeId}"${tail}? This can't be undone.`)) return;
+    if (!window.confirm(`Delete the storyline "${nodeId}"${tail}? This deletes it for EVERYONE and can't be undone.`)) return;
+    // Server verdict first: only the browser that created a storyline (or the admin) may delete it.
+    const ok = await apiDelete(nodeId).catch(() => false);
+    if (!ok) { window.alert("Only the author who created this storyline can delete it."); return; }
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
-    apiDelete(nodeId).catch(() => {});
     if (selNode === nodeId) { setSelNode(null); setSelEmail(null); }
   }, [nodes, selNode]);
 
@@ -284,7 +293,7 @@ export default function Workspace() {
 
       <div className="flex min-h-0 flex-1">
         <Sidebar
-          nodes={viewNodes} selNode={selNode} selEmail={selEmail} focused={focused}
+          nodes={viewNodes} selNode={selNode} selEmail={selEmail} focused={focused} mineIds={mineIds}
           onSelectNode={focused ? (id) => { setSelNode(id); setSelEmail(null); } : (id) => goFocus(id)}
           onSelectEmail={focused ? (nid, eid) => { setSelNode(nid); setSelEmail(eid); } : (nid, eid) => goFocus(nid, eid)}
           onAddNode={addNode} onAddEmail={addEmail} onAddExample={addExample}

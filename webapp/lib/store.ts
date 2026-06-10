@@ -60,8 +60,12 @@ async function ensurePg(): Promise<void> {
         id text PRIMARY KEY,
         data jsonb NOT NULL,
         updated_at timestamptz NOT NULL DEFAULT now(),
-        updated_by text
+        updated_by text,
+        owner text
       )`;
+      // Ownership column for tables created before the 2026-06-10 incident. `owner` is the anonymous
+      // per-browser token that first saved the row; only that browser (or the admin token) may delete it.
+      await sql`ALTER TABLE nodes ADD COLUMN IF NOT EXISTS owner text`;
       // Seed a fresh (empty) Neon DB from the bundled corpus snapshot, so the app
       // opens with the corpus instead of a blank slate. ON CONFLICT DO NOTHING means
       // it is a one-time fill that never clobbers edited rows on later boots (and is
@@ -77,6 +81,26 @@ async function ensurePg(): Promise<void> {
     })();
   }
   return pgReady;
+}
+
+// --- ownership --------------------------------------------------------------
+// No login, on purpose. The client mints a random token per browser (localStorage) and sends it as
+// `x-author`. The first save of a storyline stamps it as the row's owner; only a matching token may
+// delete the row. SB_ADMIN_TOKEN (env) overrides everything. Tokens written by header-less tools
+// ("anon") or the seeder ("seed") are stored as NULL = unowned = admin-only delete.
+const UNOWNED = new Set(["", "anon", "seed"]);
+const realOwner = (by: string): string | null => (UNOWNED.has(by) ? null : by);
+export const isAdmin = (token: string | null): boolean => !!token && !!process.env.SB_ADMIN_TOKEN && token === process.env.SB_ADMIN_TOKEN;
+
+// Which node ids the viewer may delete (drives the UI's delete buttons; the DELETE route re-checks).
+export async function ownedIds(viewer: string): Promise<string[]> {
+  if (usePg) {
+    await ensurePg();
+    const sql = await pg();
+    const { rows } = isAdmin(viewer) ? await sql`SELECT id FROM nodes` : await sql`SELECT id FROM nodes WHERE owner = ${viewer}`;
+    return rows.map((r) => r.id as string);
+  }
+  return Object.keys(fileReadAll()); // local dev is single-user: everything is yours
 }
 
 // --- public interface ------------------------------------------------------
@@ -106,7 +130,8 @@ export async function upsertNode(node: CorpusNode, by = "anon"): Promise<CorpusN
     await ensurePg();
     const sql = await pg();
     const json = JSON.stringify(node);
-    await sql`INSERT INTO nodes (id, data, updated_by) VALUES (${node.id}, ${json}::jsonb, ${by})
+    // A brand-new row is stamped with its creator's token; an update never reassigns ownership.
+    await sql`INSERT INTO nodes (id, data, updated_by, owner) VALUES (${node.id}, ${json}::jsonb, ${by}, ${realOwner(by)})
       ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_by = EXCLUDED.updated_by, updated_at = now()`;
     return node;
   }
@@ -116,14 +141,19 @@ export async function upsertNode(node: CorpusNode, by = "anon"): Promise<CorpusN
   return node;
 }
 
-export async function deleteNode(id: string): Promise<void> {
+// Returns true iff the row was deleted. Only the owner token (or admin) may delete; unowned rows
+// (owner NULL: pre-incident rows, seed, header-less writes) are admin-only.
+export async function deleteNode(id: string, by = "anon"): Promise<boolean> {
   if (usePg) {
     await ensurePg();
     const sql = await pg();
-    await sql`DELETE FROM nodes WHERE id = ${id}`;
-    return;
+    const { rowCount } = isAdmin(by)
+      ? await sql`DELETE FROM nodes WHERE id = ${id}`
+      : realOwner(by) ? await sql`DELETE FROM nodes WHERE id = ${id} AND owner = ${by}` : { rowCount: 0 };
+    return (rowCount ?? 0) > 0;
   }
   const all = fileReadAll();
   delete all[id];
   fileWriteAll(all);
+  return true;
 }

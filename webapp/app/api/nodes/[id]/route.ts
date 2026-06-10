@@ -20,8 +20,9 @@ export async function PUT(req: Request, { params }: Ctx) {
   return NextResponse.json(await upsertNode(node, by));
 }
 
-export async function DELETE(_req: Request, { params }: Ctx) {
+export async function DELETE(req: Request, { params }: Ctx) {
   const { id } = await params;
-  await deleteNode(id);
+  const by = req.headers.get("x-author") ?? "anon";
+  if (!(await deleteNode(id, by))) return NextResponse.json({ error: "only the author who created this storyline can delete it" }, { status: 403 });
   return NextResponse.json({ deleted: id });
 }
