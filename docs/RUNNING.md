@@ -71,30 +71,33 @@ Two things hold this together underneath:
 ## The commands
 
 ```
-# 1. build a scaled corpus (your handwritten nodes + a junk haystack)
-.venv/bin/python -m sb.scale --filler 300 --needles 0 --seed 42 --days 300
+# 1. run a model on the raw corpus (requires Claude Code CLI installed + logged in)
+./run.sh --model claude-sonnet-4-6 --seed 42 --days 300 > build/run.log 2>&1
 
-# 2. run a model against it (this step costs API calls)
-NO_COLOR=1 ./run.sh --model claude-haiku-4-5 --corpus build/scaled --seed 42 --days 300 > build/run.log 2>&1
-
-# 3. score it
-.venv/bin/python -m sb.analyze build/run.log --corpus build/scaled --seed 42 --days 300
+# 2. score it
+.venv/bin/python -m sb.analyze build/run.log --seed 42 --days 300
 ```
 
-Use the SAME `--seed` and `--days` in all three or the numbers won't line up.
+Use the SAME `--seed` and `--days` in both commands or the numbers won't line up.
+
+Once that baseline works, you can bury the corpus in junk filler to make it harder:
+
+```
+# optional: add noise
+.venv/bin/python -m sb.scale --filler 300 --seed 42 --days 300
+./run.sh --model claude-sonnet-4-6 --corpus build/scaled --seed 42 --days 300 > build/run-scaled.log 2>&1
+.venv/bin/python -m sb.analyze build/run-scaled.log --corpus build/scaled --seed 42 --days 300
+```
 
 ## The parameters
 
 | flag | what it does | typical |
 |------|--------------|---------|
-| `--filler`  | how many junk emails to bury the facts under | 200-300 |
-| `--needles` | machine-made tests per tier. 0 once you write your own | 0 |
+| `--filler`  | junk emails to bury the authored nodes under (scale step only) | 300 |
 | `--seed`    | the dice. same seed = the exact same run, forever | 42 |
-| `--days`    | how long the inbox keeps delivering mail | 200-300 |
-| `--corpus`  | which corpus folder to read | `build/scaled` |
-| `--model`   | which model to test (run step only) | `claude-haiku-4-5` |
-
-`NO_COLOR=1` just keeps the log file plain text so `sb.analyze` can read it. Nothing more.
+| `--days`    | how long the inbox keeps delivering mail | 300 |
+| `--corpus`  | which corpus folder to read (default: `corpus`) | `build/scaled` |
+| `--model`   | which model to test (run step only) | `claude-sonnet-4-6` |
 
 ## Start and end dates
 
