@@ -1,0 +1,928 @@
+{
+  "id": "Innovation-comp",
+  "cast": {
+    "GC": "General Counsel",
+    "HR": "Head of HR",
+    "IR": "Investor Relations",
+    "CEO": "you",
+    "OPS": "Operations",
+    "COMMS": "Communications / PR",
+    "BIZDEV": "Business Development",
+    "DESIGN": "Design Lead",
+    "FINANCE": "Finance",
+    "VP_PRODUCT": "VP Product",
+    "VP_MARKETING": "VP Marketing",
+    "SVP_OF_INNOVATION": "SVP of Innovation"
+  },
+  "emails": [
+    {
+      "id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+      "to": "CEO",
+      "body": "Hey Mark,\n\nKicking off this year's innovation pitch competition starting next week. Teams will be working on new product concepts for about a month, then we'll do the final pitch event on {!pitch_final = dom:15,+1m}. There'll be a few smaller showcases along the way too, will send those as they come up.\n\nExcited to see what people come up with this year.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@pitch_final"
+            },
+            "kind": "event",
+            "create": "pitch_final",
+            "match": [
+              "pitch"
+            ]
+          }
+        ]
+      },
+      "subject": " Pitch comp is on, locking in the final date",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2",
+      "to": "CEO",
+      "body": "Thanks Mark, makes sense. I'll keep you off the calendar for the team showcases and just have you down for the final. Will loop you back in closer to the date.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": []
+      },
+      "subject": "re: Pitch comp is on, locking in the final date",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.board-slot-the-week-after-finals",
+      "to": "CEO",
+      "body": "Hey Mark, one more ask. Could we grab a slot with the board about a week after the final, so we can walk them through whatever wins? Same time as the final would be ideal if it works for you, just makes it easier to plan around.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@pitch_final+1w"
+            },
+            "kind": "event",
+            "create": "board_presentation",
+            "match": [
+              "presentation"
+            ]
+          }
+        ]
+      },
+      "subject": "Board slot the week after finals?",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.kickoff-went-well",
+      "to": "CEO",
+      "body": "Hey Mark, quick update, kickoff this morning went great and we've got five teams signed up already. Attaching the agenda and team list for you, nothing needed from you, just wanted you in the loop.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Kickoff went well",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.come-check-out-the-semifinal-showcase",
+      "to": "CEO",
+      "body": "Hey Mark, we're doing the semifinal showcase next week, three teams presenting early concepts. Totally optional but if you've got time we'd love to have you swing by for even 15 minutes.\n\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Come check out the semifinal showcase?",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.judges-prep-session-want-in",
+      "to": "CEO",
+      "body": "Hey Mark, we're running a quick prep session with the judging panel before the final to align on scoring criteria. Figured I'd ask in case you wanted to sit in, no pressure either way.\n\nBusiness Development",
+      "from": "BIZDEV",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Judges prep session, want in?",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.mid-comp-check-in-with-the-teams",
+      "to": "CEO",
+      "body": "Hey Mark, we're doing a quick mid-point check-in with all five teams this Thursday, mostly just progress updates and Q&A. Happy to send you the notes afterward if you can't make it.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Mid-comp check-in with the teams",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.sponsor-mixer-before-the-final",
+      "to": "CEO",
+      "body": "Hey Mark, we're putting together a small mixer with a couple of our retail partners the night before the final, mostly informal. Would be great if you could make an appearance but completely understand if your schedule's packed.\n\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Sponsor mixer before the final",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.pitch-comp-budget-review-optional-sit-in",
+      "to": "CEO",
+      "body": "Hey Mark, we're doing a quick internal budget review for the pitch comp spend so far, nothing major, just making sure we're tracking against plan. You're welcome to join if you want visibility but it's not necessary.\n\nFinance",
+      "from": "FINANCE",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Pitch comp budget review, optional sit-in",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.team-morale-lunch-during-the-comp",
+      "to": "CEO",
+      "body": "Hey Mark, a few of us are organizing a casual lunch for everyone involved in the pitch comp, just a small thank you for the extra hours people are putting in. Would be a nice touch if you could pop by but totally understand if you can't.\n\nHead of HR",
+      "from": "HR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Team morale lunch during the comp",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.vp-product",
+      "to": "CEO",
+      "body": "Hey Mark, just confirming you're still good for the final on the date we locked in. Also wanted to flag, the day before we're doing a full dry run with all five teams back to back, probably useful context if you wanted to drop in but no obligation at all.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Quick reminder on the final",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.press-preview-ahead-of-the-final",
+      "to": "CEO",
+      "body": "Hey Mark, we've got a small press preview set up the morning of the final, giving a couple of trade outlets early access to the concepts under embargo. You're not needed for it but wanted to keep you posted since it's the same day.\n\nCommunications / PR",
+      "from": "COMMS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Press preview ahead of the final",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+      "to": "CEO",
+      "body": "Hey Mark, VP Product and I want to grab some time with you to go over the pitch comp budget, mainly the prize money and event costs. Could we lock in {!budget_meeting = dom:5,+1m} for that?\n\nFinance",
+      "from": "FINANCE",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@budget_meeting"
+            },
+            "kind": "event",
+            "create": "budget_meeting",
+            "match": [
+              "budget"
+            ]
+          }
+        ]
+      },
+      "subject": "Need a budget meeting for the pitch comp",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.final-lineup-confirmed",
+      "to": "CEO",
+      "body": "Hey Mark, just confirming the final five teams are locked in for the pitch event. Everyone's prepped and ready to go, nothing needed from you, just wanted to keep you in the loop ahead of time.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Final lineup confirmed",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.two-weeks-out-from-the-final",
+      "to": "CEO",
+      "body": "Hey Mark, just a heads up, we're two weeks out from the final pitch event. Venue's booked, AV is sorted, and the agenda is locked. You're all set, nothing to action.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Two weeks out from the final",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.today-s-the-day",
+      "to": "CEO",
+      "body": "Hey Mark, good luck to everyone presenting today. Room's set up, judges are briefed, see you there.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Today's the day",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.great-session-today",
+      "to": "CEO",
+      "body": "Hey Mark, that was a really strong final, lots of great energy in the room. Congrats to the winning team. Wanted to say thanks for being there, made a big difference.\n\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Great session today",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.let-s-set-up-a-recap",
+      "to": "CEO",
+      "body": "Hey Mark, now that the final's done, could we grab some time to recap how the whole comp went, what worked, what we'd change for next year? Thinking {!recap_meeting = dom:25,+2m} if that works.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@recap_meeting"
+            },
+            "kind": "event",
+            "create": "recap_meeting",
+            "match": [
+              "recap"
+            ]
+          }
+        ]
+      },
+      "subject": "Let's set up a recap",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.quick-favor-before-the-final",
+      "to": "CEO",
+      "body": "Hey Mark, ahead of the board presentation, could you put together a one pager on the comp for the board deck? Doesn't need to be polished, just bullet points on what's coming up.\n\nInvestor Relations",
+      "from": "IR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@board_presentation-1w"
+            },
+            "kind": "todo",
+            "create": "board_deck_one_pager",
+            "match": [
+              "board"
+            ]
+          }
+        ]
+      },
+      "subject": "Quick favor before the final",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Innovation-comp.board-slot-the-week-after-finals"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.sponsor-wants-a-follow-up-call",
+      "to": "CEO",
+      "body": "Hey Mark, one of our retail sponsors wants a quick call to talk about extending the partnership next year. Proposed {!sponsor_call = dom:12,+1m}, let me know if that works or if you'd rather I find another time.\n\nBusiness Development",
+      "from": "BIZDEV",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@sponsor_call"
+            },
+            "kind": "event",
+            "create": "sponsor_call",
+            "match": [
+              "sponsor"
+            ]
+          }
+        ]
+      },
+      "subject": "Sponsor wants a follow-up call",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.travel-heads-up-for-finals-week",
+      "to": "CEO",
+      "body": "Hey Mark, just a heads up, a few of the visiting partners will be in town finals week, so the office might be a bit busier than usual. Nothing for you to do, just a heads up in case you notice extra faces around.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Travel heads up for finals week",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.sponsor-call-no-longer-needed",
+      "to": "CEO",
+      "body": "Hey Mark, good news, the sponsor said they're happy to just continue as is for now, so we don't need that call after all. Sorry for the back and forth, feel free to drop it from your calendar.\n\nBusiness Development",
+      "from": "BIZDEV",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "sponsor_call",
+            "match": [
+              "sponsor"
+            ]
+          }
+        ]
+      },
+      "subject": "Sponsor call no longer needed",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.sponsor-wants-a-follow-up-call"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.need-your-sign-off-on-prize-amounts",
+      "to": "CEO",
+      "body": "Hey Mark, before we announce anything to the teams, can you give a quick thumbs up on the prize amounts we discussed? Just need a yes or no, shouldn't take long.\n\nFinance",
+      "from": "FINANCE",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "serve+2d"
+            },
+            "kind": "todo",
+            "create": "approve_prize_amounts",
+            "match": [
+              "approve"
+            ]
+          }
+        ]
+      },
+      "subject": "Need your sign off on prize amounts",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.quick-win-to-share",
+      "to": "CEO",
+      "body": "Hey Mark, thought you'd want to know, one of the junior engineers on team three told me this comp is the reason she's staying with us another year. Just a nice moment, nothing needed from you.\n\nHead of HR",
+      "from": "HR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Quick win to share",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.press-wants-a-short-interview",
+      "to": "CEO",
+      "body": "Hey Mark, one of the trade outlets that came to the press preview wants a short follow up interview with you about the comp, maybe 20 minutes. Could we pencil in {!press_interview = dom:18,+2m}?\n\nCommunications / PR",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@press_interview"
+            },
+            "kind": "event",
+            "create": "press_interview",
+            "match": [
+              "interview"
+            ]
+          }
+        ]
+      },
+      "subject": "Press wants a short interview",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.press-preview-ahead-of-the-final"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.last-year-s-recap-notes-for-reference",
+      "to": "CEO",
+      "body": "Hey Mark, digging through old files and found last year's recap notes from the comp, might be useful context before our recap this time. Attaching here, no action needed.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Last year's recap notes, for reference",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.let-s-set-up-a-recap"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.thanks-for-the-sign-off",
+      "to": "CEO",
+      "body": "Hey Mark, got your thumbs up, thanks for the quick turnaround. We'll let the teams know the prize amounts today.\n\nFinance",
+      "from": "FINANCE",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Thanks for the sign off",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.need-your-sign-off-on-prize-amounts"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.final-headcount-for-the-recap",
+      "to": "CEO",
+      "body": "Hey Mark, just confirming numbers for the recap session, looks like it'll be a small group, six or seven of us. Nothing needed from you, just prepping the room.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Final headcount for the recap",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.let-s-set-up-a-recap"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.add-this-to-the-recap-agenda",
+      "to": "CEO",
+      "body": "Hey Mark, could we add a short item to the recap about how we promote next year's comp earlier, felt like awareness was lower than it could've been this time. Just flagging so it doesn't get missed.\n\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@recap_meeting"
+            },
+            "kind": "todo",
+            "create": "add_promo_agenda_item",
+            "match": [
+              "agenda"
+            ]
+          }
+        ]
+      },
+      "subject": "Add this to the recap agenda",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Innovation-comp.let-s-set-up-a-recap"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.mixer-was-a-hit",
+      "to": "CEO",
+      "body": "Hey Mark, just wanted to say the sponsor mixer went really well, good turnout and a few of the partners mentioned they'd love to be more involved next year. No action needed, just sharing the good news.\n\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Mixer was a hit",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.sponsor-mixer-before-the-final"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.new-sponsor-wants-to-chat",
+      "to": "CEO",
+      "body": "Hey Mark, a new potential sponsor reached out after hearing about the comp, they'd like an intro call. Proposed {!prospect_call = dom:25,+2m}, let me know if you'd rather I take it solo.\n\nBusiness Development",
+      "from": "IR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@prospect_call"
+            },
+            "kind": "event",
+            "create": "prospect_call",
+            "match": [
+              "prospect"
+            ]
+          }
+        ]
+      },
+      "subject": "New sponsor wants to chat",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.one-pager-looks-good",
+      "to": "CEO",
+      "body": "Hey Mark, thanks for putting that together so quickly, it's exactly what we needed for the board deck. We're all set for the presentation.\n\nInvestor Relations",
+      "from": "IR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "One pager looks good",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.quick-favor-before-the-final"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.prep-doc-for-the-board-presentation",
+      "to": "CEO",
+      "body": "Hey Mark, ahead of the board presentation, could you skim through the slide draft and flag anything that feels off? Doesn't need to be a deep review, just a gut check.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@board_presentation-2d"
+            },
+            "kind": "todo",
+            "create": "review_board_slides",
+            "match": [
+              "slides"
+            ]
+          }
+        ]
+      },
+      "subject": "Prep doc for the board presentation",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Innovation-comp.board-slot-the-week-after-finals"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.trophy-design-quick-look",
+      "to": "CEO",
+      "body": "Hey Mark, we landed on a design for the winner's trophy, nothing fancy but wanted you to see it before we order. Attaching a render, let me know if anything feels off, otherwise we'll go ahead.\n\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "serve+3d"
+            },
+            "kind": "todo",
+            "create": " review_trophy_design",
+            "match": [
+              "trophy"
+            ]
+          }
+        ]
+      },
+      "subject": "Trophy design, quick look?",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.confirmed-for-the-new-sponsor-call",
+      "to": "CEO",
+      "body": "Hey Mark, just confirming the intro call with the new sponsor is locked in. I'll send over a quick brief beforehand so you've got context.\n\nBusiness Development",
+      "from": "BIZDEV",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Confirmed for the new sponsor call",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.new-sponsor-wants-to-chat"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.order-placed-for-trophies",
+      "to": "CEO",
+      "body": "Hey Mark, thanks for the quick look, we went ahead and placed the order. Should arrive well before the final. Nothing else needed on this for now.\n\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Order placed for trophies",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.trophy-design-quick-look"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.recap-agenda-finalized",
+      "to": "CEO",
+      "body": "Hey Mark, agenda for the recap is locked, including the promo timing item that was flagged. Should be a tight, useful session. See you then.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Recap agenda finalized",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.add-this-to-the-recap-agenda"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.brief-for-the-new-sponsor-call",
+      "to": "CEO",
+      "body": "Hey Mark, attaching a short brief on the new sponsor ahead of your call with them. Covers who they are, what they're looking for, and a couple of talking points. Nothing to action, just background.\n\nBusiness Development",
+      "from": "BIZDEV",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Brief for the new sponsor call",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.new-sponsor-wants-to-chat"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.post-recap-follow-ups",
+      "to": "CEO",
+      "body": "Hey Mark, after the recap, could you send a short thank you note to the judges? They put in a lot of time and a few words from you would mean a lot.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@recap_meeting+2d"
+            },
+            "kind": "todo",
+            "create": " thank_judges",
+            "match": [
+              "judges"
+            ]
+          }
+        ]
+      },
+      "subject": "Post recap follow ups",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Innovation-comp.let-s-set-up-a-recap"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.great-year-overall",
+      "to": "CEO",
+      "body": "Hey Mark, just wanted to say thanks for being so involved this year, especially with everything else on your plate. The teams really noticed and it made a difference. Looking forward to next year already.\n\nVP Product",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Great year overall",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.let-s-set-up-a-recap"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.press-interview-confirmed",
+      "to": "CEO",
+      "body": "Hey Mark, just confirming the interview slot with the trade outlet is locked in, they're excited to chat. I'll send a couple of likely questions beforehand so you're not caught off guard.\n\nCommunications / PR",
+      "from": "COMMS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Press interview confirmed",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.press-wants-a-short-interview"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+      "to": "CEO",
+      "body": "Heads up, one of the pitcHey Mark, quick flag, one of the team pitches involves a sole design that's pretty close to something we already have a patent filed on internally. Not a big deal, just want to make sure we don't accidentally green light something that creates an internal conflict. Can you make a note to ask about it after the final?\n\nGeneral Counsel",
+      "from": "GC",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@pitch_final+1d"
+            },
+            "kind": "event",
+            "create": "ask_about_patent_overlap",
+            "match": [
+              "overlap"
+            ]
+          }
+        ]
+      },
+      "subject": "Heads up, one of the pitches might step on toes",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.this-pitch-comp-thing-is-going-around",
+      "to": "CEO",
+      "body": "Hey Mark, small thing, someone posted a behind the scenes clip of the team prepping for finals and it's gotten a surprising amount of traction online. Mostly positive, people love seeing the human side of the brand. Nothing to do, just thought you'd get a kick out of it.\n\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "This pitch comp thing is going around",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.storm-warning-for-finals-week",
+      "to": "CEO",
+      "body": "Hey Mark, forecast is calling for some pretty rough weather the same week as the final. We've got a backup plan to move everything to the larger conference room if needed, just wanted you aware in case travel gets messy.\n\nOperations",
+      "from": "OPS",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Storm warning for finals week",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.one-of-our-designers-got-a-job-offer",
+      "to": "CEO",
+      "body": "Hey Mark, slightly awkward timing but one of the designers on team two, who's been doing great work on the comp, got an external offer this week. I'd like to put together a retention conversation before she makes a decision. Can we make sure that happens this week?\n\nHead of HR",
+      "from": "HR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "serve+2d"
+            },
+            "kind": "event",
+            "create": " retention_conversation",
+            "match": [
+              "conversation"
+            ]
+          }
+        ]
+      },
+      "subject": "One of our designers got a job offer",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.she-s-staying",
+      "to": "CEO",
+      "body": "Hey Mark, good news, the retention conversation went really well and she's decided to stay. Huge relief, especially with the comp wrapping up soon. Thanks for prioritizing it.\n\nHead of HR",
+      "from": "HR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "She's staying",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Innovation-comp.one-of-our-designers-got-a-job-offer"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Innovation-comp.a-kid-drew-the-new-logo-concept",
+      "to": "CEO",
+      "body": "Hey Mark, funny one for you, one of the engineer's kids was at the office during the showcase and apparently sketched their own \"shoe of the future\" on a napkin. The team loved it so much they pinned it up in the design room. Just a nice morale moment, nothing to do.\n\nDesign Lead",
+      "from": "",
+      "answer": {
+        "ops": []
+      },
+      "subject": "A kid drew the new logo concept",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Innovation-comp.found-a-typo-on-the-trophy",
+      "to": "CEO",
+      "body": "Hey Mark, small but annoying, the trophy engraving has a typo in the company name, missing a letter. We caught it before it shipped to the engraver, just need a quick approval on the corrected text before we reorder.\n\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "serve+1d"
+            },
+            "kind": "event",
+            "create": "approve_trophy_correction",
+            "match": [
+              "correction"
+            ]
+          }
+        ]
+      },
+      "subject": "Found a typo on the trophy",
+      "depends_on": [],
+      "tier": "T1"
+    }
+  ]
+}

@@ -19,12 +19,15 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import shutil
 import signal
 import socket
 import subprocess
 import sys
+import tempfile
 import time
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -34,7 +37,7 @@ from sb import resolver
 from sb.grader import NodeState, Obj, TurnDelta, grade_email
 from sb.resolver import Context
 from sb.schema import Corpus, load_corpus
-from sb.scheduler import build_plan
+from sb.scheduler import Levers, build_plan
 
 REPO = Path(__file__).resolve().parents[2]
 STORE_PORT = int(os.environ.get("STORE_PORT", "8077"))
@@ -239,10 +242,126 @@ def start_mcp() -> subprocess.Popen:
     raise RuntimeError("mcp server did not come up")
 
 
+# --- model drivers ---------------------------------------------------------
+# One turn = one subprocess. `claude -p` and `codex exec` both attach to the SAME
+# HTTP MCP server, keep ONE continuous session across days (--resume / exec resume),
+# and stream JSON we parse for (session_id, tools_used, is_error, assistant_text).
+# The store / scheduler / grader are identical for both -> apples-to-apples.
+
+def _limit_reset_wait(text: str) -> Optional[int]:
+    """Seconds to pause for a subscription usage-limit window, or None if this
+    isn't one. Parses the CLI's "resets 2:20pm (America/Los_Angeles)" phrasing;
+    falls back to 30min when the reset time is missing or unparseable."""
+    if not re.search(r"(session|usage) limit", text, re.IGNORECASE):
+        return None
+    m = re.search(r"resets\s+(\d{1,2}):(\d{2})\s*(am|pm)(?:\s*\(([\w/_+-]+)\))?",
+                  text, re.IGNORECASE)
+    if not m:
+        return 1800
+    hh, mm, ap, tzname = int(m.group(1)), int(m.group(2)), m.group(3).lower(), m.group(4)
+    hh = hh % 12 + (12 if ap == "pm" else 0)
+    try:
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo(tzname) if tzname else None
+    except Exception:
+        tz = None
+    now = datetime.now(tz)
+    target = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+    if target <= now:
+        target += timedelta(days=1)
+    return min(int((target - now).total_seconds()) + 120, 6 * 3600)
+
+
+def infer_driver(model: str) -> str:
+    """Pick the CLI that can serve a model id. OpenAI (gpt*/o1/o3/o4/codex) -> codex."""
+    m = model.lower()
+    if m.startswith(("gpt", "o1", "o3", "o4", "codex")) or "gpt" in m:
+        return "codex"
+    return "claude"
+
+
+def _codex_flags(mcp_url: str, cwd: Optional[str], reasoning: Optional[str]) -> list[str]:
+    flags = ["--json", "--dangerously-bypass-approvals-and-sandbox",
+             "--skip-git-repo-check"]
+    if cwd is not None:  # `codex exec resume` has no -C; subprocess cwd= isolates it anyway
+        flags += ["-C", cwd]
+    flags += ["-c", f'mcp_servers.secretary.url="{mcp_url}"',
+              # the model must solve from its inbox only — no web/image tools
+              "-c", "tools.web_search=false", "-c", "tools.image_gen=false"]
+    if reasoning:
+        flags += ["-c", f"model_reasoning_effort={reasoning}"]
+    return flags
+
+
+def build_cmd(driver: str, model: str, session: Optional[str], user_msg: str,
+              mcp_config: str, mcp_url: str, codex_cwd: str,
+              reasoning: Optional[str]) -> list[str]:
+    if driver == "codex":
+        if session is None:  # first turn carries the system prompt (codex has no flag for it)
+            common = _codex_flags(mcp_url, codex_cwd, reasoning)
+            return ["codex", "exec", *common, "-m", model, SYSTEM_PROMPT + "\n\n" + user_msg]
+        common = _codex_flags(mcp_url, None, reasoning)
+        return ["codex", "exec", "resume", *common, "-m", model, session, user_msg]
+    # claude — NO `--tools ""` (in current CLI that means "zero tools available", which
+    # blocked the MCP tools). bypassPermissions + strict-mcp-config already scope tools
+    # to only our secretary MCP server; the subprocess runs in an isolated empty cwd.
+    cmd = ["claude", "-p", "--output-format", "stream-json", "--verbose",
+           "--permission-mode", "bypassPermissions",
+           "--mcp-config", mcp_config, "--strict-mcp-config"]
+    if session is None:
+        cmd += ["--model", model, "--append-system-prompt", SYSTEM_PROMPT]
+    else:
+        cmd += ["--resume", session, "--model", model]
+    cmd.append(user_msg)
+    return cmd
+
+
+def _parse_codex(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
+    """Parse `codex exec --json` JSONL -> (thread_id, tool_names, is_error, text).
+    Only thread_id (for resume) and is_error are load-bearing; tools/text are display."""
+    session_id, tools, is_error, texts = None, [], False, []
+    for line in stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            ev = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        t = ev.get("type")
+        if t == "thread.started":
+            session_id = ev.get("thread_id") or session_id
+        elif t in ("turn.failed", "error"):
+            is_error = True
+        elif t == "item.completed":
+            item = ev.get("item", {}) if isinstance(ev.get("item"), dict) else {}
+            itype = item.get("type") or item.get("item_type") or ""
+            name = item.get("name") or item.get("tool") or ""
+            if "tool" in itype or "call" in itype:
+                if name:
+                    tools.append(str(name).split("__")[-1])
+            elif "message" in itype:
+                txt = item.get("text") or item.get("content") or ""
+                if isinstance(txt, str) and txt.strip():
+                    texts.append(txt.strip())
+    return session_id, tools, is_error, " ".join(texts)
+
+
+def parse_output(driver: str, stdout: str) -> tuple[Optional[str], list[str], bool, str]:
+    return _parse_codex(stdout) if driver == "codex" else _parse_stream(stdout)
+
+
 def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
-        per_turn_timeout: float = 240.0, corpus_dir: str = "corpus") -> None:
+        per_turn_timeout: float = 240.0, corpus_dir: str = "corpus",
+        driver: str = "auto", levers: Optional[Levers] = None,
+        reasoning: Optional[str] = None) -> None:
+    if driver == "auto":
+        driver = infer_driver(model)
     corpus = load_corpus(corpus_dir)
-    plan = build_plan(corpus, start_date=start, seed=seed, n_days=n_days)
+    plan = build_plan(corpus, start_date=start, seed=seed, n_days=n_days, levers=levers)
+    # Isolated empty cwd for BOTH drivers: codex needs a trusted root; claude must not
+    # ingest the repo's CLAUDE.md / answer-key files (context pollution + cheating).
+    iso_cwd = tempfile.mkdtemp(prefix="sb_run_")
 
     # One turn = one day. Drop empty days (no mail arrived) and, if --limit is set,
     # truncate so the total number of emails graded stays under the cap.
@@ -267,7 +386,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     results: dict[str, object] = {}
 
     print(f"\n{BOLD}{BLUE}╔═══ SecretaryBench · live run ═══╗{RESET}")
-    print(f"{BLUE}║{RESET} model {BOLD}{model}{RESET}")
+    print(f"{BLUE}║{RESET} model {BOLD}{model}{RESET} {DIM}via {driver}{RESET}")
     print(f"{BLUE}║{RESET} seed {seed} · {len(days)} days · {len(order)} emails · start {start}")
     print(f"{BOLD}{BLUE}╚═════════════════════════════════╝{RESET}")
     email_no = 0
@@ -293,32 +412,42 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
 
             before = _all_ids(httpx.get(f"{STORE_URL}/state", timeout=10).json())
 
-            cmd = ["claude", "-p", "--output-format", "stream-json", "--verbose",
-                   "--tools", "", "--permission-mode", "bypassPermissions",
-                   "--mcp-config", mcp_config, "--strict-mcp-config"]
-            if session is None:
-                cmd += ["--model", model, "--append-system-prompt", SYSTEM_PROMPT]
-            else:
-                cmd += ["--resume", session]
-            cmd.append(user_msg)
+            cmd = build_cmd(driver, model, session, user_msg, mcp_config, MCP_URL,
+                            iso_cwd, reasoning)
 
             # Retry with exponential backoff: a transient rate-limit / overload
-            # blip should pause-and-resume, not throw the day away.
-            ok, sid, tools, said, detail = False, None, [], "", "claude error"
-            for attempt in range(5):
+            # blip should pause-and-resume, not throw the day away. A subscription
+            # session-limit window ("resets 2:20pm") can last hours — pause until
+            # the stated reset instead of counting it against the retry budget.
+            ok, sid, tools, said, detail = False, None, [], "", f"{driver} error"
+            attempts = 7
+            attempt = limit_pauses = 0
+            while attempt < attempts:
                 try:
-                    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=per_turn_timeout)
-                    sid, tools, is_err, said = _parse_stream(proc.stdout)
+                    # stdin=DEVNULL: codex exec blocks reading piped stdin otherwise;
+                    # harmless for claude -p (it takes the prompt as an arg).
+                    proc = subprocess.run(cmd, capture_output=True, text=True,
+                                          timeout=per_turn_timeout, stdin=subprocess.DEVNULL,
+                                          cwd=iso_cwd)
+                    sid, tools, is_err, said = parse_output(driver, proc.stdout)
                     if not is_err and proc.returncode == 0:
                         session = session or sid
                         ok = True
                         break
-                    detail = proc.stderr.strip()[:160] or "claude returned is_error"
+                    detail = (proc.stderr.strip() or proc.stdout.strip()[-160:])[:160] or f"{driver} returned is_error"
                 except Exception as exc:
                     detail = str(exc)[:160]
-                if attempt < 4:
-                    wait = 5 * (3 ** attempt)        # 5s, 15s, 45s, 135s
-                    print(f"day {day_no:>2} ({sd}): transient ({detail}) — retry {attempt+1}/4 in {wait}s")
+                pause = _limit_reset_wait(f"{said} {detail}")
+                if pause is not None and limit_pauses < 12:
+                    limit_pauses += 1
+                    print(f"day {day_no:>2} ({sd}): session limit — pausing "
+                          f"{pause // 60}min until reset (pause {limit_pauses}/12)")
+                    time.sleep(pause)
+                    continue                      # a limit window is not a failed attempt
+                attempt += 1
+                if attempt < attempts:
+                    wait = min(240, 15 * (2 ** (attempt - 1)))  # 15,30,60,120,240,240 (~12min total)
+                    print(f"day {day_no:>2} ({sd}): transient ({detail}) — retry {attempt}/{attempts-1} in {wait}s")
                     time.sleep(wait)
 
             _print_day(day_no, sd.strftime("%a %b %d"), len(batch), tools, said)
@@ -349,6 +478,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     finally:
         mcp.terminate()
         store.terminate()
+        shutil.rmtree(iso_cwd, ignore_errors=True)
 
     graded = [r for r in results.values() if r is not None]
     passed = sum(1 for r in graded if r.passed)
@@ -367,13 +497,27 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="claude-haiku-4-5")
+    ap.add_argument("--driver", default="auto", choices=["auto", "claude", "codex"],
+                    help="which CLI drives the model (auto: infer from model id)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--start", default="2026-06-01")
     ap.add_argument("--days", type=int, default=60)
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--corpus", default="corpus")
+    # scheduler levers — the recovered authored corpus needs a larger daily_max
+    # (deadline-bearing emails cluster); default 5 matches the pilot.
+    ap.add_argument("--daily-min", type=int, default=1)
+    ap.add_argument("--daily-max", type=int, default=5)
+    ap.add_argument("--urgency-horizon", type=int, default=7)
+    ap.add_argument("--reasoning", default=None,
+                    help="codex only: model_reasoning_effort (low|medium|high|xhigh)")
+    ap.add_argument("--timeout", type=float, default=240.0, help="per-turn seconds")
     a = ap.parse_args()
-    run(a.model, a.seed, date.fromisoformat(a.start), a.days, a.limit, corpus_dir=a.corpus)
+    levers = Levers(daily_min=a.daily_min, daily_max=a.daily_max,
+                    urgency_horizon=a.urgency_horizon)
+    run(a.model, a.seed, date.fromisoformat(a.start), a.days, a.limit,
+        per_turn_timeout=a.timeout, corpus_dir=a.corpus, driver=a.driver,
+        levers=levers, reasoning=a.reasoning)
 
 
 if __name__ == "__main__":

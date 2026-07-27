@@ -1,0 +1,179 @@
+{
+  "id": "shoe-product-launch-delays",
+  "cast": {
+    "CEO": "you",
+    "CFO": "Chief Financial Officer",
+    "COO": "Chief Operating Officer",
+    "DESIGN": "Design Lead",
+    "VP_MARKETING": "VP Marketing"
+  },
+  "emails": [
+    {
+      "id": "shoe-product-launch-delays.product-launch-ready-soon",
+      "to": "CEO",
+      "body": "Hey Mark,\n\nHappy to report, I\u2019ve talked to our lead of design Melissa and it looks like the new batch of shoe designs for Acme will be ready very soon. Afterwards, I will arrange some final look-overs and then we can start producing the new shoes! Let me know if you have any questions.\n\nThanks,\nDamien",
+      "from": "COO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Product launch ready soon!",
+      "depends_on": [],
+      "tier": "T2"
+    },
+    {
+      "id": "shoe-product-launch-delays.design-delays-internal-conflicts",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nUnfortunately this second batch of shoes\u2019 designs were not completed in time. I understand we scheduled the release for next week but there were some internal conflicts within our department.\n\nI assure you we will have the designs ready in two weeks and at the same time, our marketing lead will work on advertisements. I believe Josh wanted you to double check his work the day he's done, could you please do that? He said it would be ready on {!advertising_ready = dom:15,0m}.\n\nP.S. I also wanted to discuss privately with you the future of the design team to ensure these internal conflicts never happen again. Let\u2019s schedule a meeting, I was thinking {!melissa_meeting_1 = this:WED}.\n\nBest,\nMelissa",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@advertising_ready"
+            },
+            "kind": "todo",
+            "create": "Double check Josh's advertising work",
+            "match": [
+              "advertising"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@melissa_meeting_1"
+            },
+            "kind": "event",
+            "create": "Meet with Melissa 1",
+            "match": [
+              "melissa"
+            ]
+          }
+        ]
+      },
+      "subject": "Design delays - internal conflicts",
+      "depends_on": [],
+      "tier": "T2"
+    },
+    {
+      "id": "shoe-product-launch-delays.budget-exceeded",
+      "to": "CEO",
+      "body": "Hello Mark,\n\nOur budget has been exceeded by 20% and projected to cost even more since we haven\u2019t done advertising yet.\n\nWe really need another week to discuss this budget problem. I understand the advertising was suppose to launch on {dom:15,0m} but we need to push this back to {dom:22,0m}. Let\u2019s reschedule that back a week to the 22nd of this month, and we\u2019ll have a budget meeting on {!budget_meeting_bill = dom:15,0m} instead.\n\nIt\u2019s also good to have another meeting every two weeks. For now, let\u2019s schedule one for {!second_bill_meeting = dom:29,0m}.\n\nThank you,\nBill",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:22,0m"
+            },
+            "move": "Double check Josh's advertising work",
+            "match": [
+              "advertising"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@budget_meeting_bill"
+            },
+            "kind": "event",
+            "create": "First bill meeting",
+            "match": [
+              "first"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@second_bill_meeting"
+            },
+            "kind": "event",
+            "create": "Second bill meeting",
+            "match": [
+              "second"
+            ]
+          }
+        ]
+      },
+      "subject": "Budget Exceeded",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "shoe-product-launch-delays.design-delays-internal-conflicts"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "shoe-product-launch-delays.design-team-meeting",
+      "to": "CEO",
+      "body": "Hey Mark,\n\nI spoke with Melissa as I believe you have too. We came to the agreement that half their team is effectively non-productive.\n\nLet\u2019s schedule a meeting {!design_cut_meeting = serve+3d} to discuss who we can let go.\n\nBefore then, can you have 1-2 people in mind? I\u2019m thinking between Alice, Drake, and Bobby.\n\nThanks,\nDamien",
+      "from": "COO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@design_cut_meeting"
+            },
+            "kind": "event",
+            "create": "Design cut meeting",
+            "match": [
+              "design"
+            ]
+          },
+          {
+            "on": {
+              "by": "@design_cut_meeting"
+            },
+            "kind": "todo",
+            "create": "Decide who to cut",
+            "match": [
+              "who"
+            ]
+          }
+        ]
+      },
+      "subject": "Design Team Meeting",
+      "depends_on": [],
+      "tier": "T3"
+    },
+    {
+      "id": "shoe-product-launch-delays.re-design-team-meeting",
+      "to": "CEO",
+      "body": "Hey Mark,\n\nHR managed to fix the problem with the design team, no need for that meeting anymore as we aren\u2019t firing anyone.\n\nThanks,\nDamien",
+      "from": "COO",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "Decide who to cut",
+            "match": [
+              "who"
+            ]
+          },
+          {
+            "cancel": "Design cut meeting",
+            "match": [
+              "design"
+            ]
+          }
+        ]
+      },
+      "subject": "Re: Design Team Meeting",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "shoe-product-launch-delays.design-team-meeting"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "shoe-product-launch-delays.product-launch-ready",
+      "to": "CEO",
+      "body": "Hey Mark,\n\nEverything is on track to proceed with the product launch! We were only delayed by a week or so.\n\nThanks,\nJosh",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Product launch ready",
+      "depends_on": [],
+      "tier": "T2"
+    }
+  ]
+}

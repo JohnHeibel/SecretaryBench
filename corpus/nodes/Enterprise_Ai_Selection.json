@@ -1,0 +1,174 @@
+{
+  "id": "Enterprise_Ai_Selection",
+  "cast": {
+    "CEO": "you",
+    "CFO": "Chief Financial Officer",
+    "CTO": "Chief Technology Officer"
+  },
+  "emails": [
+    {
+      "id": "Enterprise_Ai_Selection.enterprise-ai-selection-kickoff",
+      "to": "CEO",
+      "body": "Hey Mark, \nIm following up from the board meeting discussing AI. I agree that we need to make sure to stay on top of a tech like this. I am working now to set up times to meet with Anthropic, OpenAI, and Google to discuss what their platforms offer and which best suits our needs. \nBest,\nCTO",
+      "from": "CTO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Enterprise Ai Selection Kickoff",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Enterprise_Ai_Selection.ai-meeting-schedule",
+      "to": "CEO",
+      "body": "Mark, \nI have set up meetings with each company and were able to book them all this upcoming week. Anthropic will be {!Anthropic_Meet = next:TUE} on Zoom followed by Google giving us a tour of their Gemini model at {!Google_Meet = next:TUE} also over Zoom. OpenAI is sending their sales down to our office to give us an in person demonstration of ChatGPT {!OPENAI = next:WED}. I am excited that we were able to book all 3 on such short notice and look forward to seeing you there",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:TUE"
+            },
+            "kind": "event",
+            "create": "Anthropic Zoom Call ",
+            "match": [
+              "anthropic"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@Google_Meet"
+            },
+            "kind": "event",
+            "create": "Google Zoom Call",
+            "match": [
+              "google"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@OPENAI"
+            },
+            "kind": "event",
+            "create": "OpenAI In Person Walk Through ",
+            "match": [
+              "through"
+            ]
+          }
+        ]
+      },
+      "subject": "AI Meeting Schedule",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Enterprise_Ai_Selection.anthropic-google-review",
+      "to": "CEO",
+      "body": "Mark, \n\nAfter our meeting today I was impressed by both software. I wrote down some notes from each and specifically like Anthropic's \"CoWork\" and \"Code\" features. I think it would totally increase speed of work while also making the work easier. I think the technical side too will enjoy Code because it speeds up their work. I would like you to send over the notes you have too in addition, I would like to see your rubric filled out by {serve+1d}. That way we can keep things rolling while staying on the same page. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "serve+1d"
+            },
+            "kind": "todo",
+            "create": "Send CTO Rubric from Meetings",
+            "match": [
+              "meetings"
+            ]
+          }
+        ]
+      },
+      "subject": "Anthropic + Google Review ",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Enterprise_Ai_Selection.openai-review",
+      "to": "CEO",
+      "body": "WOW lol. Was it just me or did you feel like that entire meeting was sloppy? Im surprised such a big company would send people that barely know the product. ",
+      "from": "CTO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "OpenAI meeting",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Enterprise_Ai_Selection.final-review",
+      "to": "CEO",
+      "body": "Mark, \n\nThis week is busy but while it is still fresh in our heads lets meet {!Review_Meeting = this:FRI}. Not sure what time works yet but I will email you closer to Friday. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "todo",
+            "create": "AI_Final_Meeting_Review",
+            "match": [
+              "ai"
+            ]
+          }
+        ]
+      },
+      "subject": "Final Meeting Review",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Enterprise_Ai_Selection.fridays-meeting-time",
+      "to": "CEO",
+      "body": "Let's meet {next:FRI}. Im packed the rest of the day. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:FRI"
+            },
+            "kind": "event",
+            "create": "Friday_AI_Review",
+            "match": [
+              "friday"
+            ]
+          }
+        ]
+      },
+      "subject": "Fridays Meeting Time",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Enterprise_Ai_Selection.final-review"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Enterprise_Ai_Selection.ai-selection-finalization",
+      "to": "CEO",
+      "body": "Mark,\n\nI have drafted up the documents to sign our deal with Anthropic. We have agreed on terms of 1Y/120k for full access employee accounts.  Please sign the formal docs by {this:SUN}.\n\nThank you,\nCFO",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:SUN"
+            },
+            "kind": "todo",
+            "create": "AI_Sign_Off",
+            "match": [
+              "sign"
+            ]
+          }
+        ]
+      },
+      "subject": "Ai Selection Finalization",
+      "depends_on": [],
+      "tier": "T1"
+    }
+  ]
+}

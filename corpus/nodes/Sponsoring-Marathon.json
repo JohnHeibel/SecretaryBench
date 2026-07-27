@@ -1,0 +1,272 @@
+{
+  "id": "Sponsoring-Marathon",
+  "cast": {
+    "EA": "Executive Assistant",
+    "CEO": "you",
+    "CFO": "Chief Financial Officer",
+    "COO": "Chief Operating Officer",
+    "OPS": "Operations",
+    "VP_MARKETING": "VP Marketing"
+  },
+  "emails": [
+    {
+      "id": "Sponsoring-Marathon.launching-sponsoring-eugene-marathon",
+      "to": "CEO",
+      "body": "Hi Team! \nFirst off I want to congratulate each and every member for being a part of the success of this first quarter and our insane growth as a company. To have a great wrap of this summer I want to sponsor the Eugene Marathon that takes place August 10th. I want all hands on this project to make it the most successful first sponsorship as a company. Please reach out to me with any questions. \nBest, CEO{serve}",
+      "from": "CEO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Launching: Sponsoring Eugene Marathon",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2",
+      "to": "CEO",
+      "body": "I think this is an amazing idea! We have just over 2 months to get this done. Can we please all have a meeting to properly launch and create a plan for this. Lets do {!launchmeeting = this:THU}. \nEveryone please block their calendars for this meeting.\nBest, Ops",
+      "from": "OPS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:THU"
+            },
+            "kind": "event",
+            "create": "launchmeeting",
+            "match": [
+              "launchmeeting"
+            ]
+          }
+        ]
+      },
+      "subject": "Launching: Sponsoring Eugene Marathon",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.launching-sponsoring-eugene-marathon"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Sponsoring-Marathon.launch-meeting-conflict",
+      "to": "CEO",
+      "body": "Hi, \nI will be unable to attend the launch meeting since I will still be at the NYC location. Can we push the meeting to {this:FRI} past 1pm? \nLet me know,\nCFO\n",
+      "from": "CFO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Launch Meeting Conflict",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Sponsoring-Marathon.launch-meeting-conflict-2",
+      "to": "CEO",
+      "body": "Hi CFO, \nNo worries at all, unfortunately we cannot push the meeting to Friday, we have the employee party that day. CEO will send you a meeting link by {+1d} so you can hop on remotely. \nBest, \nOps",
+      "from": "OPS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "serve+1d"
+            },
+            "kind": "todo",
+            "create": "send launch meeting link",
+            "match": [
+              "launch"
+            ]
+          }
+        ]
+      },
+      "subject": "Launch Meeting Conflict",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.launch-meeting-conflict"
+        },
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Sponsoring-Marathon.launch-meeting-recap",
+      "to": "CEO",
+      "body": "Hi team! \nThanks for a great launch meeting! This is going to be a great sponsorship and event. Below is a recap of what we discussed about the event and next steps moving  forward. \nCFO: In charge of master budget and making sure team is supported financially.\nOps: Research the Sponsorship Tiers and send to CEO once complete to sign off on. \nMarketing Team: Once logistics are completed please put together a pitch deck for the team. We have our pitch to the race director on {!sponsorshippitch = dom:9,+1m} that the \"Pitch Team\" will run: CEO, COO and, VP of Marketing.\nThanks and let me know if anyone has any questions. Once we get these nailed down we can begin to plan our presence at the event.\nBest, \nEA",
+      "from": "EA",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@sponsorshippitch"
+            },
+            "kind": "event",
+            "create": "sponsorshippitch"
+          }
+        ]
+      },
+      "subject": "Launch Meeting Recap",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.launch-meeting-conflict-2"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Sponsoring-Marathon.approval-needed-race-sponsorship-budget",
+      "to": "CEO",
+      "body": "Hi, \nCan CFO please send me the master budget we have for this event? I need to know our max budget. Once we have this we can have a better idea of which sponsorship tier to select and move forward with the event. \nBest,\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Race Sponsorship Budget & Goals",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Sponsoring-Marathon.race-sponsorship-budget-goals",
+      "to": "CEO",
+      "body": "Yes I have attached the Master Budget Plan below. Let me know if you need anything else from me as of right now. CEO will need to sign off on the final sponsorship tier/budget you choose from.\nBest, \nCFO",
+      "from": "CFO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Race Sponsorship Budget & Goals",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.approval-needed-race-sponsorship-budget"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Sponsoring-Marathon.sponsorship-tiers",
+      "to": "CEO",
+      "body": "Hi CEO, COO & CFO\nBelow are the sponsorship options for the Eugene Marathon:\nGold Tier: Donate +15k - Name on Merch, Website, and Prime Event Pop Up Spot, Free Advertising Through the Eugene Marathon Marketing.\nSilver Tier: Donate +8k - Name on Merch, Website, Prime Event Pop Up Spot.\nBronze Tier: Donate +3k - Name on Website and a Event Pop Up Spot\nKeep in mind this is the sponsorship cost and does not include all other costs associated with making this happen. \nCEO please let me know which option we will go with before {!approval_of_tier_budget = dom:19,0m} and make sure it aligns with budget.  \nBest, \nVP Marketing",
+      "from": "OPS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:19,0m"
+            },
+            "kind": "todo",
+            "create": "approval of tier",
+            "match": [
+              "approval"
+            ]
+          }
+        ]
+      },
+      "subject": "Sponsorship Tiers",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.approval-needed-race-sponsorship-budget"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Sponsoring-Marathon.approval-of-budget-tier",
+      "to": "CEO",
+      "body": "We are going to meet a week from today to discuss and have the final approval of the sponsorship tier and budget for this event. I'll send out the link by tonight! \nThanks, \nOps",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:WED+2w"
+            },
+            "kind": "event",
+            "create": "sponsorship & budget approval meeting"
+          }
+        ]
+      },
+      "subject": "Approval of Budget & Tier",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.sponsorship-tiers"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Sponsoring-Marathon.pitch-deck",
+      "to": "CEO",
+      "body": "Now that budget and tier is confirmed can the Marketing team please put together a pitch deck for the race director. We need this by{dom:30,0m} so that we have a week for the Pitch team to get prepared. \nThanks, \nCOO",
+      "from": "COO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Pitch Deck",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Sponsoring-Marathon.pitch-deck-2",
+      "to": "CEO",
+      "body": "Yes lets schedule a meeting for July 2nd that preps the pitch team for this. VP of marketing will lead the briefing.",
+      "from": "",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:2,+1m"
+            },
+            "kind": "event",
+            "create": "Pitch Breifing",
+            "match": [
+              "breifing"
+            ]
+          }
+        ]
+      },
+      "subject": "Pitch Deck",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Sponsoring-Marathon.pitch-deck"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Sponsoring-Marathon.approval-of-event",
+      "to": "CEO",
+      "body": "Pitch went amazing! \nWe have secured our Gold Tier \nGreat job to the VP of Marketing and CEO for helping us be well prepared. Now lets put all of our effort over the next month into getting the Event Pop Up good to go!\nI expect all people involved to block their calendars for August 10th and being present at the event.\nBest, \nCOO",
+      "from": "COO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:10,+2m"
+            },
+            "kind": "todo",
+            "create": "event day!",
+            "match": [
+              "event"
+            ]
+          }
+        ]
+      },
+      "subject": "Approval of Event!",
+      "depends_on": [],
+      "tier": "T1"
+    }
+  ]
+}

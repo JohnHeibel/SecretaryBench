@@ -1,0 +1,189 @@
+{
+  "id": "pizza-party",
+  "cast": {
+    "EA": "Executive Assistant",
+    "HR": "Head of HR",
+    "CEO": "you",
+    "CFO": "Chief Financial Officer",
+    "VP_SALES": "VP Sales"
+  },
+  "emails": [
+    {
+      "id": "pizza-party.end-of-year-pizza-party",
+      "to": "CEO",
+      "body": "Hi, \nThe end of year pizza party is coming up! I know the team is really looking forward to having you there. I'm thinking next Monday is best- good way to kick off the week. Can't wait!!{serve }",
+      "from": "EA",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:MON"
+            },
+            "kind": "todo",
+            "create": "Team_pizza_party"
+          }
+        ]
+      },
+      "subject": "End-of-year pizza party",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "pizza-party.conference-room-reservation",
+      "to": "CEO",
+      "body": "The main conference room has been booked on 6/8 for the end-of-year pizza party.\n\n",
+      "from": "HR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Conference room reservation",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "pizza-party.end-of-year-pizza-party"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "pizza-party.pizza-place-selection",
+      "to": "CEO",
+      "body": "We've narrowed our choices down to 3 pizza places. We wanted to try something new after last years. Could you look at the memo I left in your inbox and let me know which option by Friday? {!pizza_decision = this:WED}",
+      "from": "",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "next:MON"
+            },
+            "kind": "todo",
+            "create": "Pizza_decision",
+            "match": [
+              "decision"
+            ]
+          }
+        ]
+      },
+      "subject": "Pizza place selection",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "pizza-party.end-of-year-pizza-party"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "pizza-party.pizza-party-budget",
+      "to": "CEO",
+      "body": "The pizza party budget of $1500 has been approved. ",
+      "from": "CFO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Pizza party budget ",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "pizza-party.end-of-year-pizza-party"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "pizza-party.pizza-order-deadline",
+      "to": "CEO",
+      "body": "The place you chose requires our final order by tomorrow{!ordering_date = this:FRI} so they have time to prepare it. Please remind me to submit the order before then",
+      "from": "EA",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "todo",
+            "create": "order-the-pizzas"
+          }
+        ]
+      },
+      "subject": "Pizza order deadline",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "pizza-party.end-of-year-pizza-party"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "pizza-party.client-demo-conflict",
+      "to": "CEO",
+      "body": "Our new client requested a meeting with you next Monday to see how the new team is functioning. Could we move the pizza party to June 9",
+      "from": "VP_SALES",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "nth:2,TUE,0m"
+            },
+            "move": "Team_pizza_party"
+          }
+        ]
+      },
+      "subject": "Client demo conflict",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "pizza-party.conference-room-reservation"
+        },
+        {
+          "type": "static",
+          "email": "pizza-party.end-of-year-pizza-party"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "pizza-party.updated-pizza-party-schedule",
+      "to": "CEO",
+      "body": "{!new_party_date = dom:9,0m} works for me, thanks for the heads up",
+      "from": "HR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "updated pizza party schedule",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "pizza-party.client-demo-conflict"
+        },
+        {
+          "type": "static",
+          "email": "pizza-party.end-of-year-pizza-party"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "pizza-party.room-change",
+      "to": "CEO",
+      "body": "The main conference room isn't available on {!New_party_date = nth:2,TUE,0m}, I've booked our conference room 2 instead. ",
+      "from": "HR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Room change",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "pizza-party.end-of-year-pizza-party"
+        },
+        {
+          "type": "static",
+          "email": "pizza-party.updated-pizza-party-schedule"
+        }
+      ],
+      "tier": "T3"
+    }
+  ]
+}

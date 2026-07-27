@@ -1,0 +1,142 @@
+{
+  "id": "Rebrand-goes-company-wide",
+  "cast": {
+    "HR": "Head of HR",
+    "CEO": "you",
+    "COMMS": "Communications / PR",
+    "VP_MARKETING": "VP Marketing",
+    "FRANK_SALES_FLOOR": "frank, sales floor"
+  },
+  "emails": [
+    {
+      "id": "Rebrand-goes-company-wide.teaser-campaign",
+      "to": "CEO",
+      "body": "Hey Mark, I want to walk you through a teaser plan so that the rebrand doesn't give whiplash. Does {dom:30,0m} work for you?",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:30,0m"
+            },
+            "kind": "event",
+            "create": "teaser_review",
+            "match": [
+              "teaser"
+            ]
+          }
+        ]
+      },
+      "subject": "Teaser campaign?",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Rebrand-goes-company-wide.please-reconsider-this-rebrand",
+      "to": "CEO",
+      "body": "I've sold ACME boots for 22 years to people who trust exactly what this name has always stood for. This futuristic relaunch feels like we're throwing all of that away for a trend. I'm asking leadership, please, rethink it before it's too late.",
+      "from": "FRANK_SALES_FLOOR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Please reconsider this rebrand",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Rebrand-goes-company-wide.hard-no-on-teasers",
+      "to": "CEO",
+      "body": "Hey Mark, heard that PR wants a slow warm-up. I think that's a big mistake. The impact here lies in shock value; teasers would ruin that. My recommendation is that we go completely dark until {!acme_reveal = dom:10,+2m}.",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Hard no on teasers",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Rebrand-goes-company-wide.standing-down-on-teasers",
+      "to": "CEO",
+      "body": "Got your decision, we go cold, no teasers. I disagree but it's your call and I'm behind it. No reason to keep the teaser review on the books, so we can cancel that.\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "teaser_review",
+            "match": [
+              "teaser"
+            ]
+          }
+        ]
+      },
+      "subject": "Standing down on teasers",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Rebrand-goes-company-wide.teaser-campaign"
+        },
+        {
+          "type": "static",
+          "email": "Rebrand-goes-company-wide.hard-no-on-teasers"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Rebrand-goes-company-wide.we-need-to-talk-about-morale",
+      "to": "CEO",
+      "body": "I've got a steady stream of worried people at my door about the rebrand, and it's turning into a real retention risk. Can we grab 45 minutes on {!HR_morale_sync = dom:10,+1m}?",
+      "from": "HR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@HR_morale_sync"
+            },
+            "kind": "event",
+            "create": "HR_morale_sync",
+            "match": [
+              "morale"
+            ]
+          }
+        ]
+      },
+      "subject": "We need to talk about morale",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned",
+      "to": "CEO",
+      "body": "Following our chat, the cleanest fix is one company-wide webinar where you lay out the why directly. Run it a few days before the reveal so it's fresh going into launch week. I think three days before {@acme_reveal} at {dom:7,+2m} would be optimal, so let's set our calendars for that. ",
+      "from": "HR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "@acme_reveal-3d"
+            },
+            "kind": "event",
+            "create": "all_hands_webinar",
+            "match": [
+              "webinar"
+            ]
+          }
+        ]
+      },
+      "subject": "All-hands to get everyone aligned",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Rebrand-goes-company-wide.we-need-to-talk-about-morale"
+        },
+        {
+          "type": "date",
+          "email": "Rebrand-goes-company-wide.hard-no-on-teasers"
+        }
+      ],
+      "tier": "T3"
+    }
+  ]
+}

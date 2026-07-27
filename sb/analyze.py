@@ -18,7 +18,7 @@ import os
 import re
 from datetime import date
 
-from sb.scheduler import build_plan
+from sb.scheduler import Levers, build_plan
 from sb.schema import load_corpus
 from sb.span import spans
 
@@ -77,11 +77,17 @@ def main() -> None:
     ap.add_argument("--corpus", default="build/scaled")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--days", type=int, default=300)
+    # must match the levers the run used, or the rebuilt plan won't line up
+    ap.add_argument("--daily-min", type=int, default=1)
+    ap.add_argument("--daily-max", type=int, default=5)
+    ap.add_argument("--urgency-horizon", type=int, default=7)
     a = ap.parse_args()
 
     results = parse_log(a.log)
     corpus = load_corpus(a.corpus)
-    plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=a.seed, n_days=a.days)
+    plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=a.seed, n_days=a.days,
+                      levers=Levers(daily_min=a.daily_min, daily_max=a.daily_max,
+                                    urgency_horizon=a.urgency_horizon))
     span_of = {r["needs"]: r["email_span"] for r in spans(corpus, plan)}
 
     # --- load needle manifest if present ---
