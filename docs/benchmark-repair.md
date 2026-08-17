@@ -19,11 +19,18 @@ None of them announce themselves.
    "reproduce" path (`BENCHMARK_RESULTS.md:146-147`) and are not.** `recover_corpus.py:25,32`
    fetches `https://secretarybench.vercel.app/api/nodes` **live from production** — which
    `CLAUDE.md` lists as do-not-touch — and `fix_match.py:21` rewrites `corpus/nodes/` **in
-   place**. Either one run today permanently destroys the only provenance the three
-   surviving runs have: their levers are recoverable *only* by replaying their printed
-   serve plans against the current, unchanged corpus (C-1). After a corpus write the three
-   logs become PASS/FAIL strings with no recoverable question behind them. **Do not run
-   either script. Phase 1 exists to capture what they would destroy.**
+   place** (`recover_corpus.py:131,133`, `fix_match.py:86,88` unlink then rewrite). Running
+   either would overwrite the corpus the three surviving runs were scored against, which is
+   what makes their levers recoverable at all (C-1). **Do not run either script**; the
+   production fetch alone violates a standing rule.
+
+   *Corrected by the verifier pass:* an earlier draft of this box said the damage was
+   **permanent**. It is not. Every file both scripts touch is git-tracked, committed and
+   clean (`git ls-files corpus/` → 16 files; `git status --porcelain corpus/` → empty;
+   unchanged since `24331fb`), so `git checkout -- corpus/nodes` restores them byte-for-byte
+   and the lever recovery is reproducible from git at any future date. The hazard is real
+   and the recovery is not perishable. This correction is why phase 1 is no longer labelled
+   time-critical — see the phase table.
 2. **`BENCHMARK_RESULTS.md:89-91` says `daily_max=5` is infeasible for the authored
    corpus. That is false for the corpus in the repo** — `daily_max=5` is feasible at
    `--days ≥ 57`, `daily_max=4` at `≥ 68`; only `daily_max=3` is infeasible at any ceiling
@@ -63,8 +70,15 @@ here:
 | V construct validity | `docs/_repair/V.md` | 8 |
 
 This register carries each finding's problem, severity, single best piece of sourced
-evidence, and options. **Go to the section file for the working.** A verifier pass
-red-teaming this merge against the code is the remaining phase-A step.
+evidence, and options. **Go to the section file for the working.**
+
+A verifier pass has red-teamed this merge against the code; its verdict is
+`docs/_repair/VERIFY.md`. It checked ~200 claims: ~180 confirmed, 2 substantively wrong,
+8 overstated, 3 unfalsifiable, and all six headline numbers reproduce to the digit. Its
+corrections are applied here and each is marked in place. Two are worth knowing before
+you read anything else: the corpus hazard is **not** permanent (`corpus/` is git-tracked
+and restorable), and O-1's "nothing can ever be re-graded" is too strong. Both fed the
+phase table, which has been re-argued on G-4 alone.
 
 **Get sign-off on the revised phase table before phase 1 begins.** The ordering below is
 a synthesizer decision derived from the fan-out, not the ordering that was approved
@@ -76,27 +90,37 @@ The pre-phase-A argument was: *the store state is thrown away when a run ends, s
 way to evaluate a grader change is to pay for a whole new run; therefore do **O** first so
 every later grader change can be re-scored offline against runs already paid for.*
 
-**Two findings falsify that argument.**
+**One finding falsifies it. A second, which an earlier draft leaned on equally, does not
+survive the verifier pass — the honest version of both is below.**
 
-- **O-1.** The store is terminated at `runner.py:513-516` with nothing read out of it, and
-  every surviving artifact is hand-copied stdout. **No run already paid for can ever be
-  re-graded**, at any price short of running it again. O's payoff therefore applies only
-  to runs paid for *after* O lands — it does not make phase 2 cheap, it makes phase 7
-  worth paying for.
 - **G's central result was produced offline with no live run at all.** The title-policy
   sweep (G-4) ran the *shipped* `sb.engine` + `sb.grader` against the *shipped* corpus and
   showed a scheduling-perfect agent scoring 92/167 = 55%. G already has a working offline
-  evaluation loop. It never needed O.
+  evaluation loop. It never needed O. **This is the whole load-bearing argument for the
+  re-ordering**, and it was independently reproduced by the verifier.
+- **O-1, in its defensible form.** The store is terminated at `runner.py:513-516` with
+  nothing read out of it, and every surviving artifact is hand-copied stdout. An earlier
+  draft concluded "no run already paid for can *ever* be re-graded". That is overstated,
+  and the register contradicts it three times: G-2 re-grades opus 90→97, A-1 re-grades
+  90→55 day-scoped, A-6 re-grades 90→91 and 90→89. The verifier reproduced two of those
+  from the logs alone. The true limit is narrower and still material: **no paid run can be
+  re-graded under a rule that would newly admit objects the log never rendered** — anything
+  that widens `_title_hit`, changes `op.kind`, or re-attributes by `email_id` — because
+  `grader.py:151-152` filtered those out before printing. So G-1, G-3 and G-8 are blocked
+  from offline re-scoring; rules that relax the count check, re-scope the no-action delta,
+  or drop an object are evaluable today. **This weaker version does not by itself move O
+  from phase 1 to phase 6**; G-4 does.
 
-Two further findings force moves:
+One further finding forces a move:
 
-- **C-1 puts a deadline on the front of the schedule.** The levers of the three surviving
-  runs are recoverable today by replaying their printed serve plans, and stop being
-  recoverable the moment `corpus/` changes. Phase 4 (old numbering) is the corpus pass and
-  `BENCHMARK_RESULTS.md` documents a command that does it in one step. A capture step must
-  come first, and it is free.
+- **C-1 argues for capture early, but not under a deadline.** The levers of the three
+  surviving runs are recoverable by replaying their printed serve plans against the corpus
+  they were scored on. `BENCHMARK_RESULTS.md` documents a command that overwrites that
+  corpus in one step. Capturing first is free and beats re-deriving later — but `corpus/`
+  is git-tracked and clean, so the recovery is reproducible from git regardless. **Do it
+  early; it is not perishable.**
 - **V-1 decides what the corpus pass is for.** The authored corpus is ~10.9k tokens and
-  the largest needle gap is ~7.8k tokens against a ≥200k window: no authored fact has ever
+  the largest needle gap is ~5.4k tokens of mail against a ≥200k window: no authored fact has ever
   scrolled out of context. Either the corpus gets scaled until it does (V-1 opt 1, gated on
   V-5) or the retrieval claim gets rescoped (V-1 opt 2). That decision determines whether
   K's pass is a repair or a rebuild, so it must precede K, not follow it.
@@ -107,7 +131,7 @@ Revised table. Old phase numbers in brackets.
 |---|---|---|---|
 | 0 | M, E | done — the reported blocker | free |
 | A | — | the register (done) | free |
-| 1 | **C-1** *(new)* | corpus edits destroy the only provenance the three runs have, and a documented command performs one. Capture the recovered levers, the plan digests, and the ~270 model-authored titles harvested from the four logs, **before** anything writes to `corpus/` | free, **time-critical** |
+| 1 | **C-1** *(new)* | a documented command overwrites the corpus the three runs were scored against. Capture the recovered levers, the plan digests, and the ~270 model-authored titles harvested from the four logs before anything writes to `corpus/`. Recoverable from git if missed, so early rather than urgent | free, do it early |
 | 2 | G *[was 2]* | already iterable offline today: shipped engine + oracle title-policy sweep + the harvested real-model titles. Does not depend on O | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
 | 4 | V, C *[was 5]* | decide what the benchmark claims (V-1) and pin one lever + one config (C-2, C-3, K-2) — both are inputs to the corpus pass, not outputs of it | free |
@@ -176,7 +200,7 @@ matched something.
 | **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | open | 6 |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
 | **O-9** | objects with an unparseable date are dropped from grading without a trace | distorts-measurement | open | 6 |
-| **C-1** | the levers of the only three runs survive by accident; two documented commands destroy them | blocks-measurement | open | **1** |
+| **C-1** | no artifact records its levers; two documented commands overwrite the corpus they are recovered from | blocks-measurement | open | **1** |
 | **C-2** | `urgency_horizon` absent from the score stamp and moves 148/167 serve dates | distorts-measurement | open | 4 |
 | **C-3** | corpus satisfiability is lever-dependent; the oracle gate is hardcoded to one setting | distorts-measurement | open | 4 |
 | **C-4** | `sb.analyze` takes levers by hand and silently reports a different span grid if wrong | distorts-measurement | open | 4 |
@@ -186,7 +210,7 @@ matched something.
 | **C-8** | run logs default to a gitignored path; artifacts preserved only by hand | slows-work | open | 4 |
 | **C-9** | residual stale claims in the durable record the phase-A1 banner does not cover | slows-work | open | 4 |
 | **K-1** | the serve plan drifts past the dates the corpus narrates (18 emails, 11 ops) | blocks-measurement | open | 5 |
-| **K-2** | the corpus is only coherent at `daily_max=21`; the two headline runs used 5 | blocks-measurement | open | 5 |
+| **K-2** | corpus date-coherence needs a high `daily_max`; the two headline runs used 5 | blocks-measurement | open | 5 |
 | **K-3** | prose states a date the answer key contradicts (8 emails) | distorts-measurement | open | 5 |
 | **K-4** | `Innovation-comp` supplies 29% of emails and ~38% of every model's score | distorts-measurement | open | 5 |
 | **K-5** | rendered tokens fuse into prose, render at the wrong grain, or leak authoring notes | distorts-measurement | open | 5 |
@@ -215,7 +239,7 @@ matched something.
 `/usr/bin/python3` on this machine is 3.9.6. `mcp` requires 3.10+, and
 `sb/live/mcp_app.py:50,81` use PEP 604 (`str | None`) in FastMCP tool signatures, which
 FastMCP evaluates at runtime — a hard TypeError on 3.9. The documented setup line
-(`run.sh:18`, `BENCHMARK_RESULTS.md` §4) says bare `python3`, which builds a 3.9 venv.
+(`run.sh:18` @`24331fb`, `BENCHMARK_RESULTS.md` §4) says bare `python3`, which builds a 3.9 venv.
 **Fix:** build with an explicit interpreter — `uv venv --python 3.13 .venv`.
 **Verified by:** `.venv/bin/python -m pytest sb/tests -q` → 62 passed.
 **Also done:** `run.sh` now names an explicit 3.13 in its setup hint and refuses to run a
@@ -246,10 +270,10 @@ error.
 
 ### M-1 · `run.sh` silently discarded every flag
 **Status:** verified. **This is the reported bug.**
-`run.sh:26` read `live) exec "$PY" -m sb.live.runner ;;` — no `shift`, no `"$@"`. The
+`run.sh:26` @`24331fb` read `live) exec "$PY" -m sb.live.runner ;;` — no `shift`, no `"$@"`. The
 `demo` and `test` branches both forward arguments; `live` did not. So
 `./run.sh live --model claude-opus-5 --seed 7` executed the runner with **zero
-arguments** and fell back to argparse defaults at `runner.py:499-514`:
+arguments** and fell back to argparse defaults at `runner.py:499-514` @`24331fb`:
 `--model claude-haiku-4-5`, `--seed 42`, `--days 60`, `--daily-max 5`,
 `--corpus corpus`. That is exactly the report: an unknown default model regardless of
 the flag, and an identical configuration — hence an identical score — every run.
@@ -340,9 +364,9 @@ benchmark is built to measure is barely exercised by the authored corpus alone.
 > - **The lever inference is now an identification, not an inference** (C-1): replaying the
 >   167 printed `· served <date>` pairs against rebuilt plans matches exactly one of 785
 >   feasible lever combinations for opus and sonnet — `daily_min=1 daily_max=5
->   urgency_horizon=7`. For haiku three combinations fit (`urgency_horizon ∈ {3,5,7}`).
+>   urgency_horizon=7`. For haiku seven combinations fit (`urgency_horizon ∈ 1..7`).
 > - **The 31.6 mean is not "low", it is disqualifying** (V-1): the whole corpus is ~10.9k
->   tokens and the largest needle gap ~7.8k tokens, against a ≥200k context window.
+>   tokens and the largest needle gap ~5.4k tokens of mail, against a ≥200k context window.
 
 ---
 
@@ -364,8 +388,12 @@ pass; keyword absent → **8/99 = 8%**. The authored keyword predicts the outcom
 strongly than the model does (43% / 50% / 51% across opus / sonnet / haiku). A second class
 is created by rendering: `{!name = expr}` discards the anchor *name* (`sb/resolver.py:345-356`),
 so `delayed`, `signoff`, `conference` exist in the JSON and in zero rendered bodies. The
-model is never told the rule — `SYSTEM_PROMPT` (`sb/live/runner.py:87-107`) says nothing
-about titles, descriptions, or one-object-per-obligation.
+The model is never told the matching rule. `SYSTEM_PROMPT` (`sb/live/runner.py:87-107`) is
+silent on titles and on `description`; it *does* state the one-object rule in plain English
+(`:107` ends "Never leave duplicates"). That makes the finding sharper, not weaker: the model
+was told the right rule and is penalised by a different one, since G-2 shows the count check
+fires on *distinct* obligations sharing vocabulary in 57 of 57 cases. What the prompt never
+says is that the grader decides sameness by keyword substring over `title + description`.
 *Options:* publish the contract to the model (changes the tool surface) · lint keywords
 against rendered mail (32-op corpus edit) · semantic / LLM-judge matching (costs money,
 nondeterministic) · grade by attribution instead of title (moves the problem into A).
@@ -379,7 +407,9 @@ objects with the same title (opus 0/14, sonnet 0/12, haiku 0/17, sonnet176 0/14)
 is a collision between *distinct* obligations sharing storyline vocabulary (`atlas`,
 `reveal`, `launch`, `design`, `sponsor`). The log's wording is the opposite of what
 happened, and readers will conclude models leave duplicates: they did not, in 57/57 cases.
-Under a rule of "at least one matching object on an expected day", opus 90→97, sonnet
+Under a rule of "at least one matching object on an expected day" — restricted to `eq`/`any_of`
+predicates where the day is unambiguous, a restriction the numbers move 1-2 points without —
+opus 90→97, sonnet
 91→98, haiku 98→109, sonnet176 102→111.
 *Options:* best-match assignment (Hungarian/greedy; real algorithm change) · scope
 exactly-one to the turn · relax to "≥1 satisfying, no stale survivor" (needs object
@@ -392,8 +422,13 @@ model** — blocks-measurement · free-offline · open
 `_fmt_obj` (`sb/grader.py:125-129`) prints only the title; `SYSTEM_PROMPT` never mentions
 the field, which `mcp_app.py:42,73` exposes. In `outputs/opus.md`, **23 of 101** attributed
 objects (23%) have a title lacking the keyword and matched through the description alone
-(sonnet 14/97, haiku 8/97, sonnet176 2/91 — the spread tracks how verbose each model is, so
-the metric is partly measuring writing style). Controlled offline experiment: take the
+(sonnet 14/97, haiku 8/97, sonnet176 2/91). *An earlier draft added "the spread tracks how
+verbose each model is, so the metric is partly measuring writing style". That clause is
+dropped: descriptions are never rendered (`grader.py:125-129`, and O-5 says the same), so
+description verbosity cannot be measured from any surviving artifact, and the one verbosity
+proxy that does exist runs the other way — mean title length is opus 47 > haiku 40 > sonnet
+36 while description-only matches are opus 23 > sonnet 14 > haiku 8. O-3's state dump would
+settle it.* Controlled offline experiment: take the
 **unmodified oracle** and add a realistic description (subject + first 180 chars of the
 rendered body) to every object; score falls **167/167 → 141/167 (84%)**, 25 of the 29 lost
 details being collisions, with nothing about the scheduling changed.
@@ -446,7 +481,8 @@ replaces the exactly-one rule.
 distorts-measurement · free-offline · open
 `_grade_op` matches against the entire node pool (`sb/grader.py:151`), which
 `sb/live/runner.py:137-146` builds from the whole store filtered only by node. Pass rate by
-pool depth, pooled over three runs: 0 prior same-kind obligations **42/81 = 52%**; 1–2
+pool depth — bucketing by **prior same-kind obligations in the answer key**, not by prior objects
+the model created, which is the reading that reproduces — pooled over three runs: 0 prior **42/81 = 52%**; 1–2
 **65/156 = 42%**; 3–5 **33/111 = 30%**; 6+ **14/54 = 26%**. `_node_state`'s fourth parameter
 `sid_filter` is accepted and never referenced (`grep -rn "sid_filter" sb/` returns only the
 signature) while the call site at `runner.py:509` passes `eid_new`, so the code reads as if
@@ -577,7 +613,7 @@ asymmetric — `store_app.py:225-230` 404s on an unknown id at *read*, while `:1
 day's warnings, the store is terminated with no dump, `sb/analyze.py` never reads a warning
 line, and the end-of-run summary has no warning count. Transcription hazard the monitor
 would catch and nothing measures: email ids average 45 chars (max 77), 108 of 167 exceed 40
-chars, and 16 ids are a strict prefix of another.
+chars, and there are 16 prefix *pairs* (one id a strict prefix of another) spanning 14 distinct ids.
 *Options:* add a `sibling_email_id` warning (may only be expressible as a node-mismatch
 heuristic) · warn when a stamp resolves to a node with no op the object could serve (leaks
 answer-key structure into the store) · persist warnings into the artifact and count them ·
@@ -628,8 +664,14 @@ is no `open(..., "w")` in the module. `sb/live/runner.py:513-516` terminates the
 nothing read out of it, and `sb/live/store_app.py:22-27` shows the entire run state is four
 module-level in-memory objects in a uvicorn child. Capture is shell redirection into
 `build/`, which `.gitignore` excludes. `past/claude-haiku-4-5.md:7` cites a run log that does
-not exist; `past/claude-opus-4-8.md` is 0 bytes. **Consequence: no run already paid for can
-ever be re-graded.**
+not exist; `past/claude-opus-4-8.md` is 0 bytes. **Consequence, in its defensible form: no
+run already paid for can be re-graded under a rule that would newly admit objects the log
+never rendered** — anything widening `_title_hit`, changing `op.kind`, or re-attributing by
+`email_id` — because `grader.py:151-152` filtered those out before printing. G-1, G-3 and G-8
+are blocked by this. Rules that relax the count check, re-scope the no-action delta, or drop
+an object *are* evaluable offline today, and this register does exactly that three times
+(G-2, A-1, A-6). An earlier draft of this finding said "can ever be re-graded" flatly; the
+verifier reproduced two of the three counter-examples from the logs alone.
 *Options:* `--out DIR` writing a JSON/JSONL tree · persist the store instead of the runner ·
 keep stdout as the only artifact but make it machine-parseable · instrument future runs only.
 
@@ -757,16 +799,20 @@ footer `runner.py:529-531` (served model, seed, `daily_min`-`daily_max`, email c
 `SYSTEM_PROMPT` version, a timestamp. Neither line is machine-readable and neither appears in
 any of the four saved artifacts, all of which predate phase 0.
 
-**C-1 · the levers of the only three runs survive by accident, and two documented commands
-destroy them** — blocks-measurement · free-offline · open · **phase 1**
+**C-1 · no artifact records its levers; two documented commands overwrite the corpus they are
+recovered from** — blocks-measurement · free-offline · open · **phase 1**
 No saved artifact records its levers. They are nonetheless recoverable *today*: each log prints
 its own serve plan (`runner.py:79`), and replaying the 167 `(email_id, serve_date)` pairs
 against plans rebuilt from the current corpus identifies the levers uniquely — `outputs/opus.md`
 and `outputs/sonnet.md` match **exactly one of 785 feasible combinations**
-(`daily_min=1 daily_max=5 urgency_horizon=7`, plan digest `832b0b44bce0`);
-`past/claude-haiku-4-5.md` matches three (`daily_max=21`, `urgency_horizon ∈ {3,5,7}`, digest
-`4dd378ec78f1`). The recovery works only while the corpus is frozen, and it is
-(`git diff 24331fb HEAD --stat -- corpus/` is empty). **The destruction path is documented, not
+(`daily_min=1 daily_max=5 urgency_horizon=7`, plan digest `832b0b44bce0`). The 785 is the
+count of schedulable settings over the swept grid `daily_min ∈ 1..3`, `daily_max ∈ 4..30`,
+`urgency_horizon ∈ 1..7` — the number is meaningless without that grid, so it travels with
+it. `past/claude-haiku-4-5.md` matches **seven** settings, not three: `daily_max=21` with
+`urgency_horizon ∈ 1..7`, digest `4dd378ec78f1`. (An earlier draft said three; that was an
+artifact of dropping the grid in the merge. The verifier re-swept it.) The recovery is
+reproducible from git at any date — `corpus/` is tracked, clean and unchanged since
+`24331fb` — so it is not perishable, but it is easier to record now than to re-derive. **The destruction path is documented, not
 hypothetical:** `BENCHMARK_RESULTS.md:146-147` names `scripts/recover_corpus.py` (which fetches
 production live at `:25,32`) and `scripts/fix_match.py` (`:21`, rewrites `corpus/nodes/` in
 place) as the reproduce path.
@@ -803,7 +849,7 @@ case · pin the levers as constants · treat it as a single corpus defect and fi
 
 **C-4 · `sb.analyze` takes the levers by hand and silently reports a different span grid** —
 distorts-measurement · free-offline · open
-`sb/analyze.py:76-83` rebuilds the serve plan from its own CLI defaults (`--corpus build/scaled`,
+`sb/analyze.py:88-90` rebuilds the serve plan from its own CLI defaults (`--corpus build/scaled`,
 `--days 300`, `--daily-max 5`) and never reads the levers out of the log it is analysing.
 `parse_log` extracts only PASS/FAIL and `searched`. Same haiku log, two lever settings, no
 warning either time: the default invocation bins 19/5/0 needles, the correct one
@@ -873,7 +919,7 @@ durable artifact path · normalise the five existing artifacts onto one conventi
 **C-9 · residual stale claims the phase-A1 banner does not cover** — slows-work · free-offline · open
 `BENCHMARK_RESULTS.md:89-91` claims `daily_max=21` is the minimum feasible and `daily_max=5`
 infeasible; measured, 5 is feasible at `--days ≥ 57` and 4 at `≥ 68`, and only 3 is infeasible at
-any ceiling. `:18-19` still reads "SMOKE VERIFIED — ready for the full run" eleven lines below
+any ceiling. `:18-19` still reads "SMOKE VERIFIED — ready for the full run" six lines below
 the banner contradicting it; `:175` still shows opus as `running`. The §4 "reproduce" block
 cannot be run (see the hazard box). Dead `--needles` flag in `RUNNING.md:75,91` and
 `RUN_RESULTS.md:11`. `RUNNING.md:42` documents a retired one-email-per-turn harness against
@@ -911,9 +957,9 @@ over-constraining is what already makes 19% of seeds infeasible) · scheduler in
 `build_plan` fails on a past-resolving answer (would fail today at seed 42) · re-author to
 anchor-relative expressions · quarantine the 18 and report them separately.
 
-**K-2 · the corpus is only coherent at `daily_max=21`; the two headline runs used 5** —
+**K-2 · corpus date-coherence needs a high `daily_max`; the two headline runs used 5** —
 blocks-measurement · free-offline · open
-The whole grammar is serve-relative by design (`sb/resolver.py:16`), so changing only that lever
+The whole grammar is serve-relative by design (`sb/resolver.py:15`), so changing only that lever
 **moves 87 of 127 resolved answer dates** and 160 of 167 serve dates, and roughly triples the
 defect count:
 
@@ -926,12 +972,18 @@ defect count:
 | **21** (documented, haiku) | 16 | 1 | **4** | **6** |
 | 30 | 11 | 1 | 2 | 3 |
 
+Read the table honestly: coherence improves **monotonically above `daily_max=13`**, and `30` is
+strictly better than `21` on every column (1/2/3 defects against 1/4/6). `21` is the *documented*
+lever and the one haiku ran, not the uniquely coherent one — an earlier draft titled this finding
+"only coherent at `daily_max=21`", which its own table contradicts. What the lever buys is bought
+by compressing the calendar, which trades against V-1.
+
 The sharpest instance: `corpus/nodes/pizza-party.json:121` says *"Could we move the pizza party
 to June 9"* with answer `eq: nth:2,TUE,0m`. At `daily_max=21` that resolves to **2026-06-09** and
 the prose is correct; at `daily_max=5` the email is served 2026-07-05 and the answer resolves to
 **2026-07-14**. The free-typed date is not sloppiness — it is a correct date frozen against a
 lever the recorded runs did not use. Separately, 19 of 100 seeds raise `InfeasibleSchedule`
-(mechanism: `sb/scheduler.py:85-99`, a deadline computed once and never recomputed, plus `:108`
+(mechanism: `sb/scheduler.py:85-99`, a deadline computed once and never recomputed, plus `:109`
 returning `False` forever once passed).
 *Options:* pin `daily_max=21` and re-run there (compresses retrieval span further) · pin
 `daily_max=5` and repair the corpus to be coherent at it · make the corpus lever-invariant by
@@ -978,7 +1030,7 @@ distorts-measurement · free-offline · open
 a full date is fused to an adjacent word ("final order by tomorrow**Friday, June 19th, 2026**" —
 genuinely ambiguous, and that email's two readings differ, making it a K-3 case too), **8**
 places where a determiner precedes a full weekday-date, **2** naked `{serve}` tokens stamping the
-delivery date after a sign-off, and **one leaked authoring note**: `press-tour.json:110` ships
+delivery date after a sign-off, and **one leaked authoring note**: `press-tour.json:112` ships
 `[insert date → the 13th, +2 months, + add time 11:00 AM-12:00 PM]` verbatim to the model, stating
 the answer-key expression in plain English next to the rendered date. That is a scoring-integrity
 problem independent of legibility; grep confirms it is the only one.
@@ -1001,11 +1053,13 @@ lint the rest · forbid `eq` on an Interval-resolving expression, or make `_matc
 
 **K-7 · `kind` and calendar-plausibility choices** — distorts-measurement · free-offline · open
 Four `create` ops declare a `kind` that contradicts what the obligation plainly is — most visibly
-a *party* keyed `kind: todo` (`pizza-party.json:12`). Because `grader.py:151` filters the pool by
+a *party* keyed `kind: todo` (`pizza-party.json:22-23`). Because `grader.py:151` filters the pool by
 `op.kind` before matching titles, a model that creates the right object of the other kind scores
 `(nothing matching created)`, identical in the log to doing nothing. The pizza case compounds:
 `_wire_obligations` (`sb/schema.py:393`) makes the sibling `move` inherit `kind: todo`, so a model
-that reasonably books the party as an event fails **both** of that node's graded emails.
+that reasonably books the party as an event fails **two of that node's four** graded emails
+(`pizza-party.json` grades `end-of-year-pizza-party`, `pizza-place-selection`,
+`pizza-order-deadline`, `client-demo-conflict`).
 Separately, 14 of 112 `eq` ops land on a Saturday or Sunday, including a public keynote and a
 design sign-off, because `dom:N`, `serve+Nd` and anchor arithmetic have no business-day awareness
 even though `add_business_days` exists (`sb/resolver.py:80`). **The detector is deliberately
@@ -1025,7 +1079,7 @@ free-typed prose says June 9 — three stated party dates in one node).
 are not free: they reserve a name corpus-wide. Nine obligation names carry edge whitespace, and
 because `match` defaults to `[name]` (`sb/schema.py:155`) a trailing-space name becomes a
 **match keyword containing a trailing space**. 13 duplicated subject lines (`"Reveal event date
-and venue"` ×3) degrade the retrieval surface `list_new_emails` presents; 3 emails have an empty
+and venue"` ×3) degrade the retrieval surface `list_new_emails` presents; 4 emails have an empty
 `from`.
 *Options:* lint unused anchors, case-pairs and edge whitespace (fails the corpus today at 11+1+9
 sites) · strip whitespace at parse time and warn (hides the authoring error) · lint or auto-suffix
@@ -1038,8 +1092,10 @@ blocks-measurement · free-offline · open
 `sb/span.py:4-6` states the claim: a large span means "the fact has likely scrolled out of context
 … so the model must `search_inbox` to recover it." The **entire authored corpus is 43,474
 characters (~10.9k tokens)**, the mean authored body is **227 characters**, and the largest gap
-between a needle's setup and its payoff is 18,389 body chars (~4.6k tokens), rising to ~7.8k
-tokens counting subject, sender and a JSON envelope. Every model in the roster has ≥200k context.
+between a needle's setup and its payoff is 18,389 body chars (~4.6k tokens), rising to ~5.4k
+tokens once subject and sender are counted over the same 83-email window, and higher again with
+per-email JSON overhead. (An earlier draft said ~7.8k; that figure required an unstated ~10k-char
+JSON envelope. The conclusion is untouched either way.) Every model in the roster has ≥200k context.
 **No authored fact has ever scrolled out of context in any recorded run**, and `search_inbox` has
 never been necessary to answer a single email.
 *Options:* scale the corpus with filler until the gap exceeds a real window and re-run (gated on
@@ -1079,6 +1135,12 @@ created. Against that floor:
 
 Normalised, the spread widens from 5 points to 7.8, still with haiku on top, and haiku's advantage
 is concentrated in the free points (60/64 vs 56/64).
+
+**The system prompt instructs models to take the floor.** `runner.py:101` reads *"Over-acting is
+the most common mistake; when in doubt, do nothing."* V-3 establishes the 38.3% is *available*;
+that line makes claiming it the instructed strategy. No section owned this — the verifier found it
+while checking V-3 — and it belongs to whatever decision V-3 becomes, because it means the floor
+is not an artifact a model has to discover, it is advice.
 *Options:* report the floor alongside every score and the actionable subset separately (free, one
 line, changes nothing) · make `cancel` falsifiable by requiring the object to have existed (a
 grader change, removes 8 free points) · rebalance the no-action fraction · score by op.
@@ -1127,7 +1189,8 @@ the tier concept from tooling.
 **V-7 · the authored tier gradient does not exist on the axis it is defined by** —
 distorts-measurement · free-offline · open
 `TIER_LIST.md:23-27,191` define T1→T2→T3 primarily by retrieval distance. Measured, **T3's needles
-are closer than T2's on both axes** (email-span 31.1 vs 33.3; day-span 10.4 vs 11.8), 32 of the 50
+are closer than T2's on both axes** (email-span 31.1 vs 33.3; day-span 10.4 vs 11.8 — but on
+n=6 T3 needles against n=18 T2, so the comparison is directional, not significant), 32 of the 50
 T3 emails have no cross-email anchor reference in their answer key at all, and 13 of the 50 are
 pure no-action, which `TIER_LIST.md:57-59` assigns to T1. `:166-168` requires every T3 to stack
 ≥2 hardeners; only 18 of 50 carry even one measurable one. **Stated limit:** Hardeners B and C are
@@ -1174,7 +1237,7 @@ errors. It says nothing about why haiku sits 5 points higher than opus, because 
 never touches `_title_hit` at all.
 
 **K explains why haiku was asked different questions, and this is the decisive confound.** The
-answer-key grammar is serve-relative (`sb/resolver.py:16`), so `daily_max` alone moves **87 of 127
+answer-key grammar is serve-relative (`sb/resolver.py:15`), so `daily_max` alone moves **87 of 127
 resolved answer dates**. Haiku ran at 21 — the lever the corpus's prose was evidently authored
 against and the lever `BENCHMARK_RESULTS.md` §1 pins — where past-dated ops fall from 11 to 4,
 emails narrating a past date from 18 to 6, and prose-contradicts-answer from 4 to 1 (K-2). **Haiku
@@ -1185,11 +1248,25 @@ reading, and it is the mechanism with the clearest causal path to the 3-point ac
 
 **A's rank inversion is real as a sensitivity result and must not be cited as evidence about
 attribution, because it is confounded by the same lever.** A-1's day-scoped counterfactual gives
-opus 90→55, sonnet 91→57, haiku 98→43. Look at where the damage lands: 35 of opus's 51 no-action
-passes sit on a day with a visible `create_*`, 34 of sonnet's 51, and **55 of haiku's 56**. At
-`daily_max=21` haiku received ~10.4 emails per day against opus's ~2.9, so nearly every haiku day
-necessarily contains an acting email and nearly every haiku no-action pass is nulled by
-construction. **Within the lever-matched pair the ordering is preserved** — sonnet leads opus both
+opus 90→55, sonnet 91→57, haiku 98→43. The confound is **structural and model-independent**, not
+a fact about how these three models happened to behave. Under a day-scoped rule a no-action email
+can only survive if *nothing* was created that day, so the ceiling is fixed by the serve plan
+alone — count the no-action emails sharing their day with no ops-carrying email:
+
+| `daily_max` | days | no-action emails alone on their day | ceiling on day-scoped no-action passes |
+|---|---|---|---|
+| **5** (opus, sonnet) | 57 | **10 / 56** | 10 |
+| 8 | 37 | 3 / 56 | 3 |
+| 13 | 21 | 0 / 56 | 0 |
+| **21** (haiku) | 16 | **1 / 56** | 1 |
+| 30 | 11 | 0 / 56 | 0 |
+
+Haiku's day-scoped score is capped **nine points below** opus's and sonnet's before any model
+behaviour is considered. (An earlier draft argued this correlationally, from where each model's
+passes happened to land; the ceiling argument replaces it and reaches the same conclusion causally.
+It also survives the trace-loss caveat: haiku has the lossiest trace and therefore the most room
+for a *spurious* surviving pass, yet has the fewest, because the ceiling binds.)
+**Within the lever-matched pair the ordering is preserved** — sonnet leads opus both
 before (91 > 90) and after (57 > 55). Only the odd lever out inverts. The honest statement of A-1
 is that the abstain check is 56–57% of every score and its only input is a model-supplied id;
 the "the ranking inverts" headline is a lever effect wearing an attribution label. A itself flags
@@ -1232,12 +1309,13 @@ is therefore a function of how a model chunks its tool calls, not a constant.**
 
 - **V-2's opus conclusion stands, with its argument tightened.** Opus's per-day `get_email`
   histogram is `{1:11, 2:13, 3:12, 4:12, 5:9}`, tracking the day's batch size exactly, and totals
-  166 for 167 emails. Retained can never *exceed* actual, so equality on 56 of 57 days proves no
-  `get_email` was dropped on those days. The load-bearing inference is one step further than V-2
-  states it: count equality demonstrates that opus **serialised** its tool calls (one content
-  block per assistant message), and it is serialisation, not the count itself, that excludes a
-  hidden `search_inbox`. (A message emitting `[search_inbox, get_email]` would preserve the
-  `get_email` count while losing the search; only serialisation rules that out.) Day 1's line,
+  166 for 167 emails. Retained can never *exceed* actual, so the trace **meets its lower bound
+  on 56 of 57 days** — a tight lower bound, and the strongest statement the data supports. It is
+  not proof that no `get_email` was dropped, and the earlier draft's further step — that count
+  equality *demonstrates* opus serialised its tool calls, one content block per assistant
+  message — does not follow either; O's own synthetic case 2 refutes it. A message emitting
+  `[search_inbox, get_email]` would preserve the `get_email` count while losing the search, so
+  a hidden search is bounded, not excluded. Day 1's line,
   which shows four separate retained `get_email` entries interleaved with three retained
   `search_inbox` entries, is direct evidence of serialisation.
 - **Sonnet and haiku are demonstrably lossy.** Sonnet's `{1: 57}` — exactly one `get_email` on
@@ -1261,7 +1339,7 @@ so the measure is sound in aggregate and unsound per day.
   for sonnet and haiku. Phrase them that way everywhere.
 - O-2's "41–74% `create_*` drop rate on those same runs" applies to sonnet and haiku, not opus.
 - V-1's central claim is untouched by any of this: it is a measurement of the corpus
-  (~10.9k tokens, ~7.8k max needle gap), not of the trace.
+  (~10.9k tokens, ~5.4k max needle gap), not of the trace.
 - A's use of the tools line to rule out whole-day inaction (see resolution 3) is sound in the
   direction it is used: loss can hide a `create_*` that happened, never invent one that did not.
 - The one still-open question is whether the current CLI emits one `assistant` event per content
@@ -1455,9 +1533,9 @@ against it. Twenty corrections, all found independently by two or more agents wh
     `pizza-party.json:121`'s "June 9" is exactly what `nth:2,TUE,0m` resolves to at
     `daily_max=21`. These are correct dates frozen against the documented lever, not invented ones.
 15. **§2.1's levers column is under-specified for haiku.** `daily_max=21` is independently
-    confirmable from the log's serve plan; `urgency_horizon` is not — three values (3, 5, 7)
-    reproduce it exactly. The brief's only source is a hand-typed header whose corpus-sha field is
-    unverifiable (C-5).
+    confirmable from the log's serve plan; `urgency_horizon` is not — **seven** values (1 through
+    7) reproduce it exactly. The brief's only source is a hand-typed header whose corpus-sha field
+    is unverifiable (C-5).
 16. **§2.2's forensics reproduce with a small methodology difference:** em-dash share 61%/0%/0%
     against the brief's 64%/0%/0%; mean title length 47/36/40 against 46/36/40; opus↔sonnet verdict
     agreement 148/167 = 88.6% exactly. Same conclusion.
@@ -1568,23 +1646,57 @@ gitignored `build/`.
   closed — majority keyword-discoverability, kind mismatch smallest by an order of
   magnitude, attribution arm unevidenced).
 
-  **The phase table changed**, on the strength of O-1 (nothing already paid for can ever be
-  re-graded, so O's payoff lands at the paid run, not before it) and G-4 (G's central result
-  was produced offline against the shipped engine with no live run). O moves from phase 1 to
-  phase 6; G becomes the first substantive phase; a new **phase 1 "freeze the record"**
-  is inserted ahead of everything because C-1's lever recovery dies the moment `corpus/`
-  changes and `BENCHMARK_RESULTS.md:146-147` documents the command that changes it; V moves
-  ahead of K because V-1's construct decision determines what the corpus pass is for. Phase
-  1.5 splits: the answer-key audit is free and largely delivered by K, the hand-grade of
-  model behaviour is not free and moves into phase 7.
+  **The phase table changed.** O moves from phase 1 to phase 6; G becomes the first
+  substantive phase; a new **phase 1 "freeze the record"** is inserted ahead of everything;
+  V moves ahead of K because V-1's construct decision determines what the corpus pass is
+  for. Phase 1.5 splits: the answer-key audit is free and largely delivered by K, the
+  hand-grade of model behaviour is not free and moves into phase 7. *The merge argued this
+  from two premises; the verifier pass below cut it to one. G-4 carries it.*
 
   **20 corrections to the evidence brief recorded without editing it**, including six stale
   code anchors, a fourth complete run log (`past/claude-sonnet-4-5.md`, `SCORE 102/176`)
   the brief's §2.1 table omits, and §2.6's unsound inference from the attribution warning
   count. Four operational hazards promoted to a box at the top of this file, the first being
   that the documented "reproduce" path (`scripts/recover_corpus.py`, `scripts/fix_match.py`)
-  fetches production and rewrites `corpus/nodes/` in place, destroying the only provenance
-  the surviving runs have.
+  fetches production and rewrites `corpus/nodes/` in place.
 
-  **Not done:** the verifier pass that red-teams this merge against the code. That is the
-  remaining phase-A step, and the phase table needs sign-off before phase 1 begins.
+- **2026-08-17** — Phase A, verifier pass. `docs/_repair/VERIFY.md`. ~200 claims checked:
+  6 headline numbers re-derived with independent scripts, ~50 further numeric claims,
+  ~145 `file:line` anchors opened, 8 grep assertions re-run. **~180 confirmed, 2
+  substantively wrong, 8 overstated, 3 unfalsifiable.** All six headline numbers reproduce
+  to the digit — G-4's 92/167 and the whole policy table cell-for-cell, G-1's 32/125 and
+  8%/48%, A-1's 55/57/43, V-1's 43,474 chars and 18,389-char gap, V-3's 64/167, K-2's
+  87-of-127. Merge fidelity clean: all 50 IDs present, zero severity drift, no lost anchors,
+  0 of ~145 anchors fabricated.
+
+  **The two substantive errors both fed the phase table, and both are corrected in place.**
+  (1) The hazard box called the corpus damage *permanent*. It is not — `corpus/nodes` is 16
+  git-tracked files, clean and unchanged since `24331fb`, so `git checkout -- corpus/nodes`
+  restores them byte-for-byte. That claim was the sole basis for labelling phase 1
+  "time-critical"; it is now "do it early". (2) O-1's "no run already paid for can ever be
+  re-graded" is too strong — the register performs three such re-grades itself (G-2, A-1,
+  A-6) and the verifier reproduced two from the logs alone. The defensible limit is narrower:
+  no re-grade under a rule that would newly admit objects the log never rendered, which still
+  blocks G-1, G-3 and G-8. **The phase re-ordering now rests on G-4 alone**, which was
+  independently confirmed.
+
+  Also applied: C-1's haiku levers are seven values (`urgency_horizon ∈ 1..7`), not three,
+  and the 785 now travels with the grid that defines it; A-1's lever-artifact call upgraded
+  from correlational to causal with a model-independent ceiling table (haiku capped nine
+  points below opus/sonnet by the serve plan alone, before any model behaviour); resolution
+  2's "proves no `get_email` was dropped" softened to a tight lower bound and its
+  serialisation inference dropped; G-3's writing-style clause dropped as unmeasurable;
+  G-1's prompt claim corrected — `runner.py:107` *does* say "Never leave duplicates", which
+  sharpens G-1 (told the right rule, graded by a different one); K-2 retitled off "only
+  coherent at `daily_max=21`" since its own table shows 30 strictly better; K-7's "both" →
+  "two of four"; six off-by-N anchors; three phase-0 anchors labelled `@24331fb`.
+
+  **New, found by the verifier and owned by no section:** `runner.py:101` instructs the model
+  *"Over-acting is the most common mistake; when in doubt, do nothing."* V-3 shows a null
+  model scores 38.3%; that line makes claiming the floor the *instructed* strategy. Recorded
+  under V-3.
+
+  **Nothing in this pass changed a severity or moved a finding out of `open`.** The
+  evidentiary base is sound; what needed editing was prose that over-read it.
+
+  **Not done:** sign-off on the revised phase table. Phase 1 does not begin without it.
