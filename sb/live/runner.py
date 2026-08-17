@@ -156,9 +156,14 @@ def _all_ids(state: dict) -> set[str]:
     return {r["id"] for r in state["events"]} | {r["id"] for r in state["todos"]}
 
 
-def _parse_stream(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
-    """Return (session_id, tool_names_used, is_error, assistant_text)."""
+def _parse_stream(stdout: str) -> tuple[Optional[str], list[str], bool, str, Optional[str]]:
+    """Return (session_id, tool_names_used, is_error, assistant_text, resolved_model).
+
+    resolved_model is what the CLI actually loaded, not what we asked for. The init
+    event has carried it all along; not reading it is how a silently-substituted
+    model could look like a real score."""
     session_id, tools, is_error, texts = None, [], False, []
+    resolved_model = None
     seen = {}
     for line in stdout.splitlines():
         line = line.strip()
@@ -171,8 +176,10 @@ def _parse_stream(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
         t = ev.get("type")
         if t == "system" and ev.get("subtype") == "init":
             session_id = ev.get("session_id")
+            resolved_model = ev.get("model") or resolved_model
         elif t == "assistant":
             msg = ev.get("message", {})
+            resolved_model = msg.get("model") or resolved_model
             seen[msg.get("id", id(ev))] = msg
         elif t == "result":
             session_id = session_id or ev.get("session_id")
@@ -185,7 +192,7 @@ def _parse_stream(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
                 tools.append(b.get("name", "").split("__")[-1])
             elif b.get("type") == "text" and b.get("text", "").strip():
                 texts.append(b["text"].strip())
-    return session_id, tools, is_error, " ".join(texts)
+    return session_id, tools, is_error, " ".join(texts), resolved_model
 
 
 def _free_port(port: int) -> None:
@@ -228,18 +235,23 @@ def start_mcp() -> subprocess.Popen:
     _free_port(MCP_PORT)
     env = {**os.environ, "MCP_TRANSPORT": "streamable-http", "MCP_PORT": str(MCP_PORT),
            "STORE_BASE_URL": STORE_URL, "PYTHONPATH": str(REPO)}
+    # Keep stderr: a crash here (bad mcp version, port in use) used to surface only as
+    # the generic "did not come up", which hides the actual traceback.
     proc = subprocess.Popen(
         [sys.executable, "-m", "sb.live.mcp_app"],
-        cwd=str(REPO), env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        cwd=str(REPO), env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
     )
     for _ in range(60):
+        if proc.poll() is not None:      # died on startup — report why
+            err = (proc.stderr.read() if proc.stderr else "").strip()
+            raise RuntimeError(f"mcp server exited immediately:\n{err[-800:]}")
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(1)
             if s.connect_ex(("127.0.0.1", MCP_PORT)) == 0:  # port is accepting connections
                 return proc
         time.sleep(0.5)
     proc.terminate()
-    raise RuntimeError("mcp server did not come up")
+    raise RuntimeError("mcp server did not come up within 30s")
 
 
 # --- model drivers ---------------------------------------------------------
@@ -316,10 +328,11 @@ def build_cmd(driver: str, model: str, session: Optional[str], user_msg: str,
     return cmd
 
 
-def _parse_codex(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
-    """Parse `codex exec --json` JSONL -> (thread_id, tool_names, is_error, text).
+def _parse_codex(stdout: str) -> tuple[Optional[str], list[str], bool, str, Optional[str]]:
+    """Parse `codex exec --json` JSONL -> (thread_id, tool_names, is_error, text, model).
     Only thread_id (for resume) and is_error are load-bearing; tools/text are display."""
     session_id, tools, is_error, texts = None, [], False, []
+    resolved_model = None
     for line in stdout.splitlines():
         line = line.strip()
         if not line:
@@ -331,6 +344,7 @@ def _parse_codex(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
         t = ev.get("type")
         if t == "thread.started":
             session_id = ev.get("thread_id") or session_id
+            resolved_model = ev.get("model") or resolved_model
         elif t in ("turn.failed", "error"):
             is_error = True
         elif t == "item.completed":
@@ -344,10 +358,10 @@ def _parse_codex(stdout: str) -> tuple[Optional[str], list[str], bool, str]:
                 txt = item.get("text") or item.get("content") or ""
                 if isinstance(txt, str) and txt.strip():
                     texts.append(txt.strip())
-    return session_id, tools, is_error, " ".join(texts)
+    return session_id, tools, is_error, " ".join(texts), resolved_model
 
 
-def parse_output(driver: str, stdout: str) -> tuple[Optional[str], list[str], bool, str]:
+def parse_output(driver: str, stdout: str) -> tuple[Optional[str], list[str], bool, str, Optional[str]]:
     return _parse_codex(stdout) if driver == "codex" else _parse_stream(stdout)
 
 
@@ -357,6 +371,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
         reasoning: Optional[str] = None) -> None:
     if driver == "auto":
         driver = infer_driver(model)
+    levers = levers or Levers()
     corpus = load_corpus(corpus_dir)
     plan = build_plan(corpus, start_date=start, seed=seed, n_days=n_days, levers=levers)
     # Isolated empty cwd for BOTH drivers: codex needs a trusted root; claude must not
@@ -386,10 +401,13 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     results: dict[str, object] = {}
 
     print(f"\n{BOLD}{BLUE}╔═══ SecretaryBench · live run ═══╗{RESET}")
-    print(f"{BLUE}║{RESET} model {BOLD}{model}{RESET} {DIM}via {driver}{RESET}")
+    print(f"{BLUE}║{RESET} model {BOLD}{model}{RESET} {DIM}(requested) via {driver}{RESET}")
     print(f"{BLUE}║{RESET} seed {seed} · {len(days)} days · {len(order)} emails · start {start}")
+    print(f"{BLUE}║{RESET} levers daily {levers.daily_min}-{levers.daily_max} · urgency {levers.urgency_horizon}"
+          f" · corpus {corpus_dir}")
     print(f"{BOLD}{BLUE}╚═════════════════════════════════╝{RESET}")
     email_no = 0
+    resolved_model: Optional[str] = None
     try:
         for day_no, batch in enumerate(days, 1):
             sd = plan.serve_date[batch[0]]   # every email in a batch shares the serve day
@@ -429,9 +447,26 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                     proc = subprocess.run(cmd, capture_output=True, text=True,
                                           timeout=per_turn_timeout, stdin=subprocess.DEVNULL,
                                           cwd=iso_cwd)
-                    sid, tools, is_err, said = parse_output(driver, proc.stdout)
+                    sid, tools, is_err, said, rmodel = parse_output(driver, proc.stdout)
                     if not is_err and proc.returncode == 0:
                         session = session or sid
+                        # What the CLI actually loaded. Checked EVERY turn, not just the
+                        # first: --resume could quietly drop back to a default model
+                        # mid-run, and the score would still be filed under `model`.
+                        if rmodel:
+                            if resolved_model is None:
+                                resolved_model = rmodel
+                                match = rmodel == model or rmodel.startswith(model)
+                                tag = f"{GREEN}✓{RESET}" if match else f"{RED}{BOLD}✗ MISMATCH{RESET}"
+                                print(f"   {DIM}model served{RESET}  {BOLD}{rmodel}{RESET} {tag}")
+                                if not match:
+                                    print(f"   {RED}requested {model!r} but the CLI served "
+                                          f"{rmodel!r} — this run does NOT measure {model}{RESET}")
+                            elif rmodel != resolved_model:
+                                print(f"   {RED}{BOLD}✗ MODEL DRIFT{RESET} {RED}day {day_no}: was "
+                                      f"{resolved_model!r}, now {rmodel!r} — scores before and "
+                                      f"after this point are not comparable{RESET}")
+                                resolved_model = rmodel
                         ok = True
                         break
                     detail = (proc.stderr.strip() or proc.stdout.strip()[-160:])[:160] or f"{driver} returned is_error"
@@ -491,6 +526,9 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     print(f"  {bar}")
     print(f"  {BOLD}SCORE {pct_col}{passed}/{len(order)}{RESET} {BOLD}({pct:.0%}){RESET}"
           + (f"  {RED}{errored} errored{RESET}" if errored else ""))
+    # Stamp the config next to the score so a saved log can't be mislabelled later.
+    print(f"  {DIM}served {resolved_model or model} · seed {seed} · daily "
+          f"{levers.daily_min}-{levers.daily_max} · {len(order)} emails · {corpus_dir}{RESET}")
     print(f"{BOLD}{BLUE}══════════════════════════════════{RESET}\n")
 
 

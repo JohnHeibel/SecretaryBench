@@ -4,6 +4,10 @@ uvicorn[standard]>=0.32.0
 pydantic>=2.9.0
 pytest>=8.0.0
 httpx>=0.27.0
-mcp>=1.0.0
+# Upper bound is load-bearing: mcp 2.0 renamed FastMCP -> MCPServer and moved it to
+# mcp.server.mcpserver, so sb/live/mcp_app.py fails to import on 2.x. Porting to the
+# 2.0 API changes the tool surface the model under test sees, so it is a deliberate
+# benchmark change, not a dependency bump.
+mcp>=1.0.0,<2.0.0
 pandas>=2.0.0
 openpyxl>=3.1.0

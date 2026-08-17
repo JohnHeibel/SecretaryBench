@@ -23,6 +23,7 @@ cmd="${1:-live}"
 case "$cmd" in
   demo)  shift; exec "$PY" -m sb.demo "$@" ;;
   test)  shift; exec "$PY" -m pytest sb/tests/ -q "$@" ;;
-  live)  exec "$PY" -m sb.live.runner ;;            # bare ./run.sh
+  # `shift || true` because a bare `./run.sh` has no args to shift (set -e would abort).
+  live)  shift || true; exec "$PY" -m sb.live.runner "$@" ;;   # ./run.sh [live] --model ...
   *)     exec "$PY" -m sb.live.runner "$@" ;;       # ./run.sh --model ... --seed ...
 esac
