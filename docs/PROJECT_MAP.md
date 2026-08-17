@@ -3,10 +3,19 @@
 This is the quick orientation map. It is not a replacement for the design docs;
 it tells you where things live and what each part is responsible for.
 
+## Start here
+
+- `docs/benchmark-repair.md`: **the live register.** What is wrong with the benchmark,
+  what has been changed, and what has actually been proven. Read before doing any work.
+- `docs/benchmark-repair-evidence.md`: the sourced findings the register is built on,
+  plus the working rules for the category fan-out.
+
 ## Main specs and history
 
 - `RUNNING.md`: plain-language guide for building a corpus, running a model, and
   analyzing results.
+- `BENCHMARK_RESULTS.md`: **stale** — superseded by the register above; kept for the
+  corpus-provenance and recovery notes in §3.
 - `ANSWER_KEY_GRAMMAR.md`: the token grammar and verb-based answer key contract.
 - `RECAP.md`: latest working recap of the day loop, grading, and authoring risks.
 - `TIER_LIST.md`: authoring playbook for T1/T2/T3 email difficulty.

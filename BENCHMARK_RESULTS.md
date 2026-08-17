@@ -1,5 +1,16 @@
 # SecretaryBench — multi-model benchmark results
 
+> ⚠️ **STALE as of 2026-08-17 — do not act on the numbers below.** The results table in
+> §5 and the pinned config in §1 describe the retired 176-email corpus. The corpus is now
+> 15 nodes / 167 emails, and the runs that actually exist are `outputs/opus.md` (90/167),
+> `outputs/sonnet.md` (91/167) and `past/claude-haiku-4-5.md` (98/167). The two
+> `outputs/claude-*.md` evidence links in §5 point at files that do not exist.
+>
+> More importantly: those scores were produced by a grader whose object matching is under
+> investigation, so none of them are capability measurements. Current state, and the plan
+> to fix it, live in **`docs/benchmark-repair.md`**. This file will be rewritten in that
+> plan's phase 5, once there is something trustworthy to record.
+
 Cross-model run of the **authored** corpus (Claude via `claude -p`, OpenAI via `codex exec`),
 both driving the **same** MCP store + scheduler + grader — apples-to-apples. This file is the
 durable record; scores are appended as each run finishes.
@@ -130,7 +141,8 @@ Included scenarios (emails / graded-ops): `Innovation-comp` 48/17 · `World_Cup_
 
 ```bash
 # one-time: venv + pull & recover corpus (already done)
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# Explicit 3.13 — bare `python3` is 3.9 on macOS and cannot run the MCP tool server.
+uv venv --python 3.13 .venv && uv pip install -r requirements.txt --python .venv/bin/python
 PYTHONPATH=$PWD .venv/bin/python scripts/recover_corpus.py   # pull+recover -> corpus/nodes/
 PYTHONPATH=$PWD .venv/bin/python scripts/fix_match.py         # model-robust match keywords
 

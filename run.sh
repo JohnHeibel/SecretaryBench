@@ -13,9 +13,19 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 PY=".venv/bin/python"
+# NOTE: build the venv with an explicit 3.13, not bare `python3`. macOS ships 3.9,
+# which cannot install `mcp` and cannot evaluate the PEP 604 annotations in
+# sb/live/mcp_app.py — the failure surfaces much later as "mcp server did not come up".
+SETUP="  uv venv --python 3.13 .venv && uv pip install -r requirements.txt --python .venv/bin/python"
 if [[ ! -x "$PY" ]]; then
-  echo "error: $PY not found. Create the venv first:" >&2
-  echo "  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt" >&2
+  echo "error: $PY not found. Create the venv first (Python 3.10+ required):" >&2
+  echo "$SETUP" >&2
+  exit 1
+fi
+if ! "$PY" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)'; then
+  echo "error: $PY is $("$PY" -V 2>&1), but the harness needs Python 3.10+." >&2
+  echo "Delete .venv and rebuild it (a venv cannot be upgraded in place):" >&2
+  echo "$SETUP" >&2
   exit 1
 fi
 

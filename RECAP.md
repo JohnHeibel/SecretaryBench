@@ -1,5 +1,12 @@
 # Recap — day loop, grading, and what's safe to author (2026-06-02)
 
+> **2026-08-17 update.** The architecture described below is accurate and still stands.
+> The verdict "the machinery is solid" does not: three live runs since then show ~85% of
+> all failures are the grader failing to *find* the model's object rather than the model
+> getting the date wrong. The question raised in §9 of this file — how a grader can
+> deterministically match a title the model invents — turned out to be the central
+> problem, not a loose end. Current state: **`docs/benchmark-repair.md`**.
+
 Read this first in the morning. It explains the whole machine in plain terms, what
 changed last session, and the short list of things to keep in mind before you start
 feeding real emails. Verdict up front: **the machinery is solid. You can start

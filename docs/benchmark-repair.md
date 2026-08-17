@@ -10,6 +10,57 @@ a diff). IDs are permanent and never reused.
 
 ---
 
+## Start here (next session)
+
+Phase 0 is complete and committed. **The next action is phase A: the category fan-out
+that fills in the G / A / O / C / K / V sections of this register.**
+
+To run it:
+
+1. Read `docs/benchmark-repair-evidence.md`. It is the shared brief and already contains
+   the working rules, the per-finding template, and the category list. It exists so seven
+   agents do not each re-derive the same facts and contradict each other.
+2. Spawn one read-only agent per category (G, A, O, C, K, V — six; M and E are closed
+   apart from M-5). Each gets the brief, writes its section to `docs/_repair/<ID>.md`,
+   and returns only a 3-line summary. Writing to files instead of returning prose is
+   what keeps the fan-out cheap.
+3. Spawn a synthesizer to merge `docs/_repair/*.md` into this register, then a verifier
+   to red-team the merged result against the code.
+4. Sequence the result and get approval before any phase 1 work begins.
+
+**Do not start phases 1–5 before the register is filled in.** The sequencing argument
+below depends on knowing what is actually in each category.
+
+The environment is ready: `.venv` is Python 3.13 with `mcp` 1.29.0, 62 tests pass, and
+the corpus is oracle-clean. `CLAUDE.md` (gitignored, machine-local) carries the operating
+rules and loads automatically.
+
+### Why the phases are ordered the way they are
+
+Fix what makes iteration cheap before fixing what needs iteration. The store state is
+currently thrown away when a run ends, so the only way to evaluate a grader change is to
+pay for a whole new run. Doing **O** first (state dump + structured output) means every
+later grader change can be re-scored offline against runs already paid for. Doing **G**
+first means every iteration on the hardest problem costs a full run.
+
+| phase | category | why here | cost |
+|---|---|---|---|
+| 0 | M, E | done — the reported blocker | free |
+| A | — | build the register | free |
+| 1 | O | makes everything downstream cheap to evaluate | free |
+| 1.5 | — | hand-grade ~30 emails: the honesty baseline (see §4.2 of the brief) | free |
+| 2 | G | the grader; now iterable offline | free to iterate |
+| 3 | A | depends on decisions made in G | free |
+| 4 | K | corpus pass; what makes a good `match` keyword depends on G's contract | free |
+| 5 | C, V | pin and stamp config, tier and span reporting | free |
+| 6 | — | re-run the roster under one pinned config | the only paid phase |
+
+Phase 1.5 is the one that separates *fixing* the benchmark from *inflating* it. Any
+grader change will raise the scores; only a hand-graded baseline says whether it raised
+them toward the truth.
+
+---
+
 ## Dashboard
 
 | ID | problem | severity | status | phase |
@@ -44,8 +95,9 @@ FastMCP evaluates at runtime — a hard TypeError on 3.9. The documented setup l
 (`run.sh:18`, `BENCHMARK_RESULTS.md` §4) says bare `python3`, which builds a 3.9 venv.
 **Fix:** build with an explicit interpreter — `uv venv --python 3.13 .venv`.
 **Verified by:** `.venv/bin/python -m pytest sb/tests -q` → 62 passed.
-**Still to do:** correct the setup line in `run.sh` and the docs so the next person on a
-Mac does not hit this; consider a version guard beside the existing venv check.
+**Also done:** `run.sh` now names an explicit 3.13 in its setup hint and refuses to run a
+venv below 3.10 with a message that says to delete and rebuild (a venv cannot be upgraded
+in place). `BENCHMARK_RESULTS.md` §4's setup line corrected.
 
 ### E-2 · `mcp` 2.0 broke the tool server
 **Status:** verified.
@@ -177,3 +229,11 @@ directly rather than by inference.
   (`claude-haiku-4-5`) — chosen deliberately so a persisting M-1 could not hide.
   The 9/9 and 3/3 scores are not a capability signal: these are the first easy emails
   in the plan, and the grader problems (G-*) live further into the run.
+
+- **2026-08-17** — Phase A1. Wrote `docs/benchmark-repair-evidence.md`, the sourced brief
+  for the fan-out. Propagated phase 0's findings into the docs that contradicted them:
+  `run.sh` setup hint + Python version guard, `BENCHMARK_RESULTS.md` staleness banner and
+  corrected setup line, `docs/PROJECT_MAP.md` start-here pointers, `RECAP.md` banner
+  correcting its "the machinery is solid" verdict. Moved this register from
+  `.claude/plans/` to `docs/` after finding `~/.gitignore_global` excludes
+  `.claude/plans/` — it would never have been committed.
