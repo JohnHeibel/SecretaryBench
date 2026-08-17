@@ -51,9 +51,15 @@ webapp and the `backups` branch are off limits.
 
 ## Start here (next session)
 
-Phase 0 and phase A are complete and committed. **The next action is phase 1: freeze the
-record before anything writes to `corpus/`.** See the phase table below — it changed as a
-result of phase A, and the change is the most consequential thing in this document.
+Phase 0 and phase A are complete and committed, and the revised phase table is signed off.
+**The next action is phase 1: freeze the record before anything writes to `corpus/`** —
+capture the recovered levers, the plan digests, and the ~270 model-authored titles
+harvested from the four logs into a committed sidecar. It is free, offline, and needs no
+live run.
+
+Two standing consequences of the sign-off, carried here so they are not re-litigated:
+G-1, G-3 and G-8 may reach `fix proposed` in phase 2 but cannot reach `verified` before
+phase 7; and V-1's rescope-or-rebuild decision belongs to phase 4.
 
 Phase A ran six read-only category agents over the shared brief
 (`docs/benchmark-repair-evidence.md`). They produced **50 findings**. Their full working
@@ -80,9 +86,16 @@ you read anything else: the corpus hazard is **not** permanent (`corpus/` is git
 and restorable), and O-1's "nothing can ever be re-graded" is too strong. Both fed the
 phase table, which has been re-argued on G-4 alone.
 
-**Get sign-off on the revised phase table before phase 1 begins.** The ordering below is
-a synthesizer decision derived from the fan-out, not the ordering that was approved
-before it.
+**The revised phase table was signed off on 2026-08-17, as written below.** Two decisions
+were taken at sign-off:
+
+1. **O stays at phase 6.** The consequence was put explicitly and accepted: G-1, G-3 and
+   G-8 can be *designed* in phase 2 but cannot be validated until the phase 7 run, because
+   of O-1's corrected limit. The alternative — one extra instrumented run up front to
+   unblock them — was declined as not worth the cost.
+2. **V-1's direction is decided at phase 4, not now.** Whether phase 5 is a corpus repair
+   or a corpus rebuild depends on the grading contract G and A settle first. Deciding it
+   earlier would pre-commit on thin information.
 
 ### Why the phases are ordered the way they are (revised after phase A)
 
