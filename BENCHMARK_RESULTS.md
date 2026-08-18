@@ -3,13 +3,20 @@
 > ⚠️ **STALE as of 2026-08-17 — do not act on the numbers below.** The results table in
 > §5 and the pinned config in §1 describe the retired 176-email corpus. The corpus is now
 > 15 nodes / 167 emails, and the runs that actually exist are `outputs/opus.md` (90/167),
-> `outputs/sonnet.md` (91/167) and `past/claude-haiku-4-5.md` (98/167). The two
-> `outputs/claude-*.md` evidence links in §5 point at files that do not exist.
+> `outputs/sonnet.md` (91/167) and `past/claude-haiku-4-5.md` (98/167). Of the two
+> `outputs/claude-*.md` evidence links in §5, the haiku 84/176 artifact was genuinely
+> destroyed (overwritten by a later run at the same filename); the sonnet 102/176 one
+> survives at `past/claude-sonnet-4-5.md`, a fourth complete run log.
 >
 > More importantly: those scores were produced by a grader whose object matching is under
 > investigation, so none of them are capability measurements. Current state, and the plan
 > to fix it, live in **`docs/benchmark-repair.md`**. This file will be rewritten in that
-> plan's phase 5, once there is something trustworthy to record.
+> plan's phase 4 (the stale claims, finding C-9), and rewritten after phase 7, once there
+> is a trustworthy number to record.
+>
+> ⚠️ **Do not run the §4 "reproduce" block.** `scripts/recover_corpus.py` fetches the
+> production API and `scripts/fix_match.py` rewrites `corpus/nodes/` in place. Both
+> overwrite the corpus the surviving runs were scored against.
 
 Cross-model run of the **authored** corpus (Claude via `claude -p`, OpenAI via `codex exec`),
 both driving the **same** MCP store + scheduler + grader — apples-to-apples. This file is the
