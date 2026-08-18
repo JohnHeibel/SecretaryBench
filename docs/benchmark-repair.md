@@ -62,9 +62,16 @@ G-1, G-3 and G-8 may reach `fix proposed` in phase 2 but cannot reach `verified`
 phase 7; and V-1's rescope-or-rebuild decision belongs to **phase 8**, after the run.
 
 **The scope rule for phases 1 through 7, in one line:** fix what is broken about the
-benchmark we have. Do not make it harder. Phases 1-7 are a repair, and the paid run at
-phase 7 produces the first honest number this project has ever had. What that number
-implies is phase 8's problem.
+benchmark we have. Do not make it harder. What a repaired-but-trivial score implies is
+phase 8's problem.
+
+**Revised 2026-08-18: a baseline run moves to the front (phases 1a-1c).** The O-timing
+decision taken at sign-off assumed no run would happen before phase 7, which made O's
+payoff land too late to matter. That assumption no longer holds. Building the minimum
+capture slice *before* the run converts one paid run into a permanent, re-gradeable asset:
+every later grader change can be scored against it offline, for free, indefinitely. It
+also produces the first artifact in this project's history whose served model is certified
+rather than asserted (see the provenance note under C-1).
 
 Phase A ran six read-only category agents over the shared brief
 (`docs/benchmark-repair-evidence.md`). They produced **50 findings**. Their full working
@@ -155,12 +162,15 @@ Revised table. Old phase numbers in brackets.
 | 0 | M, E | done — the reported blocker | free |
 | A | — | the register (done) | free |
 | 1 | **C-1** *(new)* | a documented command overwrites the corpus the three runs were scored against. Capture the recovered levers, the plan digests, and the ~270 model-authored titles harvested from the four logs before anything writes to `corpus/`. Recoverable from git if missed, so early rather than urgent | free, do it early |
-| 2 | G *[was 2]* | already iterable offline today: shipped engine + oracle title-policy sweep + the harvested real-model titles. Does not depend on O | free to iterate |
+| **1a** | **O-1, O-3, O-5a** *(new)* | the minimum re-gradeable capture slice: `--out DIR`, an end-of-run store dump, and **recording objects that matched no keyword**. Built before any run so the run is a permanent asset rather than a fourth disposable log | free |
+| **1b** | — *(new)* | bounded smoke (`--limit`, background) to prove the capture writes what phase 2 needs, and that the runner certifies the served model | cheap, bounded |
+| **1c** | — *(new)* | **the baseline run**: certified model, known config, fully re-gradeable. Run at seed 42 / `daily_max=5` so it is directly comparable to `outputs/opus.md` and `outputs/sonnet.md`, which retroactively validates them | **paid** |
+| 2 | G *[was 2]* | the grader. Now testable against **real recorded behaviour** from 1c, not only the oracle title-policy sweep | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
 | 4 | V *(part)*, C *[was 5]* | pin one lever and one config (C-2, C-3, K-2) and fix the **reporting** gaps: report V-3's null floor beside every score, make V-6's by-tier report exist, stamp provenance. **Does not decide what the benchmark claims** — see phase 8 | free |
 | 5 | K *[was 4]* | the corpus pass, at the pinned lever, against G's keyword contract. **A repair, not a rebuild**: make every authored question answerable and every keyword discoverable. Do not add difficulty, do not scale, do not re-author the tier set | free |
-| 6 | O *[was 1]* | instrumentation is the prerequisite for the paid run. Its one irrecoverable item (O-4, retrieval observability) requires changing the model-facing surface, which is a benchmark decision that must be taken with G/A/K/V already settled | free |
-| 7 | — | the paid instrumented run of the roster at one pinned config, **and** the hand-grade taken from *its* artifacts | the only paid phase |
+| 6 | O *(remainder)* *[was 1]* | the O items **not** in the 1a slice: O-2 trace loss, O-6 to O-9. O-4 (retrieval observability) is here rather than 1a because it requires changing the model-facing tool surface, a benchmark decision that must be taken with G/A/K/V settled | free |
+| 7 | — | the full instrumented run of the **roster** at the pinned config, plus the hand-grade. 1c is one model as a baseline; this is the comparison | **paid** |
 | 8 | **V-1, V-5** *(new)* | reassess with a real number in hand. Is the repaired benchmark still measuring anything interesting, and does the retrieval claim survive? A trivial score is itself a result. **Nothing here is scoped until phase 7 reports** | free to decide |
 
 **Phase 1.5 no longer exists as scheduled, and this is the honest version of why.** The
@@ -215,16 +225,17 @@ matched something.
 | **A-4** | `_watch_attribution` is blind to the sibling stamp it is cited as evidence about | distorts-measurement | open | 3 |
 | **A-5** | a wrong `email_id` silently removes the object from every pool; honest model loses credit | distorts-measurement | open | 3 |
 | **A-6** | worked case: one stale stamp caused one false PASS and cost one earned PASS | distorts-measurement | open | 3 |
-| **O-1** | the harness writes nothing; surviving artifacts are hand-copied stdout | blocks-measurement | open | 6 |
+| **O-1** | the harness writes nothing; surviving artifacts are hand-copied stdout | blocks-measurement | open | **1a** |
 | **O-2** | tool trace drops calls by message-id collapse; loss is model-dependent | blocks-measurement | open | 6 |
-| **O-3** | a final-state dump is insufficient: the store records no history and no day | blocks-measurement | open | 6 |
+| **O-3** | a final-state dump is insufficient: the store records no history and no day | blocks-measurement | open | **1a** |
 | **O-4** | retrieval is unobservable server-side; only the lossy client trace sees it | blocks-measurement | open | 6 |
-| **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | open | 6 |
+| **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | open | **1a** |
 | **O-6** | tools and narration attributed per day not per email; narration truncated at 200 chars | distorts-measurement | open | 6 |
 | **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | open | 6 |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
 | **O-9** | objects with an unparseable date are dropped from grading without a trace | distorts-measurement | open | 6 |
 | **C-1** | no artifact records its levers; two documented commands overwrite the corpus they are recovered from | blocks-measurement | open | **1** |
+| **C-1b** | the model label on every surviving artifact is asserted, not observed (M-1/M-2 were live) | blocks-measurement | open | **1** |
 | **C-2** | `urgency_horizon` absent from the score stamp and moves 148/167 serve dates | distorts-measurement | open | 4 |
 | **C-3** | corpus satisfiability is lever-dependent; the oracle gate is hardcoded to one setting | distorts-measurement | open | 4 |
 | **C-4** | `sb.analyze` takes levers by hand and silently reports a different span grid if wrong | distorts-measurement | open | 4 |
@@ -698,6 +709,39 @@ an object *are* evaluable offline today, and this register does exactly that thr
 verifier reproduced two of the three counter-examples from the logs alone.
 *Options:* `--out DIR` writing a JSON/JSONL tree · persist the store instead of the runner ·
 keep stdout as the only artifact but make it machine-parseable · instrument future runs only.
+
+**C-1b · the model label on every surviving artifact is an unverified assertion** —
+blocks-measurement · free-offline · open · **phase 1** *(added 2026-08-18)*
+The four artifacts' headers name a model (`outputs/opus.md:3` reads
+`model claude-opus-4-8 via claude`). Per M-2 that is the model **requested**, not served;
+the runner did not report the served model until phase 0, on 2026-08-17. The recorded runs
+are dated 2026-07-04 and 2026-07-26, so **M-1 was live when they ran** — `./run.sh live
+--model X` discarded every flag and fell back to `claude-haiku-4-5`. If they were launched
+that way, the labels are wrong.
+
+*Measured this turn, and it partly rescues them.* The broken path also forces the argparse
+defaults, including `daily_max=5`. `past/claude-haiku-4-5.md` ran `daily_max=21`, so it
+**cannot** have gone through the trap and its flags demonstrably worked. `outputs/opus.md`
+and `outputs/sonnet.md` both ran `daily_max=5`, which is what the trap produces, so both
+are consistent with it — but if *both* had been trapped they would be one model at one
+config, and they are not: 10/94 byte-identical titles (10.6%), em-dash rate 62.5% vs 0.0%,
+mean title length 45.0 vs 35.9. So **at most one of the two can be mislabelled.** Testing
+the candidate: sonnet-vs-haiku is 14/87 identical (16.1%) with mean title length 35.9 vs
+40.3 — elevated over the 10.6% baseline but not a same-model signature.
+
+Two things *are* verified, by independent checks: every one of the 167 verdicts in each of
+the three current logs resolves to an email id that exists exactly in today's corpus (0
+orphans; `past/claude-sonnet-4-5.md` has 9 orphans from the retired `Company_Retreat` node,
+correctly identifying it as the older corpus), and C-1's serve-plan replay is unique. The
+corpus binding is sound. The model labels are not.
+**Verdict: probably right, not provable.** No artifact can settle it — the served-model
+event was discarded pre-phase-0, `build/*.log` is gone (verified absent on disk), and the
+header corpus-sha algorithm exists nowhere in the repo (C-5). Only a fresh run can, which
+is what phase 1c is for.
+*Options:* record the labels as asserted-not-verified and move on · re-run one model at the
+historical config and compare (this is 1c) · drop the historical runs from any published
+comparison · attempt deeper stylometry (weak; cannot certify a specific model without a
+known-model reference sample).
 
 **O-2 · the tool trace drops calls by message-id collapse, and the loss is model-dependent** —
 blocks-measurement · free-offline · open
@@ -1745,3 +1789,20 @@ gitignored `build/`.
   correct date** in 6/10 (opus), 5/6 (sonnet) and 9/9 (haiku) cases. Date accuracy across
   all work the grader could see: opus 34/48 (71%), sonnet 37/49 (76%), haiku 44/48 (92%).
   Haiku ran the lever the corpus was authored for, which is why its rate is the outlier.
+
+- **2026-08-18** — Provenance audit before phase 1, and a baseline run moved to the front.
+  Added **C-1b**: the model label on every surviving artifact is asserted, not observed,
+  because M-1 and M-2 were both live when the runs happened. Corpus binding is verified two
+  independent ways (167/167 exact email-id resolution per log, plus C-1's unique serve-plan
+  replay); model identity cannot be verified from any artifact and no artifact can settle it.
+
+  Phases **1a/1b/1c** inserted: build the minimum re-gradeable capture slice (O-1, O-3, and
+  the unmatched-object half of O-5), prove it with a bounded smoke, then run one certified
+  baseline at seed 42 / `daily_max=5` for direct comparability with the historical logs.
+  O-1, O-3 and O-5 move from phase 6 to 1a; phase 6 keeps the remainder. Phase 7 is no
+  longer "the only paid phase".
+
+  This reverses the sign-off's O-timing decision, deliberately and for a stated reason: that
+  decision assumed no run would happen before phase 7, which made O's payoff land too late
+  to matter. Once a run is happening, building capture first converts one paid run into a
+  permanently re-gradeable asset instead of a fourth artifact that cannot be re-scored.
