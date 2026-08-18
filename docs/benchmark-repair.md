@@ -59,7 +59,12 @@ live run.
 
 Two standing consequences of the sign-off, carried here so they are not re-litigated:
 G-1, G-3 and G-8 may reach `fix proposed` in phase 2 but cannot reach `verified` before
-phase 7; and V-1's rescope-or-rebuild decision belongs to phase 4.
+phase 7; and V-1's rescope-or-rebuild decision belongs to **phase 8**, after the run.
+
+**The scope rule for phases 1 through 7, in one line:** fix what is broken about the
+benchmark we have. Do not make it harder. Phases 1-7 are a repair, and the paid run at
+phase 7 produces the first honest number this project has ever had. What that number
+implies is phase 8's problem.
 
 Phase A ran six read-only category agents over the shared brief
 (`docs/benchmark-repair-evidence.md`). They produced **50 findings**. Their full working
@@ -93,9 +98,14 @@ were taken at sign-off:
    G-8 can be *designed* in phase 2 but cannot be validated until the phase 7 run, because
    of O-1's corrected limit. The alternative — one extra instrumented run up front to
    unblock them — was declined as not worth the cost.
-2. **V-1's direction is decided at phase 4, not now.** Whether phase 5 is a corpus repair
-   or a corpus rebuild depends on the grading contract G and A settle first. Deciding it
-   earlier would pre-commit on thin information.
+2. **V-1's direction is decided at phase 8, after the paid run, not before it.**
+   *(Revised 2026-08-18. The sign-off originally parked this at phase 4; it has been moved
+   to the end.)* Phase 5 is therefore a corpus **repair**, unambiguously. The repair fixes
+   what is broken about the benchmark we already have; it does not try to make the task
+   harder. If the repaired benchmark turns out to be trivial for a frontier model, **that
+   is itself a result and worth reporting**, and it is a better basis for deciding what to
+   build next than a forecast is. Nothing about scaling, rescoping the retrieval claim, or
+   re-authoring the tier set is in scope before phase 7 reports.
 
 ### Why the phases are ordered the way they are (revised after phase A)
 
@@ -147,10 +157,11 @@ Revised table. Old phase numbers in brackets.
 | 1 | **C-1** *(new)* | a documented command overwrites the corpus the three runs were scored against. Capture the recovered levers, the plan digests, and the ~270 model-authored titles harvested from the four logs before anything writes to `corpus/`. Recoverable from git if missed, so early rather than urgent | free, do it early |
 | 2 | G *[was 2]* | already iterable offline today: shipped engine + oracle title-policy sweep + the harvested real-model titles. Does not depend on O | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
-| 4 | V, C *[was 5]* | decide what the benchmark claims (V-1) and pin one lever + one config (C-2, C-3, K-2) — both are inputs to the corpus pass, not outputs of it | free |
-| 5 | K *[was 4]* | the corpus pass, at the pinned lever, against G's keyword contract and V's scoped claim | free |
+| 4 | V *(part)*, C *[was 5]* | pin one lever and one config (C-2, C-3, K-2) and fix the **reporting** gaps: report V-3's null floor beside every score, make V-6's by-tier report exist, stamp provenance. **Does not decide what the benchmark claims** — see phase 8 | free |
+| 5 | K *[was 4]* | the corpus pass, at the pinned lever, against G's keyword contract. **A repair, not a rebuild**: make every authored question answerable and every keyword discoverable. Do not add difficulty, do not scale, do not re-author the tier set | free |
 | 6 | O *[was 1]* | instrumentation is the prerequisite for the paid run. Its one irrecoverable item (O-4, retrieval observability) requires changing the model-facing surface, which is a benchmark decision that must be taken with G/A/K/V already settled | free |
 | 7 | — | the paid instrumented run of the roster at one pinned config, **and** the hand-grade taken from *its* artifacts | the only paid phase |
+| 8 | **V-1, V-5** *(new)* | reassess with a real number in hand. Is the repaired benchmark still measuring anything interesting, and does the retrieval claim survive? A trivial score is itself a result. **Nothing here is scoped until phase 7 reports** | free to decide |
 
 **Phase 1.5 no longer exists as scheduled, and this is the honest version of why.** The
 old table listed "hand-grade ~30 emails: the honesty baseline" at cost `free`. O-5
@@ -230,11 +241,11 @@ matched something.
 | **K-6** | answers the prose does not pin: 5 no-cue exact days, 12 `by:` windows averaging 19.5d | distorts-measurement | open | 5 |
 | **K-7** | four `kind` choices contradict the obligation; 14 `eq` ops land on a weekend | distorts-measurement | open | 5 |
 | **K-8** | anchor, name and metadata hygiene: 11 unused anchors, a case-pair, 9 whitespace names | slows-work | open | 5 |
-| **V-1** | the corpus is two orders of magnitude too small to push any fact out of context | blocks-measurement | open | 4 |
+| **V-1** | the corpus is two orders of magnitude too small to push any fact out of context | blocks-measurement | open | **8** |
 | **V-2** | the search-rate figure is real for opus and unmeasurable for sonnet and haiku | blocks-measurement | open | 6 |
 | **V-3** | 38.3% of the score is available to a model that never calls a tool | distorts-measurement | open | 4 |
 | **V-4** | 190 op-level judgements compressed into 167 binary points | distorts-measurement | open | 4 |
-| **V-5** | `sb/scale.py` fails non-monotonically and raises the do-nothing floor to 60–68% | blocks-measurement | open | 4 |
+| **V-5** | `sb/scale.py` fails non-monotonically and raises the do-nothing floor to 60–68% | blocks-measurement | open | **8** |
 | **V-6** | `tier` is loaded and never read; the by-tier report hangs off a file nothing writes | blocks-measurement | open | 4 |
 | **V-7** | the authored tier gradient does not exist on the axis it is defined by | distorts-measurement | open | 4 |
 | **V-8** | the span axis is reconstructed from levers the artifact never recorded | distorts-measurement | open | 4→6 |
@@ -1713,3 +1724,24 @@ gitignored `build/`.
   evidentiary base is sound; what needed editing was prose that over-read it.
 
   **Not done:** sign-off on the revised phase table. Phase 1 does not begin without it.
+
+- **2026-08-18** — Scope narrowed by decision. V-1 (retrieval span not exercised) and V-5
+  (`sb/scale.py` broken) move out of phase 4 and into a **new phase 8**, after the paid
+  run. Phases 1-7 are now unambiguously a **repair of the benchmark we have**, not an
+  attempt to make it harder. Phase 4 keeps the lever/config pinning and the reporting
+  fixes; phase 5's corpus pass is explicitly bounded to making authored questions
+  answerable and keywords discoverable.
+
+  Rationale, recorded because it is a deliberate trade: a forecast off the recorded logs
+  puts a frontier model near 85-90% after the repair, which suggests the task may be
+  trivial once the grader stops hiding capability. That forecast is not a reason to
+  redesign now. A measured trivial score is a result, is publishable, and is a far better
+  input to a redesign than an estimate is. The alternative — building difficulty in before
+  the first honest measurement — risks tuning the benchmark against a number nobody has
+  ever seen.
+
+  Supporting measurement (offline, from the existing logs): among failures where the
+  grader found more than one matching object, the model had an object on the **exactly
+  correct date** in 6/10 (opus), 5/6 (sonnet) and 9/9 (haiku) cases. Date accuracy across
+  all work the grader could see: opus 34/48 (71%), sonnet 37/49 (76%), haiku 44/48 (92%).
+  Haiku ran the lever the corpus was authored for, which is why its rate is the outlier.
