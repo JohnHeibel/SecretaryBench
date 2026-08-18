@@ -225,11 +225,11 @@ matched something.
 | **A-4** | `_watch_attribution` is blind to the sibling stamp it is cited as evidence about | distorts-measurement | open | 3 |
 | **A-5** | a wrong `email_id` silently removes the object from every pool; honest model loses credit | distorts-measurement | open | 3 |
 | **A-6** | worked case: one stale stamp caused one false PASS and cost one earned PASS | distorts-measurement | open | 3 |
-| **O-1** | the harness writes nothing; surviving artifacts are hand-copied stdout | blocks-measurement | open | **1a** |
+| **O-1** | the harness writes nothing; surviving artifacts are hand-copied stdout | blocks-measurement | **applied** | **1a** |
 | **O-2** | tool trace drops calls by message-id collapse; loss is model-dependent | blocks-measurement | open | 6 |
-| **O-3** | a final-state dump is insufficient: the store records no history and no day | blocks-measurement | open | **1a** |
+| **O-3** | a final-state dump is insufficient: the store records no history and no day | blocks-measurement | **applied** | **1a** |
 | **O-4** | retrieval is unobservable server-side; only the lossy client trace sees it | blocks-measurement | open | 6 |
-| **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | open | **1a** |
+| **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | **applied** *(capture half; the log still renders only matches)* | **1a** |
 | **O-6** | tools and narration attributed per day not per email; narration truncated at 200 chars | distorts-measurement | open | 6 |
 | **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | open | 6 |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
@@ -1673,6 +1673,37 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-18** — Phase 1a. The capture slice is **applied**, not yet verified.
+
+  `sb/live/runner.py` gains `--out DIR`. Per day it writes the store state it was
+  already fetching and discarding, which is every object the model created with title,
+  description and attribution — including the ones matching no answer-key keyword, which
+  the printed log never renders (O-5). Plus the raw CLI stream per day, so a later fix to
+  the trace parser (O-2) can be applied retroactively to runs already recorded. Plus a
+  manifest carrying the certified served model, levers, seed, serve plan and a corpus hash
+  whose algorithm **exists in this repo** and is reproducible (`_corpus_hash`), unlike the
+  one C-5 flags in the historical headers.
+
+  New `sb/regrade.py` re-scores a capture offline with no model and no store:
+  `python -m sb.regrade <dir>`. This is what O-1 was blocking.
+
+  **Nothing touches the model-facing tool surface**, so a captured run stays directly
+  comparable to the uncaptured historical ones. `store_app.py`, `grader.py`, `mcp_app.py`
+  and the corpus are unchanged.
+
+  **Named artifact:** `sb/tests/test_capture_regrade.py`, 3 tests. It simulates the day
+  loop against a store state in the exact `/state` shape, writes a capture, re-grades it
+  offline and asserts the score is identical — at two title policies, answer-key (153/167)
+  and email-subject (90/167 = 54%). That 54% independently reproduces G-4's central result
+  through a different code path. Suite: 62 → 65 passing.
+
+  **Why `applied` and not `verified`:** the test simulates the day loop rather than calling
+  `run()`, so the capture *format* and the *offline re-grade* are proven while the wiring
+  inside the live loop is not. That is exactly what phase 1b's bounded smoke is for. No
+  finding moves to `verified` until a real run writes a capture that re-grades to its own
+  printed score.
+
 
 - **2026-08-17** — Phase 0. Fixed E-1 (venv on 3.13), E-2 (`mcp<2.0.0`), E-3 (MCP stderr),
   M-1 (`run.sh` argument forwarding), M-2 (resolved-model reporting + config stamp),

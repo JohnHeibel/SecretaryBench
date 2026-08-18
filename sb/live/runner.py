@@ -17,6 +17,7 @@ Architecture for one run:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -27,6 +28,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from dataclasses import asdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
@@ -365,10 +367,96 @@ def parse_output(driver: str, stdout: str) -> tuple[Optional[str], list[str], bo
     return _parse_codex(stdout) if driver == "codex" else _parse_stream(stdout)
 
 
+def _corpus_hash(corpus_dir: str) -> str:
+    """sha256 over every node file (name-sorted, name + bytes), first 16 hex chars.
+
+    Defined here on purpose. C-5: the corpus sha printed in the historical run
+    headers came from an algorithm that exists nowhere in this repo, so those
+    stamps are unverifiable. This one is reproducible by anyone:
+    `python -c "from sb.live.runner import _corpus_hash; print(_corpus_hash('corpus'))"`.
+    """
+    h = hashlib.sha256()
+    for path in sorted(Path(corpus_dir).glob("nodes/*.json")):
+        h.update(path.name.encode())
+        h.update(path.read_bytes())
+    return h.hexdigest()[:16]
+
+
+class _Capture:
+    """Write a run to disk so it can be re-graded offline, indefinitely.
+
+    The runner already holds everything needed and throws it away: `/state` is
+    fetched every day and carries EVERY object the model created, with title,
+    description and attribution -- including the ones matching no answer-key
+    keyword, which never appear in the printed log (O-5). Grading consumed that
+    snapshot and dropped it, which is why no run before this one can be
+    re-scored under a changed grader (O-1, O-3).
+
+    Nothing here touches the model-facing tool surface, so a captured run stays
+    directly comparable to the uncaptured historical ones.
+
+    Layout:
+        manifest.json     config, certified served model, corpus hash, score
+        verdicts.json     per-email grade + details
+        state_final.json  every object at end of run
+        warnings.json     attribution warnings (currently printed, then lost)
+        days/NNN.json     per day: state snapshot, new ids, tools, verdicts
+        raw/day_NNN.jsonl the CLI's raw stream, so a later parser fix (O-2)
+                          can be applied retroactively to this run
+    """
+
+    def __init__(self, out: Optional[str]):
+        self.dir = Path(out).resolve() if out else None
+        self.manifest: dict = {}
+        self.index: list[dict] = []
+        self.final_state: dict = {"events": [], "todos": []}
+        self.final_warnings: list[dict] = []
+        if self.dir:
+            (self.dir / "days").mkdir(parents=True, exist_ok=True)
+            (self.dir / "raw").mkdir(parents=True, exist_ok=True)
+
+    @property
+    def on(self) -> bool:
+        return self.dir is not None
+
+    def _write(self, name: str, payload) -> None:
+        (self.dir / name).write_text(json.dumps(payload, indent=2, default=str))
+
+    def start(self, **fields) -> None:
+        if not self.on:
+            return
+        self.manifest = dict(fields)
+        self._write("manifest.json", self.manifest)
+
+    def raw(self, day_no: int, stdout: str) -> None:
+        if not self.on or not stdout:
+            return
+        (self.dir / "raw" / f"day_{day_no:03d}.jsonl").write_text(stdout)
+
+    def day(self, day_no: int, **fields) -> None:
+        if not self.on:
+            return
+        self._write(f"days/{day_no:03d}.json", {"day": day_no, **fields})
+        self.index.append({k: fields.get(k) for k in ("serve_date", "batch", "ok")}
+                          | {"day": day_no})
+
+    def finish(self, results: dict, **fields) -> None:
+        if not self.on:
+            return
+        self._write("verdicts.json", {
+            eid: (asdict(r) if r is not None else None) for eid, r in results.items()})
+        self._write("state_final.json", self.final_state)
+        self._write("warnings.json", self.final_warnings)
+        self.manifest.update(fields)
+        self.manifest["days_index"] = self.index
+        self._write("manifest.json", self.manifest)
+        print(f"  {DIM}captured -> {self.dir}{RESET}")
+
+
 def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
         per_turn_timeout: float = 240.0, corpus_dir: str = "corpus",
         driver: str = "auto", levers: Optional[Levers] = None,
-        reasoning: Optional[str] = None) -> None:
+        reasoning: Optional[str] = None, out_dir: Optional[str] = None) -> None:
     if driver == "auto":
         driver = infer_driver(model)
     levers = levers or Levers()
@@ -399,6 +487,16 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     mcp_config = _mcp_config()
     session: Optional[str] = None
     results: dict[str, object] = {}
+    cap = _Capture(out_dir)
+    started_at = datetime.now()
+    cap.start(requested_model=model, driver=driver, seed=seed, start=str(start),
+              n_days=n_days, limit=limit, corpus_dir=corpus_dir,
+              corpus_hash=_corpus_hash(corpus_dir),
+              levers={"daily_min": levers.daily_min, "daily_max": levers.daily_max,
+                      "urgency_horizon": levers.urgency_horizon},
+              planned_days=len(days), planned_emails=len(order),
+              serve_plan={e: str(plan.serve_date[e]) for e in order},
+              started_at=str(started_at), schema_version=1)
 
     print(f"\n{BOLD}{BLUE}╔═══ SecretaryBench · live run ═══╗{RESET}")
     print(f"{BLUE}║{RESET} model {BOLD}{model}{RESET} {DIM}(requested) via {driver}{RESET}")
@@ -438,6 +536,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             # session-limit window ("resets 2:20pm") can last hours — pause until
             # the stated reset instead of counting it against the retry budget.
             ok, sid, tools, said, detail = False, None, [], "", f"{driver} error"
+            raw_stdout = ""
             attempts = 7
             attempt = limit_pauses = 0
             while attempt < attempts:
@@ -468,6 +567,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                                       f"after this point are not comparable{RESET}")
                                 resolved_model = rmodel
                         ok = True
+                        raw_stdout = proc.stdout
                         break
                     detail = (proc.stderr.strip() or proc.stdout.strip()[-160:])[:160] or f"{driver} returned is_error"
                 except Exception as exc:
@@ -488,11 +588,15 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             _print_day(day_no, sd.strftime("%a %b %d"), len(batch), tools, said)
             all_warnings = httpx.get(f"{STORE_URL}/warnings", timeout=10).json()
             _print_warnings(all_warnings[warning_cursor:])
+            cap.raw(day_no, raw_stdout)
             if not ok:
                 for eid in batch:
                     email_no += 1
                     results[eid] = None
                     print(f"[{email_no:>2}] {eid:24s}  ERROR after retries: {detail}")
+                cap.day(day_no, serve_date=str(sd), batch=list(batch), ok=False,
+                        error=detail, tools=list(tools), said=said,
+                        warnings=all_warnings[warning_cursor:])
                 continue
 
             # One turn handled the whole day; split its new objects back to each email
@@ -510,6 +614,20 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                                   _turn_delta(corpus, state, eid_new))
                 results[eid] = res
                 _print_email(email_no, eid, sd.strftime("%a %b %d"), res)
+
+            # The whole day, as the grader saw it. `state` is every object in the
+            # store, not just the keyword-matched ones the log prints (O-5), which
+            # is what makes this re-gradeable under a different grader later.
+            cap.day(day_no, serve_date=str(sd), batch=list(batch), ok=True,
+                    tools=list(tools), said=said,
+                    warnings=all_warnings[warning_cursor:],
+                    state=state, day_new=sorted(day_new), by_eid=by_eid,
+                    verdicts={e: asdict(results[e]) for e in batch
+                              if results.get(e) is not None})
+
+        if cap.on:
+            cap.final_state = httpx.get(f"{STORE_URL}/state", timeout=10).json()
+            cap.final_warnings = httpx.get(f"{STORE_URL}/warnings", timeout=10).json()
     finally:
         mcp.terminate()
         store.terminate()
@@ -530,6 +648,10 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     print(f"  {DIM}served {resolved_model or model} · seed {seed} · daily "
           f"{levers.daily_min}-{levers.daily_max} · {len(order)} emails · {corpus_dir}{RESET}")
     print(f"{BOLD}{BLUE}══════════════════════════════════{RESET}\n")
+    cap.finish(results, served_model=resolved_model, model_certified=resolved_model is not None,
+               score_passed=passed, score_total=len(order), errored=errored,
+               finished_at=str(datetime.now()),
+               elapsed_s=round((datetime.now() - started_at).total_seconds(), 1))
 
 
 def main():
@@ -550,12 +672,15 @@ def main():
     ap.add_argument("--reasoning", default=None,
                     help="codex only: model_reasoning_effort (low|medium|high|xhigh)")
     ap.add_argument("--timeout", type=float, default=240.0, help="per-turn seconds")
+    ap.add_argument("--out", default=None, metavar="DIR",
+                    help="write a re-gradeable capture of this run to DIR "
+                         "(state snapshots, verdicts, raw CLI stream, provenance)")
     a = ap.parse_args()
     levers = Levers(daily_min=a.daily_min, daily_max=a.daily_max,
                     urgency_horizon=a.urgency_horizon)
     run(a.model, a.seed, date.fromisoformat(a.start), a.days, a.limit,
         per_turn_timeout=a.timeout, corpus_dir=a.corpus, driver=a.driver,
-        levers=levers, reasoning=a.reasoning)
+        levers=levers, reasoning=a.reasoning, out_dir=a.out)
 
 
 if __name__ == "__main__":
