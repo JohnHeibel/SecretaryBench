@@ -1,0 +1,424 @@
+{
+  "day": 25,
+  "serve_date": "2026-06-25",
+  "batch": [
+    "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned",
+    "Planning.acme-trademark-clear",
+    "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule",
+    "Innovation-comp.kickoff-went-well"
+  ],
+  "ok": true,
+  "tools": [
+    "list_new_emails",
+    "get_email",
+    "create_event"
+  ],
+  "said": "Done.",
+  "warnings": [],
+  "state": {
+    "events": [
+      {
+        "id": "evt_1",
+        "email_id": "press-tour.press-plan-for-launch",
+        "title": "Cover-story interview",
+        "start": "2026-08-06T09:00:00",
+        "end": "2026-08-06T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_2",
+        "email_id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+        "title": "Budget meeting for pitch comp",
+        "start": "2026-07-05T09:00:00",
+        "end": "2026-07-05T10:00:00",
+        "description": "With VP Product and Finance to discuss prize money and event costs"
+      },
+      {
+        "id": "evt_3",
+        "email_id": "press-tour.morning-show-launch-day",
+        "title": "Morning show",
+        "start": "2026-08-10T07:00:00",
+        "end": "2026-08-10T08:00:00",
+        "description": "National morning show anchor slot on launch day"
+      },
+      {
+        "id": "evt_4",
+        "email_id": "Company-Retreat.company-retreat-date-conformed",
+        "title": "Company Retreat",
+        "start": "2026-06-22T09:00:00",
+        "end": "2026-06-22T17:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_5",
+        "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+        "title": "Innovation pitch comp final",
+        "start": "2026-07-15T14:00:00",
+        "end": "2026-07-15T16:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_6",
+        "email_id": "Sponsoring-Marathon.approval-of-event",
+        "title": "Event Pop Up",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T17:00:00",
+        "description": "Gold Tier sponsorship event - all involved expected to be present"
+      },
+      {
+        "id": "evt_7",
+        "email_id": "pizza-party.end-of-year-pizza-party",
+        "title": "End-of-year pizza party",
+        "start": "2026-06-08T12:00:00",
+        "end": "2026-06-08T13:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_11",
+        "email_id": "Planning.might-be-too-much",
+        "title": "Board sign-off meeting",
+        "start": "2026-06-11T10:00:00",
+        "end": "2026-06-11T11:30:00",
+        "description": "Need at least three board members for policy compliance on large spend"
+      },
+      {
+        "id": "evt_13",
+        "email_id": "Day-of-execution_and_Aftermath.launch-livestream",
+        "title": "Launch livestream",
+        "start": "2026-08-10T20:00:00",
+        "end": "2026-08-10T21:30:00",
+        "description": "Public livestream walking through the new ACME"
+      },
+      {
+        "id": "evt_17",
+        "email_id": "press-tour.keynote-at-the-footwear",
+        "title": "Expo keynote",
+        "start": "2026-08-12T10:00:00",
+        "end": "2026-08-12T11:00:00",
+        "description": "Keynote at the footwear expo"
+      },
+      {
+        "id": "evt_18",
+        "email_id": "Enterprise_Ai_Selection.fridays-meeting-time",
+        "title": "Meeting with CTO",
+        "start": "2026-06-19T09:00:00",
+        "end": "2026-06-19T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_19",
+        "email_id": "Rebrand-goes-company-wide.we-need-to-talk-about-morale",
+        "title": "Morale discussion with HR",
+        "start": "2026-07-10T10:00:00",
+        "end": "2026-07-10T10:45:00",
+        "description": "Rebrand concerns causing retention risk - 45 min meeting"
+      },
+      {
+        "id": "evt_20",
+        "email_id": "Pre-Launch.dry-run-of-the-flip",
+        "title": "Launch dry run",
+        "start": "2026-08-06T14:00:00",
+        "end": "2026-08-06T16:00:00",
+        "description": "Full dress rehearsal of site flip, whole team on call watching cutover"
+      },
+      {
+        "id": "evt_24",
+        "email_id": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+        "title": "Serena Williams - marketing campaign",
+        "start": "2026-09-22T10:00:00",
+        "end": "2026-09-22T12:00:00",
+        "description": "Apologize for rescheduling inconvenience"
+      },
+      {
+        "id": "evt_25",
+        "email_id": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+        "title": "Michael Phelps - marketing campaign",
+        "start": "2026-09-18T10:00:00",
+        "end": "2026-09-18T12:00:00",
+        "description": "Apologize for rescheduling inconvenience"
+      },
+      {
+        "id": "evt_27",
+        "email_id": "Partnership-with-deeptech-companies.whoop-collaboration-meeting",
+        "title": "WHOOP collaboration meeting",
+        "start": "2026-06-24T09:00:00",
+        "end": "2026-06-24T10:00:00",
+        "description": "New device integration in running shoes to track/improve performance"
+      },
+      {
+        "id": "evt_28",
+        "email_id": "Rebrand-goes-company-wide.teaser-campaign",
+        "title": "Teaser campaign walkthrough",
+        "start": "2026-06-30T10:00:00",
+        "end": "2026-06-30T11:00:00",
+        "description": "Teaser plan for rebrand to avoid whiplash"
+      },
+      {
+        "id": "evt_31",
+        "email_id": "project_atlas.freeze",
+        "title": "Project Atlas code freeze go/no-go",
+        "start": "2026-06-22T14:00:00",
+        "end": "2026-06-22T15:00:00",
+        "description": "Code freeze for Atlas, launch targeted for August 31st"
+      },
+      {
+        "id": "evt_32",
+        "email_id": "Partnership-with-deeptech-companies.caltech-conference-invitation",
+        "title": "FBS delegation meeting",
+        "start": "2026-06-19T14:00:00",
+        "end": "2026-06-19T15:00:00",
+        "description": "Gather delegation for Oslo conference presentation"
+      },
+      {
+        "id": "evt_33",
+        "email_id": "Partnership-with-deeptech-companies.caltech-conference-invitation",
+        "title": "FBS presentation in Oslo",
+        "start": "2026-08-25T10:00:00",
+        "end": "2026-08-25T12:00:00",
+        "description": "Present at Footwear Biomechanics Symposium about degradable technology shoes"
+      },
+      {
+        "id": "evt_35",
+        "email_id": "shoe-product-launch-delays.design-team-meeting",
+        "title": "Design team restructuring meeting",
+        "start": "2026-06-22T10:00:00",
+        "end": "2026-06-22T11:00:00",
+        "description": "Discuss who to let go - COO considering Alice, Drake, and Bobby"
+      },
+      {
+        "id": "evt_37",
+        "email_id": "Marketing-campaign-new-product-delay.lebron-james-canceled",
+        "title": "LeBron cancellation PR discussion",
+        "start": "2026-06-24T14:00:00",
+        "end": "2026-06-24T15:00:00",
+        "description": "Discuss PR implications of LeBron James canceling marketing campaign"
+      },
+      {
+        "id": "evt_40",
+        "email_id": "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned",
+        "title": "All-hands rebrand webinar",
+        "start": "2026-08-07T14:00:00",
+        "end": "2026-08-07T15:00:00",
+        "description": "Company-wide webinar to explain rebrand why, 3 days before launch"
+      },
+      {
+        "id": "evt_41",
+        "email_id": "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule",
+        "title": "LeBron James - marketing campaign",
+        "start": "2026-08-24T10:00:00",
+        "end": "2026-08-24T12:00:00",
+        "description": ""
+      }
+    ],
+    "todos": [
+      {
+        "id": "todo_10",
+        "email_id": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+        "title": "Ask about patent conflict in pitch comp team's sole design",
+        "due_date": "2026-07-16T17:00:00",
+        "description": "One team's pitch involves a sole design close to existing internal patent - follow up after final to avoid internal conflict"
+      },
+      {
+        "id": "todo_12",
+        "email_id": "Innovation-comp.one-of-our-designers-got-a-job-offer",
+        "title": "Retention conversation with designer from team two",
+        "due_date": "2026-06-13T17:00:00",
+        "description": "Designer got external offer - HR wants retention conversation this week before decision is made"
+      },
+      {
+        "id": "todo_14",
+        "email_id": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight",
+        "title": "Push tooling vendor for outsole prototype delivery",
+        "due_date": "2026-06-11T17:00:00",
+        "description": "Third sample (outsole) running late - need it by Friday June 12th for board greenlight review"
+      },
+      {
+        "id": "todo_15",
+        "email_id": "Day-of-execution_and_Aftermath.metrics-readout",
+        "title": "Review metrics readout for board/investors",
+        "due_date": "2026-08-13T17:00:00",
+        "description": "Clean metrics readout (traffic, conversion, sell-through) compiled 3 days after launch"
+      },
+      {
+        "id": "todo_16",
+        "email_id": "Innovation-comp.found-a-typo-on-the-trophy",
+        "title": "Approve corrected trophy engraving text",
+        "due_date": "2026-06-12T12:00:00",
+        "description": "Company name typo caught before shipping - need approval on corrected text to reorder"
+      },
+      {
+        "id": "todo_21",
+        "email_id": "World_Cup_Cleat_Launch.project-design-kickoff",
+        "title": "Decide on WC cleat launch window",
+        "due_date": "2026-06-29T17:00:00",
+        "description": "VP Marketing needs decision on earlier vs later launch window (was due June 12th). VP recommends earlier window for clean press run and time to ship before tournament."
+      },
+      {
+        "id": "todo_22",
+        "email_id": "Company-Retreat.tasks-before-the-retreat",
+        "title": "Contact retreat location to approve plans",
+        "due_date": "2026-06-19T17:00:00",
+        "description": ""
+      },
+      {
+        "id": "todo_23",
+        "email_id": "Company-Retreat.tasks-before-the-retreat",
+        "title": "Provide VIP employee list for retreat",
+        "due_date": "2026-06-22T09:00:00",
+        "description": ""
+      },
+      {
+        "id": "todo_26",
+        "email_id": "Enterprise_Ai_Selection.ai-selection-finalization",
+        "title": "Sign Anthropic deal documents",
+        "due_date": "2026-06-21T17:00:00",
+        "description": "1Y/120k for full access employee accounts"
+      },
+      {
+        "id": "todo_29",
+        "email_id": "Innovation-comp.trophy-design-quick-look",
+        "title": "Review trophy design render",
+        "due_date": "2026-06-19T17:00:00",
+        "description": "Quick look at winner's trophy design before order - let Design Lead know if anything feels off"
+      },
+      {
+        "id": "todo_30",
+        "email_id": "pizza-party.pizza-order-deadline",
+        "title": "Remind EA to submit pizza order",
+        "due_date": "2026-06-19T17:00:00",
+        "description": ""
+      },
+      {
+        "id": "todo_34",
+        "email_id": "press-tour.podcast-taping-pick-a-day",
+        "title": "Pick podcast taping date",
+        "due_date": "2026-06-21T17:00:00",
+        "description": "Choose from: Mon Aug 3, Tue Aug 4, or Wed Aug 5 (3-4 PM) for \"mind your own business\" podcast"
+      },
+      {
+        "id": "todo_36",
+        "email_id": "shoe-product-launch-delays.design-team-meeting",
+        "title": "Identify 1-2 design team members for layoff consideration",
+        "due_date": "2026-06-21T17:00:00",
+        "description": "COO thinking Alice, Drake, and Bobby - have 1-2 in mind before Monday meeting"
+      },
+      {
+        "id": "todo_38",
+        "email_id": "Innovation-comp.need-your-sign-off-on-prize-amounts",
+        "title": "Approve pitch comp prize amounts",
+        "due_date": "2026-06-24T17:00:00",
+        "description": "Finance needs thumbs up before announcing to teams - just yes/no"
+      },
+      {
+        "id": "todo_39",
+        "email_id": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2",
+        "title": "Confirm PO for outsole vendor",
+        "due_date": "2026-06-26T17:00:00",
+        "description": "Vendor needs PO confirmation by Friday June 26th to hit deadline for board greenlight"
+      }
+    ]
+  },
+  "day_new": [
+    "evt_40",
+    "evt_41"
+  ],
+  "by_eid": {
+    "evt_1": "press-tour.press-plan-for-launch",
+    "evt_2": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+    "evt_3": "press-tour.morning-show-launch-day",
+    "evt_4": "Company-Retreat.company-retreat-date-conformed",
+    "evt_5": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+    "evt_6": "Sponsoring-Marathon.approval-of-event",
+    "evt_7": "pizza-party.end-of-year-pizza-party",
+    "evt_11": "Planning.might-be-too-much",
+    "evt_13": "Day-of-execution_and_Aftermath.launch-livestream",
+    "evt_17": "press-tour.keynote-at-the-footwear",
+    "evt_18": "Enterprise_Ai_Selection.fridays-meeting-time",
+    "evt_19": "Rebrand-goes-company-wide.we-need-to-talk-about-morale",
+    "evt_20": "Pre-Launch.dry-run-of-the-flip",
+    "evt_24": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+    "evt_25": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+    "evt_27": "Partnership-with-deeptech-companies.whoop-collaboration-meeting",
+    "evt_28": "Rebrand-goes-company-wide.teaser-campaign",
+    "evt_31": "project_atlas.freeze",
+    "evt_32": "Partnership-with-deeptech-companies.caltech-conference-invitation",
+    "evt_33": "Partnership-with-deeptech-companies.caltech-conference-invitation",
+    "evt_35": "shoe-product-launch-delays.design-team-meeting",
+    "evt_37": "Marketing-campaign-new-product-delay.lebron-james-canceled",
+    "evt_40": "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned",
+    "evt_41": "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule",
+    "todo_10": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+    "todo_12": "Innovation-comp.one-of-our-designers-got-a-job-offer",
+    "todo_14": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight",
+    "todo_15": "Day-of-execution_and_Aftermath.metrics-readout",
+    "todo_16": "Innovation-comp.found-a-typo-on-the-trophy",
+    "todo_21": "World_Cup_Cleat_Launch.project-design-kickoff",
+    "todo_22": "Company-Retreat.tasks-before-the-retreat",
+    "todo_23": "Company-Retreat.tasks-before-the-retreat",
+    "todo_26": "Enterprise_Ai_Selection.ai-selection-finalization",
+    "todo_29": "Innovation-comp.trophy-design-quick-look",
+    "todo_30": "pizza-party.pizza-order-deadline",
+    "todo_34": "press-tour.podcast-taping-pick-a-day",
+    "todo_36": "shoe-product-launch-delays.design-team-meeting",
+    "todo_38": "Innovation-comp.need-your-sign-off-on-prize-amounts",
+    "todo_39": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2"
+  },
+  "verdicts": {
+    "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "create ~webinar",
+          "expected": "event ~\"webinar\" @ by Fri Aug 07",
+          "actual": "\"All-hands rebrand webinar\" Fri Aug 07 2 PM (60m)",
+          "reason": "matched"
+        }
+      ],
+      "headline": "event ~\"webinar\" @ by Fri Aug 07"
+    },
+    "Planning.acme-trademark-clear": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "no-action",
+          "expected": "take no action (FYI / no scheduling needed)",
+          "actual": "(nothing)",
+          "reason": "correctly took no action"
+        }
+      ],
+      "headline": "correctly took no action"
+    },
+    "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule": {
+      "passed": false,
+      "max": 1,
+      "details": [
+        {
+          "passed": false,
+          "label": "create ~LeBron James marketing campaign scheduled",
+          "expected": "event ~\"LeBron James marketing campaign scheduled\" @ Mon Aug 24",
+          "actual": "(nothing matching created)",
+          "reason": "no event titled like \"LeBron James marketing campaign scheduled\" was created"
+        }
+      ],
+      "headline": "no event titled like \"LeBron James marketing campaign scheduled\" was created"
+    },
+    "Innovation-comp.kickoff-went-well": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "no-action",
+          "expected": "take no action (FYI / no scheduling needed)",
+          "actual": "(nothing)",
+          "reason": "correctly took no action"
+        }
+      ],
+      "headline": "correctly took no action"
+    }
+  }
+}

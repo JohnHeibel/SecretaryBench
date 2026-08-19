@@ -1,0 +1,1148 @@
+
+╔═══ SecretaryBench · live run ═══╗
+║ model claude-sonnet-4-5 (requested) via claude
+║ seed 42 · 57 days · 167 emails · start 2026-06-01
+║ levers daily 1-5 · urgency 7 · corpus corpus
+╚═════════════════════════════════╝
+   model served  claude-sonnet-4-5-20250929 ✓
+
+── day 1 · Mon Jun 01 · 5 new email(s) ──
+   tools  ToolSearch, list_new_emails, get_email, search_inbox, search_inbox, search_inbox, create_event  🔍 used search_inbox
+   model said  “Done.…”
+
+ ✓ PASS  [1] Rebrand-goes-company-wide.hard-no-on-teasers  · served Mon Jun 01
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [2] Innovation-comp.sponsor-mixer-before-the-final  · served Mon Jun 01
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [3] press-tour.press-plan-for-launch  · served Mon Jun 01
+   ✓ expected  event ~"interview" @ Thu Aug 06
+     actual    "Cover-story interview" Thu Aug 06 9 AM (60m)
+     why       matched
+
+ ✓ PASS  [4] Innovation-comp.come-check-out-the-semifinal-showcase  · served Mon Jun 01
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [5] Innovation-comp.need-a-budget-meeting-for-the-pitch-comp  · served Mon Jun 01
+   ✓ expected  event ~"budget" @ Sun Jul 05
+     actual    "Budget meeting for pitch comp" Sun Jul 05 9 AM (60m)
+     why       matched
+
+── day 2 · Tue Jun 02 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [6] press-tour.morning-show-launch-day  · served Tue Jun 02
+   ✓ expected  event ~"morning" @ Mon Aug 10
+     actual    "Morning show" Mon Aug 10 7 AM (60m)
+     why       matched
+
+ ✓ PASS  [7] Company-Retreat.company-retreat-date-conformed  · served Tue Jun 02
+   ✓ expected  event ~"Company Retreat" @ Mon Jun 22
+     actual    "Company Retreat" Mon Jun 22 9 AM (480m)
+     why       matched
+
+── day 3 · Wed Jun 03 · 2 new email(s) ──
+   tools  list_new_emails, get_email
+   model said  “Done.…”
+
+ ✓ PASS  [8] Innovation-comp.pitch-comp-budget-review-optional-sit-in  · served Wed Jun 03
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [9] Innovation-comp.quick-win-to-share  · served Wed Jun 03
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 4 · Thu Jun 04 · 1 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [10] Innovation-comp.pitch-comp-is-on-locking-in-the-final-da  · served Thu Jun 04
+   ✗ expected  event ~"pitch" @ Wed Jul 15
+     actual    "Budget meeting for pitch comp" Sun Jul 05 9 AM (60m); "Innovation pitch comp final" Wed Jul 15 2 PM (120m)
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+
+── day 5 · Fri Jun 05 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [11] shoe-product-launch-delays.product-launch-ready  · served Fri Jun 05
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [12] Sponsoring-Marathon.approval-of-event  · served Fri Jun 05
+   ✗ expected  to-do ~"event" @ Mon Aug 10
+     actual    (nothing matching created)
+     why       no to-do titled like "event" was created
+
+── day 6 · Sat Jun 06 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [13] Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2  · served Sat Jun 06
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [14] pizza-party.end-of-year-pizza-party  · served Sat Jun 06
+   ✗ expected  to-do ~"Team_pizza_party" @ Mon Jun 08
+     actual    (nothing matching created)
+     why       no to-do titled like "Team_pizza_party" was created
+
+ ✗ FAIL  [15] Enterprise_Ai_Selection.final-review  · served Sat Jun 06
+   ✗ expected  to-do ~"ai" @ Fri Jun 05
+     actual    (nothing matching created)
+     why       no to-do titled like "ai" was created
+
+── day 7 · Sun Jun 07 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [16] Day-of-execution_and_Aftermath.billboard-photo-op  · served Sun Jun 07
+   ✓ expected  event ~"billboard" @ Mon Aug 10
+     actual    "Billboard photo op" Mon Aug 10 11 AM (60m)
+     why       matched
+
+ ✓ PASS  [17] Innovation-comp.judges-prep-session-want-in  · served Sun Jun 07
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [18] press-tour.local-evening-news-hit  · served Sun Jun 07
+   ✓ expected  event ~"segment" @ Tue Aug 11
+     actual    "Local evening news segment" Tue Aug 11 6 PM (60m)
+     why       matched
+
+── day 8 · Mon Jun 08 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✗ FAIL  [19] Innovation-comp.heads-up-one-of-the-pitches-might-step-o  · served Mon Jun 08
+   ✗ expected  event ~"overlap" @ Thu Jul 16
+     actual    (nothing matching created)
+     why       no event titled like "overlap" was created
+
+ ✓ PASS  [20] Day-of-execution_and_Aftermath.billboard-s-off  · served Mon Jun 08
+   ✓ expected  event ~"billboard" cancelled
+     actual    (nothing — cancelled)
+     why       cancelled
+
+── day 9 · Tue Jun 09 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✗ FAIL  [21] Innovation-comp.one-of-our-designers-got-a-job-offer  · served Tue Jun 09
+   ✗ expected  event ~"conversation" @ Thu Jun 11
+     actual    (nothing matching created)
+     why       no event titled like "conversation" was created
+
+ ✗ FAIL  [22] Planning.might-be-too-much  · served Tue Jun 09
+   ✗ expected  event ~"signoff" @ Thu Jun 11
+     actual    (nothing matching created)
+     why       no event titled like "signoff" was created
+
+ ✓ PASS  [23] Innovation-comp.a-kid-drew-the-new-logo-concept  · served Tue Jun 09
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 10 · Wed Jun 10 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [24] Innovation-comp.two-weeks-out-from-the-final  · served Wed Jun 10
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [25] Innovation-comp.storm-warning-for-finals-week  · served Wed Jun 10
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [26] Day-of-execution_and_Aftermath.launch-livestream  · served Wed Jun 10
+   ✓ expected  event ~"livestream" @ Mon Aug 10
+     actual    "Launch livestream" Mon Aug 10 8 PM (90m)
+     why       matched
+
+ ✗ FAIL  [27] World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight  · served Wed Jun 10
+   ✗ expected  to-do ~"delivery" @ Fri Jun 12
+     actual    "Push tooling vendor for outsole prototype delivery" Thu Jun 11 5 PM
+     why       on the wrong day
+
+── day 11 · Thu Jun 11 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [28] Day-of-execution_and_Aftermath.metrics-readout  · served Thu Jun 11
+   ✓ expected  to-do ~"metrics" @ by Thu Aug 13
+     actual    "Review metrics readout for board/investors" Thu Aug 13 5 PM
+     why       matched
+
+ ✗ FAIL  [29] Innovation-comp.found-a-typo-on-the-trophy  · served Thu Jun 11
+   ✗ expected  event ~"correction" @ Fri Jun 12
+     actual    (nothing matching created)
+     why       no event titled like "correction" was created
+
+── day 12 · Fri Jun 12 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [30] Innovation-comp.press-preview-ahead-of-the-final  · served Fri Jun 12
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [31] press-tour.keynote-at-the-footwear  · served Fri Jun 12
+   ✓ expected  event ~"keynote" @ Wed Aug 12
+     actual    "Expo keynote" Wed Aug 12 10 AM (60m)
+     why       matched
+
+ ✗ FAIL  [32] Marketing-campaign-new-product-delay.need-to-delay-the-release-of-the-new-pro  · served Fri Jun 12
+   ✗ expected  event ~"delayed" @ Fri Aug 07
+     actual    (nothing matching created)
+     why       no event titled like "delayed" was created
+
+ ✓ PASS  [33] shoe-product-launch-delays.product-launch-ready-soon  · served Fri Jun 12
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 13 · Sat Jun 13 · 5 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [34] Enterprise_Ai_Selection.fridays-meeting-time  · served Sat Jun 13
+   ✗ expected  event ~"friday" @ Fri Jun 19
+     actual    (nothing matching created)
+     why       no event titled like "friday" was created
+
+ ✓ PASS  [35] press-tour.news-hit-fell-through  · served Sat Jun 13
+   ✓ expected  event ~"segment" cancelled
+     actual    (nothing — cancelled)
+     why       cancelled
+
+ ✓ PASS  [36] Rebrand-goes-company-wide.we-need-to-talk-about-morale  · served Sat Jun 13
+   ✓ expected  event ~"morale" @ Fri Jul 10
+     actual    "Morale discussion with HR" Fri Jul 10 10 AM (45m)
+     why       matched
+
+ ✓ PASS  [37] Innovation-comp.today-s-the-day  · served Sat Jun 13
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [38] Pre-Launch.dry-run-of-the-flip  · served Sat Jun 13
+   ✓ expected  event ~"launch" @ Thu Aug 06
+     actual    "Launch dry run" Thu Aug 06 2 PM (120m)
+     why       matched
+
+── day 14 · Sun Jun 14 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✗ FAIL  [39] World_Cup_Cleat_Launch.project-design-kickoff  · served Sun Jun 14
+   ✗ expected  to-do ~"decision" @ Fri Jun 12
+     actual    "Decide on WC cleat launch window" Sun Jun 14 5 PM
+     why       on the wrong day
+
+ ✓ PASS  [40] Innovation-comp.vp-product  · served Sun Jun 14
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [41] Innovation-comp.new-sponsor-wants-to-chat  · served Sun Jun 14
+   ✗ expected  event ~"prospect" @ Tue Aug 25
+     actual    (nothing matching created)
+     why       no event titled like "prospect" was created
+
+── day 15 · Mon Jun 15 · 5 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [42] Company-Retreat.tasks-before-the-retreat  · served Mon Jun 15
+   ✓ expected  to-do ~"location" @ Fri Jun 19
+     actual    "Contact retreat location to approve plans" Fri Jun 19 5 PM
+     why       matched
+   ✓ expected  to-do ~"list" @ by Mon Jun 22
+     actual    "Provide VIP employee list for retreat" Mon Jun 22 9 AM
+     why       matched
+
+ ✓ PASS  [43] Innovation-comp.great-session-today  · served Mon Jun 15
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [44] Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin  · served Mon Jun 15
+   ✓ expected  event ~"william" @ Fri Sep 11
+     actual    "Serena Williams - marketing campaign" Fri Sep 11 10 AM (120m)
+     why       matched
+   ✓ expected  event ~"michael" @ Fri Sep 18
+     actual    "Michael Phelps - marketing campaign" Fri Sep 18 10 AM (120m)
+     why       matched
+
+ ✓ PASS  [45] Enterprise_Ai_Selection.ai-selection-finalization  · served Mon Jun 15
+   ✓ expected  to-do ~"sign" @ Sun Jun 21
+     actual    "Sign Anthropic deal documents" Sun Jun 21 5 PM
+     why       matched
+
+ ✓ PASS  [46] Innovation-comp.brief-for-the-new-sponsor-call  · served Mon Jun 15
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 16 · Tue Jun 16 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [47] Partnership-with-deeptech-companies.whoop-collaboration-meeting  · served Tue Jun 16
+   ✗ expected  event ~"WHOOP Meeting" @ Wed Jun 24
+     actual    (nothing matching created)
+     why       no event titled like "WHOOP Meeting" was created
+
+ ✓ PASS  [48] Rebrand-goes-company-wide.teaser-campaign  · served Tue Jun 16
+   ✓ expected  event ~"teaser" @ Tue Jun 30
+     actual    "Teaser campaign walkthrough" Tue Jun 30 10 AM (60m)
+     why       matched
+
+── day 17 · Wed Jun 17 · 3 new email(s) ──
+   tools  list_new_emails, get_email, update_event
+   model said  “Done.…”
+
+ ✗ FAIL  [49] Partnership-with-deeptech-companies.whoop-meeting-reschedule  · served Wed Jun 17
+   ✗ expected  event ~"WHOOP Meeting" @ Wed Jun 24
+     actual    (nothing matching created)
+     why       no event titled like "WHOOP Meeting" was moved
+
+ ✓ PASS  [50] Innovation-comp.final-lineup-confirmed  · served Wed Jun 17
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [51] Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig  · served Wed Jun 17
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 18 · Thu Jun 18 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [52] Enterprise_Ai_Selection.enterprise-ai-selection-kickoff  · served Thu Jun 18
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [53] Enterprise_Ai_Selection.openai-review  · served Thu Jun 18
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [54] Innovation-comp.trophy-design-quick-look  · served Thu Jun 18
+   ✗ expected  to-do ~"trophy" @ Sun Jun 21
+     actual    "Approve corrected trophy engraving text" Fri Jun 12 12 PM; "Review trophy design render" Fri Jun 19 5 PM
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+
+── day 19 · Fri Jun 19 · 5 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✗ FAIL  [55] pizza-party.pizza-order-deadline  · served Fri Jun 19
+   ✗ expected  to-do ~"order-the-pizzas" @ Fri Jun 19
+     actual    (nothing matching created)
+     why       no to-do titled like "order-the-pizzas" was created
+
+ ✓ PASS  [56] project_atlas.freeze  · served Fri Jun 19
+   ✓ expected  event ~"freeze" @ Mon Jun 22
+     actual    "Project Atlas code freeze go/no-go" Mon Jun 22 2 PM (60m)
+     why       matched
+
+ ✗ FAIL  [57] Partnership-with-deeptech-companies.caltech-conference-invitation  · served Fri Jun 19
+   ✗ expected  to-do ~"team" @ Fri Jun 19
+     actual    (nothing matching created)
+     why       no to-do titled like "team" was created
+   ✗ expected  event ~"fbs" @ Fri Jun 19
+     actual    "FBS delegation meeting" Fri Jun 19 2 PM (60m); "FBS presentation in Oslo" Tue Aug 25 10 AM (120m)
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+   ✗ expected  event ~"conference" @ Tue Aug 25
+     actual    "FBS delegation meeting" Fri Jun 19 2 PM (60m)
+     why       on the wrong day
+
+ ✗ FAIL  [58] press-tour.podcast-taping-pick-a-day  · served Fri Jun 19
+   ✗ expected  event ~"podcast" @ Mon Aug 03 or Tue Aug 04 or Wed Aug 05
+     actual    (nothing matching created)
+     why       no event titled like "podcast" was created
+
+ ✗ FAIL  [59] shoe-product-launch-delays.design-team-meeting  · served Fri Jun 19
+   ✓ expected  event ~"design" @ Mon Jun 22
+     actual    "Design team restructuring meeting" Mon Jun 22 10 AM (60m)
+     why       matched
+   ✗ expected  to-do ~"who" @ by Mon Jun 22
+     actual    (nothing matching created)
+     why       no to-do titled like "who" was created
+
+── day 20 · Sat Jun 20 · 1 new email(s) ──
+   tools  list_new_emails, get_email
+   model said  “Done.…”
+
+ ✓ PASS  [60] Sponsoring-Marathon.launching-sponsoring-eugene-marathon  · served Sat Jun 20
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 21 · Sun Jun 21 · 1 new email(s) ──
+   tools  list_new_emails, get_email
+   model said  “Done.…”
+
+ ✓ PASS  [61] Innovation-comp.travel-heads-up-for-finals-week  · served Sun Jun 21
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 22 · Mon Jun 22 · 1 new email(s) ──
+   tools  list_new_emails, get_email, update_todo
+   model said  “Done.…”
+
+ ✓ PASS  [62] World_Cup_Cleat_Launch.wc-cleat-launch-window-options  · served Mon Jun 22
+   ✓ expected  to-do ~"decision" @ Mon Jun 29
+     actual    "Decide on WC cleat launch window" Mon Jun 29 5 PM
+     why       matched
+
+── day 23 · Tue Jun 23 · 5 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [63] Marketing-campaign-new-product-delay.lebron-james-canceled  · served Tue Jun 23
+   ✓ expected  event ~"cancellation" @ Wed Jun 24
+     actual    "LeBron cancellation PR discussion" Wed Jun 24 2 PM (60m)
+     why       matched
+
+ ✗ FAIL  [64] Innovation-comp.need-your-sign-off-on-prize-amounts  · served Tue Jun 23
+   ✗ expected  to-do ~"approve" @ Thu Jun 25
+     actual    "Approve corrected trophy engraving text" Fri Jun 12 12 PM; "Approve pitch comp prize amounts" Wed Jun 24 5 PM
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+
+ ✗ FAIL  [65] World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2  · served Tue Jun 23
+   ✗ expected  to-do ~"outsole" @ Tue Jun 23
+     actual    "Push tooling vendor for outsole prototype delivery" Thu Jun 11 5 PM; "Confirm PO for outsole vendor" Fri Jun 26 5 PM
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+
+ ✓ PASS  [66] Rebrand-goes-company-wide.please-reconsider-this-rebrand  · served Tue Jun 23
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [67] Sponsoring-Marathon.approval-needed-race-sponsorship-budget  · served Tue Jun 23
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 24 · Wed Jun 24 · 1 new email(s) ──
+   tools  list_new_emails, get_email, update_event
+   model said  “Done.…”
+
+ ✗ FAIL  [68] Marketing-campaign-new-product-delay.serena-williams-reschedule  · served Wed Jun 24
+   ✗ expected  event ~"marketing" @ Tue Sep 22
+     actual    "Serena Williams - marketing campaign" Tue Sep 22 10 AM (120m); "Michael Phelps - marketing campaign" Fri Sep 18 10 AM (120m); "LeBron cancellation PR discussion" Wed Jun 24 2 PM (60m)
+     why       found 3 matching, expected exactly 1 (duplicate / double-booked)
+
+── day 25 · Thu Jun 25 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [69] Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned  · served Thu Jun 25
+   ✓ expected  event ~"webinar" @ by Fri Aug 07
+     actual    "All-hands rebrand webinar" Fri Aug 07 2 PM (60m)
+     why       matched
+
+ ✓ PASS  [70] Planning.acme-trademark-clear  · served Thu Jun 25
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [71] Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule  · served Thu Jun 25
+   ✗ expected  event ~"LeBron James marketing campaign scheduled" @ Mon Aug 24
+     actual    (nothing matching created)
+     why       no event titled like "LeBron James marketing campaign scheduled" was created
+
+ ✓ PASS  [72] Innovation-comp.kickoff-went-well  · served Thu Jun 25
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 26 · Fri Jun 26 · 5 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [73] pizza-party.conference-room-reservation  · served Fri Jun 26
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [74] Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2  · served Fri Jun 26
+   ✗ expected  event ~"launchmeeting" @ Thu Jun 25
+     actual    (nothing matching created)
+     why       no event titled like "launchmeeting" was created
+
+ ✓ PASS  [75] Innovation-comp.board-slot-the-week-after-finals  · served Fri Jun 26
+   ✓ expected  event ~"presentation" @ Wed Jul 22
+     actual    "Board presentation on pitch comp results" Wed Jul 22 2 PM (90m)
+     why       matched
+
+ ✓ PASS  [76] project_atlas.beta  · served Fri Jun 26
+   ✓ expected  to-do ~"feedback" @ by Mon Jul 06
+     actual    "Compile and summarize Atlas beta feedback" Mon Jul 06 5 PM
+     why       matched
+
+ ✗ FAIL  [77] Pre-Launch.launch-day-locked  · served Fri Jun 26
+   ✗ expected  event ~"site" @ Mon Aug 10
+     actual    "Launch dry run" Thu Aug 06 2 PM (120m)
+     why       on the wrong day
+   ✓ expected  to-do ~"sign" @ by Mon Aug 03
+     actual    "Sign off on launch items from COO" Mon Aug 03 5 PM
+     why       matched
+
+── day 27 · Sat Jun 27 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [78] Innovation-comp.thanks-for-the-sign-off  · served Sat Jun 27
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [79] Planning.rebrand-pitch  · served Sat Jun 27
+   ✗ expected  event ~"vision" @ Mon Jun 15
+     actual    (nothing matching created)
+     why       no event titled like "vision" was created
+
+ ✓ PASS  [80] Day-of-execution_and_Aftermath.we-are-live  · served Sat Jun 27
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [81] World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat  · served Sat Jun 27
+   ✓ expected  event ~"greenlight" @ Mon Jun 29
+     actual    "WC cleat greenlight call with board" Mon Jun 29 10 AM (60m)
+     why       matched
+
+── day 28 · Sun Jun 28 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [82] Company-Retreat.in-town-and-would-love-to-connect  · served Sun Jun 28
+   ✓ expected  event ~"Company Retreat" @ Mon Jun 29
+     actual    "Company Retreat" Mon Jun 29 9 AM (480m)
+     why       matched
+   ✗ expected  to-do ~"location" @ Mon Jun 29
+     actual    "Contact retreat location to approve plans" Fri Jun 19 5 PM
+     why       on the wrong day
+   ✗ expected  event ~"athlete" @ Mon Jun 22
+     actual    "Meeting with major athlete" Sat Aug 22 10 AM (120m)
+     why       on the wrong day
+
+ ✓ PASS  [83] Sponsoring-Marathon.race-sponsorship-budget-goals  · served Sun Jun 28
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [84] pizza-party.pizza-place-selection  · served Sun Jun 28
+   ✗ expected  to-do ~"decision" @ by Mon Jun 29
+     actual    (nothing matching created)
+     why       no to-do titled like "decision" was created
+
+ ✗ FAIL  [85] project_atlas.board-demo  · served Sun Jun 28
+   ✗ expected  event ~"atlas" @ Mon Jul 06
+     actual    "Project Atlas code freeze go/no-go" Mon Jun 22 2 PM (60m); "Atlas live board demo" Mon Jul 06 10 AM (90m)
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+
+── day 29 · Mon Jun 29 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✗ FAIL  [86] project_atlas.demo-moved  · served Mon Jun 29
+   ✗ expected  event ~"atlas" @ Fri Jul 03
+     actual    "Project Atlas code freeze go/no-go" Mon Jun 22 2 PM (60m); "Atlas live board demo" Fri Jul 03 10 AM (90m)
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+
+ ✗ FAIL  [87] Sponsoring-Marathon.sponsorship-tiers  · served Mon Jun 29
+   ✗ expected  to-do ~"approval" @ Fri Jun 19
+     actual    (nothing matching created)
+     why       no to-do titled like "approval" was created
+
+── day 30 · Tue Jun 30 · 1 new email(s) ──
+   tools  list_new_emails, get_email, delete_event
+   model said  “Done.…”
+
+ ✓ PASS  [88] Rebrand-goes-company-wide.standing-down-on-teasers  · served Tue Jun 30
+   ✓ expected  event ~"teaser" cancelled
+     actual    (nothing — cancelled)
+     why       cancelled
+
+── day 31 · Wed Jul 01 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [89] Marketing-campaign-new-product-delay.ronaldo-s-availability-for-marketing-cam  · served Wed Jul 01
+   ✗ expected  event ~"Giano Ronaldo marketing campaign " @ Sat Aug 08
+     actual    (nothing matching created)
+     why       no event titled like "Giano Ronaldo marketing campaign " was created
+
+ ✓ PASS  [90] World_Cup_Cleat_Launch.final-colorway-for-sign-off  · served Wed Jul 01
+   ✓ expected  to-do ~"design" @ Sun Jul 19
+     actual    "Sign off on WC cleat final colorway" Sun Jul 19 5 PM
+     why       matched
+
+ ✓ PASS  [91] pizza-party.pizza-party-budget  · served Wed Jul 01
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [92] Pre-Launch.embargo-lifts-at-six  · served Wed Jul 01
+   ✓ expected  event ~"embargo" @ Mon Aug 10
+     actual    "Press embargo lifts" Mon Aug 10 6 AM (30m)
+     why       matched
+
+── day 32 · Thu Jul 02 · 5 new email(s) ──
+   tools  list_new_emails, get_email, update_todo
+   model said  “Done.…”
+
+ ✓ PASS  [93] Day-of-execution_and_Aftermath.congrats-on-the-relaunch  · served Thu Jul 02
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [94] Planning.can-t-do-thursday  · served Thu Jul 02
+   ✗ expected  event ~"signoff" @ Wed Jul 15
+     actual    (nothing matching created)
+     why       no event titled like "signoff" was moved
+
+ ✓ PASS  [95] project_atlas.legal-fyi  · served Thu Jul 02
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [96] World_Cup_Cleat_Launch.final-colorway-for-sign-off-2  · served Thu Jul 02
+   ✓ expected  to-do ~"design" @ Wed Jul 08
+     actual    "Sign off on WC cleat final colorway" Wed Jul 08 5 PM
+     why       matched
+
+ ✓ PASS  [97] Innovation-comp.team-morale-lunch-during-the-comp  · served Thu Jul 02
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 33 · Fri Jul 03 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [98] Company-Retreat.athelete-visit  · served Fri Jul 03
+   ✗ expected  to-do ~"athlete" @ by Wed Jul 22
+     actual    "Create guest list for athlete visit and contact invitees" Sat Aug 15 5 PM
+     why       on the wrong day
+   ✗ expected  event ~"people" @ Wed Jul 22
+     actual    (nothing matching created)
+     why       no event titled like "people" was created
+
+ ✗ FAIL  [99] Innovation-comp.quick-favor-before-the-final  · served Fri Jul 03
+   ✗ expected  to-do ~"board" @ Wed Jul 15
+     actual    "Prepare comp one-pager for board deck" Tue Jul 21 5 PM
+     why       on the wrong day
+
+ ✓ PASS  [100] Innovation-comp.sponsor-wants-a-follow-up-call  · served Fri Jul 03
+   ✓ expected  event ~"sponsor" @ Wed Aug 12
+     actual    "Retail sponsor partnership call" Wed Aug 12 2 PM (60m)
+     why       matched
+
+── day 34 · Sat Jul 04 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [101] Innovation-comp.she-s-staying  · served Sat Jul 04
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [102] Enterprise_Ai_Selection.anthropic-google-review  · served Sat Jul 04
+   ✓ expected  to-do ~"meetings" @ Sun Jul 05
+     actual    "Send AI notes and complete rubric for CTO" Sun Jul 05 5 PM
+     why       matched
+
+ ✓ PASS  [103] Pre-Launch.store-floors-reset-overnight  · served Sat Jul 04
+   ✓ expected  event ~"floor" @ Sun Aug 09
+     actual    "Store floors reset overnight" Sun Aug 09 8 PM (180m)
+     why       matched
+
+── day 35 · Sun Jul 05 · 5 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [104] Innovation-comp.sponsor-call-no-longer-needed  · served Sun Jul 05
+   ✓ expected  event ~"sponsor" cancelled
+     actual    (nothing — cancelled)
+     why       cancelled
+
+ ✓ PASS  [105] Planning.memo-before-the-board-sits  · served Sun Jul 05
+   ✓ expected  to-do ~"budget" @ Tue Jul 14
+     actual    "Finalize rebrand budget memo for CFO" Tue Jul 14 5 PM
+     why       matched
+
+ ✓ PASS  [106] Pre-Launch.design-locked  · served Sun Jul 05
+   ✓ expected  to-do ~"production" @ by Mon Aug 03
+     actual    "Finalize hero film and campaign stills for production" Mon Aug 03 5 PM
+     why       matched
+
+ ✗ FAIL  [107] pizza-party.client-demo-conflict  · served Sun Jul 05
+   ✗ expected  to-do ~"Team_pizza_party" @ Tue Jul 14
+     actual    (nothing matching created)
+     why       no to-do titled like "Team_pizza_party" was moved
+
+ ✓ PASS  [108] World_Cup_Cleat_Launch.reveal-event-date-and-venue  · served Sun Jul 05
+   ✓ expected  event ~"reveal" @ Thu Aug 13
+     actual    "WC cleat reveal event" Thu Aug 13 6 PM (120m)
+     why       matched
+
+── day 36 · Mon Jul 06 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [109] Day-of-execution_and_Aftermath.thank-the-team  · served Mon Jul 06
+   ✓ expected  event ~"thank" @ Tue Aug 11
+     actual    "Launch team thank-you lunch" Tue Aug 11 12 PM (90m)
+     why       matched
+
+ ✓ PASS  [110] Innovation-comp.let-s-set-up-a-recap  · served Mon Jul 06
+   ✓ expected  event ~"recap" @ Fri Sep 25
+     actual    "Pitch comp recap with VP Product" Fri Sep 25 10 AM (60m)
+     why       matched
+
+── day 37 · Tue Jul 07 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [111] Innovation-comp.great-year-overall  · served Tue Jul 07
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [112] Sponsoring-Marathon.approval-of-budget-tier  · served Tue Jul 07
+   ✗ expected  event ~"sponsorship & budget approval meeting" @ Wed Jul 22
+     actual    (nothing matching created)
+     why       no event titled like "sponsorship & budget approval meeting" was created
+
+ ✓ PASS  [113] World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal  · served Tue Jul 07
+   ✓ expected  to-do ~"endorsement" @ Fri Jul 10
+     actual    "Review striker endorsement letter of intent" Fri Jul 10 5 PM
+     why       matched
+
+ ✗ FAIL  [114] World_Cup_Cleat_Launch.press-briefing-and-embargo  · served Tue Jul 07
+   ✓ expected  event ~"briefing" @ Thu Aug 06
+     actual    "WC cleat press briefing" Thu Aug 06 11 AM (60m)
+     why       matched
+   ✗ expected  to-do ~"Approve Press Embargo" @ Tue Jul 14
+     actual    (nothing matching created)
+     why       no to-do titled like "Approve Press Embargo" was created
+
+── day 38 · Wed Jul 08 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [115] Company-Retreat.planning-call-and-forms-for-your-company  · served Wed Jul 08
+   ✗ expected  event ~"Retreat Company Meeting Call" @ Tue Jul 21
+     actual    (nothing matching created)
+     why       no event titled like "Retreat Company Meeting Call" was created
+   ✗ expected  to-do ~"forms" @ Tue Jul 21
+     actual    (nothing matching created)
+     why       no to-do titled like "forms" was created
+
+ ✗ FAIL  [116] shoe-product-launch-delays.design-delays-internal-conflicts  · served Wed Jul 08
+   ✗ expected  to-do ~"advertising" @ Wed Jul 15
+     actual    (nothing matching created)
+     why       no to-do titled like "advertising" was created
+   ✓ expected  event ~"melissa" @ Wed Jul 08
+     actual    "Design team meeting with Melissa" Wed Jul 08 2 PM (60m)
+     why       matched
+
+ ✗ FAIL  [117] Innovation-comp.confirmed-for-the-new-sponsor-call  · served Wed Jul 08
+   ✗ expected  take no action (FYI / no scheduling needed)
+     actual    "New sponsor intro call" Tue Aug 25 2 PM (60m)
+     why       over-acted — created "New sponsor intro call" Tue Aug 25 2 PM (60m)
+
+── day 39 · Thu Jul 09 · 1 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [118] Innovation-comp.press-wants-a-short-interview  · served Thu Jul 09
+   ✓ expected  event ~"interview" @ Fri Sep 18
+     actual    "Press interview about pitch comp" Fri Sep 18 2 PM (20m)
+     why       matched
+
+── day 40 · Fri Jul 10 · 2 new email(s) ──
+   tools  list_new_emails, get_email, update_event
+   model said  “Done.…”
+
+ ✓ PASS  [119] press-tour.keynote-slot-swapped  · served Fri Jul 10
+   ✓ expected  event ~"keynote" @ Sun Sep 13
+     actual    "Expo keynote" Sun Sep 13 11 AM (60m)
+     why       matched
+
+ ✓ PASS  [120] Innovation-comp.mid-comp-check-in-with-the-teams  · served Fri Jul 10
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 41 · Sat Jul 11 · 1 new email(s) ──
+   tools  list_new_emails, get_email
+   model said  “Done.…”
+
+ ✓ PASS  [121] Innovation-comp.press-interview-confirmed  · served Sat Jul 11
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 42 · Sun Jul 12 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✗ FAIL  [122] Innovation-comp.post-recap-follow-ups  · served Sun Jul 12
+   ✗ expected  to-do ~"judges" @ Sun Sep 27
+     actual    "Send thank you note to pitch comp judges" Sat Sep 26 5 PM
+     why       on the wrong day
+
+ ✗ FAIL  [123] Innovation-comp.prep-doc-for-the-board-presentation  · served Sun Jul 12
+   ✗ expected  to-do ~"slides" @ Mon Jul 20
+     actual    (nothing matching created)
+     why       no to-do titled like "slides" was created
+
+ ✓ PASS  [124] Innovation-comp.mixer-was-a-hit  · served Sun Jul 12
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [125] Innovation-comp.final-headcount-for-the-recap  · served Sun Jul 12
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 43 · Mon Jul 13 · 3 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✗ FAIL  [126] shoe-product-launch-delays.budget-exceeded  · served Mon Jul 13
+   ✗ expected  to-do ~"advertising" @ Wed Jul 22
+     actual    (nothing matching created)
+     why       no to-do titled like "advertising" was moved
+   ✗ expected  event ~"first" @ Wed Jul 15
+     actual    (nothing matching created)
+     why       no event titled like "first" was created
+   ✗ expected  event ~"second" @ Wed Jul 29
+     actual    (nothing matching created)
+     why       no event titled like "second" was created
+
+ ✗ FAIL  [127] Partnership-with-deeptech-companies.boston-partnership-trip  · served Mon Jul 13
+   ✗ expected  to-do ~"brainstorm" @ by Mon Jul 20
+     actual    (nothing matching created)
+     why       no to-do titled like "brainstorm" was created
+   ✓ expected  event ~"strategy" @ Mon Jul 20
+     actual    "WHOOP Boston trip strategy meeting" Mon Jul 20 10 AM (60m)
+     why       matched
+
+ ✓ PASS  [128] Planning.locked-in-for  · served Mon Jul 13
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 44 · Tue Jul 14 · 1 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [129] project_atlas.ceo-note  · served Tue Jul 14
+   ✓ expected  event ~"interview" @ Mon Sep 07
+     actual    "Atlas launch press interview" Mon Sep 07 10 AM (60m)
+     why       matched
+
+── day 45 · Wed Jul 15 · 3 new email(s) ──
+   tools  list_new_emails, get_email, update_todo
+   model said  “Done.…”
+
+ ✗ FAIL  [130] World_Cup_Cleat_Launch.reveal-event-budget-is-over  · served Wed Jul 15
+   ✗ expected  to-do ~"Approve revised event budget" @ Fri Jul 17
+     actual    (nothing matching created)
+     why       no to-do titled like "Approve revised event budget" was created
+
+ ✗ FAIL  [131] Company-Retreat.inquiry-on-vip-list  · served Wed Jul 15
+   ✗ expected  to-do ~"list" @ by Thu Jul 16
+     actual    "Provide VIP employee list for retreat" Thu Jul 16 5 PM; "Create guest list for athlete visit and contact invitees" Sat Aug 15 5 PM
+     why       found 2 matching, expected exactly 1 (duplicate / double-booked)
+
+ ✓ PASS  [132] Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o  · served Wed Jul 15
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 46 · Thu Jul 16 · 2 new email(s) ──
+   tools  list_new_emails, get_email
+   model said  “Done.…”
+
+ ✓ PASS  [133] pizza-party.updated-pizza-party-schedule  · served Thu Jul 16
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [134] Partnership-with-deeptech-companies.boston-dynamics  · served Thu Jul 16
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 47 · Fri Jul 17 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [135] pizza-party.room-change  · served Fri Jul 17
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✓ PASS  [136] Innovation-comp.order-placed-for-trophies  · served Fri Jul 17
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [137] project_atlas.launch-dinner  · served Fri Jul 17
+   ✗ expected  event ~"launch" @ Mon Aug 31
+     actual    "Project Atlas code freeze go/no-go" Mon Jun 22 2 PM (60m); "Atlas launch press interview" Mon Sep 07 10 AM (60m); "Atlas launch team dinner" Mon Aug 31 7 PM (120m)
+     why       found 3 matching, expected exactly 1 (duplicate / double-booked)
+
+ ✗ FAIL  [138] Enterprise_Ai_Selection.ai-meeting-schedule  · served Fri Jul 17
+   ✓ expected  event ~"anthropic" @ Tue Jul 21
+     actual    "Anthropic meeting" Tue Jul 21 10 AM (60m)
+     why       matched
+   ✓ expected  event ~"google" @ Tue Jul 21
+     actual    "Google Gemini tour" Tue Jul 21 2 PM (60m)
+     why       matched
+   ✗ expected  event ~"through" @ Wed Jul 22
+     actual    (nothing matching created)
+     why       no event titled like "through" was created
+
+── day 48 · Sat Jul 18 · 4 new email(s) ──
+   tools  list_new_emails, get_email, delete_event
+   model said  “Done.…”
+
+ ✗ FAIL  [139] shoe-product-launch-delays.re-design-team-meeting  · served Sat Jul 18
+   ✓ expected  to-do ~"who" cancelled
+     actual    (nothing — cancelled)
+     why       cancelled
+   ✗ expected  event ~"design" cancelled
+     actual    "Design team restructuring meeting" Mon Jun 22 10 AM (60m); "Design team meeting with Melissa" Wed Jul 08 2 PM (60m)
+     why       should be cancelled, but 2 still on the calendar
+
+ ✓ PASS  [140] World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal-2  · served Sat Jul 18
+   ✓ expected  to-do ~"endorsement" @ Wed Jul 22
+     actual    "Review striker endorsement letter of intent" Wed Jul 22 5 PM
+     why       matched
+
+ ✗ FAIL  [141] project_atlas.dinner-cancel  · served Sat Jul 18
+   ✗ expected  event ~"launch" cancelled
+     actual    "Project Atlas code freeze go/no-go" Mon Jun 22 2 PM (60m); "Atlas launch press interview" Mon Sep 07 10 AM (60m)
+     why       should be cancelled, but 2 still on the calendar
+
+ ✓ PASS  [142] World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat-2  · served Sat Jul 18
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 49 · Sun Jul 19 · 4 new email(s) ──
+   tools  list_new_emails, get_email, create_event
+   model said  “Done.…”
+
+ ✓ PASS  [143] Innovation-comp.last-year-s-recap-notes-for-reference  · served Sun Jul 19
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [144] World_Cup_Cleat_Launch.reveal-event-date-and-venue-2  · served Sun Jul 19
+   ✓ expected  event ~"rehearsal" @ Wed Aug 12
+     actual    "WC reveal rehearsal with striker" Wed Aug 12 10 AM (120m)
+     why       matched
+   ✗ expected  event ~"Design Lead Stage Slot" @ Mon Jul 20
+     actual    (nothing matching created)
+     why       no event titled like "Design Lead Stage Slot" was created
+
+ ✗ FAIL  [145] World_Cup_Cleat_Launch.tooling-po-needs-approval  · served Sun Jul 19
+   ✗ expected  to-do ~"Approve tooling PO" @ Fri Jul 17
+     actual    "Approve tooling PO for factory" Sun Jul 19 5 PM
+     why       on the wrong day
+
+ ✗ FAIL  [146] Partnership-with-deeptech-companies.boston-trip-details  · served Sun Jul 19
+   ✗ expected  event ~"start" @ Mon Aug 03–Aug 09
+     actual    (nothing matching created)
+     why       no event titled like "start" was created
+   ✗ expected  event ~"end" @ Sun Aug 09
+     actual    (nothing matching created)
+     why       no event titled like "end" was created
+   ✓ expected  event ~"WHOOP HQ Visit" @ Mon Aug 03–Aug 09
+     actual    "Boston trip - WHOOP HQ visit" Tue Aug 04 9 AM (480m)
+     why       matched
+   ✗ expected  event ~"dynamics" @ Wed Aug 05
+     actual    "Boston trip - Boston Dynamics visit" Thu Aug 06 9 AM (480m)
+     why       on the wrong day
+
+── day 50 · Mon Jul 20 · 2 new email(s) ──
+   tools  list_new_emails, get_email, create_todo
+   model said  “Done.…”
+
+ ✓ PASS  [147] Innovation-comp.this-pitch-comp-thing-is-going-around  · served Mon Jul 20
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [148] Sponsoring-Marathon.pitch-deck  · served Mon Jul 20
+   ✗ expected  take no action (FYI / no scheduling needed)
+     actual    "Ensure marketing creates marathon pitch deck" Thu Jul 30 5 PM
+     why       over-acted — created "Ensure marketing creates marathon pitch deck" Thu Jul 30 5 PM
+day 51 (2026-07-21): transient (Command '['claude', '-p', '--output-format', 'stream-json', '--verbose', '--permission-mode', 'bypassPermissions', '--mcp-config', '{"mcpServers": {"secretary":) — retry 1/6 in 15s
+
+── day 51 · Tue Jul 21 · 3 new email(s) ──
+   tools  (none)
+   model said  “I'm unable to continue processing emails - the secretary tools (email management functions) are no longer available as the MCP server has disconnected.…”
+
+ ✓ PASS  [149] Innovation-comp.one-pager-looks-good  · served Tue Jul 21
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [150] World_Cup_Cleat_Launch.manufacturing-kickoff  · served Tue Jul 21
+   ✗ expected  event ~"manufacturing" @ Wed Jul 22
+     actual    (nothing matching created)
+     why       no event titled like "manufacturing" was created
+
+ ✗ FAIL  [151] World_Cup_Cleat_Launch.reveal-event-budget-is-over-2  · served Tue Jul 21
+   ✗ expected  to-do ~"Approve revised event budget" @ Wed Jul 22
+     actual    (nothing matching created)
+     why       no to-do titled like "Approve revised event budget" was moved
+
+── day 52 · Wed Jul 22 · 5 new email(s) ──
+   tools  (none)
+   model said  “I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.…”
+
+ ✗ FAIL  [152] Innovation-comp.add-this-to-the-recap-agenda  · served Wed Jul 22
+   ✗ expected  to-do ~"agenda" @ Fri Sep 25
+     actual    (nothing matching created)
+     why       no to-do titled like "agenda" was created
+
+ ✗ FAIL  [153] Day-of-execution_and_Aftermath.green-room-before-we-go-live  · served Wed Jul 22
+   ✗ expected  event ~"green" @ Thu Sep 10
+     actual    (nothing matching created)
+     why       no event titled like "green" was created
+
+ ✗ FAIL  [154] World_Cup_Cleat_Launch.manufacturing-kickoff-2  · served Wed Jul 22
+   ✗ expected  event ~"Design Lead 1:1" @ Fri Jul 24
+     actual    (nothing matching created)
+     why       no event titled like "Design Lead 1:1" was created
+
+ ✓ PASS  [155] Sponsoring-Marathon.launch-meeting-conflict  · served Wed Jul 22
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [156] Partnership-with-deeptech-companies.new-meeting-during-boston-trip  · served Wed Jul 22
+   ✗ expected  event ~"actnano" @ Sun Aug 09
+     actual    (nothing matching created)
+     why       no event titled like "actnano" was created
+
+── day 53 · Thu Jul 23 · 5 new email(s) ──
+   tools  (none)
+   model said  “I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.…”
+
+ ✓ PASS  [157] World_Cup_Cleat_Launch.manufacturing-kickoff-3  · served Thu Jul 23
+   ✓ expected  event ~"Design Lead Stage Slot" cancelled
+     actual    (nothing — cancelled)
+     why       cancelled
+
+ ✗ FAIL  [158] Sponsoring-Marathon.pitch-deck-2  · served Thu Jul 23
+   ✗ expected  event ~"breifing" @ Sun Aug 02
+     actual    (nothing matching created)
+     why       no event titled like "breifing" was created
+
+ ✗ FAIL  [159] Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs  · served Thu Jul 23
+   ✗ expected  event ~"spad" @ Wed Aug 05
+     actual    (nothing matching created)
+     why       no event titled like "spad" was created
+
+ ✗ FAIL  [160] Sponsoring-Marathon.launch-meeting-conflict-2  · served Thu Jul 23
+   ✗ expected  to-do ~"launch" @ by Fri Jul 24
+     actual    (nothing matching created)
+     why       no to-do titled like "launch" was created
+
+ ✗ FAIL  [161] World_Cup_Cleat_Launch.reveal-event-date-and-venue-3  · served Thu Jul 23
+   ✗ expected  event ~"reveal" @ Mon Jul 20
+     actual    "WC cleat reveal event" Thu Aug 13 6 PM (120m); "WC cleat press briefing" Thu Aug 06 11 AM (60m); "WC reveal rehearsal with striker" Wed Aug 12 10 AM (120m); "Design walk-through at WC reveal" Thu Aug 13 6:30 PM (15m)
+     why       found 4 matching, expected exactly 1 (duplicate / double-booked)
+   ✗ expected  event ~"rehearsal" @ Sun Jul 19
+     actual    "WC reveal rehearsal with striker" Wed Aug 12 10 AM (120m)
+     why       on the wrong day
+
+── day 54 · Fri Jul 24 · 1 new email(s) ──
+   tools  (none)
+   model said  “I cannot process emails because the required MCP secretary tools are disconnected and unavailable.…”
+
+ ✓ PASS  [162] Partnership-with-deeptech-companies.confirmation-from-spadxtech  · served Fri Jul 24
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+── day 55 · Sat Jul 25 · 2 new email(s) ──
+   tools  (none)
+   model said  “I cannot process today's emails - the secretary MCP tools (list_new_emails, get_email, create_event, create_todo, etc.) are unavailable because the MCP server has disconnected.…”
+
+ ✓ PASS  [163] Innovation-comp.recap-agenda-finalized  · served Sat Jul 25
+   ✓ expected  take no action (FYI / no scheduling needed)
+     actual    (nothing)
+     why       correctly took no action
+
+ ✗ FAIL  [164] Partnership-with-deeptech-companies.boston-dynamics-cancel  · served Sat Jul 25
+   ✗ expected  event ~"dynamics" cancelled
+     actual    "Boston trip - Boston Dynamics visit" Thu Aug 06 9 AM (480m)
+     why       should be cancelled, but 1 still on the calendar
+
+── day 56 · Sun Jul 26 · 2 new email(s) ──
+   tools  (none)
+   model said  “I cannot list or process emails - the secretary email management tools are not available due to MCP server disconnection.…”
+
+ ✗ FAIL  [165] World_Cup_Cleat_Launch.board-sync-on-the-credit-issue  · served Sun Jul 26
+   ✗ expected  event ~"board" @ Thu Jul 23
+     actual    "WC cleat greenlight call with board" Mon Jun 29 10 AM (60m)
+     why       on the wrong day
+
+ ✗ FAIL  [166] Sponsoring-Marathon.launch-meeting-recap  · served Sun Jul 26
+   ✗ expected  event ~"sponsorshippitch" @ Sun Aug 09
+     actual    (nothing matching created)
+     why       no event titled like "sponsorshippitch" was created
+
+── day 57 · Mon Jul 27 · 1 new email(s) ──
+   tools  (none)
+   model said  “The secretary email tools are unavailable - I cannot process emails without the MCP server connection.…”
+
+ ✗ FAIL  [167] World_Cup_Cleat_Launch.press-briefing-and-embargo-2  · served Mon Jul 27
+   ✗ expected  event ~"briefing" @ Mon Jul 13
+     actual    "WC cleat press briefing" Thu Aug 06 11 AM (60m)
+     why       on the wrong day
+
+══════════════════════════════════
+  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+  SCORE 97/167 (58%)
+  served claude-sonnet-4-5-20250929 · seed 42 · daily 1-5 · 167 emails · corpus
+══════════════════════════════════
+
+  captured -> <repo>/captures/baseline-sonnet-4-5

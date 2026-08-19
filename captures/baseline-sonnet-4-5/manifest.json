@@ -1,0 +1,763 @@
+{
+  "requested_model": "claude-sonnet-4-5",
+  "driver": "claude",
+  "seed": 42,
+  "start": "2026-06-01",
+  "n_days": 60,
+  "limit": null,
+  "corpus_dir": "corpus",
+  "corpus_hash": "03e0d963b9866d8f",
+  "levers": {
+    "daily_min": 1,
+    "daily_max": 5,
+    "urgency_horizon": 7
+  },
+  "planned_days": 57,
+  "planned_emails": 167,
+  "serve_plan": {
+    "Rebrand-goes-company-wide.hard-no-on-teasers": "2026-06-01",
+    "Innovation-comp.sponsor-mixer-before-the-final": "2026-06-01",
+    "press-tour.press-plan-for-launch": "2026-06-01",
+    "Innovation-comp.come-check-out-the-semifinal-showcase": "2026-06-01",
+    "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp": "2026-06-01",
+    "press-tour.morning-show-launch-day": "2026-06-02",
+    "Company-Retreat.company-retreat-date-conformed": "2026-06-02",
+    "Innovation-comp.pitch-comp-budget-review-optional-sit-in": "2026-06-03",
+    "Innovation-comp.quick-win-to-share": "2026-06-03",
+    "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da": "2026-06-04",
+    "shoe-product-launch-delays.product-launch-ready": "2026-06-05",
+    "Sponsoring-Marathon.approval-of-event": "2026-06-05",
+    "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2": "2026-06-06",
+    "pizza-party.end-of-year-pizza-party": "2026-06-06",
+    "Enterprise_Ai_Selection.final-review": "2026-06-06",
+    "Day-of-execution_and_Aftermath.billboard-photo-op": "2026-06-07",
+    "Innovation-comp.judges-prep-session-want-in": "2026-06-07",
+    "press-tour.local-evening-news-hit": "2026-06-07",
+    "Innovation-comp.heads-up-one-of-the-pitches-might-step-o": "2026-06-08",
+    "Day-of-execution_and_Aftermath.billboard-s-off": "2026-06-08",
+    "Innovation-comp.one-of-our-designers-got-a-job-offer": "2026-06-09",
+    "Planning.might-be-too-much": "2026-06-09",
+    "Innovation-comp.a-kid-drew-the-new-logo-concept": "2026-06-09",
+    "Innovation-comp.two-weeks-out-from-the-final": "2026-06-10",
+    "Innovation-comp.storm-warning-for-finals-week": "2026-06-10",
+    "Day-of-execution_and_Aftermath.launch-livestream": "2026-06-10",
+    "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight": "2026-06-10",
+    "Day-of-execution_and_Aftermath.metrics-readout": "2026-06-11",
+    "Innovation-comp.found-a-typo-on-the-trophy": "2026-06-11",
+    "Innovation-comp.press-preview-ahead-of-the-final": "2026-06-12",
+    "press-tour.keynote-at-the-footwear": "2026-06-12",
+    "Marketing-campaign-new-product-delay.need-to-delay-the-release-of-the-new-pro": "2026-06-12",
+    "shoe-product-launch-delays.product-launch-ready-soon": "2026-06-12",
+    "Enterprise_Ai_Selection.fridays-meeting-time": "2026-06-13",
+    "press-tour.news-hit-fell-through": "2026-06-13",
+    "Rebrand-goes-company-wide.we-need-to-talk-about-morale": "2026-06-13",
+    "Innovation-comp.today-s-the-day": "2026-06-13",
+    "Pre-Launch.dry-run-of-the-flip": "2026-06-13",
+    "World_Cup_Cleat_Launch.project-design-kickoff": "2026-06-14",
+    "Innovation-comp.vp-product": "2026-06-14",
+    "Innovation-comp.new-sponsor-wants-to-chat": "2026-06-14",
+    "Company-Retreat.tasks-before-the-retreat": "2026-06-15",
+    "Innovation-comp.great-session-today": "2026-06-15",
+    "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin": "2026-06-15",
+    "Enterprise_Ai_Selection.ai-selection-finalization": "2026-06-15",
+    "Innovation-comp.brief-for-the-new-sponsor-call": "2026-06-15",
+    "Partnership-with-deeptech-companies.whoop-collaboration-meeting": "2026-06-16",
+    "Rebrand-goes-company-wide.teaser-campaign": "2026-06-16",
+    "Partnership-with-deeptech-companies.whoop-meeting-reschedule": "2026-06-17",
+    "Innovation-comp.final-lineup-confirmed": "2026-06-17",
+    "Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig": "2026-06-17",
+    "Enterprise_Ai_Selection.enterprise-ai-selection-kickoff": "2026-06-18",
+    "Enterprise_Ai_Selection.openai-review": "2026-06-18",
+    "Innovation-comp.trophy-design-quick-look": "2026-06-18",
+    "pizza-party.pizza-order-deadline": "2026-06-19",
+    "project_atlas.freeze": "2026-06-19",
+    "Partnership-with-deeptech-companies.caltech-conference-invitation": "2026-06-19",
+    "press-tour.podcast-taping-pick-a-day": "2026-06-19",
+    "shoe-product-launch-delays.design-team-meeting": "2026-06-19",
+    "Sponsoring-Marathon.launching-sponsoring-eugene-marathon": "2026-06-20",
+    "Innovation-comp.travel-heads-up-for-finals-week": "2026-06-21",
+    "World_Cup_Cleat_Launch.wc-cleat-launch-window-options": "2026-06-22",
+    "Marketing-campaign-new-product-delay.lebron-james-canceled": "2026-06-23",
+    "Innovation-comp.need-your-sign-off-on-prize-amounts": "2026-06-23",
+    "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2": "2026-06-23",
+    "Rebrand-goes-company-wide.please-reconsider-this-rebrand": "2026-06-23",
+    "Sponsoring-Marathon.approval-needed-race-sponsorship-budget": "2026-06-23",
+    "Marketing-campaign-new-product-delay.serena-williams-reschedule": "2026-06-24",
+    "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned": "2026-06-25",
+    "Planning.acme-trademark-clear": "2026-06-25",
+    "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule": "2026-06-25",
+    "Innovation-comp.kickoff-went-well": "2026-06-25",
+    "pizza-party.conference-room-reservation": "2026-06-26",
+    "Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2": "2026-06-26",
+    "Innovation-comp.board-slot-the-week-after-finals": "2026-06-26",
+    "project_atlas.beta": "2026-06-26",
+    "Pre-Launch.launch-day-locked": "2026-06-26",
+    "Innovation-comp.thanks-for-the-sign-off": "2026-06-27",
+    "Planning.rebrand-pitch": "2026-06-27",
+    "Day-of-execution_and_Aftermath.we-are-live": "2026-06-27",
+    "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat": "2026-06-27",
+    "Company-Retreat.in-town-and-would-love-to-connect": "2026-06-28",
+    "Sponsoring-Marathon.race-sponsorship-budget-goals": "2026-06-28",
+    "pizza-party.pizza-place-selection": "2026-06-28",
+    "project_atlas.board-demo": "2026-06-28",
+    "project_atlas.demo-moved": "2026-06-29",
+    "Sponsoring-Marathon.sponsorship-tiers": "2026-06-29",
+    "Rebrand-goes-company-wide.standing-down-on-teasers": "2026-06-30",
+    "Marketing-campaign-new-product-delay.ronaldo-s-availability-for-marketing-cam": "2026-07-01",
+    "World_Cup_Cleat_Launch.final-colorway-for-sign-off": "2026-07-01",
+    "pizza-party.pizza-party-budget": "2026-07-01",
+    "Pre-Launch.embargo-lifts-at-six": "2026-07-01",
+    "Day-of-execution_and_Aftermath.congrats-on-the-relaunch": "2026-07-02",
+    "Planning.can-t-do-thursday": "2026-07-02",
+    "project_atlas.legal-fyi": "2026-07-02",
+    "World_Cup_Cleat_Launch.final-colorway-for-sign-off-2": "2026-07-02",
+    "Innovation-comp.team-morale-lunch-during-the-comp": "2026-07-02",
+    "Company-Retreat.athelete-visit": "2026-07-03",
+    "Innovation-comp.quick-favor-before-the-final": "2026-07-03",
+    "Innovation-comp.sponsor-wants-a-follow-up-call": "2026-07-03",
+    "Innovation-comp.she-s-staying": "2026-07-04",
+    "Enterprise_Ai_Selection.anthropic-google-review": "2026-07-04",
+    "Pre-Launch.store-floors-reset-overnight": "2026-07-04",
+    "Innovation-comp.sponsor-call-no-longer-needed": "2026-07-05",
+    "Planning.memo-before-the-board-sits": "2026-07-05",
+    "Pre-Launch.design-locked": "2026-07-05",
+    "pizza-party.client-demo-conflict": "2026-07-05",
+    "World_Cup_Cleat_Launch.reveal-event-date-and-venue": "2026-07-05",
+    "Day-of-execution_and_Aftermath.thank-the-team": "2026-07-06",
+    "Innovation-comp.let-s-set-up-a-recap": "2026-07-06",
+    "Innovation-comp.great-year-overall": "2026-07-07",
+    "Sponsoring-Marathon.approval-of-budget-tier": "2026-07-07",
+    "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal": "2026-07-07",
+    "World_Cup_Cleat_Launch.press-briefing-and-embargo": "2026-07-07",
+    "Company-Retreat.planning-call-and-forms-for-your-company": "2026-07-08",
+    "shoe-product-launch-delays.design-delays-internal-conflicts": "2026-07-08",
+    "Innovation-comp.confirmed-for-the-new-sponsor-call": "2026-07-08",
+    "Innovation-comp.press-wants-a-short-interview": "2026-07-09",
+    "press-tour.keynote-slot-swapped": "2026-07-10",
+    "Innovation-comp.mid-comp-check-in-with-the-teams": "2026-07-10",
+    "Innovation-comp.press-interview-confirmed": "2026-07-11",
+    "Innovation-comp.post-recap-follow-ups": "2026-07-12",
+    "Innovation-comp.prep-doc-for-the-board-presentation": "2026-07-12",
+    "Innovation-comp.mixer-was-a-hit": "2026-07-12",
+    "Innovation-comp.final-headcount-for-the-recap": "2026-07-12",
+    "shoe-product-launch-delays.budget-exceeded": "2026-07-13",
+    "Partnership-with-deeptech-companies.boston-partnership-trip": "2026-07-13",
+    "Planning.locked-in-for": "2026-07-13",
+    "project_atlas.ceo-note": "2026-07-14",
+    "World_Cup_Cleat_Launch.reveal-event-budget-is-over": "2026-07-15",
+    "Company-Retreat.inquiry-on-vip-list": "2026-07-15",
+    "Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o": "2026-07-15",
+    "pizza-party.updated-pizza-party-schedule": "2026-07-16",
+    "Partnership-with-deeptech-companies.boston-dynamics": "2026-07-16",
+    "pizza-party.room-change": "2026-07-17",
+    "Innovation-comp.order-placed-for-trophies": "2026-07-17",
+    "project_atlas.launch-dinner": "2026-07-17",
+    "Enterprise_Ai_Selection.ai-meeting-schedule": "2026-07-17",
+    "shoe-product-launch-delays.re-design-team-meeting": "2026-07-18",
+    "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal-2": "2026-07-18",
+    "project_atlas.dinner-cancel": "2026-07-18",
+    "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat-2": "2026-07-18",
+    "Innovation-comp.last-year-s-recap-notes-for-reference": "2026-07-19",
+    "World_Cup_Cleat_Launch.reveal-event-date-and-venue-2": "2026-07-19",
+    "World_Cup_Cleat_Launch.tooling-po-needs-approval": "2026-07-19",
+    "Partnership-with-deeptech-companies.boston-trip-details": "2026-07-19",
+    "Innovation-comp.this-pitch-comp-thing-is-going-around": "2026-07-20",
+    "Sponsoring-Marathon.pitch-deck": "2026-07-20",
+    "Innovation-comp.one-pager-looks-good": "2026-07-21",
+    "World_Cup_Cleat_Launch.manufacturing-kickoff": "2026-07-21",
+    "World_Cup_Cleat_Launch.reveal-event-budget-is-over-2": "2026-07-21",
+    "Innovation-comp.add-this-to-the-recap-agenda": "2026-07-22",
+    "Day-of-execution_and_Aftermath.green-room-before-we-go-live": "2026-07-22",
+    "World_Cup_Cleat_Launch.manufacturing-kickoff-2": "2026-07-22",
+    "Sponsoring-Marathon.launch-meeting-conflict": "2026-07-22",
+    "Partnership-with-deeptech-companies.new-meeting-during-boston-trip": "2026-07-22",
+    "World_Cup_Cleat_Launch.manufacturing-kickoff-3": "2026-07-23",
+    "Sponsoring-Marathon.pitch-deck-2": "2026-07-23",
+    "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs": "2026-07-23",
+    "Sponsoring-Marathon.launch-meeting-conflict-2": "2026-07-23",
+    "World_Cup_Cleat_Launch.reveal-event-date-and-venue-3": "2026-07-23",
+    "Partnership-with-deeptech-companies.confirmation-from-spadxtech": "2026-07-24",
+    "Innovation-comp.recap-agenda-finalized": "2026-07-25",
+    "Partnership-with-deeptech-companies.boston-dynamics-cancel": "2026-07-25",
+    "World_Cup_Cleat_Launch.board-sync-on-the-credit-issue": "2026-07-26",
+    "Sponsoring-Marathon.launch-meeting-recap": "2026-07-26",
+    "World_Cup_Cleat_Launch.press-briefing-and-embargo-2": "2026-07-27"
+  },
+  "started_at": "2026-08-18 22:35:37.699820",
+  "schema_version": 1,
+  "served_model": "claude-sonnet-4-5-20250929",
+  "model_certified": true,
+  "score_passed": 97,
+  "score_total": 167,
+  "errored": 0,
+  "finished_at": "2026-08-18 23:06:25.126597",
+  "elapsed_s": 1847.4,
+  "days_index": [
+    {
+      "serve_date": "2026-06-01",
+      "batch": [
+        "Rebrand-goes-company-wide.hard-no-on-teasers",
+        "Innovation-comp.sponsor-mixer-before-the-final",
+        "press-tour.press-plan-for-launch",
+        "Innovation-comp.come-check-out-the-semifinal-showcase",
+        "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp"
+      ],
+      "ok": true,
+      "day": 1
+    },
+    {
+      "serve_date": "2026-06-02",
+      "batch": [
+        "press-tour.morning-show-launch-day",
+        "Company-Retreat.company-retreat-date-conformed"
+      ],
+      "ok": true,
+      "day": 2
+    },
+    {
+      "serve_date": "2026-06-03",
+      "batch": [
+        "Innovation-comp.pitch-comp-budget-review-optional-sit-in",
+        "Innovation-comp.quick-win-to-share"
+      ],
+      "ok": true,
+      "day": 3
+    },
+    {
+      "serve_date": "2026-06-04",
+      "batch": [
+        "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da"
+      ],
+      "ok": true,
+      "day": 4
+    },
+    {
+      "serve_date": "2026-06-05",
+      "batch": [
+        "shoe-product-launch-delays.product-launch-ready",
+        "Sponsoring-Marathon.approval-of-event"
+      ],
+      "ok": true,
+      "day": 5
+    },
+    {
+      "serve_date": "2026-06-06",
+      "batch": [
+        "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2",
+        "pizza-party.end-of-year-pizza-party",
+        "Enterprise_Ai_Selection.final-review"
+      ],
+      "ok": true,
+      "day": 6
+    },
+    {
+      "serve_date": "2026-06-07",
+      "batch": [
+        "Day-of-execution_and_Aftermath.billboard-photo-op",
+        "Innovation-comp.judges-prep-session-want-in",
+        "press-tour.local-evening-news-hit"
+      ],
+      "ok": true,
+      "day": 7
+    },
+    {
+      "serve_date": "2026-06-08",
+      "batch": [
+        "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+        "Day-of-execution_and_Aftermath.billboard-s-off"
+      ],
+      "ok": true,
+      "day": 8
+    },
+    {
+      "serve_date": "2026-06-09",
+      "batch": [
+        "Innovation-comp.one-of-our-designers-got-a-job-offer",
+        "Planning.might-be-too-much",
+        "Innovation-comp.a-kid-drew-the-new-logo-concept"
+      ],
+      "ok": true,
+      "day": 9
+    },
+    {
+      "serve_date": "2026-06-10",
+      "batch": [
+        "Innovation-comp.two-weeks-out-from-the-final",
+        "Innovation-comp.storm-warning-for-finals-week",
+        "Day-of-execution_and_Aftermath.launch-livestream",
+        "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight"
+      ],
+      "ok": true,
+      "day": 10
+    },
+    {
+      "serve_date": "2026-06-11",
+      "batch": [
+        "Day-of-execution_and_Aftermath.metrics-readout",
+        "Innovation-comp.found-a-typo-on-the-trophy"
+      ],
+      "ok": true,
+      "day": 11
+    },
+    {
+      "serve_date": "2026-06-12",
+      "batch": [
+        "Innovation-comp.press-preview-ahead-of-the-final",
+        "press-tour.keynote-at-the-footwear",
+        "Marketing-campaign-new-product-delay.need-to-delay-the-release-of-the-new-pro",
+        "shoe-product-launch-delays.product-launch-ready-soon"
+      ],
+      "ok": true,
+      "day": 12
+    },
+    {
+      "serve_date": "2026-06-13",
+      "batch": [
+        "Enterprise_Ai_Selection.fridays-meeting-time",
+        "press-tour.news-hit-fell-through",
+        "Rebrand-goes-company-wide.we-need-to-talk-about-morale",
+        "Innovation-comp.today-s-the-day",
+        "Pre-Launch.dry-run-of-the-flip"
+      ],
+      "ok": true,
+      "day": 13
+    },
+    {
+      "serve_date": "2026-06-14",
+      "batch": [
+        "World_Cup_Cleat_Launch.project-design-kickoff",
+        "Innovation-comp.vp-product",
+        "Innovation-comp.new-sponsor-wants-to-chat"
+      ],
+      "ok": true,
+      "day": 14
+    },
+    {
+      "serve_date": "2026-06-15",
+      "batch": [
+        "Company-Retreat.tasks-before-the-retreat",
+        "Innovation-comp.great-session-today",
+        "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+        "Enterprise_Ai_Selection.ai-selection-finalization",
+        "Innovation-comp.brief-for-the-new-sponsor-call"
+      ],
+      "ok": true,
+      "day": 15
+    },
+    {
+      "serve_date": "2026-06-16",
+      "batch": [
+        "Partnership-with-deeptech-companies.whoop-collaboration-meeting",
+        "Rebrand-goes-company-wide.teaser-campaign"
+      ],
+      "ok": true,
+      "day": 16
+    },
+    {
+      "serve_date": "2026-06-17",
+      "batch": [
+        "Partnership-with-deeptech-companies.whoop-meeting-reschedule",
+        "Innovation-comp.final-lineup-confirmed",
+        "Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig"
+      ],
+      "ok": true,
+      "day": 17
+    },
+    {
+      "serve_date": "2026-06-18",
+      "batch": [
+        "Enterprise_Ai_Selection.enterprise-ai-selection-kickoff",
+        "Enterprise_Ai_Selection.openai-review",
+        "Innovation-comp.trophy-design-quick-look"
+      ],
+      "ok": true,
+      "day": 18
+    },
+    {
+      "serve_date": "2026-06-19",
+      "batch": [
+        "pizza-party.pizza-order-deadline",
+        "project_atlas.freeze",
+        "Partnership-with-deeptech-companies.caltech-conference-invitation",
+        "press-tour.podcast-taping-pick-a-day",
+        "shoe-product-launch-delays.design-team-meeting"
+      ],
+      "ok": true,
+      "day": 19
+    },
+    {
+      "serve_date": "2026-06-20",
+      "batch": [
+        "Sponsoring-Marathon.launching-sponsoring-eugene-marathon"
+      ],
+      "ok": true,
+      "day": 20
+    },
+    {
+      "serve_date": "2026-06-21",
+      "batch": [
+        "Innovation-comp.travel-heads-up-for-finals-week"
+      ],
+      "ok": true,
+      "day": 21
+    },
+    {
+      "serve_date": "2026-06-22",
+      "batch": [
+        "World_Cup_Cleat_Launch.wc-cleat-launch-window-options"
+      ],
+      "ok": true,
+      "day": 22
+    },
+    {
+      "serve_date": "2026-06-23",
+      "batch": [
+        "Marketing-campaign-new-product-delay.lebron-james-canceled",
+        "Innovation-comp.need-your-sign-off-on-prize-amounts",
+        "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2",
+        "Rebrand-goes-company-wide.please-reconsider-this-rebrand",
+        "Sponsoring-Marathon.approval-needed-race-sponsorship-budget"
+      ],
+      "ok": true,
+      "day": 23
+    },
+    {
+      "serve_date": "2026-06-24",
+      "batch": [
+        "Marketing-campaign-new-product-delay.serena-williams-reschedule"
+      ],
+      "ok": true,
+      "day": 24
+    },
+    {
+      "serve_date": "2026-06-25",
+      "batch": [
+        "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned",
+        "Planning.acme-trademark-clear",
+        "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule",
+        "Innovation-comp.kickoff-went-well"
+      ],
+      "ok": true,
+      "day": 25
+    },
+    {
+      "serve_date": "2026-06-26",
+      "batch": [
+        "pizza-party.conference-room-reservation",
+        "Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2",
+        "Innovation-comp.board-slot-the-week-after-finals",
+        "project_atlas.beta",
+        "Pre-Launch.launch-day-locked"
+      ],
+      "ok": true,
+      "day": 26
+    },
+    {
+      "serve_date": "2026-06-27",
+      "batch": [
+        "Innovation-comp.thanks-for-the-sign-off",
+        "Planning.rebrand-pitch",
+        "Day-of-execution_and_Aftermath.we-are-live",
+        "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat"
+      ],
+      "ok": true,
+      "day": 27
+    },
+    {
+      "serve_date": "2026-06-28",
+      "batch": [
+        "Company-Retreat.in-town-and-would-love-to-connect",
+        "Sponsoring-Marathon.race-sponsorship-budget-goals",
+        "pizza-party.pizza-place-selection",
+        "project_atlas.board-demo"
+      ],
+      "ok": true,
+      "day": 28
+    },
+    {
+      "serve_date": "2026-06-29",
+      "batch": [
+        "project_atlas.demo-moved",
+        "Sponsoring-Marathon.sponsorship-tiers"
+      ],
+      "ok": true,
+      "day": 29
+    },
+    {
+      "serve_date": "2026-06-30",
+      "batch": [
+        "Rebrand-goes-company-wide.standing-down-on-teasers"
+      ],
+      "ok": true,
+      "day": 30
+    },
+    {
+      "serve_date": "2026-07-01",
+      "batch": [
+        "Marketing-campaign-new-product-delay.ronaldo-s-availability-for-marketing-cam",
+        "World_Cup_Cleat_Launch.final-colorway-for-sign-off",
+        "pizza-party.pizza-party-budget",
+        "Pre-Launch.embargo-lifts-at-six"
+      ],
+      "ok": true,
+      "day": 31
+    },
+    {
+      "serve_date": "2026-07-02",
+      "batch": [
+        "Day-of-execution_and_Aftermath.congrats-on-the-relaunch",
+        "Planning.can-t-do-thursday",
+        "project_atlas.legal-fyi",
+        "World_Cup_Cleat_Launch.final-colorway-for-sign-off-2",
+        "Innovation-comp.team-morale-lunch-during-the-comp"
+      ],
+      "ok": true,
+      "day": 32
+    },
+    {
+      "serve_date": "2026-07-03",
+      "batch": [
+        "Company-Retreat.athelete-visit",
+        "Innovation-comp.quick-favor-before-the-final",
+        "Innovation-comp.sponsor-wants-a-follow-up-call"
+      ],
+      "ok": true,
+      "day": 33
+    },
+    {
+      "serve_date": "2026-07-04",
+      "batch": [
+        "Innovation-comp.she-s-staying",
+        "Enterprise_Ai_Selection.anthropic-google-review",
+        "Pre-Launch.store-floors-reset-overnight"
+      ],
+      "ok": true,
+      "day": 34
+    },
+    {
+      "serve_date": "2026-07-05",
+      "batch": [
+        "Innovation-comp.sponsor-call-no-longer-needed",
+        "Planning.memo-before-the-board-sits",
+        "Pre-Launch.design-locked",
+        "pizza-party.client-demo-conflict",
+        "World_Cup_Cleat_Launch.reveal-event-date-and-venue"
+      ],
+      "ok": true,
+      "day": 35
+    },
+    {
+      "serve_date": "2026-07-06",
+      "batch": [
+        "Day-of-execution_and_Aftermath.thank-the-team",
+        "Innovation-comp.let-s-set-up-a-recap"
+      ],
+      "ok": true,
+      "day": 36
+    },
+    {
+      "serve_date": "2026-07-07",
+      "batch": [
+        "Innovation-comp.great-year-overall",
+        "Sponsoring-Marathon.approval-of-budget-tier",
+        "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal",
+        "World_Cup_Cleat_Launch.press-briefing-and-embargo"
+      ],
+      "ok": true,
+      "day": 37
+    },
+    {
+      "serve_date": "2026-07-08",
+      "batch": [
+        "Company-Retreat.planning-call-and-forms-for-your-company",
+        "shoe-product-launch-delays.design-delays-internal-conflicts",
+        "Innovation-comp.confirmed-for-the-new-sponsor-call"
+      ],
+      "ok": true,
+      "day": 38
+    },
+    {
+      "serve_date": "2026-07-09",
+      "batch": [
+        "Innovation-comp.press-wants-a-short-interview"
+      ],
+      "ok": true,
+      "day": 39
+    },
+    {
+      "serve_date": "2026-07-10",
+      "batch": [
+        "press-tour.keynote-slot-swapped",
+        "Innovation-comp.mid-comp-check-in-with-the-teams"
+      ],
+      "ok": true,
+      "day": 40
+    },
+    {
+      "serve_date": "2026-07-11",
+      "batch": [
+        "Innovation-comp.press-interview-confirmed"
+      ],
+      "ok": true,
+      "day": 41
+    },
+    {
+      "serve_date": "2026-07-12",
+      "batch": [
+        "Innovation-comp.post-recap-follow-ups",
+        "Innovation-comp.prep-doc-for-the-board-presentation",
+        "Innovation-comp.mixer-was-a-hit",
+        "Innovation-comp.final-headcount-for-the-recap"
+      ],
+      "ok": true,
+      "day": 42
+    },
+    {
+      "serve_date": "2026-07-13",
+      "batch": [
+        "shoe-product-launch-delays.budget-exceeded",
+        "Partnership-with-deeptech-companies.boston-partnership-trip",
+        "Planning.locked-in-for"
+      ],
+      "ok": true,
+      "day": 43
+    },
+    {
+      "serve_date": "2026-07-14",
+      "batch": [
+        "project_atlas.ceo-note"
+      ],
+      "ok": true,
+      "day": 44
+    },
+    {
+      "serve_date": "2026-07-15",
+      "batch": [
+        "World_Cup_Cleat_Launch.reveal-event-budget-is-over",
+        "Company-Retreat.inquiry-on-vip-list",
+        "Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o"
+      ],
+      "ok": true,
+      "day": 45
+    },
+    {
+      "serve_date": "2026-07-16",
+      "batch": [
+        "pizza-party.updated-pizza-party-schedule",
+        "Partnership-with-deeptech-companies.boston-dynamics"
+      ],
+      "ok": true,
+      "day": 46
+    },
+    {
+      "serve_date": "2026-07-17",
+      "batch": [
+        "pizza-party.room-change",
+        "Innovation-comp.order-placed-for-trophies",
+        "project_atlas.launch-dinner",
+        "Enterprise_Ai_Selection.ai-meeting-schedule"
+      ],
+      "ok": true,
+      "day": 47
+    },
+    {
+      "serve_date": "2026-07-18",
+      "batch": [
+        "shoe-product-launch-delays.re-design-team-meeting",
+        "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal-2",
+        "project_atlas.dinner-cancel",
+        "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat-2"
+      ],
+      "ok": true,
+      "day": 48
+    },
+    {
+      "serve_date": "2026-07-19",
+      "batch": [
+        "Innovation-comp.last-year-s-recap-notes-for-reference",
+        "World_Cup_Cleat_Launch.reveal-event-date-and-venue-2",
+        "World_Cup_Cleat_Launch.tooling-po-needs-approval",
+        "Partnership-with-deeptech-companies.boston-trip-details"
+      ],
+      "ok": true,
+      "day": 49
+    },
+    {
+      "serve_date": "2026-07-20",
+      "batch": [
+        "Innovation-comp.this-pitch-comp-thing-is-going-around",
+        "Sponsoring-Marathon.pitch-deck"
+      ],
+      "ok": true,
+      "day": 50
+    },
+    {
+      "serve_date": "2026-07-21",
+      "batch": [
+        "Innovation-comp.one-pager-looks-good",
+        "World_Cup_Cleat_Launch.manufacturing-kickoff",
+        "World_Cup_Cleat_Launch.reveal-event-budget-is-over-2"
+      ],
+      "ok": true,
+      "day": 51
+    },
+    {
+      "serve_date": "2026-07-22",
+      "batch": [
+        "Innovation-comp.add-this-to-the-recap-agenda",
+        "Day-of-execution_and_Aftermath.green-room-before-we-go-live",
+        "World_Cup_Cleat_Launch.manufacturing-kickoff-2",
+        "Sponsoring-Marathon.launch-meeting-conflict",
+        "Partnership-with-deeptech-companies.new-meeting-during-boston-trip"
+      ],
+      "ok": true,
+      "day": 52
+    },
+    {
+      "serve_date": "2026-07-23",
+      "batch": [
+        "World_Cup_Cleat_Launch.manufacturing-kickoff-3",
+        "Sponsoring-Marathon.pitch-deck-2",
+        "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs",
+        "Sponsoring-Marathon.launch-meeting-conflict-2",
+        "World_Cup_Cleat_Launch.reveal-event-date-and-venue-3"
+      ],
+      "ok": true,
+      "day": 53
+    },
+    {
+      "serve_date": "2026-07-24",
+      "batch": [
+        "Partnership-with-deeptech-companies.confirmation-from-spadxtech"
+      ],
+      "ok": true,
+      "day": 54
+    },
+    {
+      "serve_date": "2026-07-25",
+      "batch": [
+        "Innovation-comp.recap-agenda-finalized",
+        "Partnership-with-deeptech-companies.boston-dynamics-cancel"
+      ],
+      "ok": true,
+      "day": 55
+    },
+    {
+      "serve_date": "2026-07-26",
+      "batch": [
+        "World_Cup_Cleat_Launch.board-sync-on-the-credit-issue",
+        "Sponsoring-Marathon.launch-meeting-recap"
+      ],
+      "ok": true,
+      "day": 56
+    },
+    {
+      "serve_date": "2026-07-27",
+      "batch": [
+        "World_Cup_Cleat_Launch.press-briefing-and-embargo-2"
+      ],
+      "ok": true,
+      "day": 57
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "day": 3,
+  "serve_date": "2026-06-03",
+  "batch": [
+    "Innovation-comp.pitch-comp-budget-review-optional-sit-in",
+    "Innovation-comp.quick-win-to-share"
+  ],
+  "ok": true,
+  "tools": [
+    "list_new_emails",
+    "get_email"
+  ],
+  "said": "Done.",
+  "warnings": [],
+  "state": {
+    "events": [
+      {
+        "id": "evt_1",
+        "email_id": "press-tour.press-plan-for-launch",
+        "title": "Cover-story interview",
+        "start": "2026-08-06T09:00:00",
+        "end": "2026-08-06T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_2",
+        "email_id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+        "title": "Budget meeting for pitch comp",
+        "start": "2026-07-05T09:00:00",
+        "end": "2026-07-05T10:00:00",
+        "description": "With VP Product and Finance to discuss prize money and event costs"
+      },
+      {
+        "id": "evt_3",
+        "email_id": "press-tour.morning-show-launch-day",
+        "title": "Morning show",
+        "start": "2026-08-10T07:00:00",
+        "end": "2026-08-10T08:00:00",
+        "description": "National morning show anchor slot on launch day"
+      },
+      {
+        "id": "evt_4",
+        "email_id": "Company-Retreat.company-retreat-date-conformed",
+        "title": "Company Retreat",
+        "start": "2026-06-22T09:00:00",
+        "end": "2026-06-22T17:00:00",
+        "description": ""
+      }
+    ],
+    "todos": []
+  },
+  "day_new": [],
+  "by_eid": {
+    "evt_1": "press-tour.press-plan-for-launch",
+    "evt_2": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+    "evt_3": "press-tour.morning-show-launch-day",
+    "evt_4": "Company-Retreat.company-retreat-date-conformed"
+  },
+  "verdicts": {
+    "Innovation-comp.pitch-comp-budget-review-optional-sit-in": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "no-action",
+          "expected": "take no action (FYI / no scheduling needed)",
+          "actual": "(nothing)",
+          "reason": "correctly took no action"
+        }
+      ],
+      "headline": "correctly took no action"
+    },
+    "Innovation-comp.quick-win-to-share": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "no-action",
+          "expected": "take no action (FYI / no scheduling needed)",
+          "actual": "(nothing)",
+          "reason": "correctly took no action"
+        }
+      ],
+      "headline": "correctly took no action"
+    }
+  }
+}
