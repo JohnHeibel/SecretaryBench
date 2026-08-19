@@ -165,11 +165,12 @@ Revised table. Old phase numbers in brackets.
 |---|---|---|---|
 | 0 | M, E | done — the reported blocker | free |
 | A | — | the register (done) | free |
-| 1 | **C-1** *(new)* | a documented command overwrites the corpus the three runs were scored against. Capture the recovered levers, the plan digests, and the ~270 model-authored titles harvested from the four logs before anything writes to `corpus/`. Recoverable from git if missed, so early rather than urgent | free, do it early |
+| 1 | **C-1** *(reduced)* | record C-1's lever recovery and its replay script before phase 5 edits `corpus/` and invalidates it. **Scope cut 2026-08-19:** the harvested-titles half is dropped — the 1c capture supplies 81 unbiased objects *with descriptions*, where the historical logs only ever rendered keyword-matched ones. Provenance half superseded by the certified baseline | free, small |
 | **1a** | **O-1, O-3, O-5a** *(new)* | the minimum re-gradeable capture slice: `--out DIR`, an end-of-run store dump, and **recording objects that matched no keyword**. Built before any run so the run is a permanent asset rather than a fourth disposable log | free |
 | **1b** | — *(new)* | bounded smoke (`--limit`, background) to prove the capture writes what phase 2 needs, and that the runner certifies the served model | cheap, bounded |
 | **1c** | — *(new)* | **the baseline run**: certified model, known config, fully re-gradeable. Run at seed 42 / `daily_max=5` so it is directly comparable to `outputs/opus.md` and `outputs/sonnet.md`, which retroactively validates them | **paid** |
-| 2 | G *[was 2]* | the grader. Now testable against **real recorded behaviour** from 1c, not only the oracle title-policy sweep | free to iterate |
+| **1d** | **the hand-grade** *(new)* | ~30 emails judged by a human against the 1c capture, **while the grader is still untouched**. Produces the fixed reference every phase-2 change is measured against. Was phase 7 only because no artifact recorded model behaviour; one now does | free |
+| 2 | G *[was 2]* | the grader. Now testable against **real recorded behaviour** from 1c, and against 1d's human reference. **Fix G-1, G-2, G-7 and the kind filter as ONE contract** — 1c proved that widening identity alone relocates failures rather than removing them | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
 | 4 | V *(part)*, C *[was 5]* | pin one lever and one config (C-2, C-3, K-2) and fix the **reporting** gaps: report V-3's null floor beside every score, make V-6's by-tier report exist, stamp provenance. **Does not decide what the benchmark claims** — see phase 8 | free |
 | 5 | K *[was 4]* | the corpus pass, at the pinned lever, against G's keyword contract. **A repair, not a rebuild**: make every authored question answerable and every keyword discoverable. Do not add difficulty, do not scale, do not re-author the tier set | free |
@@ -189,7 +190,12 @@ splits in two:
   did most of it*: 18 emails delivered after a date their own body states (K-1), 8 emails
   whose prose contradicts their answer key (K-3), 5 exact-day answers with no cue in the
   body (K-6), 10 rendering defects including one leaked answer-key expression (K-5).
-- **1.5b — hand-grade real model behaviour.** Needs O plus a fresh instrumented run.
+- **1.5b — hand-grade real model behaviour.** ~~Needs O plus a fresh instrumented run.~~
+  **Unblocked 2026-08-19 and promoted to phase 1d, ahead of phase 2.** O-1/O-3/O-5a landed
+  at 1a and `captures/baseline-sonnet-4-5` records all 81 objects with descriptions, per day,
+  attributed. The original reasoning stands and now cuts the other way: this is the only thing
+  that distinguishes *fixing* the benchmark from *inflating* it, phase 2 is where the
+  inflating risk lives, so the reference must be taken **before** the grader moves, not after.
   It is part of **phase 7**, not a precursor to phase 2.
 
 The consequence for phase 2's honesty is stated plainly: **a G change can be evaluated
@@ -1708,6 +1714,31 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-19** — Sequencing decisions taken on the 1c results.
+
+  **The hand-grade moves ahead of phase 2, as new phase 1d.** ~30 emails judged by a human
+  against `captures/baseline-sonnet-4-5`, while the grader is untouched, producing the fixed
+  reference every phase-2 change is scored against. The register's own argument for it is
+  unchanged — *any grader change will raise the scores; only a hand-graded baseline says
+  whether it raised them toward the truth* — but it was parked at phase 7 purely because no
+  artifact recorded model behaviour. One does now. Phase 2 is where the inflating risk lives,
+  so the reference is worthless taken afterwards.
+
+  **What 1d produces:** for each sampled email, the rendered mail, the answer key, and every
+  object the model actually created for it, side by side. A human verdict independent of
+  `sb/grader.py`. Compared against the grader's verdict this yields its **false-negative rate**
+  (model did the work, grader missed it) and **false-positive rate** (grader passed something a
+  human would not), which is the number phase 2 has to improve and currently nobody knows.
+
+  **Phase 1 cut to the lever record.** The harvested-titles half is dropped: 1c supplies 81
+  unbiased objects with descriptions, where the four historical logs only ever rendered
+  keyword-matched ones — a sample biased by exactly the mechanism under investigation. What
+  remains is committing C-1's lever recovery and replay script before phase 5 edits `corpus/`.
+
+  **Phase 2's entry condition restated in the table:** G-1, G-2, G-7 and the kind filter are
+  one contract, per the 1c relocation result.
+
 
 - **2026-08-18** — Plan revisions forced by the 1c results. **Phase 2's design constraint
   changed, and a sign-off decision is superseded.**
