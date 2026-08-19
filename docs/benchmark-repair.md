@@ -1458,6 +1458,37 @@ individual case. G's partition is not a per-case attribution and does not claim 
   as an exposure argument (A-5) until an instrumented run measures it.
 - Closing it per-case requires phase 6 + phase 7. Nothing on disk can do it.
 
+> **CLOSED 2026-08-18 by the phase 1c capture.** The last bullet was right that nothing
+> *then* on disk could do it, and wrong that it needed phases 6 and 7 — the 1a capture slice
+> was enough. Measured on `captures/baseline-sonnet-4-5` (certified `claude-sonnet-4-5`,
+> 97/167, same corpus and levers as `outputs/sonnet.md`), over **50 op-level failures** of
+> the form `no <kind> titled like "X" was created`:
+>
+> | arm | measured | phase-A estimate |
+> |---|---|---|
+> | keyword undiscoverable | **38 (76%)** | 52–60% |
+> | kind mismatch | **7 (14%)** | 0–4% "smallest by an order of magnitude" |
+> | genuine under-action | **5 (10%)** | ≤25–31% |
+> | grader bug | **0** | — |
+>
+> Method, stated so it is not redone wrongly: classify **per op, not per email** (emails carry
+> multiple ops; an email can fail on a to-do while its event op passes), against the **state of
+> the day the email was graded**, not end-of-run state, reconstructing the grader's own pool
+> (`_node_state`: node-scoped, kind-filtered, cumulative to that day). A first pass that paired
+> the first `why` line with the first `expected` line produced three phantom "grader bug" cases;
+> all three dissolved under the per-op method.
+>
+> **The corpus-discoverability arm is worse than phase A estimated, under-action is better, and
+> kind mismatch was underestimated by 3-4x.** The grader has no bug: it does exactly what it
+> says. Representative failures, each one an object of the right kind in the right node:
+> wanted `"whoop meeting"`, model wrote `"WHOOP collaboration meeting"` (both words present,
+> not adjacent, so the substring fails); wanted `"signoff"`, model wrote `"Board sign-off
+> meeting"` (**one hyphen**); wanted `"order-the-pizzas"`, model wrote `"Remind EA to submit
+> pizza order"`.
+>
+> This is the strongest available evidence for **G-1**, and it independently confirms **V-4**:
+> the run graded **190 ops** compressed into 167 binary email points.
+
 ---
 
 ## Overlap map
@@ -1673,6 +1704,40 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-18** — Phase 1c. **The baseline run exists**, and §4.3 is closed.
+
+  `captures/baseline-sonnet-4-5/` — requested `claude-sonnet-4-5`, **served
+  `claude-sonnet-4-5-20250929`, certified on every one of 57 turns**, 97/167 (58%),
+  seed 42 / daily 1-5 / urgency 7, corpus sha `03e0d963b9866d8f`, CLI 2.1.235, 0 errored,
+  no drift. 3.1 MB, committed rather than left in gitignored `build/` (C-8's failure mode).
+
+  **`python -m sb.regrade captures/baseline-sonnet-4-5` → `RESCORE 97/167` against
+  `as-run 97/167`.** Grader changes are now free to evaluate. That was O-1's entire cost.
+
+  **O-5 measured at scale:** the model created **81** objects; the printed log renders **65**.
+  **16 (20%) exist in no human-readable record.** 71 of 81 carry a `description`, the field
+  that is in the grader's match haystack and had never appeared in any artifact (G-3).
+
+  **§4.3 closed** — see the resolution section above for the 76 / 14 / 10 / 0 split and the
+  method. Headline: the grader has no bug, and three quarters of its dominant failure mode is
+  the model doing the right work under a name the answer key never told it to use.
+
+  **C-1b, partially cleared for sonnet.** This run is the controlled comparison C-1b called
+  for. Against `outputs/sonnet.md` (91/167) at identical config: verdict agreement
+  **153/167 (91.6%)**, em-dash rate **0.0% in both**, byte-identical titles on shared emails
+  **26.4%** — against the cross-model baselines phase A measured of 10.6% (opus↔sonnet, same
+  lever) and 16.1% (sonnet↔haiku). Self-identity is markedly higher than any cross-model pair,
+  so `outputs/sonnet.md` is very likely genuinely sonnet-4-5. Score moved 91 → 97 with churn in
+  *both* directions (10 newly passing, 4 newly failing), the signature of sampling
+  nondeterminism rather than a different model or a changed harness. **C-1b narrows to opus
+  alone and stays open**; this is corroboration, not proof.
+
+  **Incidental:** no `corpus/nodes` or answer-key read appears anywhere in 161 raw stream
+  events, which checks brief §2.12's cheating exposure against raw data rather than the lossy
+  parsed log. M-3 re-confirmed on CLI **2.1.235** across 57 `--resume` turns (previously only
+  2.1.233, 3 turns). Runner stdout line-buffered so long runs stream to their log.
+
 
 - **2026-08-18** — Phase 1b. The bounded smoke ran and **O-1, O-3 and O-5's capture half
   are now `verified`.**
