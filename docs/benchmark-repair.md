@@ -101,10 +101,14 @@ phase table, which has been re-argued on G-4 alone.
 **The revised phase table was signed off on 2026-08-17, as written below.** Two decisions
 were taken at sign-off:
 
-1. **O stays at phase 6.** The consequence was put explicitly and accepted: G-1, G-3 and
+1. ~~**O stays at phase 6.** The consequence was put explicitly and accepted: G-1, G-3 and
    G-8 can be *designed* in phase 2 but cannot be validated until the phase 7 run, because
-   of O-1's corrected limit. The alternative — one extra instrumented run up front to
-   unblock them — was declined as not worth the cost.
+   of O-1's corrected limit.~~ **SUPERSEDED 2026-08-18.** The 1a capture slice landed
+   instead, and `captures/baseline-sonnet-4-5` **can** be re-scored under a rule that newly
+   admits objects the log never rendered — demonstrated by swapping `_title_hit` for a
+   word-level rule and re-grading in about one second at zero quota. **G-1, G-3 and G-8 are
+   no longer blocked from validation until phase 7.** The limit O-1 describes is real for the
+   four *historical* logs and does not apply to captured runs.
 2. **V-1's direction is decided at phase 8, after the paid run, not before it.**
    *(Revised 2026-08-18. The sign-off originally parked this at phase 4; it has been moved
    to the end.)* Phase 5 is therefore a corpus **repair**, unambiguously. The repair fixes
@@ -1704,6 +1708,47 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-18** — Plan revisions forced by the 1c results. **Phase 2's design constraint
+  changed, and a sign-off decision is superseded.**
+
+  **1. G-1 cannot be fixed on its own.** Measured against the capture, offline, free:
+  swapping the shipped substring `_title_hit` for a word-level rule (order-insensitive,
+  hyphen-tolerant) moves the score **not at all** — 97/167 before and after, 110→109 passing
+  ops. It does not fix failures, it **relocates** them:
+
+  | bucket | shipped | widened | delta |
+  |---|---|---|---|
+  | `not_found` | 50 | 47 | **−3** |
+  | `wrong_day` | 14 | 16 | **+2** |
+  | count, too many matched | 11 | 12 | **+1** |
+  | cancel residue | 3 | 4 | +1 |
+  | **failing ops** | **80** | **81** | **+1** |
+
+  Objects that become visible are then found to be on the wrong date, or to trip the
+  exactly-one rule by matching alongside a sibling. **G-1, G-2, G-7 and the kind filter must
+  be co-designed and evaluated as one contract**, not fixed one at a time. Evaluating them
+  singly will read as "no improvement" and invite the wrong conclusion.
+
+  **2. Sign-off decision #1 superseded** (marked in place above). G-1, G-3 and G-8 can be
+  validated offline against the capture now. Their `verified` gate is no longer phase 7.
+
+  **3. Kind mismatch reprioritised.** Measured at **14%** of the dominant failure bucket
+  against a phase-A estimate of 0–4% and an explicit "smallest arm by an order of magnitude".
+  It is the second-largest arm. G's kind-filter option deserves weight it was denied.
+
+  **4. The post-repair score forecast is tempered.** An earlier estimate put a frontier model
+  at 85–90% once identity was fixed, reasoning that ~76% of the dominant failure is
+  discoverability. That reasoning ignored where the recovered ops land. The `wrong_day +2`
+  row is the asymmetry made concrete: fixing identity both recovers credit and **exposes date
+  errors the grader could not previously reach**, because it never got past finding the
+  object. The honest position is that the post-repair number is unknown and will be produced
+  by phase 7, not forecast before it.
+
+  **5. Phase 1 shrinks.** Its provenance half is largely superseded — C-1b is corroborated for
+  sonnet by the 1c comparison, and future runs certify themselves. What remains worth doing
+  is recording C-1's lever recovery before phase 5 edits `corpus/` and invalidates the replay.
+
 
 - **2026-08-18** — Phase 1c. **The baseline run exists**, and §4.3 is closed.
 
