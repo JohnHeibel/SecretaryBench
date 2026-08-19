@@ -225,17 +225,17 @@ matched something.
 | **A-4** | `_watch_attribution` is blind to the sibling stamp it is cited as evidence about | distorts-measurement | open | 3 |
 | **A-5** | a wrong `email_id` silently removes the object from every pool; honest model loses credit | distorts-measurement | open | 3 |
 | **A-6** | worked case: one stale stamp caused one false PASS and cost one earned PASS | distorts-measurement | open | 3 |
-| **O-1** | the harness writes nothing; surviving artifacts are hand-copied stdout | blocks-measurement | **applied** | **1a** |
+| **O-1** | the harness writes nothing; surviving artifacts are hand-copied stdout | blocks-measurement | **verified** | 1a |
 | **O-2** | tool trace drops calls by message-id collapse; loss is model-dependent | blocks-measurement | open | 6 |
-| **O-3** | a final-state dump is insufficient: the store records no history and no day | blocks-measurement | **applied** | **1a** |
+| **O-3** | a final-state dump is insufficient: the store records no history and no day | blocks-measurement | **verified** | 1a |
 | **O-4** | retrieval is unobservable server-side; only the lossy client trace sees it | blocks-measurement | open | 6 |
-| **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | **applied** *(capture half; the log still renders only matches)* | **1a** |
+| **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | **verified** *(capture half; the log still renders only matches)* | 1a |
 | **O-6** | tools and narration attributed per day not per email; narration truncated at 200 chars | distorts-measurement | open | 6 |
 | **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | open | 6 |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
 | **O-9** | objects with an unparseable date are dropped from grading without a trace | distorts-measurement | open | 6 |
 | **C-1** | no artifact records its levers; two documented commands overwrite the corpus they are recovered from | blocks-measurement | open | **1** |
-| **C-1b** | the model label on every surviving artifact is asserted, not observed (M-1/M-2 were live) | blocks-measurement | open | **1** |
+| **C-1b** | the model label on every surviving artifact is asserted, not observed (M-1/M-2 were live) | blocks-measurement | open *(fixed forward: 1b certifies)* | **1** |
 | **C-2** | `urgency_horizon` absent from the score stamp and moves 148/167 serve dates | distorts-measurement | open | 4 |
 | **C-3** | corpus satisfiability is lever-dependent; the oracle gate is hardcoded to one setting | distorts-measurement | open | 4 |
 | **C-4** | `sb.analyze` takes levers by hand and silently reports a different span grid if wrong | distorts-measurement | open | 4 |
@@ -1673,6 +1673,48 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-18** — Phase 1b. The bounded smoke ran and **O-1, O-3 and O-5's capture half
+  are now `verified`.**
+
+  `./run.sh live --model claude-sonnet-4-5 --limit 9 --out build/smoke1` — 9 emails,
+  3 turns, 78.8s, SCORE 9/9. Non-default model chosen deliberately so a silently-dropped
+  `--model` could not hide, the same guard phase 0 used.
+
+  **The acceptance test passed against a real run.** `python -m sb.regrade build/smoke1`
+  prints `RESCORE 9/9 (100%)` against `as-run 9/9 (identical)`. The live-loop wiring the
+  unit test could not exercise is now proven, which is what separated `applied` from
+  `verified`.
+
+  **O-5 demonstrated on live data, immediately.** The model created **5** events. The
+  grader's `actual` fields across all 9 emails render **4**. `evt_2` "Launch reveal",
+  stamped to `press-tour.press-plan-for-launch`, appears in zero grading records — it
+  exists only in the store. In a 9-email smoke where every email passed, one object in
+  five was already invisible to the printed record. That is the mechanism behind the ~85%
+  "nothing matching created" failures, caught in the smallest possible run.
+
+  Descriptions are captured too, so **G-3 becomes analysable**: `evt_3` carries
+  `'With VP Product and Finance to review prize money and event costs'`, a field that is
+  in the grader's match haystack and has never appeared in any log.
+
+  Raw stream captured and valid: 161 JSONL events over 3 turns
+  (`system` 94, `assistant` 40, `user` 21, `result` 3, `rate_limit_event` 3). O-2's
+  message-id collapse is therefore retroactively fixable on any run captured from here on.
+
+  **Provenance now recorded at the source.** The manifest carries requested model, served
+  model (`claude-sonnet-4-5-20250929`, certified), driver, seed, levers, reproducible
+  corpus hash `03e0d963b9866d8f`, and the full serve plan. This is precisely what C-1 had
+  to reverse-engineer from 785 lever combinations for the historical runs, and what C-1b
+  says cannot be recovered for them at all.
+
+  **Incidental confirmations:** `--model` survives `--resume` on CLI **2.1.235** with no
+  drift across 3 turns (M-3 was verified on 2.1.233); `run.sh live` forwards flags (M-1);
+  store and MCP tore down cleanly, no stray processes. Suite 65 passing.
+
+  **Known nit, not blocking:** stdout is block-buffered when redirected, so a long run
+  will not stream progress to its log file. Fine at 3 turns; wants `-u` or an explicit
+  flush before 1c's full run.
+
 
 - **2026-08-18** — Phase 1a. The capture slice is **applied**, not yet verified.
 
