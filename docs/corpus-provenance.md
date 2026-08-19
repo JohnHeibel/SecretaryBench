@@ -169,14 +169,71 @@ diffing against production, which is what this document is.
 
 ---
 
+## Resolution — measured 2026-08-19, after the first draft of this document
+
+**The first draft framed production as the authoring source that local had diverged from.
+That framing is wrong, and the evidence reverses it.**
+
+Classifying all 46 body differences:
+
+| classification | count |
+|---|---|
+| `local` = `production` minus time-of-day (the `dc5d762` migration) | 40 |
+| differs only inside a `{token}` | 1 |
+| prose wording differs | 5 |
+| **emails where production holds text or a correction local lacks** | **0** |
+
+Of the 5 prose differences, local holds the typo correction and production holds none.
+**Production has not moved forward since the snapshot.** Every difference is accounted for by
+a transformation applied locally.
+
+And the residue that is *not* the grammar migration is a coherent **authoring pass**, not
+damage:
+
+| kind of edit | count | examples |
+|---|---|---|
+| answer keys tightened | 9 | `by`→`eq` (deadline → exact day) ×3, `@Review_Meeting`→`next:FRI`, `any_of`→`eq`, `@board_signoff-1d`→`dom:14,0m` |
+| retrieval spans lengthened | 3 | `@Delayed_Release_Date+5d`→`+5w`, `+9d`→`+6w` |
+| prose converted to tokens | 2 | `"possibly a day earlier?"`→`"by tomorrow, {+1d}?"`, `"before {this:THU}"`→`"by {+1d}"` |
+| `depends_on` types corrected | 4 | `type: date` → `type: static` |
+
+Someone was deliberately improving this corpus: making vague deadlines checkable, replacing
+anchors with concrete expressions, lengthening spans. **That work exists only in `corpus/`.**
+
+### The corrected picture
+
+- **`corpus/` holds the authoritative content.** It is production plus a schema migration plus
+  a genuine authoring pass.
+- **Production is a stale backup** that predates all of it.
+- **`match` remains the one exception.** It is machine-generated from op names, it is the root
+  cause of G-1, and §2 shows the grader scores as well without it.
+
+**The risk is therefore the reverse of what the first draft implied.** `recover_corpus.py`
+would not restore truth; it would overwrite a real authoring pass with a stale snapshot. The
+hazard box in the register is correct, for a stronger reason than was known when it was
+written.
+
+### One incomplete edit, worth naming
+
+In `Company-Retreat.in-town-and-would-love-to-connect`, a single edit changed the prose
+**June → August** *and* the anchor `dom:22,0m` → `dom:22,1m`. But `1m` from a June-28 serve
+resolves to **July 22**, not August. The edit was made and left half-finished, which is why
+the email says August, the answer key says July, and a hand-grader flagged it as incoherent
+on first contact. Register **K-3**.
+
+---
+
 ## The decision this needs
 
 Not a decision for the repair work to take unilaterally. It belongs to whoever owns the
 authored corpus.
 
-1. **Which side is authoritative?** Production holds the authentic authoring but an older
-   grammar and known typos. Local holds a legitimate migration plus generated keywords.
-   Neither can simply overwrite the other.
+1. ~~**Which side is authoritative?**~~ **Answered by the resolution above: `corpus/` is.**
+   What remains is a single yes/no for the corpus authors: *did someone perform an authoring
+   pass around July 2026 — tightening answer keys, lengthening spans, converting prose to
+   tokens — that was never pushed back to the webapp?* If yes, local is simply ahead and the
+   repair proceeds on it. If nobody recognises that work, its provenance needs explaining
+   before anything is built on it.
 2. **Should `match` exist at all?** §2 suggests it need not: a better grader-side matching
    rule scores the same with the corpus left as authored. That would end the divergence at
    its largest source.

@@ -263,7 +263,7 @@ matched something.
 | **C-6** | the whole evidentiary base entered in one commit titled "." that also rewrote the harness | distorts-measurement | open | 4 |
 | **C-7** | the stamp prints "served <model>" from the requested model when nothing was served | distorts-measurement | open | 4 |
 | **C-8** | run logs default to a gitignored path; artifacts preserved only by hand | slows-work | open | 4 |
-| **C-10** | `corpus/` has forked from the authored corpus upstream; `match` is generated, not authored | blocks-measurement | open | **5** |
+| **C-10** | `corpus/` has forked from upstream; `match` is generated, not authored | blocks-measurement | **resolved** *(corpus/ authoritative; `match` to drop)* | 5 |
 | **C-9** | residual stale claims in the durable record the phase-A1 banner does not cover | slows-work | open | 4 |
 | **K-1** | the serve plan drifts past the dates the corpus narrates (18 emails, 11 ops) | blocks-measurement | open | 5 |
 | **K-2** | corpus date-coherence needs a high `daily_max`; the two headline runs used 5 | blocks-measurement | open | 5 |
@@ -1734,6 +1734,31 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-19** — **C-10 resolved: `corpus/` is authoritative, production is a stale backup.**
+  This reverses the framing in the same day's earlier entry, on measurement.
+
+  All 46 body differences classified: **40** are exactly `production` minus time-of-day (the
+  `dc5d762` migration), 1 is a token change, 5 are prose. Of the prose differences local holds
+  the correction and production holds none, and there are **zero** emails where production has
+  text or a fix that local lacks. Production has not moved since the snapshot.
+
+  The non-migration residue is a deliberate **authoring pass**: 9 answer keys tightened
+  (`by`→`eq`, `@anchor`→concrete), 3 retrieval spans lengthened (`+5d`→`+5w`), 2 prose→token
+  conversions, 4 `depends_on` type corrections. That work exists only in `corpus/`.
+
+  **Consequence:** `recover_corpus.py` would not restore truth, it would destroy a real
+  authoring pass. The hazard box is right for a stronger reason than when it was written.
+  `match` remains the sole machine-generated field and the sole thing to drop.
+
+  Also identified: the incoherence a hand-grader hit first is **one half-finished edit** —
+  `Company-Retreat.in-town-and-would-love-to-connect` had its prose changed June→August and
+  its anchor `dom:22,0m`→`1m` in the same pass, but `1m` resolves to July. Prose, key and
+  anchor all disagree (K-3).
+
+  **Phase 2 is unblocked** pending one yes/no from the corpus authors: did someone do that
+  July authoring pass without pushing it upstream? See `docs/corpus-provenance.md`.
+
 
 - **2026-08-19** — **C-10: the corpus we grade is not the corpus the team authored.**
   Full writeup in `docs/corpus-provenance.md`; summary here.
