@@ -17,6 +17,11 @@
 > ⚠️ **Do not run the §4 "reproduce" block.** `scripts/recover_corpus.py` fetches the
 > production API and `scripts/fix_match.py` rewrites `corpus/nodes/` in place. Both
 > overwrite the corpus the surviving runs were scored against.
+>
+> ⚠️ **The scores below were produced against generated answer keys.** The `match` keywords
+> the grader matches on do not exist in the authored corpus upstream — `fix_match.py`
+> derived them from op names across 96 emails. On the corpus as actually authored, the same
+> run scores 67/167 rather than 97/167. See `docs/corpus-provenance.md` (register C-10).
 
 Cross-model run of the **authored** corpus (Claude via `claude -p`, OpenAI via `codex exec`),
 both driving the **same** MCP store + scheduler + grader — apples-to-apples. This file is the

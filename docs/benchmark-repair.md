@@ -15,6 +15,12 @@ a diff). IDs are permanent and never reused.
 Four things in this repo will destroy evidence or produce a confidently wrong number.
 None of them announce themselves.
 
+0. **`corpus/` has silently forked from the authored corpus in production.** The `match`
+   keywords the grader depends on **do not exist upstream** — they were generated locally by
+   `scripts/fix_match.py` from op names. Date grammar, prose and tiers also differ, and none
+   of it is in git. See **`docs/corpus-provenance.md`** (finding C-10) before treating any
+   score, or any answer key, as authoritative.
+
 1. **`scripts/recover_corpus.py` and `scripts/fix_match.py` are documented as the
    "reproduce" path (`BENCHMARK_RESULTS.md:146-147`) and are not.** `recover_corpus.py:25,32`
    fetches `https://secretarybench.vercel.app/api/nodes` **live from production** — which
@@ -52,10 +58,14 @@ webapp and the `backups` branch are off limits.
 ## Start here (next session)
 
 Phase 0 and phase A are complete and committed, and the revised phase table is signed off.
-**The next action is phase 1: freeze the record before anything writes to `corpus/`** —
-capture the recovered levers, the plan digests, and the ~270 model-authored titles
-harvested from the four logs into a committed sidecar. It is free, offline, and needs no
-live run.
+**The next action is a decision, not a task: C-10, which corpus is authoritative.**
+`corpus/` has forked from the authored corpus in production, and the `match` keywords the
+grader depends on were generated locally rather than authored. Read
+`docs/corpus-provenance.md`. Phases 1d and 2 are both blocked behind it, because both are
+measured against answer keys whose provenance is now in question.
+
+Phase 1 (freeze the lever record) remains free, offline and unblocked if you want progress
+in the meantime.
 
 Two standing consequences of the sign-off, carried here so they are not re-litigated:
 G-1, G-3 and G-8 may reach `fix proposed` in phase 2 but cannot reach `verified` before
@@ -169,11 +179,11 @@ Revised table. Old phase numbers in brackets.
 | **1a** | **O-1, O-3, O-5a** *(new)* | the minimum re-gradeable capture slice: `--out DIR`, an end-of-run store dump, and **recording objects that matched no keyword**. Built before any run so the run is a permanent asset rather than a fourth disposable log | free |
 | **1b** | — *(new)* | bounded smoke (`--limit`, background) to prove the capture writes what phase 2 needs, and that the runner certifies the served model | cheap, bounded |
 | **1c** | — *(new)* | **the baseline run**: certified model, known config, fully re-gradeable. Run at seed 42 / `daily_max=5` so it is directly comparable to `outputs/opus.md` and `outputs/sonnet.md`, which retroactively validates them | **paid** |
-| **1d** | **the hand-grade** *(new)* | ~30 emails judged by a human against the 1c capture, **while the grader is still untouched**. Produces the fixed reference every phase-2 change is measured against. Was phase 7 only because no artifact recorded model behaviour; one now does | free |
+| **1d** | **the hand-grade** *(deferred 2026-08-19)* | ~30 emails judged by a human against the 1c capture. **On hold pending C-10**: judging against answer keys now known to be partly machine-generated measures an artifact that may be replaced. Worksheet built and published; resume once corpus authority is settled | free |
 | 2 | G *[was 2]* | the grader. Now testable against **real recorded behaviour** from 1c, and against 1d's human reference. **Fix G-1, G-2, G-7 and the kind filter as ONE contract** — 1c proved that widening identity alone relocates failures rather than removing them | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
 | 4 | V *(part)*, C *[was 5]* | pin one lever and one config (C-2, C-3, K-2) and fix the **reporting** gaps: report V-3's null floor beside every score, make V-6's by-tier report exist, stamp provenance. **Does not decide what the benchmark claims** — see phase 8 | free |
-| 5 | K *[was 4]* | the corpus pass, at the pinned lever, against G's keyword contract. **A repair, not a rebuild**: make every authored question answerable and every keyword discoverable. Do not add difficulty, do not scale, do not re-author the tier set | free |
+| 5 | **C-10**, K *[was 4]* | **first settle which corpus is authoritative (C-10)** — production and `corpus/` have forked and `match` is generated, not authored. Then the corpus pass at the pinned lever. **A repair, not a rebuild**: make every authored question answerable. Do not add difficulty, do not scale, do not re-author the tier set | free |
 | 6 | O *(remainder)* *[was 1]* | the O items **not** in the 1a slice: O-2 trace loss, O-6 to O-9. O-4 (retrieval observability) is here rather than 1a because it requires changing the model-facing tool surface, a benchmark decision that must be taken with G/A/K/V settled | free |
 | 7 | — | the full instrumented run of the **roster** at the pinned config, plus the hand-grade. 1c is one model as a baseline; this is the comparison | **paid** |
 | 8 | **V-1, V-5** *(new)* | reassess with a real number in hand. Is the repaired benchmark still measuring anything interesting, and does the retrieval claim survive? A trivial score is itself a result. **Nothing here is scoped until phase 7 reports** | free to decide |
@@ -253,6 +263,7 @@ matched something.
 | **C-6** | the whole evidentiary base entered in one commit titled "." that also rewrote the harness | distorts-measurement | open | 4 |
 | **C-7** | the stamp prints "served <model>" from the requested model when nothing was served | distorts-measurement | open | 4 |
 | **C-8** | run logs default to a gitignored path; artifacts preserved only by hand | slows-work | open | 4 |
+| **C-10** | `corpus/` has forked from the authored corpus upstream; `match` is generated, not authored | blocks-measurement | open | **5** |
 | **C-9** | residual stale claims in the durable record the phase-A1 banner does not cover | slows-work | open | 4 |
 | **K-1** | the serve plan drifts past the dates the corpus narrates (18 emails, 11 ops) | blocks-measurement | open | 5 |
 | **K-2** | corpus date-coherence needs a high `daily_max`; the two headline runs used 5 | blocks-measurement | open | 5 |
@@ -442,6 +453,15 @@ says is that the grader decides sameness by keyword substring over `title + desc
 *Options:* publish the contract to the model (changes the tool surface) · lint keywords
 against rendered mail (32-op corpus edit) · semantic / LLM-judge matching (costs money,
 nondeterministic) · grade by attribution instead of title (moves the problem into A).
+
+> **Root cause re-attributed 2026-08-19 (C-10).** These keywords are **not authored**. The
+> upstream corpus has no `match` field at all; it was generated from op names by
+> `scripts/fix_match.py` across 96 emails / 114 op sets. G-1 is a defect of that generation
+> step, not of the team's answer keys. Two consequences: the fix belongs in the grader's
+> matching rule rather than in a corpus edit, and **matching any content word from the
+> authored op name already scores 99/167 against the generated keywords' 97** — see
+> `docs/corpus-provenance.md` §2. G-8 (`match` defaulting to the whole name) is the reason
+> the authored corpus scores only 67/167 unaided, and the two must be fixed together.
 
 **G-2 · the exactly-one rule counts keyword hits, not obligations** —
 blocks-measurement · free-offline · open
@@ -1714,6 +1734,58 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-19** — **C-10: the corpus we grade is not the corpus the team authored.**
+  Full writeup in `docs/corpus-provenance.md`; summary here.
+
+  A read-only `GET /api/nodes` (authorised, no write verbs called, `corpus/` untouched) shows
+  production holds **25 nodes / 184 emails** against local's **15 / 167**. Every local node
+  exists upstream at an identical count, so nothing was lost. The extra is mostly drafts —
+  six empty `node-N` scaffolds, two stubs, and `Company_Retreat`, the superseded underscore
+  version whose ids are the 9 orphans in `past/claude-sonnet-4-5.md`. One node,
+  `rebrand-execution` (6 emails, 4 graded), may be real content that never reached the
+  benchmark.
+
+  **The `match` field does not exist upstream.** It was generated by `scripts/fix_match.py`
+  from op names, on 96 emails / 114 op sets. **G-1's root cause is therefore re-attributed**:
+  the undiscoverable keywords are the output of a local generation step, not of the team's
+  authoring. `["athlete"]` came from "Create A List For Athlete Visit".
+
+  **But the script was solving a real problem**, measured offline against the 1c capture:
+
+  | identity policy | emails |
+  |---|---|
+  | null model, no tools (V-3 floor) | 64/167 · 38% |
+  | **authored keys, shipped grader** | **67/167 · 40%** |
+  | `fix_match.py` keywords — what every recorded run used | 97/167 · 58% |
+  | **authored keys + match any content word** | **99/167 · 59%** |
+  | oracle titling by the key itself | 167/167 |
+
+  On the authored keys the shipped grader puts a real model three points above the
+  do-nothing floor, because `schema.py:155` falls back to `match = [name]` and demands the
+  whole obligation name as one substring. The benchmark is inert without generated keywords.
+
+  **The phase-2 result:** matching any content word from the *authored* op name scores
+  **99/167**, equal to or slightly better than the generated keywords, with **no corpus
+  mutation at all**. The gap is 2 emails and inside noise, so the claim is "as good as", and
+  it is one run of one model. But it means the keyword-generation step may be unnecessary —
+  fix the grader's rule and leave the corpus as authored, which removes the largest source of
+  divergence and lets production stay the source of truth.
+
+  Also diverged: **36 `on` date expressions** (mostly the `dc5d762` day-level grammar
+  migration that never reached production, but a few are semantic answer changes), **4
+  `depends_on`**, **46 bodies** (local copy-edits), and `tier` exists only locally. The
+  anchor behind the case a hand-grader flagged first is among them: production `dom:22,0m`
+  (June 22), local `dom:22,1m` (July 22), prose "August 22nd" — all three disagree (K-3).
+
+  **None of it is in git.** The corpus arrived in one commit titled `.` and no commit records
+  any of these transformations.
+
+  **Phase 1d (hand-grade) and the judge panel are deferred.** Judging model behaviour against
+  answer keys now known to be partly machine-generated measures an artifact we may be about
+  to replace. The corpus authority question (C-10) comes first; it is a decision for the
+  corpus owners, not for the repair.
+
 
 - **2026-08-19** — Sequencing decisions taken on the 1c results.
 
