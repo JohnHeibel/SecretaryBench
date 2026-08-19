@@ -655,6 +655,12 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
 
 
 def main():
+    # Line-buffer stdout: a long run is normally redirected to a file, and block
+    # buffering means no progress is visible until the process exits (~57 turns).
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except AttributeError:      # non-reconfigurable stream (pytest capture, pipes)
+        pass
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="claude-haiku-4-5")
     ap.add_argument("--driver", default="auto", choices=["auto", "claude", "codex"],
