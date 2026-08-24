@@ -58,11 +58,16 @@ webapp and the `backups` branch are off limits.
 ## Start here (next session)
 
 Phase 0 and phase A are complete and committed, and the revised phase table is signed off.
-**The next action is a decision, not a task: C-10, which corpus is authoritative.**
-`corpus/` has forked from the authored corpus in production, and the `match` keywords the
-grader depends on were generated locally rather than authored. Read
-`docs/corpus-provenance.md`. Phases 1d and 2 are both blocked behind it, because both are
-measured against answer keys whose provenance is now in question.
+**Phase 2 is in progress. The next action is to re-verify the second grader contract,
+then implement it.** See `docs/grader-contract.md` — designed and measured, `fix proposed`,
+`sb/grader.py` still unchanged. The first design was rejected outright by an adversarial pass
+(`docs/_repair/VERIFY-phase2.md`); the second fixes what it found and has not yet been
+re-verified.
+
+C-10 (which corpus is authoritative) is **resolved for working purposes**: `corpus/` is
+authoritative, production is a stale backup. One yes/no remains outstanding for the corpus
+authors — see `docs/corpus-provenance.md`. Phase 1d (hand-grade) stays deferred, so nothing
+in phase 2 can reach `verified`.
 
 Phase 1 (freeze the lever record) remains free, offline and unblocked if you want progress
 in the meantime.
@@ -1734,6 +1739,56 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-08-24** — Phase 2, iteration 2. Contract redesigned after the adversarial pass
+  rejected iteration 1. **Still `fix proposed`; `sb/grader.py` remains unchanged.**
+  Full design, guard set and open issues: **`docs/grader-contract.md`**.
+
+  **What the verifier killed (iteration 1).** 42 claims checked, 27 confirmed, 7 unsafe. Every
+  headline number reproduced exactly and the +15 was genuinely earned — all 16 flips audited
+  object-by-object. But the contract had **no volume brake**: deleting `count_ok` removed the
+  only penalty for creating extra objects, and a `dateok` tie-break turned grading into a
+  search for something that fits. A model that never reads a date scored **148/167 (89%)**,
+  thirty-six points above the real model. `dup5` scored 167. Two of three guards were also
+  vacuous — the oracle was circular (titled by the exact string the contract keys on) and
+  `null`/`+3d` cannot separate any two contracts on this corpus.
+
+  **Iteration 2 changes.** Volume brake scoped to the **turn delta** (works on every code path
+  and cannot be defeated by a mis-stamped `email_id`, register A-5; membership must be tested
+  by value since `_turn_delta` builds fresh `Obj`s). `dateok` tie-break dropped — free on every
+  world. Stemming added, without which word matching is *less* inflection-robust than the
+  substring rule it replaces.
+
+  **Guard set replaced** with the adversaries that broke iteration 1: `dup5`, date-blind
+  shotguns at 7/45/90 days, wrong-kind, subject-titled and inflected oracles, plus
+  `sb/oracle.py` itself.
+
+  | world | shipped | proposed |
+  |---|---|---|
+  | real (certified capture) | 97 | **114** |
+  | `oracle_name` | **148** | **167** |
+  | `oracle_subject` | 92 | **139** |
+  | `oracle_inflect` | 132 | **159** |
+  | `null` | 64 | 64 |
+  | `dup5` | 64 | **64** (was 167) |
+  | `shot7 / shot45 / shot90` | 64 | **64 / 64 / 64** (were 93 / 128 / 148) |
+  | `sb/oracle.py` via engine | 167 | **166** |
+
+  **Every gaming guard now holds.** Note the shipped grader *fails* `oracle_name` at 148:
+  today's grader cannot award full marks to a flawless assistant.
+
+  **Not resolved, and recorded as open:** `oracle_engine` is 166 not 167, which would fail
+  `sb/scale.py:127`'s mandatory gate. The cause is a **corpus ambiguity, not a contract flaw** —
+  `'Retreat Company Meeting Call'` and `'Company Retreat'` both reduce to `{company, retreat}`,
+  exactly what **G-5** predicts. Also open: the kind filter is still unaddressed (so the "one
+  contract" entry condition is not met), `cancel` bypasses the assignment (G-7),
+  `sb/oracle.py:51` must change in the same change-set, and `sb/tests/test_e2e.py:58` must be
+  re-baselined deliberately.
+
+  Failure profile on the real capture: `not found` 50→26, `wrong day` 14→**30**,
+  `count: too many` 11→**0**. Half the recovered work proves to be on the wrong date — error
+  that was always present and invisible behind "couldn't find it". The +17 is net of it.
+
 
 - **2026-08-19** — **C-10 resolved: `corpus/` is authoritative, production is a stale backup.**
   This reverses the framing in the same day's earlier entry, on measurement.
