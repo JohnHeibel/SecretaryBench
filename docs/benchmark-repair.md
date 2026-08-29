@@ -66,7 +66,7 @@ in any store order. **Next actions:** phase 3 (A — the no-action rule and attr
 now the largest gaming surface the grader does not close), phase 1 (the lever record, still
 free), and the G-5 name-aware lint at phase 5 (single-word and nested obligation names are
 the soft spot of every rule). Nothing in phase 2 reaches `verified` before the phase 1d
-hand-grade.
+hand-grade, for which the worksheet now exists: `docs/_repair/audit-baseline-sonnet-4-5.md`.
 Three passes so far: iteration 1 rejected outright (`docs/_repair/VERIFY-phase2.md`);
 iteration 3 rejected on two safety properties (`docs/_repair/VERIFY-phase2-iter3.md`);
 iteration 4 confirmed to the digit on an independent implementation and passed with changes
@@ -194,7 +194,7 @@ Revised table. Old phase numbers in brackets.
 | **1a** | **O-1, O-3, O-5a** *(new)* | the minimum re-gradeable capture slice: `--out DIR`, an end-of-run store dump, and **recording objects that matched no keyword**. Built before any run so the run is a permanent asset rather than a fourth disposable log | free |
 | **1b** | — *(new)* | bounded smoke (`--limit`, background) to prove the capture writes what phase 2 needs, and that the runner certifies the served model | cheap, bounded |
 | **1c** | — *(new)* | **the baseline run**: certified model, known config, fully re-gradeable. Run at seed 42 / `daily_max=5` so it is directly comparable to `outputs/opus.md` and `outputs/sonnet.md`, which retroactively validates them | **paid** |
-| **1d** | **the hand-grade** *(deferred 2026-08-19)* | ~30 emails judged by a human against the 1c capture. **On hold pending C-10**: judging against answer keys now known to be partly machine-generated measures an artifact that may be replaced. Worksheet built and published; resume once corpus authority is settled | free |
+| **1d** | **the hand-grade** *(deferred 2026-08-19)* | ~30 emails judged by a human against the 1c capture. **On hold pending C-10**: judging against answer keys now known to be partly machine-generated measures an artifact that may be replaced. **Worksheet regenerated 2026-08-29 under the shipped grader**: `docs/_repair/audit-baseline-sonnet-4-5.md` (all 60 failing ops + 15 sampled passes, with resolved dates, anchors, dependency emails and the model's objects side by side), built by `docs/_repair/audit_worksheet.py`. The annotated copy comes back as an `.md` and is committed next to it | free |
 | 2 | G *[was 2]* | the grader. Now testable against **real recorded behaviour** from 1c, and against 1d's human reference. **Fix G-1, G-2, G-7 and the kind filter as ONE contract** — 1c proved that widening identity alone relocates failures rather than removing them | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
 | 4 | V *(part)*, C *[was 5]* | pin one lever and one config (C-2, C-3, K-2) and fix the **reporting** gaps: report V-3's null floor beside every score, make V-6's by-tier report exist, stamp provenance. **Does not decide what the benchmark claims** — see phase 8 | free |
