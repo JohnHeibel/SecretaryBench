@@ -58,11 +58,13 @@ webapp and the `backups` branch are off limits.
 ## Start here (next session)
 
 Phase 0 and phase A are complete and committed, and the revised phase table is signed off.
-**Phase 2 is in progress. The next action is to re-verify the second grader contract,
-then implement it.** See `docs/grader-contract.md` — designed and measured, `fix proposed`,
-`sb/grader.py` still unchanged. The first design was rejected outright by an adversarial pass
-(`docs/_repair/VERIFY-phase2.md`); the second fixes what it found and has not yet been
-re-verified.
+**Phase 2 is in progress. Iteration 3 of the grader contract is designed and measured; the
+next action is its adversarial pass, then implementation.** See `docs/grader-contract.md` —
+`fix proposed`, `sb/grader.py` still unchanged. Iteration 1 was rejected outright by an
+adversarial pass (`docs/_repair/VERIFY-phase2.md`); iteration 2 left four blockers open;
+iteration 3 closes them and passes every guard in `docs/_repair/phase2_guards.py`, including
+a new one (`dupmove`) that both earlier iterations would have failed. Reproduce with the
+command at the top of that file before building on it.
 
 C-10 (which corpus is authoritative) is **resolved for working purposes**: `corpus/` is
 authoritative, production is a stale backup. One yes/no remains outstanding for the corpus
@@ -1740,6 +1742,49 @@ gitignored `build/`.
 
 ## Changelog
 
+- **2026-08-29** — Phase 2, iteration 3. The four blockers of iteration 2 are closed in the
+  design; **still `fix proposed`, `sb/grader.py` unchanged**, adversarial pass pending. Full
+  design, guard table, audits and open issues: **`docs/grader-contract.md`**. Prototype:
+  `docs/_repair/phase2_guards.py` (`grade_v4`).
+
+  **Closures.** Kind: the pool is cross-kind with kind as the *first* tie-break, which is
+  score-identical to the shipped kind filter on every guard and turns "nothing created" into
+  `wrong kind` when that is what happened (8 of 26 residual not-found ops on the capture).
+  Cancel: graded through the assignment — create/move claim first, then a cancel claims the best
+  unclaimed object at full overlap, either kind; both remaining real-capture cancel failures were
+  hand-audited and are genuine (one was a false *pass* under the shipped grader). `sb/oracle.py`:
+  titles by `op.name`, measured through the engine at 167; it must ride in the grader's commit.
+  `test_e2e.py:58`: **does not flip** — the double-booked reschedule still fails, under a new
+  stale-survivor rule for `move`, and the test will pin the reason.
+
+  **Two things the blockers exposed.** (1) Iteration 2's `oracle_engine` 166 was *not* a corpus
+  ambiguity: the `email_id` tie-break was dead on the engine path (no id is passed there), so the
+  two grading paths disagreed on the same state — measured both ways on `test_e2e`'s fixture.
+  Tie-break is now turn membership by value, which exists on every path and cannot be defeated by
+  a mis-stamped id (A-5). (2) The synthetic agent double-booked on every move. Fixing it corrects
+  the shipped grader's `oracle_name` from **148 to 158** — ten of the nineteen losses were the
+  agent's, not the grader's; the claim that today's grader cannot award full marks stands at 158.
+  The double-booker is kept as guard `dupmove` (must not exceed `oracle_name` − 15).
+
+  | world | shipped | iter. 2 | **iter. 3** |
+  |---|---|---|---|
+  | real (certified capture) | 97 | 114 | **114** (0 flips vs iter. 2) |
+  | `oracle_engine` (name-titled oracle) | 158 | 166 | **167** |
+  | `oracle_name` | 158 | 167 | **167** |
+  | `oracle_subject` / `oracle_inflect` | 95 / 142 | 138 / 159 | 137 / 159 |
+  | `null` · `dup5` · `shot7/45/90` | 64 | 64 | **64** |
+  | `dupmove` | 148 | **167** ✗ | **152** = 167 − 15 |
+
+  Also measured and closed: stop-word sensitivity (12 of 97 words move any world, by ≤2, none
+  moves `oracle_name`; 66 never occur in an op name). Cancel threshold swept (any-word and 0.5
+  both produce oracle false negatives). Overlap-before-kind ordering rejected (fails a model that
+  creates both kinds for one obligation). Title-only over-creation haystack: no change anywhere.
+
+  **Still open, all corpus-side (phase 5):** single-content-word obligation names (24 of 134)
+  are the soft spot of every rule — the G-5 name-aware lint; `event day!` is an all-stop-word
+  name; K-7's four mis-keyed kinds now read `wrong kind`. `sb/schema.py` lint #5 becomes dead
+  once `match` is unread but cannot be replaced without a corpus edit.
+
 - **2026-08-24** — Phase 2, iteration 2. Contract redesigned after the adversarial pass
   rejected iteration 1. **Still `fix proposed`; `sb/grader.py` remains unchanged.**
   Full design, guard set and open issues: **`docs/grader-contract.md`**.
@@ -1766,7 +1811,7 @@ gitignored `build/`.
   | world | shipped | proposed |
   |---|---|---|
   | real (certified capture) | 97 | **114** |
-  | `oracle_name` | **148** | **167** |
+  | `oracle_name` | **148** *(corrected to 158 on 2026-08-29: the synth agent double-booked on moves)* | **167** |
   | `oracle_subject` | 92 | **139** |
   | `oracle_inflect` | 132 | **159** |
   | `null` | 64 | 64 |
@@ -1780,7 +1825,8 @@ gitignored `build/`.
   **Not resolved, and recorded as open:** `oracle_engine` is 166 not 167, which would fail
   `sb/scale.py:127`'s mandatory gate. The cause is a **corpus ambiguity, not a contract flaw** —
   `'Retreat Company Meeting Call'` and `'Company Retreat'` both reduce to `{company, retreat}`,
-  exactly what **G-5** predicts. Also open: the kind filter is still unaddressed (so the "one
+  exactly what **G-5** predicts. *(Superseded 2026-08-29: the nesting is real but the 166 was the
+  `email_id` tie-break being dead on the engine path; iteration 3 reads 167.)* Also open: the kind filter is still unaddressed (so the "one
   contract" entry condition is not met), `cancel` bypasses the assignment (G-7),
   `sb/oracle.py:51` must change in the same change-set, and `sb/tests/test_e2e.py:58` must be
   re-baselined deliberately.
