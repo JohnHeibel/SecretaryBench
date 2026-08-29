@@ -563,128 +563,103 @@ def overlap_title5(obj, kws):
     return sum(k in hay for k in kws) / len(kws) if kws else 0.0
 
 
-def grade_batch_v5(items, today, *, stale_floor='half', wrong_kind_floor=0.5, create_fresh_only=True,
-                   cancel_tau=1.0, cancel_phase='joint', precision=True, title_first=True,
-                   wrong_kind_needs_title=True):
-    """Grade the emails of ONE node served on one day, together.
-
-    items: [(answer, ctx, state, turn)] -- all against the same node state (the
-    first item's is used as the pool). today: TurnDelta of everything created
-    today (a superset of every turn). Returns one EmailResult per item.
-    """
-    state = items[0][2]
+def grade_v5(answer, ctx, state, turn, eid=None, today=None, *, stale_floor='half',
+             wrong_kind_floor=0.5, create_fresh_only=True, cancel_tau=1.0, precision=True,
+             title_first=True, wrong_kind_needs_title=True, wrong_kind_today=True):
+    """Iteration 4 as revised after VERIFY-phase2-iter4: one email at a time, with
+    `today` = everything created today on every path (defaults to the turn, which
+    is what the engine path has). No batch assignment, no `mine` term, no
+    `words matched` term; the key tail carries description and stamp."""
+    today = turn if today is None else today
+    if not answer.ops:
+        return _noaction(turn)
     pool = state.events + state.todos
     day_fresh = {_vkey(o) for o in (today.events + today.todos)}
-    mine = [{_vkey(o) for o in (turn.events + turn.todos)} for (_, _, _, turn) in items]
-    ops = [(ei, oi, op) for ei, (ans, _, _, _) in enumerate(items) for oi, op in enumerate(ans.ops)]
-    kws = {(ei, oi): keywords5(op) for ei, oi, op in ops}
+    kws = {oi: keywords5(op) for oi, op in enumerate(answer.ops)}
+    pairs = []
+    for oi, op in enumerate(answer.ops):
+        for o in pool:
+            if o.kind != op.kind:
+                continue
+            if op.verb == 'create' and create_fresh_only and _vkey(o) not in day_fresh:
+                continue
+            sc = overlap5(o, kws[oi])
+            if sc <= 0 or (op.verb == 'cancel' and sc < cancel_tau):
+                continue
+            key = ((-overlap_title5(o, kws[oi]) if title_first else 0), -sc,
+                   0 if _vkey(o) in day_fresh else 1,
+                   -title_precision(o, kws[oi]) if precision else 0,
+                   1 if op.verb == 'cancel' else 0,
+                   oi, o.title, o.description, o.when.isoformat(), o.email_id)
+            pairs.append((key, oi, o, sc))
+    pairs.sort(key=lambda t: t[0])
     claimed, taken = {}, set()
-
-    def phase(verbs, floor):
-        pairs = []
-        for ei, oi, op in ops:
-            if op.verb not in verbs:
-                continue
-            for o in pool:
-                if o.kind != op.kind:
-                    continue
-                if op.verb == 'create' and create_fresh_only and _vkey(o) not in day_fresh:
-                    continue
-                sc = overlap5(o, kws[(ei, oi)])
-                if sc <= 0 or sc < floor or (op.verb == 'cancel' and sc < cancel_tau):
-                    continue
-                key = ((-overlap_title5(o, kws[(ei, oi)]) if title_first else 0),
-                       -sc, -round(sc * len(kws[(ei, oi)])), 0 if _vkey(o) in mine[ei] else 1,
-                       -title_precision(o, kws[(ei, oi)]) if precision else 0,
-                       1 if op.verb == 'cancel' else 0,       # a perfect tie goes to the work, not the cancel
-                       ei, oi, o.title, o.when.isoformat())
-                pairs.append((key, ei, oi, o, sc))
-        pairs.sort(key=lambda t: t[0])
-        for _, ei, oi, o, sc in pairs:
-            if (ei, oi) in claimed or id(o) in taken:
-                continue
-            claimed[(ei, oi)] = (o, sc)
-            taken.add(id(o))
-
-    if cancel_phase == 'joint':          # one ranking; a cancel needs full overlap to enter it
-        phase(('create', 'move', 'cancel'), 0.0)
-    elif cancel_phase == 'after':        # iteration 3: cancels take what create/move leave
-        phase(('create', 'move'), 0.0)
-        phase(('cancel',), cancel_tau)
-    else:                                # 'independent': a cancel fails on ANY full-overlap survivor
-        phase(('create', 'move'), 0.0)
-        for ei, oi, op in ops:
-            if op.verb == 'cancel':
-                left = [o for o in pool if o.kind == op.kind and overlap5(o, kws[(ei, oi)]) >= cancel_tau]
-                if left:
-                    claimed[(ei, oi)] = (left[0], 1.0)
-
-    results = []
-    for ei, (answer, ctx, _, turn) in enumerate(items):
-        if not answer.ops:
-            results.append(_noaction(turn))
+    for _, oi, o, sc in pairs:
+        if oi in claimed or id(o) in taken:
             continue
-        details = []
-        for oi, op in enumerate(answer.ops):
-            word = "event" if op.kind == "event" else "to-do"
-            kw = op.name.replace('_', ' ')
-            got = claimed.get((ei, oi))
-            if op.verb == 'cancel':
-                p = got is None
-                details.append({"passed": p, "label": f"cancel ~{kw}", "expected": f'{word} ~"{kw}" cancelled',
-                                "actual": G._fmt_obj(got[0]) if got else "(nothing — cancelled)",
-                                "reason": "cancelled" if p else "should be cancelled, but still on the calendar"})
-                continue
-            exp = f'{word} ~"{kw}" @ {G._describe_predicate(op.on, ctx)}'
-            label = f"{op.verb} ~{kw}"
-            if got is None:
-                other = [(overlap5(o, kws[(ei, oi)]), o) for o in pool
-                         if o.kind != op.kind and id(o) not in taken
-                         and (overlap_title5(o, kws[(ei, oi)]) > 0 or not wrong_kind_needs_title)]
-                best = max(other, key=lambda t: t[0], default=(0.0, None))
-                if best[0] > wrong_kind_floor:
-                    details.append({"passed": False, "label": label, "expected": exp, "actual": G._fmt_obj(best[1]),
-                                    "reason": f"wrong kind: created a {'event' if best[1].kind == 'event' else 'to-do'}, expected a {word}"})
-                else:
-                    details.append({"passed": False, "label": label, "expected": exp,
-                                    "actual": "(nothing matching created)",
-                                    "reason": f'no {word} titled like "{kw}" was {"moved" if op.verb == "move" else "created"}'})
-                continue
-            obj, sc = got
-            dups, stale = [], []
-            for o in pool:
-                if o.kind != op.kind or id(o) in taken:
-                    continue
-                h = overlap5(o, kws[(ei, oi)])
-                if _vkey(o) in day_fresh:
-                    if h >= sc:
-                        dups.append(o)
-                elif op.verb == 'move':
-                    if {'sc': h >= sc, 'half': h > 0.5, 'both': h >= sc or h > 0.5,
-                        'gehalf': h >= 0.5}[stale_floor]:
-                        stale.append(o)
-            if dups:
+        claimed[oi] = (o, sc)
+        taken.add(id(o))
+
+    details = []
+    for oi, op in enumerate(answer.ops):
+        word = "event" if op.kind == "event" else "to-do"
+        kw = op.name.replace('_', ' ')
+        got = claimed.get(oi)
+        if op.verb == 'cancel':
+            p = got is None
+            details.append({"passed": p, "label": f"cancel ~{kw}", "expected": f'{word} ~"{kw}" cancelled',
+                            "actual": G._fmt_obj(got[0]) if got else "(nothing — cancelled)",
+                            "reason": "cancelled" if p else "should be cancelled, but still on the calendar"})
+            continue
+        exp = f'{word} ~"{kw}" @ {G._describe_predicate(op.on, ctx)}'
+        label = f"{op.verb} ~{kw}"
+        if got is None:
+            other = [(overlap5(o, kws[oi]), o) for o in pool
+                     if o.kind != op.kind and id(o) not in taken
+                     and (overlap_title5(o, kws[oi]) > 0 or not wrong_kind_needs_title)
+                     and (op.verb != 'create' or not wrong_kind_today or _vkey(o) in day_fresh)]
+            best = max(other, key=lambda t: t[0], default=(0.0, None))
+            if best[0] > wrong_kind_floor:
+                details.append({"passed": False, "label": label, "expected": exp, "actual": G._fmt_obj(best[1]),
+                                "reason": f"wrong kind: created a {'event' if best[1].kind == 'event' else 'to-do'}, expected a {word}"})
+            else:
                 details.append({"passed": False, "label": label, "expected": exp,
-                                "actual": "; ".join(G._fmt_obj(o) for o in [obj] + dups[:3]),
-                                "reason": f"over-created: {len(dups)+1} equally-matching {word}s for one obligation"})
+                                "actual": "(nothing matching created)",
+                                "reason": f'no {word} titled like "{kw}" was {"moved" if op.verb == "move" else "created"}'})
+            continue
+        obj, sc = got
+        dups, stale = [], []
+        for o in pool:
+            if o.kind != op.kind or id(o) in taken:
                 continue
-            if stale:
-                details.append({"passed": False, "label": label, "expected": exp,
-                                "actual": "; ".join(G._fmt_obj(o) for o in [obj] + stale[:3]),
-                                "reason": f"moved, but {len(stale)} stale copy left behind (double-booked)"})
-                continue
-            ok = G._predicate_ok(obj, op.on, ctx, op.tolerance)
-            details.append({"passed": ok, "label": label, "expected": exp,
-                            "actual": G._fmt_obj(obj), "reason": "matched" if ok else "on the wrong day"})
-        passed = all(d["passed"] for d in details)
-        headline = "; ".join(d["expected"] for d in details) if passed else next(d["reason"] for d in details if not d["passed"])
-        results.append(G.EmailResult(passed=passed, max=1, headline=headline, details=details))
-    return results
+            h = overlap5(o, kws[oi])
+            if _vkey(o) in day_fresh:
+                if h >= sc:
+                    dups.append(o)
+            elif op.verb == 'move':
+                if {'sc': h >= sc, 'half': h > 0.5, 'both': h >= sc or h > 0.5, 'gehalf': h >= 0.5}[stale_floor]:
+                    stale.append(o)
+        if dups:
+            details.append({"passed": False, "label": label, "expected": exp,
+                            "actual": "; ".join(G._fmt_obj(o) for o in [obj] + dups[:3]),
+                            "reason": f"over-created: {len(dups)+1} equally-matching {word}s for one obligation"})
+            continue
+        if stale:
+            details.append({"passed": False, "label": label, "expected": exp,
+                            "actual": "; ".join(G._fmt_obj(o) for o in [obj] + stale[:3]),
+                            "reason": f"moved, but {len(stale)} stale copy left behind (double-booked)"})
+            continue
+        ok = G._predicate_ok(obj, op.on, ctx, op.tolerance)
+        details.append({"passed": ok, "label": label, "expected": exp,
+                        "actual": G._fmt_obj(obj), "reason": "matched" if ok else "on the wrong day"})
+    passed = all(d["passed"] for d in details)
+    headline = "; ".join(d["expected"] for d in details) if passed else next(d["reason"] for d in details if not d["passed"])
+    return G.EmailResult(passed=passed, max=1, headline=headline, details=details)
 
 
-def grade_v5(answer, ctx, state, turn, eid=None, **kw):
-    """Single-email form (the engine path): the turn is the whole day for this email."""
-    return grade_batch_v5([(answer, ctx, state, turn)], turn, **kw)[0]
+def grade_batch_v5(items, today, **kw):
+    """Compatibility shim for run_guards5: one email at a time, sharing `today`."""
+    return [grade_v5(a, c, s, t, today=today, **kw) for (a, c, s, t) in items]
 
 
 # ------------------------------------------------- worlds with both paths recorded
@@ -741,6 +716,9 @@ def synth5(policy='name', *, act=True, dup=0, shotgun=0, wrongkind=False, dupmov
                             if c > 0 and launder == 'any':
                                 sibs = [x for x in node_emails[em.node] if x != eid]
                                 stamp = sibs[0] if sibs else eid
+                            elif c > 0 and launder == 'cross':
+                                others = [x for x in CORPUS.emails if CORPUS.emails[x].node != em.node]
+                                stamp = others[0]
                             elif c > 0 and launder == 'past':
                                 sibs = [x for x in node_emails[em.node] if PLAN.serve_date[x] < PLAN.serve_date[eid]]
                                 stamp = max(sibs, key=lambda x: PLAN.serve_date[x]) if sibs else eid
@@ -827,6 +805,7 @@ WORLDS5 = [
     ('launder',         lambda: synth5(dup=5, launder='any', launder_creates_only=True)),
     ('launder_all',     lambda: synth5(dup=5, launder='any')),
     ('launder_past',    lambda: synth5(dup=5, launder='past')),
+    ('launder_cross',   lambda: synth5(dup=5, launder='cross')),   # informational: A-5, not closed here
     ('bothkinds',       lambda: synth5(both_kinds=True)),
     ('nocancel',        lambda: synth5(skip_cancel=True)),
 ]
@@ -835,9 +814,18 @@ N_CANCEL_EMAILS = sum(1 for e in CORPUS.emails.values() if e.answer.ops and all(
 # that keeps MORE than half the obligation's words, so a two-word name escapes (1 of 2 = half);
 # a one-word name gets ' x' appended and is caught. Expected: every move email fails unless
 # all of its move ops have exactly two keywords.
+def _retitled_caught(op):
+    """Does dropping the last word of the obligation's name still leave more than half its keywords?"""
+    words = op.name.replace('_', ' ').split()
+    kept = ' '.join(words[:-1]) if len(words) > 1 else op.name + ' x'
+    class _T:  # a bare title, no description
+        title, description = kept, ''
+    return overlap5(_T, keywords5(op)) > 0.5
 N_RETITLE_CAUGHT = sum(1 for e in CORPUS.emails.values()
-                       if any(op.verb == 'move' for op in e.answer.ops)
-                       and not all(len(keywords5(op)) == 2 for op in e.answer.ops if op.verb == 'move'))
+                       if any(op.verb == 'move' and _retitled_caught(op) for op in e.answer.ops))
+N_MOVE_ONLY_EMAILS = sum(1 for e in CORPUS.emails.values()
+                         if any(op.verb == 'move' for op in e.answer.ops)
+                         and not any(op.verb == 'create' for op in e.answer.ops))
 
 
 def run_guards5(label, grader_batch=grade_batch_v5, shuffles=6, **kw):
@@ -868,13 +856,13 @@ def run_guards5(label, grader_batch=grade_batch_v5, shuffles=6, **kw):
 def report5(rows):
     cols = ['real', 'oracle_engine', 'oracle_name', 'oracle_subject', 'oracle_inflect', 'null', 'dup5',
             'shot7', 'shot45', 'shot90', 'wrongkind', 'dupmove', 'dupmove_retitle', 'launder',
-            'launder_all', 'launder_past', 'bothkinds', 'nocancel']
+            'launder_all', 'launder_past', 'launder_cross', 'bothkinds', 'nocancel']
     print(f"{'contract':22s} " + " ".join(f"{c[:8]:>8s}" for c in cols))
     print("-" * (23 + 9 * len(cols)))
     for label, r, _ in rows:
         print(f"{label:22s} " + " ".join(f"{r.get(c, 0):8d}" for c in cols))
     print(f"\nGUARDS: oracle_engine & oracle_name MUST be 167 · null MUST be 64 · nocancel MUST be 167-{N_CANCEL_EMAILS}")
-    print("        dup5 / shot* / launder* MUST NOT exceed null (64); launder (creates only) may keep its move emails")
+    print(f"        dup5 / shot* / launder* MUST NOT exceed null (64); launder (creates only) may keep its {N_MOVE_ONLY_EMAILS} move-only emails")
     print(f"        dupmove MUST NOT exceed oracle_name - {N_MOVE_EMAILS}; dupmove_retitle MUST NOT exceed oracle_name - {N_RETITLE_CAUGHT}")
     print("        every world: engine path == runner path, and invariant under pool shuffles")
     for label, r, notes in rows:
@@ -885,7 +873,7 @@ def report5(rows):
         if r.get('nocancel') != 167 - N_CANCEL_EMAILS: bad.append(f"nocancel {r['nocancel']}")
         for g in ('dup5', 'shot7', 'shot45', 'shot90', 'launder_all', 'launder_past'):
             if r.get(g, 0) > r['null']: bad.append(f"{g} {r[g]}")
-        if r.get('launder', 0) > r['null'] + N_MOVE_EMAILS: bad.append(f"launder {r['launder']}")
+        if r.get('launder', 0) > r['null'] + N_MOVE_ONLY_EMAILS: bad.append(f"launder {r['launder']}")
         if r.get('dupmove', 0) > r['oracle_name'] - N_MOVE_EMAILS: bad.append(f"dupmove {r['dupmove']}")
         if r.get('dupmove_retitle', 0) > r['oracle_name'] - N_RETITLE_CAUGHT: bad.append(f"dupmove_retitle {r['dupmove_retitle']}")
         bad += notes

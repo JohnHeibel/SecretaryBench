@@ -17,8 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from sb.grader import grade_email
-from sb.live.runner import _corpus_hash, _node_state, _turn_delta
+from sb.live.runner import _corpus_hash, _grade_day
 from sb.oracle import _as_dt, _target
 from sb.regrade import regrade, score
 from sb.resolver import Context
@@ -78,14 +77,7 @@ def simulate(corpus, plan, title_of):
         day_new = {r["id"] for r in events + todos} - before
         by_eid = {r["id"]: r.get("email_id", "") for r in events + todos}
 
-        for eid in batch:                       # grade exactly as the runner does
-            email = corpus.emails[eid]
-            ctx = Context(serve=plan.serve_date[eid], anchors=plan.anchors)
-            eid_new = {i for i in day_new if by_eid.get(i) == eid}
-            results[eid] = grade_email(
-                email.answer, ctx,
-                _node_state(corpus, state, email.node, eid_new),
-                _turn_delta(corpus, state, eid_new))
+        results.update(_grade_day(corpus, plan, list(batch), state, day_new))   # exactly as the runner does
 
         day_records.append({"day": day_no, "serve_date": str(sd), "batch": list(batch),
                             "ok": True, "state": state, "day_new": sorted(day_new),

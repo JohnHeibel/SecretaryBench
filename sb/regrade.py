@@ -24,9 +24,7 @@ from datetime import date
 from pathlib import Path
 from typing import Optional
 
-from sb.grader import grade_email
-from sb.live.runner import _node_state, _turn_delta
-from sb.resolver import Context
+from sb.live.runner import _grade_day
 from sb.schema import load_corpus
 from sb.scheduler import Levers, build_plan
 
@@ -59,17 +57,7 @@ def regrade(capture_dir: str, corpus_dir: Optional[str] = None) -> dict:
             for eid in rec["batch"]:
                 results[eid] = None
             continue
-        state = rec["state"]
-        day_new = set(rec["day_new"])
-        by_eid = rec["by_eid"]
-        for eid in rec["batch"]:
-            email = corpus.emails[eid]
-            ctx = Context(plan.serve_date[eid], plan.anchors)
-            eid_new = {i for i in day_new if by_eid.get(i) == eid}
-            results[eid] = grade_email(
-                email.answer, ctx,
-                _node_state(corpus, state, email.node, eid_new),
-                _turn_delta(corpus, state, eid_new))
+        results.update(_grade_day(corpus, plan, list(rec["batch"]), rec["state"], set(rec["day_new"])))
     return results
 
 

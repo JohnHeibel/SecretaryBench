@@ -1,15 +1,17 @@
 # The grader's identity contract — phase 2
 
-**Status: `fix proposed`, iteration 4.** Designed and measured, **not implemented**.
-`sb/grader.py` is unchanged. Iteration 1 was rejected outright by an adversarial pass
-(`docs/_repair/VERIFY-phase2.md`); iteration 2 left four blockers; iteration 3 closed them and
-was rejected by a second pass (`docs/_repair/VERIFY-phase2-iter3.md`) on two load-bearing
-safety properties that did not hold. This iteration answers that pass, item by item, and is
-awaiting its own before anything is written into `sb/`.
+**Status: `applied`, iteration 4, revised after its adversarial pass.** Implemented in
+`sb/grader.py`, `sb/oracle.py`, `sb/live/runner.py`, `sb/regrade.py`, `sb/schema.py` and the
+tests, in one commit with no corpus change. Not `verified`: nothing here can be until the phase
+1d hand-grade exists (open issue 9). Three adversarial passes so far:
+iteration 1 rejected outright (`docs/_repair/VERIFY-phase2.md`); iteration 3 rejected on two
+safety properties that did not hold (`docs/_repair/VERIFY-phase2-iter3.md`); iteration 4
+passed with four required changes, all measured free (`docs/_repair/VERIFY-phase2-iter4.md`).
+Those four are applied below, together with one simplification the pass offered.
 
 Register: **G-1, G-2, G-3, G-5, G-7, G-8, G-9, G-10, A-5**, and **C-10**.
 Evidence: `captures/baseline-sonnet-4-5`. Prototype and guard harness:
-`docs/_repair/phase2_guards.py` (`grade_batch_v5` / `grade_v5`, `run_guards5`, `report5`).
+`docs/_repair/phase2_guards.py` (`grade_v5`, `run_guards5`, `report5`).
 
 ---
 
@@ -36,29 +38,6 @@ obligations (G-2). The benchmark cannot award full marks to a flawless assistant
 
 ---
 
-## What the second adversarial pass found, and what changed
-
-`docs/_repair/VERIFY-phase2-iter3.md` confirmed every number of iteration 3 to the digit and
-then broke two of its stated safety properties:
-
-| finding | iteration 3 | iteration 4 |
-|---|---|---|
-| **§2** The volume brake was scoped to "the turn", but on the runner and regrade paths the turn *is* the `email_id` split. Duplicates stamped with a sibling's id were invisible to it: a launderer scored **167** with 509 objects in the store, and the same state scored 64 on the engine path. | ✗ | The emails of a node served on one day are graded **together** (`grade_batch`) against the day's new objects. A sibling's correct object is claimed by the sibling; what nobody claims is surplus. Laundering scores **64 / 64 / 77** on three variants; both paths agree on every world |
-| **§3** The greedy assignment had no tie-break for nested keyword sets, so `oracle_name` = 167 held in 19 of 60 pool orderings and a perfect agent that handled two moves in the other order read 165 through `sb.engine.run`. | ✗ | The sort key is a **total order on content** (title overlap, full overlap, words matched, created-for-this-email, title precision, verb, then title and date). Invariant under 8 shuffles on all 17 worlds |
-| §5.3 A `create` could claim an inherited object, so a same-email cancel of it passed with the model doing nothing (constructed). Under batch grading the same shape appeared **on the real capture**: a sibling's single-word `move 'Reveal Event'` took `"Design walk-through at WC reveal"` and shielded the cancel in `manufacturing-kickoff-3`. | latent | A create claims only an object **made today**; cancels are ranked **jointly** with create/move so the op that matches more of an object's words gets it (the cancel matches the walk-through on four words, the move on one). The false pass is closed on both shapes |
-| §5.4 / §6 The cross-kind pool made `cancel` strictly harder than the shipped rule, let a wrong-kind claim shield a duplicate, and the stated reason for rejecting overlap-first ordering did not reproduce. | ✗ | Claiming is **same-kind** again, for every verb. A wrong-kind object is **reported, never claimed**, and only when it carries more than half the obligation's words in title + description, some of them in its title, and no sibling op claimed it. 6 of 6 such labels on the capture are genuine (were 6 of 8) |
-| §4.1 The stale rule (`≥ claimed score`) was evaded by dropping one word from the stale copy's title (163 vs a 152 guard). | ✗ | Floor is **more than half the obligation's words**: 11 of 15 retitled copies caught (was 4). The 4 that escape are two-word names losing exactly half, by construction; the guard's requirement is computed from the corpus, not asserted |
-| §7 Stemmer over-stripped `-es` and broke `note/notes`, `trophy/trophies`; stop list applied pre-stem. | | `-ies → y`, `-es` only after a sibilant, `-s` not after `s`: `oracle_inflect` 159 → **165**. Stopping on the stem too was measured: −1 on `oracle_subject`, 0 elsewhere, and it collapses `news` → `new` → stopped; **not applied**, stop-words stay matched on the raw word |
-| §7 A name with no letters or digits has an empty keyword set: its cancel passes vacuously. | latent | `sb/schema.py` raises `CorpusError` |
-| §11.5 / §11.7 (could not check) | | `store_app.py` keeps insertion order and delete-then-recreate moves an object to the end, so §3 was reachable live; the store accepts exact-duplicate creates, so §2 was reachable live. Both are now guarded, not assumed |
-
-Also corrected in this document: the shipped grader's `dupmove` 148 is a guard **failure**
-(it misses 5 of 15 double-bookings), and the claim that turn membership "cannot be defeated
-by a mis-stamped `email_id`" is withdrawn — the mechanism that makes A-5 harmless to the
-brake is batch grading, and it is guarded by three launder worlds.
-
----
-
 ## The contract
 
 ### 1. Identity from the obligation's name, not a generated keyword
@@ -66,33 +45,45 @@ brake is batch grading, and it is guarded by three launder worlds.
 Keywords are the **stemmed content words of `op.name`** (stop-words dropped on the raw word;
 falls back to all words when a name is entirely stop-words, e.g. `event day!`). An
 (obligation, object) pair scores the fraction of keywords present in `title + description`;
-the same fraction over the **title alone** is the primary evidence (G-3: the description can
-complete a match, never outrank a title match).
+the same fraction over the **title alone** is the primary evidence (G-3: a description can
+complete a match, never outrank a title match). There is **no minimum overlap** for a claim:
+one shared content word on the right day passes. A perfect scheduler that titles every object
+with a single content word of the obligation's name scores 165. Read the +17 with that in mind.
 
 `match` is no longer consulted, so `fix_match.py` becomes unnecessary and the corpus needs no
 mutation — which resolves the largest source of the C-10 fork.
 
-### 2. One assignment for the day, per node
+### 2. Exclusive assignment, same kind, one ranking
 
-The emails of a node served on one day are graded together. Every `create`/`move`/`cancel` op
-of those emails claims at most one **same-kind** object and every object serves at most one
-op, by one ranking:
+Every op of the email claims at most one **same-kind** object and every object serves at most
+one op, by one ranking:
 
-1. title overlap; 2. title + description overlap; 3. words matched (a two-word full match
-beats a one-word full match); 4. created for this email; 5. title precision (how much of the
-title *is* the obligation); 6. create/move before cancel; 7. the op's position; 8. the object's
-title and date.
+1. title overlap; 2. title + description overlap; 3. created **today**; 4. title precision
+(how much of the title *is* the obligation); 5. create/move before cancel; 6. the op's
+position; 7. the object's title, description, date and stamp.
 
 A `create` may claim only an object **created today** (it asked for one). A `move` may claim
 any. A `cancel` enters the ranking only at **full overlap** — every content word present.
 
-Steps 7–8 make the ranking a total order on content: the verdict cannot depend on the order the
-store lists objects in, on either grading path. On the engine path each email is its own batch.
+Step 7 makes the key a total order: the verdict cannot depend on the order the store lists
+objects in. "Created today" is the day's new-object set, not the `email_id` stamp: the stamp
+decides nothing here unless two objects are otherwise identical. (Iteration 4 as first
+written ranked "created for this email" ahead of the verb, so a correct object stamped with a
+sibling cancel's id failed two emails; `VERIFY-phase2-iter4` §5.3. Removed: 0 verdicts moved.)
 
 ### 3. Over-creation
 
-A `create`/`move` **fails** if another same-kind object **created today** matches it at least as
-well and was claimed by no op in the batch. That is a duplicate, whatever id it carries.
+A `create`/`move` **fails** if another same-kind object **created today**, stamped with any
+email of this node, matches it at least as well and was claimed by no op of the email. That is a
+duplicate. This is the day-scoped `today` the iteration-3 pass recommended; it is what closes
+laundering inside a node (`launder_all` / `launder_past` 152 / 139 → **64 / 64**).
+
+What it does **not** close: copies stamped with an email of **another node**, or with an id that
+resolves to nothing, never reach this node's pool — `sb/live/runner.py:139-145` drops them by
+attribution before the grader sees them. A launderer that does that scores **167 with 594
+objects** (`launder_cross`), as it does under the shipped grader at its own ceiling. That is
+register **A-5**, which this contract does not close; phase 3 owns attribution. The guard suite
+pins the value so the day it moves, someone changed attribution on purpose.
 
 ### 4. Stale copies on a move
 
@@ -103,34 +94,51 @@ exactly one may remain (`runner.py:107`, *"Never leave duplicates"*; `test_e2e.p
 ### 5. Cancel
 
 A `cancel` **fails** if it claims anything: a same-kind survivor carrying every content word of
-the obligation that no sibling op accounts for. Cross-kind survivors are not its business (the
-shipped rule; G-7).
+the obligation that no other op of the email accounts for. Cross-kind survivors are not its
+business (the shipped rule; G-7).
 
 ### 6. Diagnosis
 
 A failed `create`/`move` reports `wrong kind: created a <kind>, expected a <kind>` when an
-unclaimed object of the other kind carries more than half its words, some in the title; else
-`no <kind> titled like "…" was created`. Other reasons: `over-created: N equally-matching …`,
-`moved, but N stale copy left behind (double-booked)`, `should be cancelled, but still on the
-calendar`, `on the wrong day`.
+unclaimed object of the other kind carries more than half its words, some in the title, and
+(for a create) was made today; else `no <kind> titled like "…" was created`. Other reasons:
+`over-created: N equally-matching …`, `moved, but N stale copy left behind (double-booked)`,
+`should be cancelled, but still on the calendar`, `on the wrong day`.
 
 ### Explicitly not included
 
 - **No `dateok` term anywhere.** Grading must not search the model's output for something that
   fits (iteration 1; 63 points of gaming headroom).
-- **No attribution rule.** `email_id` decides only which email's *turn* an object belongs to
-  (the no-action check and rank step 4). Nothing passes or fails on it.
+- **No attribution rule in the grader.** `email_id` decides only which email's *turn* an object
+  belongs to — the no-action check — and, upstream, which node's pool it enters (A-5, above).
+- **No batch assignment.** Iteration 4 first graded a node's emails for one day together. Its
+  pass measured that inert (1 op reason string on 21 worlds, 0 verdicts) and found it had
+  *created* a cross-email exposure — a sibling's move could take a cancel's survivor — that a
+  tie-break was holding off. Dropped; the day-scoped `today` is the whole benefit.
+- **No `words matched` term.** For a title-overlap tie on one object it orders exactly as title
+  precision does (both are `|keywords| / |title words|` there); mutation-testing found nothing
+  detected its removal. Dropped.
 - **No kind tolerance.** K-7's four mis-keyed ops are a corpus edit for phase 5.
 - **No optimal assignment.** Greedy loses 2 create/move ops on the capture to optimal; optimal
   fabricates a pass (`VERIFY-phase2` §3).
 
 ---
 
+## What the adversarial passes found, in order
+
+| pass | killed | answered by |
+|---|---|---|
+| 1 (`VERIFY-phase2`) | no volume brake: a date-blind shotgun scored 148, five copies of everything 167; `dateok` tie-break searched the output; oracle circular | rules 3–4, the guard set, stemming |
+| 2 (`VERIFY-phase2-iter3`) | the brake was scoped to the `email_id` split on the runner path (a launderer scored 167 with 509 objects; the engine path said 64); assignment order-dependent (`oracle_name` 167 in 19 of 60 orderings); cross-kind claiming made cancel harder and shielded duplicates; stale rule evaded by one retitled word | day-scoped `today`; total-order key; same-kind claiming; stale floor `> half`; stemmer |
+| 3 (`VERIFY-phase2-iter4`) | "a duplicate whatever id it carries" false across nodes; `mine` ranked before verb so a stamp decided verdicts; key not total (description absent); batch grading and joint cancel ranking inert and misattributed; four audit counts wrong; retitle threshold 10 for 11 caught; `words matched` and verb priority unguarded | `mine` → "created today"; key tail `(title, description, when, stamp)`; wrong-kind report needs a today object for creates; thresholds computed by simulation; batching dropped; the counts corrected below; unit tests for verb priority, specificity, determinism-with-descriptions, the sibling-cancel stamp |
+
+---
+
 ## The guard set
 
-Built from the adversaries that broke iterations 1 and 3. All free, offline, seconds.
-Every world is scored on **both** grading paths (day-end state split by `email_id`, and
-per-email snapshots as `sb.engine` sees them) and under **pool shuffles**.
+Built from the adversaries that broke iterations 1 and 3. All free, offline, seconds. Every
+world is scored on **both** grading paths (day-end state split by `email_id`, and per-email
+snapshots as `sb.engine` sees them) and under **pool shuffles**.
 
 | guard | what it is | requirement |
 |---|---|---|
@@ -140,11 +148,12 @@ per-email snapshots as `sb.engine` sees them) and under **pool shuffles**.
 | `null` | creates nothing | **64** (register V-3) |
 | `dup5` · `shot7/45/90` | five copies of everything · date-blind, one object per day over N days | **≤ null** |
 | `dupmove` | every move leaves the old object behind | **≤ oracle_name − 15** (the move emails) |
-| **`dupmove_retitle`** | as above, one word dropped from each stale copy's title | **≤ oracle_name − 10** (copies keeping more than half the words; computed) |
-| **`launder`** | right answer + 5 copies of every *created* object, stamped with a node sibling's id | **≤ null + 15** (its moves leave nothing) |
-| **`launder_all`** · **`launder_past`** | copies on moves too · copies stamped with an already-graded sibling | **≤ null** |
-| **`nocancel`** | perfect, never deletes anything | **167 − 8** (the all-cancel emails) |
-| `wrongkind` · **`bothkinds`** | right title and day, wrong kind · an event *and* a to-do for every obligation | pinned |
+| `dupmove_retitle` | as above, one word dropped from each stale copy's title | **≤ oracle_name − 11** (copies keeping more than half the words; simulated, not counted) |
+| `launder` | right answer + 5 copies of every *created* object, stamped with a node sibling's id | **≤ null + 13** (its move-only emails) |
+| `launder_all` · `launder_past` | copies on moves too · copies stamped with an already-graded sibling | **≤ null** |
+| `launder_cross` | copies stamped with **another node's** email id | informational: **167**, A-5, pinned |
+| `nocancel` | perfect, never deletes anything | **167 − 8** (the all-cancel emails) |
+| `wrongkind` · `bothkinds` | right title and day, wrong kind · an event *and* a to-do for every obligation | pinned |
 | every world | engine path == runner path; invariant under shuffles | **required** |
 
 The synthetic agents act by obligation identity (they remember which record they made for
@@ -172,11 +181,15 @@ oracle row runs `sb/oracle.py` titled by `op.name` (shipped with its `match` tit
 | `launder` | 72 | **167** ✗ | **77** |
 | `launder_all` | 64 | 152 ✗ | **64** |
 | `launder_past` | 64 | 139 ✗ | **64** |
+| `launder_cross` | 158 | — | 167 (A-5, see rule 3) |
 | `bothkinds` | 153 | 166 | 166 |
 | `nocancel` | 150 ✗ | 159 | **159** |
 | engine == runner on every world | yes | **no** (launder: 77/167, 64/152, 64/139) | **yes** |
-| invariant under pool shuffles | yes | **no** (`oracle_name` 165–167, `dupmove` 151–152, …) | **yes** (8 shuffles × 17 worlds) |
+| invariant under pool shuffles | yes | **no** (`oracle_name` 165–167, `dupmove` 151–152, …) | **yes** (60 × 21 worlds × 2 paths, third pass) |
 | **guards** | fails 5 | fails 4 + 2 properties | **PASS** |
+
+The third pass reproduced every cell on an independent implementation and found the staged
+port identical to the prototype at verdict, reason and `actual` level on 21 worlds × 2 paths.
 
 **Op-level failure profile on the real capture** (190 ops):
 
@@ -184,7 +197,7 @@ oracle row runs `sb/oracle.py` titled by `op.name` (shipped with its `match` tit
 |---|---|---|---|
 | ok | 56 | 76 | **76** |
 | not found | 50 | 18 | 28 |
-| wrong kind | — | 8 (2 false) | **6** (0 false) |
+| wrong kind | — | 8 (2 false) | **6** (0 false after the today rule; was 5 of 6) |
 | wrong day | 14 | 29 | 21 |
 | count: too many | 11 | 0 | 0 |
 | stale copy on move | — | 1 | 1 |
@@ -192,10 +205,11 @@ oracle row runs `sb/oracle.py` titled by `op.name` (shipped with its `match` tit
 | over-acted | 2 | 2 | 2 |
 | **failing ops** | **80** | **60** | **60** |
 
-Iteration 4 changes **no email verdict** against iteration 3 (0 flips). Eight `wrong day`
-diagnoses became `not found`: they were creates claiming an inherited sibling's object
-(`'Design Lead 1:1'` → the design walk-through, `'Actnano Visit'` → a strategy meeting). The
-model created nothing for those obligations that day, and the grader now says so.
+Iteration 4 changes **no email verdict** against iteration 3 (0 flips). Seven `wrong day`
+diagnoses became `not found` and one became `wrong kind`: they were creates claiming an
+inherited sibling's object (`'Design Lead 1:1'` → the design walk-through, `'Actnano Visit'` → a
+strategy meeting). The model created nothing for those obligations that day, and the grader
+now says so.
 
 **Read the `wrong day` count honestly.** Roughly half the work the identity rule recovers turns
 out to be on the wrong date — error that was always there and invisible behind "couldn't find
@@ -203,19 +217,23 @@ it". The +17 is net of it.
 
 ### Audits on the real capture
 
-- **Both remaining cancel failures are genuine** (confirmed by both verifiers). In
+- **Both remaining cancel failures are genuine** (confirmed by all three passes). In
   `manufacturing-kickoff-3` the survivor is the model's own answer to the very obligation being
-  cancelled, matched through its description; the shipped grader passed it falsely.
+  cancelled, matched through its description; the shipped grader passed it falsely. Under
+  batch grading a sibling's single-word `move 'Reveal Event'` briefly took that survivor and
+  the cancel passed; **title precision** is what steered the move to `"WC cleat reveal event"`
+  (0.33 vs 0.20), and without batching the exposure does not exist.
 - **The one stale flag is a mis-diagnosis inside an email that fails anyway**:
   `reveal-event-date-and-venue-3`, `move 'Reveal Event'` — `event` is a stop word, so the keyword
-  set is `{reveal}` and the press briefing (description "week before reveal") reads as a copy.
-  The stale rule's true-positive rate on this capture is 0 of 1; its justification is the
-  `dupmove` guards, on which it is exact.
-- **The 6 `wrong kind` labels** are all genuine model-vs-key disagreements, including K-7's
-  `Team pizza party` (keyed `todo`) and the all-stop-word `event day!`.
-- **`wrongkind` +3 over the floor**: three emails where a right-kind sibling object shares the
-  obligation's single content word and sits on the right day. Kind-filtered claiming shows the
-  same; it is the single-word identity weakness, not a kind rule.
+  set is `{reveal}` and two siblings (the press briefing by description, the walk-through by
+  title) read as copies. The stale rule's true-positive rate on this capture is 0 of 2 flags;
+  its justification is the `dupmove` guards, on which it is exact.
+- **The 6 `wrong kind` labels** are genuine model-vs-key disagreements, K-7's `Team pizza
+  party` (keyed `todo`) among them. `event day!` is not among them: its `"Event Pop Up"` was a
+  loose cross-kind claim in iteration 3 and is now `not found`.
+- **`wrongkind` +3 over the floor**: three emails with one event op and one to-do op of
+  overlapping vocabulary; when every kind is swapped, each op's object satisfies the other's
+  on the right day. Kind-filtered claiming shows the same.
 - **Stop-word sensitivity**: leave-one-out over all 97 words moves some world for 7 words, never
   by more than ±2, none moves `oracle_name`. 66 of the 97 never occur in an op name.
 
@@ -224,7 +242,7 @@ it". The +17 is net of it.
 | blocker | resolution |
 |---|---|
 | kind filter | same-kind claiming (the shipped semantics, exactly); wrong-kind reported with a floor; K-7 surfaces as `wrong kind` |
-| `cancel` bypasses the assignment | ranked jointly with create/move at full overlap; a sibling's object is claimed by the sibling; a weaker sibling claim cannot shield a cancel |
+| `cancel` bypasses the assignment | in the assignment at full overlap; a sibling op's object is claimed by the sibling, and a perfect tie goes to the work |
 | `sb/oracle.py:52` titles by `match` | becomes `op.name.replace('_', ' ')`, same commit as the grader; 167 through the engine and through `sb.scale` (`--filler 0` and default) |
 | `test_e2e.py:58` would flip | it does not: the double-booked reschedule fails under rule 4; the test pins the reason |
 
@@ -234,23 +252,30 @@ it". The +17 is net of it.
 
 1. **Single-content-word obligations** (24 of 134) remain the soft spot of every rule: the
    only defence on them is the date predicate, the stale rule mis-describes siblings that share
-   the word, and the `wrongkind` guard sits 3 above the floor because of them. The G-5
-   **name-aware lint** (flag same-kind siblings whose keyword sets nest, and one-word names)
-   belongs to phase 5 with the renames it will demand. `sb/schema.py` lint #5 still checks the
-   old `match` rule; dead once `match` is unread, and replacing it fails the current corpus on
-   10 names, so it cannot ride in the grader commit.
-2. **Two-word names** escape the retitled-stale-copy check by construction (5 of 15 move
+   the word, and one shared word on the right day is a pass. The G-5 **name-aware lint** (flag
+   same-kind siblings whose keyword sets nest, and one-word names) belongs to phase 5 with the
+   renames it will demand. `sb/schema.py` lint #5 still checks the old `match` rule; dead once
+   `match` is unread, and replacing it fails the current corpus on 10 names.
+2. **Cross-node and unresolvable stamps** are invisible to every rule (A-5; rule 3). Phase 3.
+3. **A same-day sibling whose object contains every keyword of this op** reads as a duplicate
+   under rule 3, because each email is graded alone against the day's objects: `create 'Board
+   Sync'` (`sync` is a stop word, so `{board}`) next to a sibling's correct `"Board memo
+   review"` fails as over-created. Batch grading would have let the sibling claim its own
+   object; it was dropped for the cross-email cancel exposure it created. Both need G-5
+   nesting, and no feasible seed of 100 batches a nested pair on one day; the lint in issue 1
+   removes the condition.
+4. **Two-word names** escape the retitled-stale-copy check by construction (4 of 15 move
    emails). Any lower floor breaks the oracles (`≥ half`: 166 / 166).
-3. **`event day!`** is the only all-stop-word name; its fallback keywords are words every other
+5. **Two cancel emails of one node on one day** would let one survivor accuse only one of them
+   (exclusive claiming); the other passes falsely. Every node has exactly one cancel email
+   today; a phase-5 edit could change that.
+6. **`event day!`** is the only all-stop-word name; its fallback keywords are words every other
    op stops. Rename in phase 5.
-4. **Descriptions** stay in identity (title first). The `manufacturing-kickoff-3` cancel is
-   right *because* of one; the `Reveal Event` stale flag is wrong because of one. Net on the
-   capture: blanking every description moves the score by one email either way.
-5. **Same-day ops on one obligation** (a create and its move in one batch) would compete for
-   one object. In 69 feasible seeds of 100 it never happens; a corpus edit could make it happen.
-6. **One capture, one model, one seed, one lever set.** The guards are model-independent; the
+7. **Descriptions** stay in identity (title first). The `manufacturing-kickoff-3` cancel is
+   right *because* of one; the `Reveal Event` stale flag is wrong because of one.
+8. **One capture, one model, one seed, one lever set.** The guards are model-independent; the
    +17 is not. It needs a second captured run before anyone quotes it.
-7. **Everything here is grader-versus-grader.** Only the phase 1d hand-grade can say whether the
+9. **Everything here is grader-versus-grader.** Only the phase 1d hand-grade can say whether the
    score moved toward *truth*, and it is deferred behind C-10. Per the register's status legend
    this can reach `fix proposed` — never `verified`.
 
@@ -258,21 +283,19 @@ it". The +17 is net of it.
 
 ## Implementation notes
 
-- `grade_email(answer, ctx, state, turn)` keeps its signature and is `grade_batch([one], turn)`.
-  New: `grade_batch(items, today)`, where `items` are `(answer, ctx, state, turn)` for the emails
-  of one node served on one day, and `today` is everything created that day.
-- `sb/live/runner.py` gains `_grade_day(corpus, plan, batch, state, day_new)`, which splits the
-  day's new objects by stamp (each email's `turn`), groups the batch by node and calls
-  `grade_batch`. The runner's day loop, `sb/regrade.py` and `test_capture_regrade.simulate` all
-  route through it, so the three cannot drift. `sb/engine.py` is unchanged.
-- `EmailResult`/`details` keep their shape; `_print_email`, the capture's `verdicts`,
-  `sb.regrade` and `sb.analyze` read them unchanged (checked by the verifier, all 10 consumers).
+- `grade_email(answer, ctx, state, turn, today=None)`: the fifth argument is everything created
+  today; it defaults to `turn`, which is exact on the engine path. `sb/engine.py` is unchanged.
+- `sb/live/runner.py` gains `_grade_day(corpus, plan, batch, state, day_new)`: splits the day's
+  new objects by stamp into each email's `turn`, passes the whole day as `today`. The runner's
+  day loop, `sb/regrade.py` and `test_capture_regrade.simulate` all route through it.
+- `EmailResult`/`details` keep their shape; all ten downstream consumers checked by the passes.
 - `sb/oracle.py` titles by `op.name.replace('_', ' ')`. `sb/schema.py` rejects a name with no
   letters or digits and its `Op` docstring stops calling `match` the grader's field.
 - `sb/tests/test_e2e.py:58` keeps `assert not passed` and pins `"stale copy"`.
-- `sb/tests/test_grader_guards.py` is the guard set above as tests — 17 worlds, both paths,
-  shuffles, and pins for `real` (114), `oracle_subject` (137), `oracle_inflect` (165),
-  `wrongkind` (67), `bothkinds` (166) — so no future change can quietly move the score. The
-  `real` pin skips itself if the corpus no longer matches the capture's hash.
-  `sb/tests/test_grader.py` gains 13 identity tests (G-10). Whole suite: 104 tests, ~2 s.
+- `sb/tests/test_grader_guards.py` is the guard set above as tests — 18 worlds, both paths,
+  shuffles, thresholds computed from the corpus by simulation, and pins for `real` (114),
+  `oracle_subject` (137), `oracle_inflect` (165), `wrongkind` (67), `bothkinds` (166),
+  `launder_cross` (167). The `real` pin skips itself if the corpus no longer matches the
+  capture's hash. `sb/tests/test_grader.py` gains 16 identity tests (G-10), including the two
+  the third pass found unguarded by mutation (verb priority, specificity). Whole suite ~2 s.
 - `webapp/api/_lib/sb/` is regenerated at build by `webapp/scripts/vendor_sb.py`; nothing to do.

@@ -58,15 +58,21 @@ webapp and the `backups` branch are off limits.
 ## Start here (next session)
 
 Phase 0 and phase A are complete and committed, and the revised phase table is signed off.
-**Phase 2 is in progress. Iteration 4 of the grader contract is designed and measured; the
-next action is its adversarial pass, then implementation.** See `docs/grader-contract.md` —
-`fix proposed`, `sb/grader.py` still unchanged. Iteration 1 was rejected outright by an
-adversarial pass (`docs/_repair/VERIFY-phase2.md`); iteration 3 was rejected by a second
-(`docs/_repair/VERIFY-phase2-iter3.md`) — every number reproduced, two safety properties did
-not hold. Iteration 4 answers that pass item by item and passes every guard in
-`docs/_repair/phase2_guards.py`, on both grading paths, in any store order. Reproduce with
-the command at the top of that file before building on it. Both adversarial passes overturned
-conclusions the author was confident about; the third is not optional.
+**Phase 2's grader contract is `applied`.** Iteration 4 shipped after passing its adversarial
+pass with four required changes; see `docs/grader-contract.md` for the contract, its guard set
+and its open issues, and `sb/tests/test_grader_guards.py` for the guards as tests. The certified
+capture re-grades to **114/167** (was 97); a flawless assistant scores 167 on both grading paths
+in any store order. **Next actions:** phase 3 (A — the no-action rule and attribution; A-5 is
+now the largest gaming surface the grader does not close), phase 1 (the lever record, still
+free), and the G-5 name-aware lint at phase 5 (single-word and nested obligation names are
+the soft spot of every rule). Nothing in phase 2 reaches `verified` before the phase 1d
+hand-grade.
+Three passes so far: iteration 1 rejected outright (`docs/_repair/VERIFY-phase2.md`);
+iteration 3 rejected on two safety properties (`docs/_repair/VERIFY-phase2-iter3.md`);
+iteration 4 confirmed to the digit on an independent implementation and passed with changes
+(`docs/_repair/VERIFY-phase2-iter4.md`). Reproduce with the command at the top of
+`docs/_repair/phase2_guards.py` before building on it. Every pass overturned something the
+author was confident about; a further one is warranted for any material change.
 
 C-10 (which corpus is authoritative) is **resolved for working purposes**: `corpus/` is
 authoritative, production is a stale backup. One yes/no remains outstanding for the corpus
@@ -238,16 +244,16 @@ matched something.
 | M-3 | `--model` behaviour across `--resume` turns unverified on CLI 2.1.233 | distorts-measurement | **verified** | 0 |
 | M-4 | documented model roster may be stale | cosmetic | **closed** | 0 |
 | M-5 | runner inherits `CLAUDE_CODE_*` env when launched from a Claude Code session | unknown | open | 0 |
-| **G-1** | required `match` keyword absent from the mail the model reads (32/125 ops) | blocks-measurement | open | 2 |
-| **G-2** | exactly-one rule counts keyword hits, not obligations; 0 of 57 "duplicates" are duplicates | blocks-measurement | open | 2 |
-| **G-3** | `description` is in the match haystack, invisible in the log, unmentioned to the model | blocks-measurement | open | 2 |
-| **G-4** | the oracle certifies satisfiability and is structurally blind to gradeability | blocks-measurement | open | 2 |
+| **G-1** | required `match` keyword absent from the mail the model reads (32/125 ops) | blocks-measurement | **applied** *(identity by the name's content words; `match` unread)* | 2 |
+| **G-2** | exactly-one rule counts keyword hits, not obligations; 0 of 57 "duplicates" are duplicates | blocks-measurement | **applied** *(exclusive assignment; day-scoped duplicate rule; `count: too many` 11 → 0)* | 2 |
+| **G-3** | `description` is in the match haystack, invisible in the log, unmentioned to the model | blocks-measurement | **applied** *(title evidence ranks first; description completes a match; collision penalty on a perfect agent −16 → −3)* | 2 |
+| **G-4** | the oracle certifies satisfiability and is structurally blind to gradeability | blocks-measurement | **applied** *(subject-titled and inflected perfect agents pinned in `test_grader_guards.py`; oracle titles by `op.name`)* | 2 |
 | **G-5** | lint #5 compares author strings to author strings; name-aware variant flags 10 | distorts-measurement | open | 2 |
 | **G-6** | pool is cumulative over the run, so obligations get harder by position (52%→26%) | distorts-measurement | open | 2 |
-| **G-7** | `cancel` graded as keyword absence over the cumulative pool | distorts-measurement | open | 2 |
-| **G-8** | `match` defaults to the whole obligation name as one contiguous phrase (21 ops, 13% pass) | distorts-measurement | open | 2 |
-| **G-9** | the grader's own reason strings cannot distinguish its failure modes | slows-work | open | 2 |
-| **G-10** | the identity logic has no unit tests | slows-work | open | 2 |
+| **G-7** | `cancel` graded as keyword absence over the cumulative pool | distorts-measurement | **applied** *(in the assignment at full overlap; the historical Boston case passes at 0.67)* | 2 |
+| **G-8** | `match` defaults to the whole obligation name as one contiguous phrase (21 ops, 13% pass) | distorts-measurement | **applied** *(dissolved: the grader never reads `match`)* | 2 |
+| **G-9** | the grader's own reason strings cannot distinguish its failure modes | slows-work | **applied** *(not found / wrong kind / wrong day / over-created / stale copy / cancel residue are distinct)* | 2 |
+| **G-10** | the identity logic has no unit tests | slows-work | **applied** *(16 identity tests + the guard suite; mutation-tested by the third pass)* | 2 |
 | **A-1** | 56–57% of every score is the abstain check; the model ranking is not robust to the rule | blocks-measurement | open | 3 |
 | **A-2** | the live attribution split is untested and diverges from the path the oracle validates | blocks-measurement | open | 3 |
 | **A-3** | five ways over-action escapes the no-action check; only one is the one §2.6 names | distorts-measurement | open | 3 |
@@ -292,8 +298,8 @@ matched something.
 | **V-8** | the span axis is reconstructed from levers the artifact never recorded | distorts-measurement | open | 4→6 |
 
 **Counts.** 50 phase-A findings: 18 blocks-measurement, 26 distorts-measurement,
-6 slows-work. Cost to verify: 49 free-offline, 1 needs-one-live-run (A-5). All 50 are
-`open`; nothing has been applied.
+6 slows-work. Cost to verify: 49 free-offline, 1 needs-one-live-run (A-5). Phase 2 applied
+G-1, G-2, G-3, G-4, G-7, G-8, G-9 and G-10 (2026-08-29); G-5 and G-6 stay open; nothing is `verified`.
 
 ---
 
@@ -1789,10 +1795,37 @@ gitignored `build/`.
   **Still open, corpus-side:** single-word names (G-5 lint), `event day!`, two-word names
   escaping the retitle check by construction, K-7's kinds. Full list in the contract doc.
 
-  Staged and green, not shipped: the port of the contract, `sb/oracle.py`, `_grade_day`,
-  `test_e2e.py:58` pinned, 13 identity unit tests, and the guard set as
-  `sb/tests/test_grader_guards.py` (17 worlds, both paths, shuffles, pinned scores) — 104
-  tests in ~2 s, `sb.scale` 167/167. Awaiting the third adversarial pass.
+  **Third adversarial pass (`docs/_repair/VERIFY-phase2-iter4.md`): safe to implement with
+  four changes, all measured free.** 38 claims: every number reproduced on an independent
+  implementation, the staged port identical to the prototype at reason level on 21 worlds ×
+  2 paths, 60 shuffles × 21 worlds × 2 paths with 0 flips. Found: the "duplicate whatever id
+  it carries" claim is false across **nodes** (copies stamped with another node's id leave the
+  pool at `_node_state`; 167 with 594 objects — A-5, which this contract does not close and
+  now says so); "created for this email" ranked ahead of the verb, so a stamp could fail two
+  emails; the key omitted description, so not a total order; batch grading and joint cancel
+  ranking were inert and misattributed (the day-scoped `today` closes laundering; title
+  precision closed the `manufacturing-kickoff-3` shielding, which batching had created); four
+  audit counts wrong; `words matched` and verb priority unguarded by the suite.
+
+  **Applied:** batch grading dropped (`grade_email(..., today=None)`; `_grade_day` passes the
+  day); "created today" replaces the stamp term; `words matched` dropped (identical to title
+  precision on a title-overlap tie); key tail carries description and stamp; wrong-kind
+  report for a create needs a today object (6 of 6 labels genuine); guard thresholds
+  simulated, not counted (`dupmove_retitle` ≤ 167 − 11, `launder` ≤ 64 + 13); `launder_cross`
+  pinned at 167 as the A-5 record; unit tests for verb priority, specificity,
+  determinism-with-descriptions and the sibling-cancel stamp. No score on any world moved.
+
+  **Shipped**, in one commit with no corpus change: `sb/grader.py` (the contract),
+  `sb/oracle.py` (titles by `op.name`), `sb/live/runner.py` (`_grade_day`, used by the day
+  loop), `sb/regrade.py` and `test_capture_regrade.py` (route through it), `sb/schema.py`
+  (empty-name `CorpusError`; `Op` docstring), `test_e2e.py:58` re-baselined to pin the
+  stale-copy reason, 16 identity unit tests, and the guard set as
+  `sb/tests/test_grader_guards.py` (18 worlds, both paths, shuffles, pinned scores). 107 tests
+  in ~1.5 s; `sb.scale` 167/167 and 287/287; `python -m sb.regrade captures/baseline-sonnet-4-5`
+  → 114/167 against as-run 97. G-1, G-2, G-3, G-4, G-7, G-8, G-9, G-10 → `applied`. Not
+  `verified`, per the status legend, until the phase 1d hand-grade exists. Note for A-5:
+  this contract does **not** close cross-node or unresolvable stamps (`launder_cross` pinned
+  at 167); that is now the grader's largest open gaming surface and belongs to phase 3.
 
 - **2026-08-29** — Phase 2, iteration 3. *(Rejected the same day by
   `docs/_repair/VERIFY-phase2-iter3.md`; see the entry above. The blocker closures below stand;

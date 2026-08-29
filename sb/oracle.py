@@ -49,7 +49,7 @@ def _as_dt(v: Value, default_hour: int) -> datetime:
 
 def oracle_model(email: Email, rendered_body: str, ctx: Context, store: Store) -> None:
     for op in email.answer.ops:
-        title = " ".join(op.match) if op.match else op.name
+        title = op.name.replace("_", " ")     # the grader keys identity on the name (docs/grader-contract.md)
 
         if op.verb == "cancel":
             while (oid := store.find_in_node(email.node, op.kind, title)) is not None:

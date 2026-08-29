@@ -27,7 +27,7 @@ def imperfect_model(email: Email, rendered: str, ctx: Context, store: Store) -> 
         store.create_todo(email.id, "follow up", _as_dt(ctx.serve, 17))   # over-action
         return
     for op in ops:
-        title = " ".join(op.match) if op.match else op.name
+        title = op.name.replace("_", " ")
         if op.verb == "cancel":
             continue                                       # never cancels -> leaves the object
         when = _as_dt(_target(op.on, ctx), 9 if op.kind == "event" else 17)
@@ -55,7 +55,12 @@ def test_imperfect_model_is_caught():
     _corpus, res = _run(imperfect_model)
     # over-action on a no-action FYI, and a reschedule done as a duplicate, must fail.
     assert not res.results["gamma.notice"].passed           # no-action violated
-    assert not res.results["beta.shift"].passed             # double-booked (not the expected single event)
+    # Double-booked reschedule. Re-baselined 2026-08-29 with the identity contract
+    # (docs/grader-contract.md rule 4): it still fails, now as a stale copy left
+    # behind by the move rather than under the old exactly-one count.
+    shift = res.results["beta.shift"]
+    assert not shift.passed
+    assert "stale copy" in shift.headline, shift.headline
     # a plain single create on the right day still passes (day-level grading)
     assert res.results["alpha.brief"].passed
     assert res.results["alpha.review"].passed

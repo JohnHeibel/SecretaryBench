@@ -36,10 +36,10 @@ from typing import Optional
 import httpx
 
 from sb import resolver
-from sb.grader import NodeState, Obj, TurnDelta, grade_email
+from sb.grader import EmailResult, NodeState, Obj, TurnDelta, grade_email
 from sb.resolver import Context
 from sb.schema import Corpus, load_corpus
-from sb.scheduler import Levers, build_plan
+from sb.scheduler import Levers, Plan, build_plan
 
 REPO = Path(__file__).resolve().parents[2]
 STORE_PORT = int(os.environ.get("STORE_PORT", "8077"))
@@ -156,6 +156,29 @@ def _turn_delta(corpus: Corpus, state: dict, new_ids: set[str]) -> TurnDelta:
 
 def _all_ids(state: dict) -> set[str]:
     return {r["id"] for r in state["events"]} | {r["id"] for r in state["todos"]}
+
+
+def _grade_day(corpus: Corpus, plan: Plan, batch: list[str], state: dict,
+               day_new: set[str]) -> dict[str, EmailResult]:
+    """Grade one day's batch from the day-end store state.
+
+    One turn handled the whole day, so the day's new objects are split back to
+    each email by the email_id the model stamped on them (that is the email's
+    `turn`, which the no-action rule reads). The whole day's new objects go in
+    as `today`, so a duplicate cannot hide behind a sibling's stamp
+    (docs/grader-contract.md, register A-5). sb.regrade and the capture test
+    call this too, so the three paths cannot drift.
+    """
+    by_eid = {r["id"]: r.get("email_id", "") for r in state["events"] + state["todos"]}
+    today = _turn_delta(corpus, state, day_new)
+    out: dict[str, EmailResult] = {}
+    for eid in batch:
+        email = corpus.emails[eid]
+        ctx = Context(plan.serve_date[eid], plan.anchors)
+        mine = {i for i in day_new if by_eid.get(i) == eid}
+        out[eid] = grade_email(email.answer, ctx, _node_state(corpus, state, email.node, mine),
+                               _turn_delta(corpus, state, mine), today)
+    return out
 
 
 def _parse_stream(stdout: str) -> tuple[Optional[str], list[str], bool, str, Optional[str]]:
@@ -604,16 +627,11 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             state = httpx.get(f"{STORE_URL}/state", timeout=10).json()
             day_new = _all_ids(state) - before
             by_eid = {r["id"]: r.get("email_id", "") for r in state["events"] + state["todos"]}
+            graded = _grade_day(corpus, plan, list(batch), state, day_new)
             for eid in batch:
                 email_no += 1
-                email = corpus.emails[eid]
-                ctx = Context(plan.serve_date[eid], plan.anchors)
-                eid_new = {i for i in day_new if by_eid.get(i) == eid}
-                res = grade_email(email.answer, ctx,
-                                  _node_state(corpus, state, email.node, eid_new),
-                                  _turn_delta(corpus, state, eid_new))
-                results[eid] = res
-                _print_email(email_no, eid, sd.strftime("%a %b %d"), res)
+                results[eid] = graded[eid]
+                _print_email(email_no, eid, sd.strftime("%a %b %d"), graded[eid])
 
             # The whole day, as the grader saw it. `state` is every object in the
             # store, not just the keyword-matched ones the log prints (O-5), which

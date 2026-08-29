@@ -52,8 +52,9 @@ class Edge:
 @dataclass
 class Op:
     """One verb on a named obligation. The name is the obligation's identity and a
-    node-scoped anchor; `match` is the fuzzy title keyword set the grader uses to
-    tie the model's calendar object to this obligation (defaults to [name])."""
+    node-scoped anchor; the grader ties the model's calendar object to it by the
+    name's content words (docs/grader-contract.md). `match` is a legacy keyword
+    set still carried by the corpus format and lint #5; the grader does not read it."""
     verb: str                                   # "create" | "move" | "cancel"
     name: str                                   # obligation identity (also a @name anchor)
     kind: Optional[str] = None                  # "event" | "todo" (set on create; filled in for move/cancel)
@@ -135,6 +136,9 @@ def _parse_op(raw: dict) -> Op:
     name = raw[verb]
     if not isinstance(name, str) or not name:
         raise CorpusError(f"op {verb} needs a non-empty obligation name: {raw!r}")
+    if not re.search(r"[A-Za-z0-9]", name):
+        raise CorpusError(f"op {verb} name {name!r} has no letters or digits; the grader identifies "
+                          f"an obligation by the words of its name")
     kind = raw.get("kind")
     on = raw.get("on")
     if verb == "create":
