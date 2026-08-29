@@ -58,13 +58,15 @@ webapp and the `backups` branch are off limits.
 ## Start here (next session)
 
 Phase 0 and phase A are complete and committed, and the revised phase table is signed off.
-**Phase 2 is in progress. Iteration 3 of the grader contract is designed and measured; the
+**Phase 2 is in progress. Iteration 4 of the grader contract is designed and measured; the
 next action is its adversarial pass, then implementation.** See `docs/grader-contract.md` —
 `fix proposed`, `sb/grader.py` still unchanged. Iteration 1 was rejected outright by an
-adversarial pass (`docs/_repair/VERIFY-phase2.md`); iteration 2 left four blockers open;
-iteration 3 closes them and passes every guard in `docs/_repair/phase2_guards.py`, including
-a new one (`dupmove`) that both earlier iterations would have failed. Reproduce with the
-command at the top of that file before building on it.
+adversarial pass (`docs/_repair/VERIFY-phase2.md`); iteration 3 was rejected by a second
+(`docs/_repair/VERIFY-phase2-iter3.md`) — every number reproduced, two safety properties did
+not hold. Iteration 4 answers that pass item by item and passes every guard in
+`docs/_repair/phase2_guards.py`, on both grading paths, in any store order. Reproduce with
+the command at the top of that file before building on it. Both adversarial passes overturned
+conclusions the author was confident about; the third is not optional.
 
 C-10 (which corpus is authoritative) is **resolved for working purposes**: `corpus/` is
 authoritative, production is a stale backup. One yes/no remains outstanding for the corpus
@@ -1742,7 +1744,59 @@ gitignored `build/`.
 
 ## Changelog
 
-- **2026-08-29** — Phase 2, iteration 3. The four blockers of iteration 2 are closed in the
+- **2026-08-29** (later) — Phase 2, iteration 4, after the second adversarial pass
+  (`docs/_repair/VERIFY-phase2-iter3.md`) rejected iteration 3. **Still `fix proposed`;
+  `sb/grader.py` unchanged.** Design, table, audits: **`docs/grader-contract.md`**.
+
+  **What the verifier killed.** 35 claims: 18 confirmed, 5 wrong, 6 overstated, 4 unsafe.
+  Every number reproduced to the digit. Two safety properties did not hold: (1) the volume
+  brake was scoped to "the turn", but on the runner and regrade paths the turn *is* the
+  `email_id` split, so duplicates stamped with a sibling's id were invisible — a launderer
+  scored **167** with 509 objects, and the same state scored 64 on the engine path; (2) the
+  assignment had no tie-break for nested keyword sets, so `oracle_name` = 167 held in 19 of 60
+  store orderings and a perfect agent handling two moves in the other order read 165 through
+  `sb.engine.run`. Also wrong: the stated reason for rejecting overlap-first kind ordering, the
+  shipped grader's `dupmove` marked as a pass, and the claim that turn membership "cannot be
+  defeated by a mis-stamped `email_id`".
+
+  **Iteration 4.** The emails of a node served on one day are graded **together** against the
+  day's new objects (`grade_batch`; runner, regrade and the capture test route through one
+  `_grade_day`), so a sibling's correct object is claimed by the sibling and only surplus is a
+  duplicate: laundering scores 64 / 64 / 77, both paths agree on all 17 worlds. The ranking is
+  a **total order on content** (title overlap first, then title + description, words matched,
+  created-for-this-email, title precision, verb, then title and date): invariant under 8
+  shuffles. Claiming is **same-kind** again; wrong-kind is reported, not claimed. A create
+  claims only an object made today; cancels rank jointly with create/move — which closed a
+  false pass that batch grading exposed on the real capture (`manufacturing-kickoff-3`,
+  shielded by a sibling's single-word move). Stale floor: more than half the words (retitled
+  copies caught 11/15, was 4/15). Stemmer fixed (`oracle_inflect` 159 → 165).
+
+  | world | shipped | iter. 3 | **iter. 4** |
+  |---|---|---|---|
+  | real (certified capture) | 97 | 114 | **114** (0 flips) |
+  | `oracle_engine` / `oracle_name` | 158 / 158 | 167 / 167 | **167 / 167**, any order |
+  | `oracle_subject` / `oracle_inflect` | 95 / 142 | 137 / 159 | 137 / **165** |
+  | `null` · `dup5` · `shot7/45/90` | 64 | 64 | **64** |
+  | `launder` / `launder_all` / `launder_past` | 72 / 64 / 64 | **167 / 152 / 139** ✗ | **77 / 64 / 64** |
+  | `dupmove` / `dupmove_retitle` | 148 / 146 | 152 / 163 ✗ | **152 / 156** |
+  | `nocancel` | 150 | 159 | **159** = 167 − 8 |
+  | engine path == runner path | yes | no | **yes** |
+
+  Op-level on the capture: 8 `wrong day` became `not found` (creates that had claimed a
+  sibling's inherited object; the model made nothing for them), 2 false `wrong kind` labels
+  gone (6 remain, all genuine). Failing ops 60, unchanged.
+
+  **Still open, corpus-side:** single-word names (G-5 lint), `event day!`, two-word names
+  escaping the retitle check by construction, K-7's kinds. Full list in the contract doc.
+
+  Staged and green, not shipped: the port of the contract, `sb/oracle.py`, `_grade_day`,
+  `test_e2e.py:58` pinned, 13 identity unit tests, and the guard set as
+  `sb/tests/test_grader_guards.py` (17 worlds, both paths, shuffles, pinned scores) — 104
+  tests in ~2 s, `sb.scale` 167/167. Awaiting the third adversarial pass.
+
+- **2026-08-29** — Phase 2, iteration 3. *(Rejected the same day by
+  `docs/_repair/VERIFY-phase2-iter3.md`; see the entry above. The blocker closures below stand;
+  the "cannot be defeated by a mis-stamped id" claim and the `oracle_engine` explanation do not.)* The four blockers of iteration 2 are closed in the
   design; **still `fix proposed`, `sb/grader.py` unchanged**, adversarial pass pending. Full
   design, guard table, audits and open issues: **`docs/grader-contract.md`**. Prototype:
   `docs/_repair/phase2_guards.py` (`grade_v4`).
