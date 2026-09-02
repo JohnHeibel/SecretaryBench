@@ -50,8 +50,8 @@ Things the worksheet resolves for you: **expected dates are already computed** f
 **Grader's verdict:** FAIL — no to-do titled like "event day!" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** **KEY.** Gathering keyed `todo`. The prose is explicit that this belongs on a calendar: "block their calendars for August 10th and being present at the event". The model's event "Event Pop Up" is on the keyed date (Mon Aug 10), so only the kind failed it. Corpus convention: 34 of 36 `todo` creates are verb-named actions, and the only two exceptions are this and `Team_pizza_party`, both gatherings. **Not among K-7's four** (K.md:607-610) - a fifth mis-key its deliberately conservative detector missed. Also grader-contract open issue 6, the only all-stop-word name.
 
 ---
 
@@ -80,8 +80,8 @@ Things the worksheet resolves for you: **expected dates are already computed** f
 **Grader's verdict:** FAIL — wrong kind: created a event, expected a to-do  
 **Grader's `actual`:** "End-of-year pizza party" Mon Jun 08 12 PM (60m)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** **KEY.** Only documented kind rule is `runner.py:89` "to-dos - tasks that have a deadline"; a party at a fixed time is an event under it. Corpus convention agrees: 34/36 `todo` creates are actions, the 2 outliers are both gatherings. Twin case `project_atlas.launch-dinner` ("Penciling it in") is keyed event. Hedged-time hypothesis tested and falsified: 10 event-keyed creates sit on emails hedging as hard or harder (`Proposed` x2, `tentativ` x2, `Pencil`, `I think`). Cascades to `client-demo-conflict` via kind inheritance in `_wire_obligations` (schema.py:393), so one authoring error fails two emails. K-7, phase 5.
 
 ---
 
@@ -109,8 +109,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — no to-do titled like "AI Final Meeting Review" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[x]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** **PLAN.** Served **Sat Jun 06**; the key's `this:FRI` resolves to **Fri Jun 05**, the day *before* serve. No answer could be right. K-1, and the exact mechanism K-7 notes at K.md:655 (a weekend serve day drives `this:WD` into the past). K-7 separately lists this op's kind as wrong (keyed `todo`, prose says "lets meet") at K.md:608 - moot here, since no date is reachable. Model created nothing, which is defensible for an impossible email. Identity words reduce to `{ai}` alone: grader-contract open issue 1.
 
 ---
 
@@ -154,8 +154,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — wrong kind: created a to-do, expected a event  
 **Grader's `actual`:** "Ask about patent conflict in pitch comp team's sole design" Thu Jul 16 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** **KEY.** Action keyed `event`. The email says "Can you **make a note to** ask about it after the final?", which is the definition of a to-do. Corpus convention: 25 verb-named ops keyed `todo` against 4 keyed `event`, and this is one of the outliers. The model's to-do is on **exactly** the keyed date (Thu Jul 16 = `@pitch_final+1d`) with an accurate description, so only the kind failed it. **Not among K-7's four** - second mis-key its detector missed.
 
 ---
 
@@ -188,8 +188,10 @@ _(nothing)_
 **Grader's verdict:** FAIL — wrong kind: created a to-do, expected a event  
 **Grader's `actual`:** "Retention conversation with designer from team two" Sat Jun 13 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[x]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** **MODEL** `[close]`. Corpus keys 34 gathering-nouns as `event` against 3 as `todo`, and all 3 of those are verb-named actions *about* a meeting (`Send CTO Rubric`, `AI_Final_Meeting_Review`, `send launch meeting link`). A retention conversation is the gathering, so `event` is sound. `runner.py:89` says to-dos are "tasks that have a deadline"; a conversation held at a time is not one. The model's to-do is defensible on a "make sure it happens" reading, but its **Sat Jun 13 17:00** is the to-do default time on a weekend and fails on day under any reading, so no resolution of the kind question saves the op.
+
+**Key defect, separate, does not change the verdict:** `serve+2d` + `tolerance: exact_day` turns "this week" into one exact day with nothing in the prose picking Thursday. K-6. Should be `within:`.
 
 ---
 
@@ -223,7 +225,9 @@ _(nothing)_
 **Grader's `actual`:** "Push tooling vendor for outsole prototype delivery" Thu Jun 11 5 PM
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Notes:** _(left for you - genuine judgment call, not common sense either way.)_ Two defensible readings. The **key** encodes the deliverable: "Outsole sample delivery" due Fri Jun 12, which the prose does pin ("get it to us **by Friday, June 12th**"). The **model** encoded the action instead: "Push tooling vendor for outsole prototype delivery" due Thu Jun 11, i.e. push the vendor the day before so delivery lands on time. Right node, right topic, sound reasoning, one day early against the key.
+
+Tick **MODEL** if you hold the model to the key's obligation; **AMBIGUOUS** if "ask them to get it to us by Friday" legitimately supports either object. Not **KEY** either way: Fri Jun 12 is explicit in the prose.
 
 ---
 
@@ -257,8 +261,10 @@ _(nothing)_
 **Grader's verdict:** FAIL — wrong kind: created a to-do, expected a event  
 **Grader's `actual`:** "Approve corrected trophy engraving text" Fri Jun 12 12 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** **KEY.** Action keyed `event`. Email: "just need a quick approval on the corrected text before we reorder." An approval is a task, not a meeting. This **is** one of K-7's four named mis-keys (K.md:610). The model's to-do "Approve corrected trophy engraving text" is on the keyed date (Fri Jun 12), so only the kind failed it.
+
+**Also a K-6 instance:** `serve+1d` with `tolerance: exact_day` on a body whose only temporal cue is the word "quick" - one of the three `Innovation-comp` no-cue exact days K-6 names. Moot here, the model hit the date anyway.
 
 ---
 
