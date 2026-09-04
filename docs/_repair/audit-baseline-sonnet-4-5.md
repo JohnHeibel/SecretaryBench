@@ -329,8 +329,12 @@ _(nothing)_
 **Grader's verdict:** FAIL — no event titled like "Friday AI Review" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[x]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** **GRADER.** The model did the work: `event`, Fri Jun 19, right node, correctly stamped. It failed on identity alone. The key's identity words are `{ai, friday}` and **"ai" appears nowhere in the email or its subject** - it comes from the node name `Enterprise_Ai_Selection`, which the model never sees as a title cue. The whole email is "Let's meet Friday, June 19th, 2026. Im packed the rest of the day." No competent assistant produces "Friday AI Review" from that, and `"Meeting with CTO"` shares zero content words with it.
+
+**Not KEY:** the obligation is right, there *is* a meeting on Jun 19. What is wrong is that the grader scores identity on a channel this email does not determine. That routes to the phase 2/3 contract, not to a phase 5 rename.
+
+**Corpus-wide:** 30 of 125 `create`/`move` keys demand at least one identity word absent from the email body and subject; 2 demand only absent words. A floor, since the probe reads the raw body. Compare `oracle_subject` = 137/167 (`grader-contract.md:174`): a flawless agent titling by subject line loses 30 emails to titling alone. This is the title analogue of K-6 and is **not** currently a register finding. See `docs/_repair/handgrade-findings.md`, finding 1.
 
 ---
 
