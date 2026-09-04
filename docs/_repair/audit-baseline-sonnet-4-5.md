@@ -369,8 +369,10 @@ _(nothing)_
 **Grader's verdict:** FAIL — on the wrong day  
 **Grader's `actual`:** "Decide on WC cleat launch window" Sun Jun 14 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[x]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** email was sent on the 14th and requests for an action to be done by the 12th.
+
+*Sourced:* served **Sun Jun 14**; the body says "I need your call by this Friday, June 12th, 2026" and the key's `this:FRI` resolves to **Fri Jun 12**, two days before serve. K-1, second instance in this pass after item 3. Worth noting the model handled the impossible email well: its description records "(was due June 12th)" and it filed the to-do for the serve day rather than backdating it.
 
 ---
 
@@ -405,8 +407,10 @@ _(nothing)_
 **Grader's verdict:** FAIL — no event titled like "prospect call" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[x]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** seems like the model just plainly didn't make an object or an event for some reason.
+
+*Sourced:* confirmed - none of the 5 objects the model held for `Innovation-comp` that day is stamped to this email (no starred row). It created nothing at all, so there is nothing for the identity rule to miss. The email proposes an intro call on Tue Aug 25 and offers an opt-out ("let me know if you'd rather I take it solo"), but the default reading is to book it. A clean miss.
 
 ---
 
@@ -441,8 +445,12 @@ _(nothing)_
 **Grader's verdict:** FAIL — on the wrong day  
 **Grader's `actual`:** "Review trophy design render" Fri Jun 19 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** Email doesn't state a date
+
+*Sourced:* confirmed, the body carries no temporal cue of any kind. The key is `serve+3d` with `tolerance: exact_day` -> Sun Jun 21. This is **one of the three `Innovation-comp` no-cue exact days K-6 names by construction** (`serve+1d`/`serve+2d`/`serve+3d` on bodies whose only urgency cue is "quick"; the subject here is "Trophy design, quick look?"). Second hand-confirmed K-6 instance after item 7.
+
+**Second defect in the same op:** Sun Jun 21 is a **Sunday**, so the key demands a weekend deadline for reviewing a render. That is K-7's other half (14 of 112 `eq` ops land on a weekend). The model's Fri Jun 19 is the more plausible date on both counts.
 
 ---
 

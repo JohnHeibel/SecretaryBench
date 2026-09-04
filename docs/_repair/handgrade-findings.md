@@ -8,7 +8,7 @@ Every number here is reproduced by:
 
     .venv/bin/python docs/_repair/handgrade_probes.py
 
-**Status:** in progress. 7 of 60 Part A items verdicted, 1 left open (item 6), Part B not
+**Status:** in progress. 11 of 60 Part A items verdicted, 1 left open (item 6), Part B not
 started. Nothing here is a register finding yet; candidates are marked and the counts that
 would promote them are given. No corpus or grader change: corpus sha `03e0d963b9866d8f`.
 
@@ -116,16 +116,36 @@ obligations whose names or prose need sharpening, and it is a different list fro
 
 ---
 
-## Running tally (Part A, 7 of 60)
+## Which existing register findings are actually biting
+
+Instances hand-confirmed so far, as a check on whether phase A's estimates hold up:
+
+| finding | what it predicts | confirmed here |
+|---|---|---|
+| **K-1** emails served after a date their own body states (18) | no answer can be right | items **3**, **10** |
+| **K-6** exact-day keys with no cue in the prose (5) | model penalised for a date nothing pins | items **7**, **12** — both `Innovation-comp`, 2 of the 3 K-6 names by construction |
+| **K-7** kind contradicts the obligation (4 named) | right object, wrong column | items **1**, **2**, **4**, **7** — two of them *not* among K-7's four (finding 2) |
+| **K-7** weekend `eq` dates (14 of 112) | implausible business dates | item **12** (Sun Jun 21 to review a render) |
+
+Item 12 carries **two** defects at once, K-6 and the weekend half of K-7, which is worth
+remembering when phase 5 counts ops to edit: the defect count and the op count differ.
+
+---
+
+## Running tally (Part A, 11 of 60)
 
 | code | items | n |
 |---|---|---|
-| `KEY` | 1, 2, 4, 7 | 4 |
-| `PLAN` | 3 | 1 |
-| `MODEL` | 5 | 1 |
+| `KEY` | 1, 2, 4, 7, 12 | 5 |
+| `PLAN` | 3, 10 | 2 |
+| `MODEL` | 5, 11 | 2 |
 | `GRADER` | 9 | 1 |
 | open | 6 | 1 |
 
-**Do not read a ratio off this yet.** Seven consecutive items ordered by serve date is not a
-sample, and `Innovation-comp` — which K already flagged for dominance — supplies three of
-them. The number that matters is the `GRADER` count at the end of the pass.
+**Do not read a ratio off this yet.** Eleven items ordered by serve date is not a sample, and
+`Innovation-comp` — which K already flagged for dominance — supplies five of them. The number
+that matters is the `GRADER` count at the end of the pass.
+
+Two clean `MODEL` items so far and both are unambiguous: item 11 created nothing at all, item 5
+filed a gathering as a weekend to-do. Neither is a near miss, which matters — it means the
+`MODEL` bucket is so far measuring real failures rather than grader strictness.
