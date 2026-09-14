@@ -224,10 +224,9 @@ _(nothing)_
 **Grader's verdict:** FAIL — on the wrong day  
 **Grader's `actual`:** "Push tooling vendor for outsole prototype delivery" Thu Jun 11 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** _(left for you - genuine judgment call, not common sense either way.)_ Two defensible readings. The **key** encodes the deliverable: "Outsole sample delivery" due Fri Jun 12, which the prose does pin ("get it to us **by Friday, June 12th**"). The **model** encoded the action instead: "Push tooling vendor for outsole prototype delivery" due Thu Jun 11, i.e. push the vendor the day before so delivery lands on time. Right node, right topic, sound reasoning, one day early against the key.
+**Your verdict:** `[ ]` MODEL   `[ x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:**  The model did the correct thing but the key wanted a later date which I don't agree with. What the model did was satisfactory
 
-Tick **MODEL** if you hold the model to the key's obligation; **AMBIGUOUS** if "ask them to get it to us by Friday" legitimately supports either object. Not **KEY** either way: Fri Jun 12 is explicit in the prose.
 
 ---
 
@@ -484,8 +483,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — no to-do titled like "Talk to CTO about team for FBS" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[x ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** Model did not make a todo before the FBS meeting, to meet with the CTO. So its an obvious model fail.
 
 ---
 
@@ -516,8 +515,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — wrong kind: created a to-do, expected a event  
 **Grader's `actual`:** "Pick podcast taping date" Sun Jun 21 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[x ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** It would be the job of the CEO or whoever this secretary is reporting to choose the actual time, not necessarily the secretary. So the key is just wrong.
 
 ---
 
@@ -557,9 +556,9 @@ _(nothing)_
 **Grader's verdict:** FAIL — no to-do titled like "Decide who to cut" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ x]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
-
+Model got it right, and key is fine, but the grader still got it wrong. Since it was just a different word selection in the title that caused it to be wrong.
 ---
 
 ### 16. `Innovation-comp.need-your-sign-off-on-prize-amounts` · create `approve_prize_amounts` (todo)
@@ -594,8 +593,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — on the wrong day  
 **Grader's `actual`:** "Approve pitch comp prize amounts" Wed Jun 24 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[ x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** doesn't specify a date for the todo to be set, just says soon so model picks the next day. But the key requires two days later instead of a window.
 
 ---
 
@@ -640,8 +639,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — on the wrong day  
 **Grader's `actual`:** "Confirm PO for outsole vendor" Fri Jun 26 5 PM
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[ x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** Email states Friday June 26 explicitly; model matched it. Key's eq serve (Jun 23) has no cue in the prose. Grader applied the key correctly. Fix key to Jun 26 or a window ending Jun 26.
 
 ---
 
@@ -678,8 +677,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — no event titled like "launchmeeting" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ x]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** Email was served the 26th and asks about a meeting the 25th
 
 ---
 
@@ -711,8 +710,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — no event titled like "site go-live" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ x]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** Model never made an event that was specified in the email that should have been on August 10th.
 
 ---
 
@@ -740,8 +739,8 @@ _(nothing)_
 **Grader's verdict:** FAIL — no event titled like "vision sync" was created  
 **Grader's `actual`:** (nothing matching created)
 
-**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
-**Notes:** 
+**Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ x]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
+**Notes:** email was served the 27th and asks for a meeting the 10th way before the meeting was served.
 
 ---
 
