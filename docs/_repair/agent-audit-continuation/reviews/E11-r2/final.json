@@ -1,0 +1,72 @@
+{
+  "case_id": "E11",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["PLAN", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The key incorrectly treats the pizza party as a todo and requires July 14. The explicit revision says June 9, and the existing party is calendar event evt_7. The grader's selected todo_47 is a separate pizza-vendor selection task, not the party. The model made no party change. That misses a literal historical correction, but delivery on July 5 makes both the original June 8 party and requested June 9 move stale; treating the prospective move as no longer actionable is also defensible. Neither reading supports the keyed July 14 todo. This is a definite key defect with uncertain targeted model compliance, not evidence that a fulfilled supported requirement was rejected.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_035.jsonl:24",
+          "observation": "Observed get_email body: \"Our new client requested a meeting with you next Monday to see how the new team is functioning. Could we move the pizza party to June 9\"; served_date is \"2026-07-05\"."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key is verb=move, name=Team_pizza_party, kind=todo, on={\"eq\":\"nth:2,TUE,0m\"}, exact_day, resolved to July 14. Verdict is \"FAIL — on the wrong day\" with actual \"Select pizza place from 3 options\" on July 3."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Complete stores contain unchanged evt_7, \"End-of-year pizza party\", 2026-06-08T12:00:00–13:00:00, and unchanged todo_47, \"Select pizza place from 3 options\", due 2026-07-03T17:00:00. No party replacement or revision exists anywhere in the after-store."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_035.jsonl:49-56",
+          "observation": "The entire day's mutations delete evt_55 and create todo_58, todo_59, and evt_60; none concerns the target email."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "Whether a past-dated party reschedule should be applied as a historical correction or treated as a stale prospective request is unspecified.",
+        "The model's reason for taking no action on the party is not established by the trace."
+      ],
+      "suggested_human_question": "Should this email have been delivered before June 8, or is June 9 meant as a historical correction? Correct the key to an event and the supported date after resolving that chronology."
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "scope": "Unkeyed client meeting in the same target email",
+      "confidence": "medium",
+      "observation": "The observed mail requests a client meeting \"next Monday\". The instruction to compute relative dates from the turn supports July 6, 2026 at the default 09:00–10:00. Neither complete store contains that client meeting, and the day trace creates none. This apparent omitted meeting is separate from T1's invalid party key; the stale conflict storyline limits confidence that the sentence was intended as a fresh scheduling request.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_035.jsonl:24", "stage-a.json: assistant_instructions", "full-state-before.json", "full-state-after.json"]
+    },
+    {
+      "category": "MODEL",
+      "scope": "Separate same-day reveal event default-time issue",
+      "confidence": "high",
+      "observation": "The reveal email specifies August 13 without a time or duration. evt_60 was created for 18:00–20:00, contrary to the supplied 09:00 and one-hour defaults. This day-level timing defect does not validate T1's party rejection.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_035.jsonl:26", "captures/baseline-sonnet-4-5/raw/day_035.jsonl:55-56", "all_available_emails.json: World_Cup_Cleat_Launch storyline"]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "scope": "Original party creation time",
+      "confidence": "high",
+      "observation": "The original party email establishes Monday June 8 without a clock time. Its creation at noon rather than the instructed 09:00 default predates this target. Preserving or correcting that existing time during a date revision is distinct from the present key's wrong kind and date.",
+      "evidence": ["stage-a.json: preceding_storyline_emails[0]", "captures/baseline-sonnet-4-5/raw/day_006.jsonl:46-47", "full-state-before.json: evt_7"]
+    },
+    {
+      "category": "KEY",
+      "scope": "Identity provenance for the grader's actual object",
+      "confidence": "high",
+      "observation": "todo_47 was created on June 28 from pizza-party.pizza-place-selection to choose a vendor. It is not a prior representation of the party and its date cannot establish compliance with moving evt_7.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_028.jsonl:50-51", "all_available_emails.json: pizza-party.pizza-place-selection"]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

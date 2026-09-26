@@ -1,0 +1,160 @@
+{
+  "batch": 2,
+  "spot_check_items": [
+    "31",
+    "B4"
+  ],
+  "targets": [
+    {
+      "batch": 2,
+      "worksheet_item": "26",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The key anchors preparation to July 22 despite the earlier explicit August 22 visit and conflicting next-week wording.",
+      "model_assessment": "todo_53 records the guest list due August 15. That fits August 22 but not next week; model credit remains unresolved.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18,43-44",
+        "captures/baseline-sonnet-4-5/raw/day_028.jsonl:17"
+      ],
+      "excerpt": "All this before the visit, of course!",
+      "decision_group": "Q5",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "27",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "Contacting invitees is a task before the visit, not an event exactly July 22. Both the keyed kind and date are unsupported.",
+      "model_assessment": "The combined todo_53 explicitly includes contacting invitees. Content is represented, but the conflicting visit date prevents a model pass; no actual outreach is established.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18,43-44"
+      ],
+      "excerpt": "make sure to contact the people you've selected,letting them know!",
+      "decision_group": "Q5",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "28",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The exact July 15 deadline is unsupported by either the body\u2019s pre-board window or a literal before-final reading of the subject.",
+      "model_assessment": "todo_54 is due July 21 before the July 22 board presentation, but after the July 15 final. Reviewers disagree on model credit; queued without overturning the definite key defect.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_033.jsonl:19,45-46",
+        "captures/baseline-sonnet-4-5/days/033.json#state"
+      ],
+      "excerpt": "Subject: Quick favor before the final; body: ahead of the board presentation",
+      "decision_group": "Q5",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "29",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The requested pizza-party event move is to June 9; the key instead requires a July 14 task and selects unrelated todo_47. Delivery on July 5 is also stale.",
+      "model_assessment": "evt_7 remains June 8, with no replacement. Literal historical correction was not performed; unspecified stale-request handling prevents model-credit attribution.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_035.jsonl:24,49-56",
+        "captures/baseline-sonnet-4-5/days/035.json#state"
+      ],
+      "excerpt": "Could we move the pizza party to June 9",
+      "decision_group": "Q3",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "30",
+      "classification": "MODEL",
+      "status": "AGENT_RESOLVED",
+      "finding": "The observed July 7 request supports a July 14 sponsorship approval meeting. The key\u2019s July 22 date is independently wrong.",
+      "model_assessment": "No corresponding meeting exists under any title in either full store; the model read the request with connected tools and omitted it. Failure remains justified after correcting the key.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_037.jsonl:21,48-53",
+        "captures/baseline-sonnet-4-5/days/036.json#state",
+        "captures/baseline-sonnet-4-5/days/037.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "31",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The planning call explicitly names June 21, not the keyed July 21; July 8 delivery also makes it stale.",
+      "model_assessment": "No planning-call event exists or was created. Model credit depends on the unspecified treatment of historical requests, not on the invalid July key.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17,45-50",
+        "corpus/nodes/Company-Retreat.json"
+      ],
+      "excerpt": "join a call with me and some of my people on June 21st",
+      "decision_group": "Q3",
+      "additional_source_spot_check": "Direct original raw email, all mutations/results and corpus operation inspected. June 21 prose conflicts with dom:21,0m at July delivery. Full-store absence confirmed; no shared reviewer error."
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "32",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "Forms are due before the June 21 call, not exactly July 21. The key has the wrong month and wrongly narrows a deadline window.",
+      "model_assessment": "No forms task exists or was created. A default 17:00 due time on the 09:00 call day would itself be late; delivery and missing backfill policy leave model credit unresolved.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17,45-50",
+        "captures/baseline-sonnet-4-5/days/038.json#state"
+      ],
+      "excerpt": "fill out these forms I've attached before the meeting",
+      "decision_group": "Q3",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "B4",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The preview explicitly says Mark is not needed; no action is supported.",
+      "model_assessment": "Only unrelated keynote evt_17 is added; all previous objects remain unchanged, with no press-preview object under another title.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_012.jsonl:16,33-34",
+        "captures/baseline-sonnet-4-5/days/012.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": "Direct raw FYI and complete mutation stream inspected. Explicit exclusion plus no preview object confirms the no-action pass; keynote timing is separate."
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "B5",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The explicit August 12 expo-keynote hold is uniquely represented by evt_17.",
+      "model_assessment": "Day-level pass accepted. The 10:00 start independently violates the 09:00 default; one-hour duration is correct.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_012.jsonl:17,33-34",
+        "captures/baseline-sonnet-4-5/days/012.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 2,
+      "worksheet_item": "B6",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The explicit August 6 launch dry run is uniquely represented by evt_20.",
+      "model_assessment": "Day-level pass accepted. Its 14:00-16:00 hours violate both the 09:00 start and one-hour defaults.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_013.jsonl:30,54-55",
+        "captures/baseline-sonnet-4-5/days/013.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    }
+  ],
+  "notes": "All 16 original Stage A and final reports examined. Primary classifications agree for every target. #28 model-credit disagreement and five other uncertain-credit checks remain in NEEDS_JAMES; resolved classification does not mean model pass. Secondary GRADER labels caused solely by unsupported exact-date keys are not independent matcher defects."
+}

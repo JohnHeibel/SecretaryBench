@@ -1,0 +1,74 @@
+{
+  "case_id": "E11",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["PLAN", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The key requires a to-do on July 14, but the email explicitly requests moving the pizza party to June 9. The continuing party is calendar event evt_7, not pizza-selection task todo_47. Neither converting it into a task nor substituting July 14 is supported. The grader's cited actual is an unrelated preparation task and cannot establish the party's date. The model leaves evt_7 unchanged on June 8 and makes no replacement. That fails a literal historical reschedule, but delivery on July 5 makes the prospective party move stale, and the instruction to avoid over-acting supports caution. Consequently the key defect is definite while target compliance remains ambiguous. This is not a demonstrated case of a satisfied party move being rejected.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_035.jsonl:24 (day-tool-trace.json)",
+          "observation": "Observed target body: \"Our new client requested a meeting with you next Monday to see how the new team is functioning. Could we move the pizza party to June 9\"; served_date is \"2026-07-05\"."
+        },
+        {
+          "source": "stage-b.json, targets[0].operation and current_grader_target_result",
+          "observation": "Key: verb \"move\", name \"Team_pizza_party\", kind \"todo\", on.eq \"nth:2,TUE,0m\", resolved July 14. Verdict: \"FAIL — on the wrong day\"; actual: \"Select pizza place from 3 options\" Fri Jul 03 5 PM."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json, evt_7 and todo_47",
+          "observation": "Both complete stores retain evt_7, \"End-of-year pizza party\", start \"2026-06-08T12:00:00\", end \"2026-06-08T13:00:00\". Both retain todo_47, \"Select pizza place from 3 options\", due_date \"2026-07-03T17:00:00\". No other party event or party task supplies a move."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_035.jsonl:49-56 (day-tool-trace.json)",
+          "observation": "The day's mutations delete evt_55 and create todo_58, todo_59 and evt_60; no party mutation occurs. The target body was successfully read, so this omission is not a disconnected-tool failure."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No instruction explains whether a past-dated prospective reschedule should retroactively alter history or be treated as stale.",
+        "No evidence establishes an alternative future pizza-party date."
+      ],
+      "suggested_human_question": "Should this July 5 delivery be excluded as stale, or should the task explicitly require a retroactive June 9 calendar correction?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The same email also supports a new-client demo on July 6, because next Monday is anchored to the July 5 turn. The complete after-store contains no corresponding client-demo event, and the day's trace contains no creation for this email. This is separate from the keyed pizza-party move and has no keyed check in Stage B.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_035.jsonl:24 (day-tool-trace.json)",
+          "observation": "\"Our new client requested a meeting with you next Monday to see how the new team is functioning.\""
+        },
+        {
+          "source": "stage-a.json, assistant_instructions; full-state-after.json",
+          "observation": "\"Compute all relative dates from it\" anchors next Monday to July 6. All calendar objects inspected; none represents this requested client meeting. Default timing would be 09:00-10:00."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The initial party was created at noon despite the original invitation specifying no time and instructions defaulting events to 09:00. This inherited time defect is separate from the day-level reschedule target.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_006.jsonl:46-47 (history-actions.jsonl)",
+          "observation": "Creation of evt_7 uses start \"2026-06-08T12:00:00\" and end \"2026-06-08T13:00:00\"."
+        },
+        {
+          "source": "stage-a.json, preceding_storyline_emails[0] and assistant_instructions",
+          "observation": "The original invitation says \"I'm thinking next Monday is best- good way to kick off the week\" without a time; instructions say \"Defaults unless the email says otherwise: events 9am, 1 hour long\"."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

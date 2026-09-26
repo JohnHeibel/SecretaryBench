@@ -19,18 +19,37 @@ Should #8 require an event, and should the existing MODEL label for #19 remain o
 
 ## Q3: Requests delivered after their deadlines
 
-Items: 24, 20.
+Items: 24, 29, 31, 32, 20.
 
 For these stale requests, how should model credit be treated: backfill required, no action acceptable, or unresolved/excluded from capability attribution?
 
-**Recommendation:** Retain the settled PLAN defects and leave model credit unresolved. Do not invent a backfill requirement or treat arbitrary new dates as authorized.
+**Recommendation:** Retain the settled KEY and PLAN defects and leave model credit unresolved. Do not invent a backfill requirement or treat arbitrary new dates as authorized.
 
 **Competing readings:** Historical calendar/task recording remains mechanically possible; prospective fulfillment is already impossible and instructions supply no recovery policy.
 
 | Item | Email excerpt | Observed action and settled facts |
 |---|---|---|
 | 24 | let me know which option we will go with before Friday, June 19th | The June 29 delivery misses the explicitly pre-June-19 deadline; the exact June 19 key is also too restrictive. todo_49 substitutes unsupported July 3. Late-request handling and conflicting earlier Gold approval remain unresolved; no model pass is awarded. |
+| 29 | Could we move the pizza party to June 9 | The requested pizza-party event move is to June 9; the key instead requires a July 14 task and selects unrelated todo_47. Delivery on July 5 is also stale. evt_7 remains June 8, with no replacement. Literal historical correction was not performed; unspecified stale-request handling prevents model-credit attribution. |
+| 31 | join a call with me and some of my people on June 21st | The planning call explicitly names June 21, not the keyed July 21; July 8 delivery also makes it stale. No planning-call event exists or was created. Model credit depends on the unspecified treatment of historical requests, not on the invalid July key. |
+| 32 | fill out these forms I've attached before the meeting | Forms are due before the June 21 call, not exactly July 21. The key has the wrong month and wrongly narrows a deadline window. No forms task exists or was created. A default 17:00 due time on the 09:00 call day would itself be late; delivery and missing backfill policy leave model credit unresolved. |
 | 20 | get a vision sync on your calendar for Monday, June 15th, 2026 | Saved PLAN label preserved: June 15 vision-sync request delivered June 27. No event created; whether to backfill stale requests is unspecified. |
+
+## Q5: Conflicting timing within available emails
+
+Items: 26, 27, 28.
+
+Which date controls athlete preparation (#26/#27), and does the one-pager (#28) need to precede the final or only the board presentation?
+
+**Recommendation:** Keep the definite KEY findings. Leave model credit unresolved unless an evidence-based reading resolves the conflict; #28 has reviewer disagreement.
+
+**Competing readings:** The athlete’s explicit August 22 date versus the newer next-week wording; the one-pager’s before-final subject versus its ahead-of-board body. Neither supports the key’s exact deadlines.
+
+| Item | Email excerpt | Observed action and settled facts |
+|---|---|---|
+| 26 | All this before the visit, of course! | The key anchors preparation to July 22 despite the earlier explicit August 22 visit and conflicting next-week wording. todo_53 records the guest list due August 15. That fits August 22 but not next week; model credit remains unresolved. |
+| 27 | make sure to contact the people you've selected,letting them know! | Contacting invitees is a task before the visit, not an event exactly July 22. Both the keyed kind and date are unsupported. The combined todo_53 explicitly includes contacting invitees. Content is represented, but the conflicting visit date prevents a model pass; no actual outreach is established. |
+| 28 | Subject: Quick favor before the final; body: ahead of the board presentation | The exact July 15 deadline is unsupported by either the body’s pre-board window or a literal before-final reading of the subject. todo_54 is due July 21 before the July 22 board presentation, but after the July 15 final. Reviewers disagree on model credit; queued without overturning the definite key defect. |
 
 ## Q2: Explicit delegation to choose a slot
 

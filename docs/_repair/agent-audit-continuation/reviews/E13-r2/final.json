@@ -1,0 +1,79 @@
+{
+  "case_id": "E13",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["PLAN", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The keyed July 21 event contradicts the explicit June 21 call date. Delivery on July 8 also makes the natural 2026 reading stale. Neither the earlier retreat postponement nor the arrival month authorizes moving this separate planning call to July 21. The model read the target and made no matching event; the full stores confirm absence under any title, rather than a title-matching rejection. That does not justify the keyed failure. No action is defensible under the instruction to avoid over-acting when uncertain, but instructions do not expressly settle backdated invitations, and the trace does not expose the model's reason. Accordingly model compliance is uncertain rather than a supported MODEL defect. If the email were delivered prospectively, an event on June 21 at the default 09:00 for one hour would fit; this is not a supported July obligation.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17 (day-tool-trace.json)",
+          "observation": "Observed get_email result says 'join a call with me and some of my people on June 21st' and 'served_date': '2026-07-08'."
+        },
+        {
+          "source": "stage-b.json targets[0].operation and worksheet_key_and_resolved_dates",
+          "observation": "The event key has on.eq='dom:21,0m', tolerance='exact_day', resolved as 'Tue Jul 21'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; captures/baseline-sonnet-4-5/raw/day_038.jsonl:45-50",
+          "observation": "All 34 prior events and 27 prior to-dos remain unchanged. Only evt_67, evt_68 and todo_66 are added, for other emails. No retreat planning call exists in either full store. Existing evt_4 is 'Company Retreat' on 2026-06-29, a different object."
+        },
+        {
+          "source": "stage-a.json assistant_instructions; stage-b.json infrastructure",
+          "observation": "Instructions say 'Over-acting is the most common mistake; when in doubt, do nothing.' The secretary server was connected at captures/baseline-sonnet-4-5/raw/day_038.jsonl:1; target reading is observed, so no disconnected-tool explanation is needed."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No explicit policy requires or prohibits creating a past calendar event after late delivery.",
+        "The packet supplies no corrected call date and no explanation for the model's omission."
+      ],
+      "suggested_human_question": "Was this email intended to arrive before June 21, and should stale invitations require backdated calendar entries?"
+    },
+    {
+      "target_id": "T2",
+      "primary_category": "KEY",
+      "secondary_categories": ["PLAN", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The forms are due before the June 21 call, not exactly July 21. The key both shifts the month without support and converts a before-meeting window into an exact day. Even if the month were repaired, an exact June 21 requirement would reject defensible earlier reminders; a default 17:00 due time on the call day would also follow the default 09:00 call. The actual July 8 delivery is after the supported deadline. The model created no forms task. A conservative no-op is defensible, while an overdue task is another possible handling of an unfinished request; the packet gives neither a late-task policy nor completion evidence, so a definite model failure is not established. This uncertainty cannot validate the specific July 21 key. The absence of a reminder does not establish real-world noncompletion, just as creating one would not establish completion.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17 (day-tool-trace.json)",
+          "observation": "The target says 'fill out these forms I've attached before the meeting' immediately after the explicit 'June 21st' call request; served_date is '2026-07-08'."
+        },
+        {
+          "source": "stage-b.json targets[1].operation and worksheet_key_and_resolved_dates",
+          "observation": "The 'Fill out Retreat Forms' to-do key has on.eq='dom:21,0m', tolerance='exact_day', resolved as 'Tue Jul 21'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; captures/baseline-sonnet-4-5/raw/day_038.jsonl:45-46",
+          "observation": "No forms task appears anywhere in either full store. The only new to-do is todo_66, 'Review Josh's marketing advertisements', attributed to shoe-product-launch-delays.design-delays-internal-conflicts. Retreat todo_22 and todo_23 concern venue approval and VIP names, not attached forms."
+        },
+        {
+          "source": "stage-a.json assistant_instructions",
+          "observation": "Defaults are 'events 9am, 1 hour long; to-dos due 5pm.' These defaults cannot make a same-day 17:00 task occur before a 09:00 meeting, and do not supply an exact due day."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "There is no evidence that the forms remain useful after the call or remain incomplete.",
+        "No instruction resolves whether a late request with an expired deadline must become an overdue task.",
+        "No exact day within the original before-call window is specified."
+      ],
+      "suggested_human_question": "Should this late email be removed or delivered before its June deadline, and should the forms check accept a before-meeting window?"
+    }
+  ],
+  "sibling_observations": [
+    "T1 and T2 are separate obligations. Both have an unsupported July key and stale June request, but the forms target independently has an unjustified exact-day constraint. Neither target's absence proves failure of the other."
+  ],
+  "historical_observations": [
+    "The preceding original retreat email explicitly names June 22, 2026. The June 28 rescheduling email has inconsistent date cues but does not revise this planning call or its forms deadline. In both full stores evt_4 is retreat attendance on June 29, evt_46 is the athlete meeting on August 22, and todo_22/todo_23/todo_53 concern different tasks. None is a substitute target object. No historical defect is needed to decide these keys."
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

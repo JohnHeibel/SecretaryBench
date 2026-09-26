@@ -1,0 +1,43 @@
+{
+  "case_id": "E16",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The keyed day-level check is supported and passed correctly: the email expressly requests a launch dry-run call on August 6, and the model created exactly one matching event on that date. No key or grading defect is established. Separately, full instruction compliance fails on clock time and duration: the model chose 14:00–16:00 although the email supplies neither, and the assistant defaults require 09:00 and one hour. The NO compliance answer reflects this separate default violation, not failure of the day-level target. The existing 09:00 cover-story interview might explain choosing an afternoon slot, but no supplied instruction authorizes overriding the defaults for conflicts, and it does not explain the two-hour duration.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:30",
+          "observation": "Observed get_email body: \"I want a full dress rehearsal of the site flip before the real thing, the whole team on the call watching the cutover end to end. Hold Thursday, August 6th, 2026 for the launch dry run.\""
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:54-55",
+          "observation": "create_event uses email_id Pre-Launch.dry-run-of-the-flip, title Launch dry run, start 2026-08-06T14:00:00 and end 2026-08-06T16:00:00. Successful result creates evt_20 with description \"Full dress rehearsal of site flip, whole team on call watching cutover\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores show no preexisting dry-run event and exactly one afterward, evt_20. The unrelated evt_1 Cover-story interview remains at 2026-08-06T09:00:00–10:00:00. No target duplicate or target to-do is present."
+        },
+        {
+          "source": "stage-b.json:targets[0]",
+          "observation": "Operation is create/event on dom:6,+2m with tolerance exact_day; reported result is PASS and actual \"Launch dry run\" Thu Aug 06 2 PM (120m)."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

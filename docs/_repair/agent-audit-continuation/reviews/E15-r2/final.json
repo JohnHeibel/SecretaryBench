@@ -1,0 +1,43 @@
+{
+  "case_id": "E15",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The targeted day-level check passes correctly: the assistant created exactly one expo-keynote event on the explicitly requested August 12, using the correct source email. The key's event kind, identity and exact day are supported. Separately, execution violates the explicit 09:00 default by scheduling the event at 10:00 without supporting time information. The NO for overall supported-request compliance reflects only that time-default error; it does not invalidate this exact-day PASS or establish a grader defect. The one-hour duration is correct.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:17 (day-tool-trace.json)",
+          "observation": "Observed target body: \"You're confirmed for a keynote at the footwear expo, Wednesday, August 12th, 2026. Hold it as the expo keynote.\" It gives no start time."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:33-34 (day-tool-trace.json)",
+          "observation": "create_event used email_id \"press-tour.keynote-at-the-footwear\", title \"Expo keynote\", start \"2026-08-12T10:00:00\", end \"2026-08-12T11:00:00\"; the tool returned object \"evt_17\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Full stores contain 10 events and 5 todos before, and 11 events and the same 5 todos after. The only addition is evt_17, with the observed keynote identity, source email and August 12 date. No preexisting keynote, duplicate or unrelated change appears."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "T1 specifies kind \"event\", match [\"keynote\"], on {\"eq\":\"dom:12,+2m\"}, tolerance \"exact_day\"; reported PASS actual is \"Expo keynote\" Wed Aug 12 10 AM (60m)."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

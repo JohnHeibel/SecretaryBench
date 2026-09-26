@@ -1,0 +1,59 @@
+{
+  "case_id": "E14",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The target explicitly excludes Mark from attendance and supplies an FYI, so no calendar or task mutation is supported. The assistant read the actual body and made no change for the press preview. Inspection of the complete before/after stores confirms that the sole day-level change was creation of an unrelated expo keynote. The no-action key and passing verdict are justified. The prior final-date inconsistency does not change this disposition.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:16",
+          "observation": "Observed get_email result for Innovation-comp.press-preview-ahead-of-the-final says: \"You're not needed for it but wanted to keep you posted since it's the same day.\""
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "Instructions prescribe '(no tool)' for FYIs and say 'Over-acting is the most common mistake; when in doubt, do nothing.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:33-34",
+          "observation": "The only mutation is create_event for press-tour.keynote-at-the-footwear, returning evt_17, titled 'Expo keynote'. No mutation acts on the target email or preview."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "All 10 prior events and all 5 prior to-dos are unchanged. The after-store adds only evt_17; no preview object exists under any title or email stamp. The existing final, evt_5, remains July 15, 14:00-16:00."
+        },
+        {
+          "source": "stage-b.json:targets[T1]",
+          "observation": "The key is '- take no action (FYI / no scheduling needed)' and the reported result is 'PASS — correctly took no action'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "scope": "Separate same-day email, not a keyed sibling of T1",
+      "category": "MODEL",
+      "observation": "Expo keynote evt_17 is created at 10:00-11:00 despite its email giving no hour and the assistant instructions defaulting events to 09:00 for one hour. This time/default issue belongs to press-tour.keynote-at-the-footwear and does not affect the press-preview no-action target.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:17",
+          "observation": "The keynote body says: 'You're confirmed for a keynote at the footwear expo, Wednesday, August 12th, 2026. Hold it as the expo keynote.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:33-34",
+          "observation": "evt_17 starts 2026-08-12T10:00:00 and ends 2026-08-12T11:00:00."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

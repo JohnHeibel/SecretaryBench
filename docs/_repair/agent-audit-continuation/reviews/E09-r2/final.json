@@ -1,0 +1,92 @@
+{
+  "case_id": "E09",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The model created the requested guest-list task in todo_53. Its August 15 deadline is before the explicitly requested August 22 athlete meeting and uses the 17:00 default. The key instead resolves the visit to July 22, a malformed prefix in the earlier message rather than its explicit scheduling instruction. That anchor is unsupported. No exact preparation day was requested. Overall model compliance remains ambiguous because the July 3 message also says the visit is next week, which would make August 15 late. This date conflict prevents a clean model pass, but does not justify the grader's July 22 deadline. The combined task explicitly includes both obligations; it is not a missing-list case.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18",
+          "observation": "Observed target body asks to 'create a list of people you want to come to the visit' and says 'All this before the visit, of course!'"
+        },
+        {
+          "source": "stage-a.json:31",
+          "observation": "Earlier Company-Retreat.in-town-and-would-love-to-connect begins 'Wednesday, July 22nd, 2026Hey Man!' but explicitly says 'put the date of the meeting with the athlete on your calander for August 22nd now!'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:43-44",
+          "observation": "create_todo returned todo_53, title 'Create guest list for athlete visit and contact invitees', due_date '2026-08-15T17:00:00', description 'Prepare guest list and notify selected people before athlete visit on Aug 22nd'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; stage-b.json targets[0]",
+          "observation": "Full stores retain evt_46 on August 22 and add todo_53; all existing objects are unchanged. T1 is failed as 'on the wrong day' against @athlete_visit = July 22."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The latest 'next week' statement conflicts with the earlier explicit August 22 date; no supplied message resolves that conflict.",
+        "A task records the requested work but does not establish that a guest list was actually completed."
+      ],
+      "suggested_human_question": "Was the athlete visit intended for August 22, or did the July 3 'next week' message move it into July 6–12?"
+    },
+    {
+      "target_id": "T2",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "Contacting selected attendees before a visit is a deadline-bearing task, not a scheduled meeting. The key's requirement for a separate event exactly on July 22 is unsupported in kind and date. The model expressly included contact invitees in todo_53 and notify selected people in its description, so the absent separate event does not demonstrate a missed contact obligation. The August 15 deadline satisfies the explicit August 22 appointment, but not the alternative reading of the newer next-week statement. Thus there is a definite key defect alongside uncertain timing compliance. No evidence supports a separate outreach appointment, and reminder creation does not demonstrate real-world contact.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18",
+          "observation": "Observed email says 'make sure to contact the people you've selected,letting them know! All this before the visit, of course!' It supplies no contact appointment or time."
+        },
+        {
+          "source": "stage-a.json:3,31; stage-b.json targets[1]",
+          "observation": "Instructions define create_todo for 'tasks that have a deadline'. The earlier mail expressly names August 22, while T2 requires kind event, eq @athlete_visit resolved to July 22, and fails because no matching event was created."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:43-44",
+          "observation": "todo_53 explicitly includes 'contact invitees' in the title and 'notify selected people before athlete visit on Aug 22nd' in the description, due August 15 at 17:00."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores show todo_53 as the only new athlete-related object, with no changes or deletions to existing objects. evt_46 remains the athlete meeting on August 22; the only new event is unrelated evt_55."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The actual visit date remains unresolved between explicit August 22 and the latest next-week wording.",
+        "No attendee identities or evidence of completed outreach are supplied; the benchmark tools support recording the obligation."
+      ],
+      "suggested_human_question": "Which visit date should control the contact deadline: August 22 or the week following July 3?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "scope": "Shared representation of T1 and T2",
+      "observation": "todo_53 contains both requested actions. A combined task is defensible; T2 should not be treated as omitted solely because it shares T1's object.",
+      "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:43-44"
+    },
+    {
+      "scope": "Same-day untargeted event time",
+      "category": "MODEL",
+      "observation": "Unrelated evt_55 was scheduled August 12 at 14:00 despite the sponsor mail specifying no hour and instructions defaulting to 09:00. This time defect is separate from both athlete checks and does not justify their day-level failures.",
+      "source": "stage-a.json:3,47; captures/baseline-sonnet-4-5/raw/day_033.jsonl:47-48"
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "evt_46 was originally created for August 22 at 10:00–12:00. The date follows the explicit earlier request, but the hour and two-hour duration exceed the specified 09:00, one-hour defaults without email support. The object was unchanged on the audited day, so this is historical and does not determine T1 or T2.",
+      "source": "stage-a.json:3,31; captures/baseline-sonnet-4-5/raw/day_028.jsonl:48-49 in history-actions.jsonl; full-state-before.json; full-state-after.json"
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

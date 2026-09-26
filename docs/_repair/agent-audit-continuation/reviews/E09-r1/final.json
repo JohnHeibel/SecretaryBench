@@ -1,0 +1,105 @@
+{
+  "case_id": "E09",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The guest-list obligation is represented in new todo_53, correctly linked to the target email, with the default 17:00 time. August 15 is before the expressly requested August 22 visit and is therefore acceptable under that reading; there is no mandatory exact preparation day. However, the July 3 email's 'next week' permits an earlier visit reading under which August 15 is late. The key's July 22 anchor comes from stray prefixed text in the earlier email, contradicting its express August 22 scheduling instruction and not resolving the newer relative-date conflict. Rejecting this reminder solely against July 22 is not justified. The definite key defect does not establish definite model compliance.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18",
+          "observation": "Observed target body: 'create a list of people you want to come to the visit' and 'All this before the visit, of course!' It also says the athlete will arrive 'next week'."
+        },
+        {
+          "source": "all_available_emails.json:574",
+          "observation": "Company-Retreat.in-town-and-would-love-to-connect begins 'Wednesday, July 22nd, 2026Hey Man!' but expressly says 'put the date of the meeting with the athlete on your calander for August 22nd now!'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:43",
+          "observation": "create_todo uses email_id 'Company-Retreat.athelete-visit', title 'Create guest list for athlete visit and contact invitees', due_date '2026-08-15T17:00:00', and description 'Prepare guest list and notify selected people before athlete visit on Aug 22nd'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:44; full-state-before.json; full-state-after.json",
+          "observation": "Creation returns todo_53. Full-store inspection confirms this is the new athlete preparation item, with evt_46 remaining on August 22 and retreat VIP task todo_23 separate."
+        },
+        {
+          "source": "stage-b.json: targets[T1]",
+          "observation": "Key requires todo by @athlete_visit resolved to July 22; reported verdict is 'FAIL — on the wrong day' for August 15."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No authoritative reconciliation of August 22, prefixed July 22, and the July 3 'next week' statement is supplied.",
+        "The reminder records future work; no evidence establishes actual list completion."
+      ],
+      "suggested_human_question": "Was the intended athlete visit August 22, July 22, or a date in the week after July 3?"
+    },
+    {
+      "target_id": "T2",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "Contacting selected invitees before the visit is a task with a deadline, not a scheduled meeting. The key instead demands an event on July 22, imposing both an unsupported kind and an unsupported exact date. The combined todo_53 explicitly records contacting invitees, and its description preserves notifying selected people before the visit. A separate event is unnecessary, so absence of a matching event does not establish omission. As with the list obligation, August 15 satisfies the explicit August 22 visit reading but misses a visit next week after July 3. Thus content and kind are appropriate, timing remains ambiguous, and the stated event-based failure is unjustified independently of T1.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18",
+          "observation": "Observed target body: 'make sure to contact the people you've selected,letting them know! All this before the visit, of course!' No contact appointment or exact contact date is specified."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "Tools distinguish the calendar from 'create_todo / update_todo / delete_todo — tasks that have a deadline'; to-dos default to 5 p.m."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:43",
+          "observation": "The created task title includes 'and contact invitees'; its description says 'notify selected people before athlete visit on Aug 22nd', due '2026-08-15T17:00:00'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:44; full-state-before.json; full-state-after.json",
+          "observation": "todo_53 is successfully created and persists after the day. Complete stores show no separate athlete contact event and no pre-existing athlete preparation reminder."
+        },
+        {
+          "source": "stage-b.json: targets[T2]",
+          "observation": "Key demands kind 'event' with eq @athlete_visit resolved to July 22. Verdict says 'FAIL — no event titled like \"Contact People Added To List\" was created'."
+        },
+        {
+          "source": "all_available_emails.json:574; captures/baseline-sonnet-4-5/raw/day_033.jsonl:18",
+          "observation": "Earlier email expressly requests August 22; target email served July 3 says 'next week', leaving visit timing contradictory."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The date conflict prevents determining whether August 15 was early enough.",
+        "Creation of todo_53 is evidence of tracking outreach, not evidence that invitees were contacted."
+      ],
+      "suggested_human_question": "Which visit date was intended? Outreach should then be keyed as a task due before that visit."
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "Historical evt_46 uses 10:00–12:00 although the supplied visit email gives no time and the assistant instructions default events to 09:00 for one hour. This time/default defect predates E09 and does not decide either target's day-level preparation check.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:48",
+          "observation": "create_event for Company-Retreat.in-town-and-would-love-to-connect specifies start '2026-08-22T10:00:00' and end '2026-08-22T12:00:00'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:49",
+          "observation": "Tool result assigns id 'evt_46'; both complete stores retain this event unchanged."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions; all_available_emails.json:574",
+          "observation": "Default is 'events 9am, 1 hour long'; the visit email supplies no event time or duration."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

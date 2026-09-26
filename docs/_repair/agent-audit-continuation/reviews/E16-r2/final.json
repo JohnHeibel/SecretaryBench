@@ -1,0 +1,48 @@
+{
+  "case_id": "E16",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The keyed day-level check is satisfied: evt_20 is a newly created launch dry-run event on the explicitly requested August 6, with the correct originating email and a description preserving the full-team cutover rehearsal. Complete stores show no duplicate dry run. The event kind and exact day are supported, and the grader correctly passes that limited check. Separately, full instruction compliance fails: the model chose 14:00–16:00 although the email specifies neither time nor duration and the assistant instructions require the 09:00, one-hour default. Thus MODEL is secondary for the time/default defect, not a reason to overturn the day-level pass. The existing cover-story interview does not supply authority for the particular afternoon slot or two-hour duration. No key defect or prospective-action staleness is evident.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:30 (day-tool-trace.json)",
+          "observation": "Observed target body: \"Hold Thursday, August 6th, 2026 for the launch dry run.\" It requests \"the whole team on the call watching the cutover end to end\" and supplies no clock time or duration."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:54-55 (day-tool-trace.json)",
+          "observation": "create_event used email_id Pre-Launch.dry-run-of-the-flip, title \"Launch dry run\", start \"2026-08-06T14:00:00\", end \"2026-08-06T16:00:00\"; successful result created evt_20 with description \"Full dress rehearsal of site flip, whole team on call watching cutover\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "All events and todos inspected. No dry-run object exists before; evt_20 is the only dry-run object after. Distinct cover-story interview evt_1 remains August 6, 09:00–10:00."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "T1 requires create/event with date eq dom:6,+2m and tolerance exact_day. The recorded result is \"PASS — matched\" for \"Launch dry run\" on August 6."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "captures/baseline-sonnet-4-5/raw/day_001.jsonl:94-95 (history-actions.jsonl); all_available_emails.json: press-tour.press-plan-for-launch",
+      "observation": "evt_1 was created for the separately requested August 6 cover-story interview at 09:00–10:00. Its date agrees with the earlier mail. This existing overlap is context only; it neither revises the dry-run date nor authorizes its chosen time and duration."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

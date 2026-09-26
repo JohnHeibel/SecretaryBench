@@ -1,0 +1,59 @@
+{
+  "case_id": "E10",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The exact July 15 deadline is unsupported. The body asks for preparation ahead of the board presentation, not exactly one week beforehand. todo_54 captures the requested one-pager and is due July 21 at the instructed 17:00 default, before the July 22 board presentation. This satisfies the straightforward body-led reading recorded in Stage A. However, the subject 'Quick favor before the final' can be read as requiring completion before the July 15 competition final, making full model compliance ambiguous. Neither reading justifies an exact-day July 15 key: the body permits other pre-board dates, and a literal pre-final deadline would precede the event. The failure is therefore not a justified exact-date rejection. No evidence shows actual drafting, which is outside the calendar/to-do action being evaluated.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:19 (day-tool-trace.json)",
+          "observation": "Observed get_email result has subject 'Quick favor before the final' and body 'ahead of the board presentation, could you put together a one pager on the comp for the board deck?' with 'just bullet points on what's coming up.' It states no one-week lead time."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:45-46 (day-tool-trace.json)",
+          "observation": "create_todo succeeds as todo_54, email_id Innovation-comp.quick-favor-before-the-final, title 'Prepare comp one-pager for board deck', due_date '2026-07-21T17:00:00'."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Full-store comparison shows no prior one-pager and exactly one new matching todo_54. Existing evt_42 remains '2026-07-22T14:00:00' to '2026-07-22T15:30:00'; the target does not alter it or duplicate a preparation task."
+        },
+        {
+          "source": "stage-b.json targets[0]",
+          "observation": "The key requires on.eq '@__obl_Innovation_comp__board_presentation-1w' with tolerance 'exact_day'; the supplied verdict is 'FAIL — on the wrong day' for July 21."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The subject suggests before the final; the body explicitly ties preparation to the later board presentation. No supplied instruction resolves whether the subject establishes a separate deadline.",
+        "Earlier storyline timing language conflicts with the explicit July 15 final date. No explicit replacement or cancellation establishes a different authoritative date."
+      ],
+      "suggested_human_question": "Was the one-pager required before the competition final or simply before the board presentation, and what source supports exactly July 15?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:21,47-48 (day-tool-trace.json)",
+      "observation": "Separate same-day sponsor email specifies August 12 without a time. evt_55 is created at 14:00-15:00, contrary to the assistant's 09:00, one-hour event default. This is independent of T1's date rejection."
+    },
+    {
+      "category": "AMBIGUOUS",
+      "source": "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18,43-44; all_available_emails.json Company-Retreat.in-town-and-would-love-to-connect; full-state-before.json evt_46",
+      "observation": "Separate athlete-preparation todo_53 is due August 15 before stored evt_46 on August 22, consistent with the earlier explicit 'August 22nd' instruction. The July 3 email says the visit is 'next week', conflicting with that stored date; this does not decide T1."
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "source": "captures/baseline-sonnet-4-5/raw/day_004.jsonl:35-36 and day_026.jsonl:50-51 (history-actions.jsonl); all_available_emails.json Innovation-comp.pitch-comp-is-on-locking-in-the-final-da and Innovation-comp.board-slot-the-week-after-finals",
+      "observation": "evt_5 was created July 15 at 14:00-16:00 although its source supplied no time or duration, conflicting with the 09:00, one-hour defaults. evt_42 then uses that 14:00 start and an unsupported 90-minute duration. These historical timing problems do not invalidate July 21 as preceding the board presentation under either the stored or default time."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

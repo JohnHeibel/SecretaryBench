@@ -1,0 +1,81 @@
+{
+  "case_id": "E13",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["PLAN", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The event kind is supported, but the July 21 key contradicts the explicit June 21 request. July 8 delivery also makes the actual request stale. The assistant read the email and created no planning-call event, confirmed by the complete before/after stores. This is not a missed existing object or failed tool connection. A literal retrospective-record interpretation would require a June 21 event; a prospective-assistant interpretation reasonably permits a no-op for an already elapsed meeting. The instructions do not settle this distinction, so model compliance remains ambiguous. The keyed failure cannot establish a supported July 21 requirement. There is no basis to classify a separate matcher defect: no equivalent event was created on any date.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17 (day-tool-trace.json)",
+          "observation": "Observed get_email result says 'join a call with me and some of my people on June 21st' and has served_date '2026-07-08'."
+        },
+        {
+          "source": "stage-b.json targets[T1].operation and worksheet_key_and_resolved_dates",
+          "observation": "Key is event create with {\"eq\":\"dom:21,0m\"}, tolerance exact_day, resolved to 'Tue Jul 21'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; captures/baseline-sonnet-4-5/raw/day_038.jsonl:45-50",
+          "observation": "Complete store comparison shows only todo_66, evt_67 and evt_68 added, all for other emails; no planning-call object exists. evt_4 is the distinct Company Retreat on 2026-06-29T09:00:00."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No explicit policy states whether elapsed requests should be recorded retrospectively.",
+        "No supplied message revises the planning call to July 21 or establishes that it is still upcoming."
+      ],
+      "suggested_human_question": "Should the delivery date precede June 21, or was the author intending a different explicit meeting date?"
+    },
+    {
+      "target_id": "T2",
+      "primary_category": "KEY",
+      "secondary_categories": ["PLAN", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "A forms to-do is supported, but only with a deadline before the June 21 meeting. The July 21 exact-day key has the wrong month and wrongly narrows a before-meeting window to one day. Even correcting the key to June 21 would require care: the default 17:00 to-do time is after the default 09:00 call, whereas June 20 at 17:00 would satisfy the timing relationship if delivered in time. On July 8 the supported window is already past. No forms reminder was created or present, but the lack of a past-dated-request policy prevents confidently attributing that no-op to model failure. The grader's unsupported July 21 requirement is not justified, independently of the call target.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17 (day-tool-trace.json)",
+          "observation": "Observed target body says 'fill out these forms I've attached before the meeting'; the same body names June 21st for the call."
+        },
+        {
+          "source": "stage-b.json targets[T2].operation and worksheet_key_and_resolved_dates",
+          "observation": "Key is todo create with {\"eq\":\"dom:21,0m\"}, tolerance exact_day, resolved to 'Tue Jul 21'."
+        },
+        {
+          "source": "stage-a.json assistant_instructions",
+          "observation": "'Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.'"
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; captures/baseline-sonnet-4-5/raw/day_038.jsonl:45-50",
+          "observation": "No forms task or equivalent exists anywhere in either store. The only added task is todo_66, Review Josh's marketing advertisements. Existing todo_22 and todo_23 concern retreat location approval and a VIP list, not the forms."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The message does not specify a unique forms due day, only the before-meeting relationship.",
+        "Past-dated task handling is unspecified; neither real-world completion nor continued need for these forms is established."
+      ],
+      "suggested_human_question": "Once the call's intended date and delivery timing are corrected, should the forms check accept any deadline before that call?"
+    }
+  ],
+  "sibling_observations": [
+    "The planning call and forms are separate targets. Neither the absent call nor the absent forms task alone decides compliance with the other; each has its own unsupported July date key. There are no additional keyed sibling operations."
+  ],
+  "historical_observations": [
+    {
+      "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:28-29; captures/baseline-sonnet-4-5/raw/day_028.jsonl:46-47 (history-actions.jsonl)",
+      "observation": "evt_4 was created as Company Retreat on June 22 and updated to June 29. Its identity and history do not satisfy the separate planning-call request or authorize a July 21 call."
+    },
+    {
+      "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:51-54 (history-actions.jsonl)",
+      "observation": "todo_22 and todo_23 were created for retreat location approval and the VIP employee list. They are distinct from forms completion and provide no evidence that the target work was already recorded."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

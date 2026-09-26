@@ -1,0 +1,7 @@
+# E10 Stage A
+
+IR asks Mark to prepare a one-page competition summary for the board deck, with simple bullet points about what is coming up. This supports a preparation to-do linked to `Innovation-comp.quick-favor-before-the-final`, rather than a new meeting. Completion is required ahead of the board presentation; creating a task represents tracking the request, not actual drafting.
+
+The strongest explicit final-event date is July 15, 2026 (`Innovation-comp.pitch-comp-is-on-locking-in-the-final-da`). The June 26 board request says “about a week after the final,” and the existing board presentation is `evt_42`, July 22 at 14:00. A to-do scheduled after receipt on July 3 and before that presentation is defensible; July 21 at the default 17:00 is a straightforward safe choice. Neither the target nor the preceding board request mandates a particular preparation day. A same-day July 22 deadline would need to precede 14:00. The subject “before the final” could favor an earlier date, but the body expressly relates preparation to the board presentation.
+
+`evt_5` records the July 15 final at 14:00–16:00. The shown email supplied no time, so this stored timing is contextual state rather than independently established authority. Storyline messages saying “two weeks out,” “today,” and “that was a really strong final” conflict with the explicit future final date; no explicit replacement date or cancellation appears. Preserve the board/final identities unless stronger prior evidence changes them. There is no existing one-pager task in the complete before-store.

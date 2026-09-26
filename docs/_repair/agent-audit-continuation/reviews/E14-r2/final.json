@@ -1,0 +1,65 @@
+{
+  "case_id": "E14",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The press-preview email explicitly says Mark is not needed and merely keeps him posted. The assistant read its body and made no scheduling or to-do change for it. Inspection of all before/after objects shows only an unrelated expo keynote was added; no preview object exists under another email stamp or title, and the final remains unchanged. The no-action key and passing verdict are supported. The conflicting earlier relative description of the final date does not create an action requirement for this FYI.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:14,16 (day-tool-trace.json)",
+          "observation": "get_email was called for Innovation-comp.press-preview-ahead-of-the-final and returned: \"You're not needed for it but wanted to keep you posted since it's the same day.\""
+        },
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "Instructions specify '(no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change.'"
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores contain 10 then 11 events and the same 5 todos. The only new object is evt_17, Expo keynote, stamped press-tour.keynote-at-the-footwear. All existing objects are unchanged, including evt_5, Innovation pitch comp final. Neither store contains a press-preview event or task."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:33,34 (day-tool-trace.json); stage-b.json: targets[0]",
+          "observation": "The day's sole mutation creates unrelated evt_17. T1 is keyed '- take no action (FYI / no scheduling needed)' and graded 'PASS — correctly took no action' with actual '(nothing)'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "scope": "Unrelated same-day email, not a sibling operation of the target",
+      "category": "MODEL",
+      "object_id": "evt_17",
+      "observation": "The expo keynote date is supported, but its 10:00 start conflicts with the 09:00 default. This separate time issue does not invalidate T1's no-action pass.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:17,33,34 (day-tool-trace.json)",
+          "observation": "The returned keynote body gives Wednesday, August 12th, 2026 without a time; create_event and result evt_17 use start 2026-08-12T10:00:00 and end 2026-08-12T11:00:00. Stage A instructions default events to 9am for 1 hour."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "scope": "Existing final event; unrelated to target no-action compliance",
+      "category": "MODEL",
+      "object_id": "evt_5",
+      "observation": "The earlier final announcement supplies July 15 without a time or duration. Its historical creation used 14:00–16:00, departing from the 09:00–10:00 default. Both stores preserve that historical choice; today's preview email neither caused it nor requires changing it.",
+      "evidence": [
+        {
+          "source": "stage-a.json: preceding_storyline_emails; captures/baseline-sonnet-4-5/raw/day_004.jsonl:35,36 (history-actions.jsonl)",
+          "observation": "The final announcement says 'the final pitch event on Wednesday, July 15th, 2026.' The creation and returned evt_5 use start 2026-07-15T14:00:00 and end 2026-07-15T16:00:00."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

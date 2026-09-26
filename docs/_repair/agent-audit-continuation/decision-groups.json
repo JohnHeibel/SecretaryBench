@@ -14,7 +14,7 @@
   "Q3": {
     "title": "Requests delivered after their deadlines",
     "question": "For these stale requests, how should model credit be treated: backfill required, no action acceptable, or unresolved/excluded from capability attribution?",
-    "recommendation": "Retain the settled PLAN defects and leave model credit unresolved. Do not invent a backfill requirement or treat arbitrary new dates as authorized.",
+    "recommendation": "Retain the settled KEY and PLAN defects and leave model credit unresolved. Do not invent a backfill requirement or treat arbitrary new dates as authorized.",
     "alternatives": "Historical calendar/task recording remains mechanically possible; prospective fulfillment is already impossible and instructions supply no recovery policy."
   },
   "Q4": {
@@ -22,5 +22,11 @@
     "question": "Which reminder timing, if any, should receive model credit when the key specifies an unsupported exact day?",
     "recommendation": "Preserve definite KEY findings while withholding model credit unless the email establishes a deadline or admissible window.",
     "alternatives": "A pragmatic reminder can be useful; usefulness alone may not satisfy an unstated timing requirement."
+  },
+  "Q5": {
+    "title": "Conflicting timing within available emails",
+    "question": "Which date controls athlete preparation (#26/#27), and does the one-pager (#28) need to precede the final or only the board presentation?",
+    "recommendation": "Keep the definite KEY findings. Leave model credit unresolved unless an evidence-based reading resolves the conflict; #28 has reviewer disagreement.",
+    "alternatives": "The athlete\u2019s explicit August 22 date versus the newer next-week wording; the one-pager\u2019s before-final subject versus its ahead-of-board body. Neither supports the key\u2019s exact deadlines."
   }
 }

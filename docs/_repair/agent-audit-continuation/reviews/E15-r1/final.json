@@ -1,0 +1,43 @@
+{
+  "case_id": "E15",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The day-level target is satisfied: the assistant created exactly one identifiable expo keynote on the explicitly requested August 12, 2026, with the correct email provenance. The key's event kind and exact day are supported, so its PASS is justified. Separately, full instruction compliance fails because the assistant invented a 10:00 start instead of applying the stated 09:00 default. The NO concerns that time-default defect only, not the day-level keyed requirement. The one-hour duration is correct. Complete before/after stores show the keynote was absent beforehand and evt_17 was the sole addition; there is no duplicate or mistaken revision.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "Exact instruction: 'Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:17 (day-tool-trace.json)",
+          "observation": "Observed get_email body: \"You're confirmed for a keynote at the footwear expo, Wednesday, August 12th, 2026. Hold it as the expo keynote.\" It provides no time override."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:33-34 (day-tool-trace.json)",
+          "observation": "create_event used email_id 'press-tour.keynote-at-the-footwear', title 'Expo keynote', start '2026-08-12T10:00:00', end '2026-08-12T11:00:00'; the successful tool result returned id 'evt_17'."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "The full before store contains ten events and five todos, with no expo keynote. The after store preserves those fifteen objects and adds only evt_17, matching the successful create result."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "The keyed operation is create/event, match ['keynote'], on {'eq':'dom:12,+2m'}, tolerance 'exact_day'; its result is 'PASS — matched' against 'Expo keynote' on August 12."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

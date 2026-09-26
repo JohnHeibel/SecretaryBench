@@ -1,0 +1,53 @@
+{
+  "case_id": "E12",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "MODEL",
+      "secondary_categories": ["KEY"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The observed July 7 email unambiguously schedules a sponsorship tier/budget approval meeting one week later, July 14. The model read it but created no corresponding event. Full before/after stores contain no semantic equivalent, and the only new event is an unrelated press briefing. The FAIL is therefore justified for the missing meeting even after correcting the independent key defect: next:WED+2w resolves to July 22, which contradicts 'a week from today.' This is not a false rejection of an otherwise satisfied request. The existing marathon pop-up and tier-selection task are distinct objects and cannot satisfy the meeting request. No target time issue is observable because no target event exists; the supported default would be July 14, 09:00–10:00.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_037.jsonl:21 (day-tool-trace.json)",
+          "observation": "Observed get_email result for Sponsoring-Marathon.approval-of-budget-tier says: 'We are going to meet a week from today to discuss and have the final approval of the sponsorship tier and budget for this event. I'll send out the link by tonight!' Its served_date is 2026-07-07."
+        },
+        {
+          "source": "stage-b.json, targets[0].operation.on and current_grader_target_result",
+          "observation": "Key is {\"eq\":\"next:WED+2w\"}, resolved as Wed Jul 22. Grader reports 'FAIL — no event titled like \"sponsorship & budget approval meeting\" was created' and '(nothing matching created)'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "All stored events and todos inspected. No sponsorship approval meeting exists in either state. Existing evt_6 is Event Pop Up on 2026-08-10; todo_49 is Select Eugene Marathon sponsorship tier due 2026-07-03. Only additions are todo_63, evt_64, and todo_65, all attached to World_Cup_Cleat_Launch emails."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_037.jsonl:48-53 (day-tool-trace.json); stage-b.json infrastructure",
+          "observation": "Successful mutations create todo_63, evt_64, and todo_65 only. No target creation/update attempt appears. Secretary server is reported connected and capture_ok is true, so evidence does not support attributing omission to a disconnected tool."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "observation": "Earlier sponsorship chronology is inconsistent, but none of those messages cancels the current July 14 meeting. The June 5 message says Gold Tier is secured, while later June messages seek a tier choice and final sign-off. Existing objects have separate historical provenance and do not establish real-world completion or attendance at the target meeting.",
+      "evidence": [
+        {
+          "source": "stage-a.json, preceding_storyline_emails",
+          "observation": "June 5: 'We have secured our Gold Tier'; June 28: 'CEO will need to sign off on the final sponsorship tier/budget you choose from.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_005.jsonl:34-35; captures/baseline-sonnet-4-5/raw/day_029.jsonl:38-39 (history-actions.jsonl)",
+          "observation": "evt_6 was created from Sponsoring-Marathon.approval-of-event; todo_49 was created from Sponsoring-Marathon.sponsorship-tiers. Neither was created for the July 7 approval-meeting email."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

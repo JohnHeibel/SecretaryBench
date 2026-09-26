@@ -1,0 +1,58 @@
+{
+  "case_id": "E12",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "MODEL",
+      "secondary_categories": ["KEY"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The assistant read an explicit meeting announcement but created no sponsorship/budget approval meeting. July 7 plus 'a week from today' supports July 14, with the instructed 09:00–10:00 defaults. The full before/after stores contain neither a preexisting equivalent nor a new equivalent under a different title or email stamp. The prior marathon pop-up and sponsorship-selection task are different objects. The FAIL outcome is justified by the omission and would remain justified under the corrected date. Independently, the key's July 22 exact-day requirement is unsupported and must not be treated as the requested meeting date. The tool connection and observed target body rule out attributing this omission to a disconnected tool or unreadable message.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_037.jsonl:21 (day-tool-trace.json)",
+          "observation": "Observed get_email result for Sponsoring-Marathon.approval-of-budget-tier: 'We are going to meet a week from today to discuss and have the final approval of the sponsorship tier and budget for this event.' served_date is '2026-07-07'."
+        },
+        {
+          "source": "stage-b.json, targets[0].operation.on and worksheet_key_and_resolved_dates",
+          "observation": "The key is {\"eq\":\"next:WED+2w\"}, resolved as 'Wed Jul 22', although the delivered message supports Tuesday July 14."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json (complete events and todos)",
+          "observation": "No sponsorship approval meeting exists in either store. evt_6 is 'Event Pop Up' on August 10; todo_49 is 'Select Eugene Marathon sponsorship tier' due July 3. Neither satisfies the announced July 14 meeting."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_037.jsonl:48-53 (day-tool-trace.json)",
+          "observation": "The only day mutations create todo_63, evt_64, and todo_65, all for World_Cup_Cleat_Launch emails. No target-email mutation was attempted."
+        },
+        {
+          "source": "stage-b.json, infrastructure (captures/baseline-sonnet-4-5/raw/day_037.jsonl:1)",
+          "observation": "Secretary MCP server status is 'connected'; capture_ok and target_body_observed_in_tool_result are true."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "scope": "same-day email, outside T1",
+      "category": "MODEL",
+      "object_id": "evt_64",
+      "observation": "The press-briefing event has the supported August 6 date but an unsupported 11:00 start. Its delivered email specifies no time, so the 09:00 default applies. This time defect is separate from day-level grading and does not decide T1.",
+      "evidence": ["day-tool-trace.json: raw/day_037.jsonl:25 provides the undated-time briefing announcement", "day-tool-trace.json: raw/day_037.jsonl:50-51 creates evt_64 at 2026-08-06T11:00:00–12:00:00", "stage-a.json: assistant_instructions specifies events 9am, 1 hour long"]
+    }
+  ],
+  "historical_observations": [
+    {
+      "scope": "prior sponsorship-selection task, outside T1",
+      "object_id": "todo_49",
+      "observation": "The June 29 sponsorship-tiers email explicitly asks for a choice before June 19, a deadline already past on delivery. The prior model created todo_49 due July 3, unsupported by that literal deadline. This combines stale delivery context with a historical date discrepancy; it is not evidence that the July 14 approval meeting was already scheduled or completed.",
+      "evidence": ["stage-a.json: Sponsoring-Marathon.sponsorship-tiers, served_date 2026-06-29, 'before Friday, June 19th, 2026'", "history-actions.jsonl:111-112, raw/day_029.jsonl:38-39, create_todo and result for todo_49 with due_date 2026-07-03T17:00:00", "full-state-before.json and full-state-after.json: todo_49 unchanged"]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

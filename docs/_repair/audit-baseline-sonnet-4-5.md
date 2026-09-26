@@ -1067,6 +1067,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 26, 2026-09-26:** AGENT_RESOLVED · KEY. The key anchors preparation to July 22 despite the earlier explicit August 22 visit and conflicting next-week wording. todo_53 records the guest list due August 15. That fits August 22 but not next week; model credit remains unresolved. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q5](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 27. `Company-Retreat.athelete-visit` · create `Contact People Added To List` (event)
@@ -1119,6 +1123,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 27, 2026-09-26:** AGENT_RESOLVED · KEY. Contacting invitees is a task before the visit, not an event exactly July 22. Both the keyed kind and date are unsupported. The combined todo_53 explicitly includes contacting invitees. Content is represented, but the conflicting visit date prevents a model pass; no actual outreach is established. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q5](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 28. `Innovation-comp.quick-favor-before-the-final` · create `board_deck_one_pager` (todo)
@@ -1168,6 +1176,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 28, 2026-09-26:** AGENT_RESOLVED · KEY. The exact July 15 deadline is unsupported by either the body’s pre-board window or a literal before-final reading of the subject. todo_54 is due July 21 before the July 22 board presentation, but after the July 15 final. Reviewers disagree on model credit; queued without overturning the definite key defect. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q5](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 29. `pizza-party.client-demo-conflict` · move `Team_pizza_party` (todo)
@@ -1208,6 +1220,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 29, 2026-09-26:** AGENT_RESOLVED · KEY. The requested pizza-party event move is to June 9; the key instead requires a July 14 task and selects unrelated todo_47. Delivery on July 5 is also stale. evt_7 remains June 8, with no replacement. Literal historical correction was not performed; unspecified stale-request handling prevents model-credit attribution. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -1254,6 +1270,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 30, 2026-09-26:** AGENT_RESOLVED · MODEL. The observed July 7 request supports a July 14 sponsorship approval meeting. The key’s July 22 date is independently wrong. No corresponding meeting exists under any title in either full store; the model read the request with connected tools and omitted it. Failure remains justified after correcting the key. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -1315,6 +1335,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 31, 2026-09-26:** AGENT_RESOLVED · KEY. The planning call explicitly names June 21, not the keyed July 21; July 8 delivery also makes it stale. No planning-call event exists or was created. Model credit depends on the unspecified treatment of historical requests, not on the invalid July key. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 32. `Company-Retreat.planning-call-and-forms-for-your-company` · create `Fill out Retreat Forms` (todo)
@@ -1374,6 +1398,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 32, 2026-09-26:** AGENT_RESOLVED · KEY. Forms are due before the June 21 call, not exactly July 21. The key has the wrong month and wrongly narrows a deadline window. No forms task exists or was created. A default 17:00 due time on the 09:00 call day would itself be late; delivery and missing backfill policy leave model credit unresolved. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -3043,6 +3071,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for B4, 2026-09-26:** AGENT_RESOLVED · PASS. The preview explicitly says Mark is not needed; no action is supported. Only unrelated keynote evt_17 is added; all previous objects remain unchanged, with no press-preview object under another title. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### B5. `press-tour.keynote-at-the-footwear` · create `expo_keynote` (event)
@@ -3075,6 +3107,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for B5, 2026-09-26:** AGENT_RESOLVED · PASS. The explicit August 12 expo-keynote hold is uniquely represented by evt_17. Day-level pass accepted. The 10:00 start independently violates the 09:00 default; one-hour duration is correct. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### B6. `Pre-Launch.dry-run-of-the-flip` · create `launch-dry-run` (event)
@@ -3103,6 +3139,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for B6, 2026-09-26:** AGENT_RESOLVED · PASS. The explicit August 6 launch dry run is uniquely represented by evt_20. Day-level pass accepted. Its 14:00-16:00 hours violate both the 09:00 start and one-hour defaults. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
 
 ---
 
