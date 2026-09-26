@@ -4,7 +4,7 @@
 
 ## Current phase 1d continuation checkpoint, 2026-09-26
 
-2/6 batches; 18/54 fresh checks; 16/48 emails; 32/96 initial reviewer assignments. New classifications resolved: 19 (including two reused pilot checks); unresolved new classifications: 1. 12 checks have queued interpretation, model-credit or saved-label decisions. 39/75 worksheet checks accounted for, including 19 preserved human judgments.
+3/6 batches; 27/54 fresh checks; 24/48 emails; 48/96 initial reviewer assignments. New classifications resolved: 26 (including two reused pilot checks); unresolved new classifications: 3. 14 checks have queued interpretation, model-credit or saved-label decisions. 48/75 worksheet checks accounted for, including 19 preserved human judgments.
 
 James approved the full six-batch plan and its reviewer usage. This supersedes historical awaiting-approval language below. [Findings](_repair/agent-audit-continuation/RESULTS.md), [decision queue](_repair/agent-audit-continuation/NEEDS_JAMES.md), paired reports and batch archives provide provenance. No repair status is promoted, no benchmark score is changed, and no future grader is implemented. Original human labels remain intact; #14/#19 remain pending human decisions. Python tests: 107 passed. Webapp checks blocked by absent dependencies; audit integrity checks pass at each committed batch.
 

@@ -1,0 +1,26 @@
+{
+  "scope": "Uncounted sibling questions observed during the authorized target reviews. No extra target coverage or automatic closure is claimed.",
+  "targets": [
+    {
+      "worksheet_item": "S1 (uncounted E20 sibling)",
+      "decision_group": "Q5",
+      "excerpt": "the advertising was suppose to launch ... push this back",
+      "finding": "The July 13 email moves the advertising launch; July 8 separately requires reviewing Josh\u2019s work when ready on July 15.",
+      "model_assessment": "todo_66 and the sibling key both move the review to July 22. Whether postponing launch also postpones readiness/review is unstated. Keep this ancillary observation unadjudicated; it does not change #36/#37 or coverage.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_038.jsonl:19,45-46",
+        "captures/baseline-sonnet-4-5/raw/day_043.jsonl:18,38-39"
+      ]
+    },
+    {
+      "worksheet_item": "S2 (uncounted E22 sibling)",
+      "decision_group": "Q5",
+      "excerpt": "the day before the main event ... Sunday, July 12th, 2026",
+      "finding": "The rehearsal\u2019s explicit July 12 date conflicts with day-before the established August 13 reveal; it is already past at July 19 delivery.",
+      "model_assessment": "evt_81 and the sibling key choose August 12. Both reviewers find that reading defensible but not uniquely established. Keep this ancillary question unadjudicated; #39 remains a clear KEY finding.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:21,51-52"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "case_id": "E18",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "GRADER"
+      ],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The email requires a judges thank-you note after the recap, with no exact day or two-day delay. The September 25 recap is supported by the earlier explicit request and remains evt_62 in both stores. The model created one correctly attributed reminder, todo_70, on September 26 at the default 5pm, which satisfies the supported post-recap sequencing. The exact September 27 key imposes an unsupported +2d requirement; rejecting September 26 therefore penalizes an acceptable action. This assesses the calendar/to-do task only, not proof that the note was sent. Full-store inspection found no pre-existing judges thank-you object or duplicate, and only todo_70 and the unrelated todo_71 were added.",
+      "evidence": [
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_042.jsonl:18",
+          "observation": "Observed target body: \"Hey Mark, after the recap, could you send a short thank you note to the judges? They put in a lot of time and a few words from you would mean a lot.\""
+        },
+        {
+          "source": "stage-a.json, preceding_storyline_emails; Innovation-comp.let-s-set-up-a-recap",
+          "observation": "The recap request says \"Thinking Friday, September 25th, 2026 if that works.\" No supplied recap mail establishes a later thank-you deadline."
+        },
+        {
+          "source": "history-actions.jsonl; captures/baseline-sonnet-4-5/raw/day_036.jsonl:32-33; full-state-before.json and full-state-after.json",
+          "observation": "evt_62, \"Pitch comp recap with VP Product\", is created and retained with start \"2026-09-25T10:00:00\" and end \"2026-09-25T11:00:00\"."
+        },
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_042.jsonl:39-40; full-state-after.json",
+          "observation": "create_todo uses email_id \"Innovation-comp.post-recap-follow-ups\", title \"Send thank you note to pitch comp judges\", due_date \"2026-09-26T17:00:00\"; successful result is \"id\": \"todo_70\"."
+        },
+        {
+          "source": "stage-b.json, targets[0]",
+          "observation": "The key has \"on\": {\"eq\": \"@recap_meeting+2d\"} and \"tolerance\": \"exact_day\", resolved to September 27; the reported verdict is \"FAIL — on the wrong day\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The email supplies a sequence rather than a deadline. Creating a reminder is a defensible representation of the request; neither the text nor the assistant defaults singles out September 27.",
+        "Earlier final-event chronology is inconsistent, but there is no supplied completed or revised recap that supersedes September 25."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "observation": "No other keyed operation belongs to this target email. The day also adds todo_71 for the separate slide-review request; it does not duplicate the judges reminder.",
+      "evidence": [
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_042.jsonl:41-42; full-state-before.json and full-state-after.json",
+          "observation": "todo_71 is \"Review board presentation slide draft\", attributed to Innovation-comp.prep-doc-for-the-board-presentation, due \"2026-07-21T17:00:00\". All 37 existing events and 28 existing to-dos are unchanged."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The existing recap event starts at 10am although the supplied recap request specifies no time and the assistant instructions default events to 9am for one hour. This historical time deviation is separate from the target day-level check and does not invalidate a September 26 follow-up.",
+      "evidence": [
+        {
+          "source": "stage-a.json, assistant_instructions and Innovation-comp.let-s-set-up-a-recap; history-actions.jsonl, captures/baseline-sonnet-4-5/raw/day_036.jsonl:32-33",
+          "observation": "Instructions: \"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\" The date-only recap request produced evt_62 with start \"2026-09-25T10:00:00\" and end \"2026-09-25T11:00:00\"."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

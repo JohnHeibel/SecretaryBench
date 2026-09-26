@@ -1,0 +1,43 @@
+{
+  "case_id": "E24",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The CFO explicitly requests signing the Anthropic documents by June 21. The model read that request and created todo_26 for the correct action and deal, due June 21 at the instructed default 17:00. The key's to-do kind and resolved day are supported. Full before/after stores confirm a newly created signing task, no duplicate signing object, and no change to the separate CTO meeting evt_18. The targeted PASS is justified. This establishes correct task tracking, not real-world signature completion.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:28",
+          "observation": "Observed get_email result for Enterprise_Ai_Selection.ai-selection-finalization says: \"Please sign the formal docs by Sunday, June 21st, 2026.\" It identifies Anthropic and \"1Y/120k for full access employee accounts.\""
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "Instructions specify \"create_todo / update_todo / delete_todo — tasks that have a deadline\" and \"to-dos due 5pm\" by default."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:59-60",
+          "observation": "create_todo uses email_id Enterprise_Ai_Selection.ai-selection-finalization, title \"Sign Anthropic deal documents\", due_date \"2026-06-21T17:00:00\", and description \"1Y/120k for full access employee accounts\". The successful tool result returns id \"todo_26\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores contain no preexisting signing task and one new signing task, todo_26. The separate \"Meeting with CTO\" evt_18 remains June 19, 09:00-10:00, in both stores."
+        },
+        {
+          "source": "stage-b.json:targets[0]",
+          "observation": "T1 keys create AI_Sign_Off as todo with exact_day next:SUN, resolved June 21; current result is \"PASS — matched\" against \"Sign Anthropic deal documents\" on June 21 at 5 PM."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

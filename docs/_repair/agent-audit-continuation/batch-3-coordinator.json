@@ -1,0 +1,149 @@
+{
+  "batch": 3,
+  "spot_check_items": [
+    "34",
+    "B7"
+  ],
+  "targets": [
+    {
+      "batch": 3,
+      "worksheet_item": "33",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "The sponsor confirmation adds no new date, but its previously requested August 25 intro is absent from the before-store.",
+      "model_assessment": "evt_68 creates that missing call, distinct from the cancelled August 12 retail-sponsor call. Repair versus confirmation-only no-op is unsettled. Its 14:00 start independently violates the 09:00 default.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_038.jsonl:21,49-50",
+        "captures/baseline-sonnet-4-5/raw/day_035.jsonl:49-50",
+        "captures/baseline-sonnet-4-5/days/037.json#state"
+      ],
+      "excerpt": "just confirming the intro call with the new sponsor is locked in",
+      "decision_group": "Q6",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "34",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "After the September 25 recap does not require exactly September 27; the +2-day key invents precision.",
+      "model_assessment": "todo_70 on September 26 at 17:00 satisfies the follow-up relationship. This is task tracking, not evidence of a sent note.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_042.jsonl:18,39-40",
+        "captures/baseline-sonnet-4-5/raw/day_036.jsonl:32-33",
+        "corpus/nodes/Innovation-comp.json"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": "Direct raw request and successful todo_70 creation/result plus corpus +2d key inspected. September 26 follows the verified September 25 recap; no shared substantive reviewer error."
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "35",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "Ahead of the July 22 board presentation does not require an exact July 20 deadline.",
+      "model_assessment": "todo_71 captures the light slide review and flagging request on July 21 at 17:00. It is distinct from the one-pager todo_54 and satisfies the scheduling target.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_042.jsonl:20,41-42",
+        "captures/baseline-sonnet-4-5/days/042.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "36",
+      "classification": "GRADER",
+      "status": "AGENT_RESOLVED",
+      "finding": "The requested budget meeting on July 15 exists as evt_72; the no-matching-event rejection is a semantic identity false negative.",
+      "model_assessment": "Unique evt_72 has the correct source email, date and budget purpose. The 10:00 start separately violates the 09:00 default and does not justify this day-level rejection.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_043.jsonl:18,40-41",
+        "captures/baseline-sonnet-4-5/days/043.json#state",
+        "sb/grader.py:130,138,281"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "37",
+      "classification": "GRADER",
+      "status": "AGENT_RESOLVED",
+      "finding": "The requested budget meeting on July 29 exists as evt_73; the no-matching-event rejection is a semantic identity false negative.",
+      "model_assessment": "Unique evt_73 has the correct source email, date and budget purpose. The 10:00 start separately violates the 09:00 default and does not justify this day-level rejection.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_043.jsonl:18,42-43",
+        "captures/baseline-sonnet-4-5/days/043.json#state",
+        "sb/grader.py:130,138,281"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "38",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "Sharing other company ideas is conditional on having them in mind; a mandatory brainstorm task is not clearly established.",
+      "model_assessment": "No company-suggestions task or equivalent exists. evt_74 covers only the strategy meeting; uncertainty about obligation, not a hidden match or outage, prevents attribution.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_043.jsonl:21,38-45",
+        "captures/baseline-sonnet-4-5/days/043.json#state"
+      ],
+      "excerpt": "If you have any other companies we can pay a visit to on your mind, please let me know till then.",
+      "decision_group": "Q7",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "39",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The Design Lead slot is on the established August 13 reveal date. Nothing available supports the keyed July 20.",
+      "model_assessment": "evt_82 represents that distinct slot on August 13, leaving evt_60 intact. Its invented 18:30-18:45 timing violates defaults; the contradictory rehearsal wording is a separate sibling issue.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:21,53-54",
+        "captures/baseline-sonnet-4-5/raw/day_035.jsonl:55-56"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "B7",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The requested July 10 morale meeting is uniquely represented by evt_19, with the expressly requested 45-minute duration.",
+      "model_assessment": "Day-level pass accepted. The unsupported 10:00 start separately violates the 09:00 default.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_013.jsonl:26,52-53",
+        "corpus/nodes/Rebrand-goes-company-wide.json"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": "Direct raw date/duration request, create/result and corpus anchor inspected. July 10 and 45 minutes are correct; default-start error remains separate."
+    },
+    {
+      "batch": 3,
+      "worksheet_item": "B8",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The Anthropic-signing task is due June 21, satisfying the explicit by-June-21 deadline.",
+      "model_assessment": "todo_26 uniquely captures signing at the default 17:00. The key is narrower than the allowable before-or-on window, but correctly accepts this observed action; signing itself is not established.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_015.jsonl:28,59-60",
+        "captures/baseline-sonnet-4-5/days/015.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    }
+  ],
+  "notes": "All 16 original reports and Stage A interpretations examined. #33 and #38 remain AMBIGUOUS despite reviewer agreement. #36/#37 identity failures independently confirmed: current grader matches obligation-name content words, not op.match hints; original reports are retained without alteration. Unsupported clock defaults and sibling observations do not decide day-level targets."
+}

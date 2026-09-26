@@ -1,0 +1,76 @@
+{
+  "case_id": "E17",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [
+        "MODEL"
+      ],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "medium",
+      "rationale": "The no-action key is a defensible reading of a confirmation under the explicit instructions. However, the complete before store has no new-sponsor intro appointment, and the creation adds exactly one on the previously proposed August 25 date. It is therefore also defensible as repairing an earlier omission; it is not a duplicate or revival of the cancelled retail-sponsor call. A categorical over-action failure depends on whether confirmation processing may reconcile an absent, previously requested appointment. At day-level the repair has the supported identity and date. Separately, the 14:00 start is a definite MODEL default-time error: neither sponsor email specifies a time, and instructions require 09:00. That does not independently justify this day-level no-action rejection.",
+      "evidence": [
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_038.jsonl:21",
+          "observation": "Observed target body says \"just confirming the intro call with the new sponsor is locked in\" and \"I'll send over a quick brief beforehand\". It requests no new task or date change."
+        },
+        {
+          "source": "stage-a.json; preceding_storyline_emails, Innovation-comp.new-sponsor-wants-to-chat",
+          "observation": "Earlier request says \"Proposed Tuesday, August 25th, 2026, let me know if you'd rather I take it solo.\""
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Inspected every event and todo. Before has no new-sponsor intro object. After has exactly one, evt_68, dated 2026-08-25; unrelated evt_33 is an FBS presentation, not the sponsor call."
+        },
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_038.jsonl:49-50",
+          "observation": "create_event for target email succeeds as evt_68, \"New sponsor intro call\", start \"2026-08-25T14:00:00\", end \"2026-08-25T15:00:00\"."
+        },
+        {
+          "source": "stage-a.json; assistant_instructions",
+          "observation": "\"(no tool) \u2014 for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change.\" Also: \"Defaults unless the email says otherwise: events 9am, 1 hour long\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "Instructions do not explicitly resolve whether a confirmation should repair an earlier omitted event or remain a no-op regardless of existing state."
+      ],
+      "suggested_human_question": "Should a confirmation be scored as no action even when the previously requested, still-future appointment is absent, or should one correctly dated repair event be accepted?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The earlier new-sponsor intro request was not represented in the before store, and the supplied historical event mutations show no prior creation of it. This is an earlier omission, separate from the current confirmation action. The absence is not explained by the retail-sponsor cancellation.",
+      "evidence": [
+        {
+          "source": "stage-a.json; Innovation-comp.new-sponsor-wants-to-chat; full-state-before.json; history-actions.jsonl",
+          "observation": "June 14 request proposes August 25 intro. No historical event creation or before-store object represents that call."
+        }
+      ]
+    },
+    {
+      "category": "PASS",
+      "observation": "The historical retail-sponsor cancellation affected the separate August 12 partnership-extension call, not the August 25 intro.",
+      "evidence": [
+        {
+          "source": "history-actions.jsonl; captures/baseline-sonnet-4-5/raw/day_033.jsonl:47-48",
+          "observation": "Created evt_55 from Innovation-comp.sponsor-wants-a-follow-up-call, \"Retail sponsor partnership call\", August 12."
+        },
+        {
+          "source": "history-actions.jsonl; captures/baseline-sonnet-4-5/raw/day_035.jsonl:49-50",
+          "observation": "delete_event {\"event_id\":\"evt_55\"} returned {\"deleted\":\"evt_55\"}."
+        },
+        {
+          "source": "stage-a.json; Innovation-comp.sponsor-call-no-longer-needed",
+          "observation": "Cancellation says sponsor is \"happy to just continue as is\", matching an existing partnership."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

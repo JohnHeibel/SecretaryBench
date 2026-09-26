@@ -1,0 +1,57 @@
+{
+  "case_id": "E21",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The missing to-do is real: the complete stores and trace contain no candidate-company task or equivalent reminder, and evt_74's description does not preserve that request. Attribution is uncertain because the source asks Mark to share other company ideas if he already has any in mind. It does not clearly require him to brainstorm or produce suggestions. Treating this as a deadline-bearing reminder to consider/send suggestions is defensible, in which case the model missed it; treating it as an optional invitation is also defensible under the instruction to avoid over-acting and do nothing when in doubt. The key's mandatory brainstorm task resolves that ambiguity without supporting evidence. Its July 20 upper bound is supported by 'till then'; the supplied predicate is 'by', so the exact_day tolerance label alone does not establish that earlier reminders would fail. There is no matching alternate object that could establish a grader false negative, and no infrastructure failure or late delivery explains the omission.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:21",
+          "observation": "Observed get_email result: 'If you have any other companies we can pay a visit to on your mind, please let me know till then.' The preceding sentence sets the strategy meeting to Monday, July 20th, 2026."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "'Over-acting is the most common mistake; when in doubt, do nothing.' Tasks are described as 'tasks that have a deadline.' These instructions permit caution on a conditional invitation."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; day-tool-trace.json",
+          "observation": "All events and todos were inspected. No Boston candidate-company reminder appears in either store. The day's only to-do mutation is update_todo on unrelated todo_66; no create_todo is present."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:44; captures/baseline-sonnet-4-5/raw/day_043.jsonl:45",
+          "observation": "The sole target-email mutation creates evt_74, 'WHOOP Boston trip strategy meeting', described as 'Ad-hoc meeting to decide dates for Boston HQ visit - advise on fabrication process'. It contains no request to consider or send other company suggestions."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key requires create todo 'Boston Companies Brainstorm', match ['brainstorm'], on {'by':'@strategy_meeting'}. Reported FAIL says nothing matching was created."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No evidence establishes whether Mark has other companies in mind.",
+        "The conditional invitation does not resolve whether a separate reminder is mandatory or optional."
+      ],
+      "suggested_human_question": "Should invitations phrased 'if you have any ... in mind' require a separate brainstorming to-do under the instruction to avoid over-acting?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "PASS",
+      "observation": "The sibling strategy-meeting day check is satisfied by evt_74 on 2026-07-20, using the target email_id. No duplicate Boston strategy event exists in the complete after-state.",
+      "evidence": ["stage-b.json: other_keyed_operations[0]", "captures/baseline-sonnet-4-5/raw/day_043.jsonl:45", "full-state-after.json: evt_74"]
+    },
+    {
+      "category": "MODEL",
+      "observation": "Separately from day-level grading, evt_74 is 10:00–11:00 despite the source supplying no time and the assistant instructions defaulting events to 09:00 for one hour. This sibling time error does not establish that the conditional brainstorm target was mandatory.",
+      "evidence": ["stage-a.json: assistant_instructions", "captures/baseline-sonnet-4-5/raw/day_043.jsonl:44", "full-state-after.json: evt_74"]
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

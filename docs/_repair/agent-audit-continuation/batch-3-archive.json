@@ -1,0 +1,1990 @@
+{
+  "protocol_version": 2,
+  "source": {
+    "branch": "debug/model-resolution",
+    "head": "540c76ec10c68e36b9b2e11a1bd61ab77aa43a5b",
+    "corpus_hash": "03e0d963b9866d8f",
+    "capture_manifest_sha256": "b53edf7d7172d210cf9de1ad7bd90f4ac17272415e785fcc1c2efcbb67bf2e02",
+    "worksheet_sha256": "cea96bae113130e9f310cb42f66a178f3fcc49f20735fc85a1b8db34377a4e2f",
+    "system_prompt_matches_commit": "d396921"
+  },
+  "source_head": "9a506fb",
+  "batch": 3,
+  "cases": [
+    {
+      "case_id": "E17",
+      "batch": 3,
+      "email_id": "Innovation-comp.confirmed-for-the-new-sponsor-call",
+      "day": 38,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "33",
+          "op_index": null
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E17",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "Innovation-comp.confirmed-for-the-new-sponsor-call",
+          "served_date": "2026-07-08",
+          "sender": "BIZDEV",
+          "subject": "Confirmed for the new sponsor call",
+          "body": "Hey Mark, just confirming the intro call with the new sponsor is locked in. I'll send over a quick brief beforehand so you've got context.\n\nBusiness Development"
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "Innovation-comp.come-check-out-the-semifinal-showcase",
+            "served_date": "2026-06-01",
+            "sender": "DESIGN",
+            "subject": "Come check out the semifinal showcase?",
+            "body": "Hey Mark, we're doing the semifinal showcase next week, three teams presenting early concepts. Totally optional but if you've got time we'd love to have you swing by for even 15 minutes.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+            "served_date": "2026-06-01",
+            "sender": "FINANCE",
+            "subject": "Need a budget meeting for the pitch comp",
+            "body": "Hey Mark, VP Product and I want to grab some time with you to go over the pitch comp budget, mainly the prize money and event costs. Could we lock in Sunday, July 5th, 2026 for that?\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-mixer-before-the-final",
+            "served_date": "2026-06-01",
+            "sender": "VP_MARKETING",
+            "subject": "Sponsor mixer before the final",
+            "body": "Hey Mark, we're putting together a small mixer with a couple of our retail partners the night before the final, mostly informal. Would be great if you could make an appearance but completely understand if your schedule's packed.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-budget-review-optional-sit-in",
+            "served_date": "2026-06-03",
+            "sender": "FINANCE",
+            "subject": "Pitch comp budget review, optional sit-in",
+            "body": "Hey Mark, we're doing a quick internal budget review for the pitch comp spend so far, nothing major, just making sure we're tracking against plan. You're welcome to join if you want visibility but it's not necessary.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.quick-win-to-share",
+            "served_date": "2026-06-03",
+            "sender": "HR",
+            "subject": "Quick win to share",
+            "body": "Hey Mark, thought you'd want to know, one of the junior engineers on team three told me this comp is the reason she's staying with us another year. Just a nice moment, nothing needed from you.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+            "served_date": "2026-06-04",
+            "sender": "VP_PRODUCT",
+            "subject": " Pitch comp is on, locking in the final date",
+            "body": "Hey Mark,\n\nKicking off this year's innovation pitch competition starting next week. Teams will be working on new product concepts for about a month, then we'll do the final pitch event on Wednesday, July 15th, 2026. There'll be a few smaller showcases along the way too, will send those as they come up.\n\nExcited to see what people come up with this year.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2",
+            "served_date": "2026-06-06",
+            "sender": "VP_PRODUCT",
+            "subject": "re: Pitch comp is on, locking in the final date",
+            "body": "Thanks Mark, makes sense. I'll keep you off the calendar for the team showcases and just have you down for the final. Will loop you back in closer to the date.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.judges-prep-session-want-in",
+            "served_date": "2026-06-07",
+            "sender": "BIZDEV",
+            "subject": "Judges prep session, want in?",
+            "body": "Hey Mark, we're running a quick prep session with the judging panel before the final to align on scoring criteria. Figured I'd ask in case you wanted to sit in, no pressure either way.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+            "served_date": "2026-06-08",
+            "sender": "GC",
+            "subject": "Heads up, one of the pitches might step on toes",
+            "body": "Heads up, one of the pitcHey Mark, quick flag, one of the team pitches involves a sole design that's pretty close to something we already have a patent filed on internally. Not a big deal, just want to make sure we don't accidentally green light something that creates an internal conflict. Can you make a note to ask about it after the final?\n\nGeneral Counsel"
+          },
+          {
+            "email_id": "Innovation-comp.a-kid-drew-the-new-logo-concept",
+            "served_date": "2026-06-09",
+            "sender": "",
+            "subject": "A kid drew the new logo concept",
+            "body": "Hey Mark, funny one for you, one of the engineer's kids was at the office during the showcase and apparently sketched their own \"shoe of the future\" on a napkin. The team loved it so much they pinned it up in the design room. Just a nice morale moment, nothing to do.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.one-of-our-designers-got-a-job-offer",
+            "served_date": "2026-06-09",
+            "sender": "HR",
+            "subject": "One of our designers got a job offer",
+            "body": "Hey Mark, slightly awkward timing but one of the designers on team two, who's been doing great work on the comp, got an external offer this week. I'd like to put together a retention conversation before she makes a decision. Can we make sure that happens this week?\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.storm-warning-for-finals-week",
+            "served_date": "2026-06-10",
+            "sender": "OPS",
+            "subject": "Storm warning for finals week",
+            "body": "Hey Mark, forecast is calling for some pretty rough weather the same week as the final. We've got a backup plan to move everything to the larger conference room if needed, just wanted you aware in case travel gets messy.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.two-weeks-out-from-the-final",
+            "served_date": "2026-06-10",
+            "sender": "OPS",
+            "subject": "Two weeks out from the final",
+            "body": "Hey Mark, just a heads up, we're two weeks out from the final pitch event. Venue's booked, AV is sorted, and the agenda is locked. You're all set, nothing to action.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.found-a-typo-on-the-trophy",
+            "served_date": "2026-06-11",
+            "sender": "DESIGN",
+            "subject": "Found a typo on the trophy",
+            "body": "Hey Mark, small but annoying, the trophy engraving has a typo in the company name, missing a letter. We caught it before it shipped to the engraver, just need a quick approval on the corrected text before we reorder.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.press-preview-ahead-of-the-final",
+            "served_date": "2026-06-12",
+            "sender": "COMMS",
+            "subject": "Press preview ahead of the final",
+            "body": "Hey Mark, we've got a small press preview set up the morning of the final, giving a couple of trade outlets early access to the concepts under embargo. You're not needed for it but wanted to keep you posted since it's the same day.\n\nCommunications / PR"
+          },
+          {
+            "email_id": "Innovation-comp.today-s-the-day",
+            "served_date": "2026-06-13",
+            "sender": "VP_PRODUCT",
+            "subject": "Today's the day",
+            "body": "Hey Mark, good luck to everyone presenting today. Room's set up, judges are briefed, see you there.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.new-sponsor-wants-to-chat",
+            "served_date": "2026-06-14",
+            "sender": "IR",
+            "subject": "New sponsor wants to chat",
+            "body": "Hey Mark, a new potential sponsor reached out after hearing about the comp, they'd like an intro call. Proposed Tuesday, August 25th, 2026, let me know if you'd rather I take it solo.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.vp-product",
+            "served_date": "2026-06-14",
+            "sender": "VP_PRODUCT",
+            "subject": "Quick reminder on the final",
+            "body": "Hey Mark, just confirming you're still good for the final on the date we locked in. Also wanted to flag, the day before we're doing a full dry run with all five teams back to back, probably useful context if you wanted to drop in but no obligation at all.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.brief-for-the-new-sponsor-call",
+            "served_date": "2026-06-15",
+            "sender": "BIZDEV",
+            "subject": "Brief for the new sponsor call",
+            "body": "Hey Mark, attaching a short brief on the new sponsor ahead of your call with them. Covers who they are, what they're looking for, and a couple of talking points. Nothing to action, just background.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.great-session-today",
+            "served_date": "2026-06-15",
+            "sender": "VP_MARKETING",
+            "subject": "Great session today",
+            "body": "Hey Mark, that was a really strong final, lots of great energy in the room. Congrats to the winning team. Wanted to say thanks for being there, made a big difference.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.final-lineup-confirmed",
+            "served_date": "2026-06-17",
+            "sender": "VP_PRODUCT",
+            "subject": "Final lineup confirmed",
+            "body": "Hey Mark, just confirming the final five teams are locked in for the pitch event. Everyone's prepped and ready to go, nothing needed from you, just wanted to keep you in the loop ahead of time.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.trophy-design-quick-look",
+            "served_date": "2026-06-18",
+            "sender": "DESIGN",
+            "subject": "Trophy design, quick look?",
+            "body": "Hey Mark, we landed on a design for the winner's trophy, nothing fancy but wanted you to see it before we order. Attaching a render, let me know if anything feels off, otherwise we'll go ahead.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.travel-heads-up-for-finals-week",
+            "served_date": "2026-06-21",
+            "sender": "OPS",
+            "subject": "Travel heads up for finals week",
+            "body": "Hey Mark, just a heads up, a few of the visiting partners will be in town finals week, so the office might be a bit busier than usual. Nothing for you to do, just a heads up in case you notice extra faces around.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.need-your-sign-off-on-prize-amounts",
+            "served_date": "2026-06-23",
+            "sender": "FINANCE",
+            "subject": "Need your sign off on prize amounts",
+            "body": "Hey Mark, before we announce anything to the teams, can you give a quick thumbs up on the prize amounts we discussed? Just need a yes or no, shouldn't take long.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.kickoff-went-well",
+            "served_date": "2026-06-25",
+            "sender": "OPS",
+            "subject": "Kickoff went well",
+            "body": "Hey Mark, quick update, kickoff this morning went great and we've got five teams signed up already. Attaching the agenda and team list for you, nothing needed from you, just wanted you in the loop.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.board-slot-the-week-after-finals",
+            "served_date": "2026-06-26",
+            "sender": "VP_PRODUCT",
+            "subject": "Board slot the week after finals?",
+            "body": "Hey Mark, one more ask. Could we grab a slot with the board about a week after the final, so we can walk them through whatever wins? Same time as the final would be ideal if it works for you, just makes it easier to plan around.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.thanks-for-the-sign-off",
+            "served_date": "2026-06-27",
+            "sender": "FINANCE",
+            "subject": "Thanks for the sign off",
+            "body": "Hey Mark, got your thumbs up, thanks for the quick turnaround. We'll let the teams know the prize amounts today.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.team-morale-lunch-during-the-comp",
+            "served_date": "2026-07-02",
+            "sender": "HR",
+            "subject": "Team morale lunch during the comp",
+            "body": "Hey Mark, a few of us are organizing a casual lunch for everyone involved in the pitch comp, just a small thank you for the extra hours people are putting in. Would be a nice touch if you could pop by but totally understand if you can't.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.quick-favor-before-the-final",
+            "served_date": "2026-07-03",
+            "sender": "IR",
+            "subject": "Quick favor before the final",
+            "body": "Hey Mark, ahead of the board presentation, could you put together a one pager on the comp for the board deck? Doesn't need to be polished, just bullet points on what's coming up.\n\nInvestor Relations"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-wants-a-follow-up-call",
+            "served_date": "2026-07-03",
+            "sender": "BIZDEV",
+            "subject": "Sponsor wants a follow-up call",
+            "body": "Hey Mark, one of our retail sponsors wants a quick call to talk about extending the partnership next year. Proposed Wednesday, August 12th, 2026, let me know if that works or if you'd rather I find another time.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.she-s-staying",
+            "served_date": "2026-07-04",
+            "sender": "HR",
+            "subject": "She's staying",
+            "body": "Hey Mark, good news, the retention conversation went really well and she's decided to stay. Huge relief, especially with the comp wrapping up soon. Thanks for prioritizing it.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-call-no-longer-needed",
+            "served_date": "2026-07-05",
+            "sender": "BIZDEV",
+            "subject": "Sponsor call no longer needed",
+            "body": "Hey Mark, good news, the sponsor said they're happy to just continue as is for now, so we don't need that call after all. Sorry for the back and forth, feel free to drop it from your calendar.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.let-s-set-up-a-recap",
+            "served_date": "2026-07-06",
+            "sender": "VP_PRODUCT",
+            "subject": "Let's set up a recap",
+            "body": "Hey Mark, now that the final's done, could we grab some time to recap how the whole comp went, what worked, what we'd change for next year? Thinking Friday, September 25th, 2026 if that works.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.great-year-overall",
+            "served_date": "2026-07-07",
+            "sender": "VP_PRODUCT",
+            "subject": "Great year overall",
+            "body": "Hey Mark, just wanted to say thanks for being so involved this year, especially with everything else on your plate. The teams really noticed and it made a difference. Looking forward to next year already.\n\nVP Product"
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "Company-Retreat.planning-call-and-forms-for-your-company",
+            "served_date": "2026-07-08",
+            "sender": "RETREAT_HOST_COMPANY",
+            "subject": "Planning Call and Forms for your company retreat",
+            "body": "Hello Sir,\n\nI wanted to ask you to join a call with me and some of my people on June 21st to discuss the plans for your company's retreat! I would also like you to fill out these forms I've attached before the meeting, so everything is cleared up!\n\nThank you sir!\nThe Retreat Company"
+          },
+          {
+            "email_id": "shoe-product-launch-delays.design-delays-internal-conflicts",
+            "served_date": "2026-07-08",
+            "sender": "DESIGN",
+            "subject": "Design delays - internal conflicts",
+            "body": "Hi Mark,\n\nUnfortunately this second batch of shoes’ designs were not completed in time. I understand we scheduled the release for next week but there were some internal conflicts within our department.\n\nI assure you we will have the designs ready in two weeks and at the same time, our marketing lead will work on advertisements. I believe Josh wanted you to double check his work the day he's done, could you please do that? He said it would be ready on Wednesday, July 15th, 2026.\n\nP.S. I also wanted to discuss privately with you the future of the design team to ensure these internal conflicts never happen again. Let’s schedule a meeting, I was thinking Wednesday, July 8th, 2026.\n\nBest,\nMelissa"
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E17",
+        "target_email_id": "Innovation-comp.confirmed-for-the-new-sponsor-call",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": null,
+            "operation": null,
+            "worksheet_key_and_resolved_dates": "- take no action (FYI / no scheduling needed)",
+            "current_grader_target_result": "FAIL — over-acted — created \"New sponsor intro call\" Tue Aug 25 2 PM (60m)  \n**Grader's `actual`:** \"New sponsor intro call\" Tue Aug 25 2 PM (60m)"
+          }
+        ],
+        "other_keyed_operations": [],
+        "capture_day": 38,
+        "capture_date": "2026-07-08",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_038.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e17r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E17-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E17-r1/final.json",
+          "stage_a_sha256": "450dccb827685b99f71696bea30ca445e3bff1d280346ae9fbacd615325a5ffb",
+          "final_sha256": "4427d56a3e865c4fae319aa40b7ff2a2113b3c4c8e320753da906ecedc52113a"
+        },
+        {
+          "agent_task": "/root/e17r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E17-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E17-r2/final.json",
+          "stage_a_sha256": "9d034d4882a64c284ac51d469f72e5a59cd7c35ebd32401c1d0bcba10b24c08d",
+          "final_sha256": "dc880ff54f743f172427f81045d084f6a60298f1b41cd1c12a3ba0ca6d4ad463"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/037.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/038.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_038.jsonl",
+        "history": "all raw days 001 through 037, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E17/history-actions.jsonl": "2e24a809d137b7ef169ab4e9df6fbaab04e035d1a495cdb180d0d0f2dd96f626",
+        "packets/E17/stage-a.json": "fd9d08e8253f26994ba6042d60969df6808ad1d44f9f1d676922e447f76b4ffc",
+        "packets/E17/day-tool-trace.json": "a7e653fc0d32af0fb03c81cc59080e024b93ecf6b25a581e1eaaef22c0cd1956",
+        "packets/E17/all_available_emails.json": "d744f8ce1979e8eacff3c152337e79defb0910ec93298cdda5ced1a320be29dd",
+        "packets/E17/full-state-after.json": "68fba1db268be131a16360151fc849ddf358250a4439773ef2355b273efc0f0b",
+        "packets/E17/full-state-before.json": "fec59f73de9d88b0ac6419c532e6f9fd4be1c6546b19f7b58b204a80cd09fc71",
+        "packets/E17/stage-b.json": "6b06b9a63ce7ae42b58a883921ac6766bce91f326b5e964c7c77f2ffbb17269f"
+      }
+    },
+    {
+      "case_id": "E18",
+      "batch": 3,
+      "email_id": "Innovation-comp.post-recap-follow-ups",
+      "day": 42,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "34",
+          "op_index": 0
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E18",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "Innovation-comp.post-recap-follow-ups",
+          "served_date": "2026-07-12",
+          "sender": "OPS",
+          "subject": "Post recap follow ups",
+          "body": "Hey Mark, after the recap, could you send a short thank you note to the judges? They put in a lot of time and a few words from you would mean a lot.\n\nOperations"
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "Innovation-comp.come-check-out-the-semifinal-showcase",
+            "served_date": "2026-06-01",
+            "sender": "DESIGN",
+            "subject": "Come check out the semifinal showcase?",
+            "body": "Hey Mark, we're doing the semifinal showcase next week, three teams presenting early concepts. Totally optional but if you've got time we'd love to have you swing by for even 15 minutes.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+            "served_date": "2026-06-01",
+            "sender": "FINANCE",
+            "subject": "Need a budget meeting for the pitch comp",
+            "body": "Hey Mark, VP Product and I want to grab some time with you to go over the pitch comp budget, mainly the prize money and event costs. Could we lock in Sunday, July 5th, 2026 for that?\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-mixer-before-the-final",
+            "served_date": "2026-06-01",
+            "sender": "VP_MARKETING",
+            "subject": "Sponsor mixer before the final",
+            "body": "Hey Mark, we're putting together a small mixer with a couple of our retail partners the night before the final, mostly informal. Would be great if you could make an appearance but completely understand if your schedule's packed.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-budget-review-optional-sit-in",
+            "served_date": "2026-06-03",
+            "sender": "FINANCE",
+            "subject": "Pitch comp budget review, optional sit-in",
+            "body": "Hey Mark, we're doing a quick internal budget review for the pitch comp spend so far, nothing major, just making sure we're tracking against plan. You're welcome to join if you want visibility but it's not necessary.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.quick-win-to-share",
+            "served_date": "2026-06-03",
+            "sender": "HR",
+            "subject": "Quick win to share",
+            "body": "Hey Mark, thought you'd want to know, one of the junior engineers on team three told me this comp is the reason she's staying with us another year. Just a nice moment, nothing needed from you.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+            "served_date": "2026-06-04",
+            "sender": "VP_PRODUCT",
+            "subject": " Pitch comp is on, locking in the final date",
+            "body": "Hey Mark,\n\nKicking off this year's innovation pitch competition starting next week. Teams will be working on new product concepts for about a month, then we'll do the final pitch event on Wednesday, July 15th, 2026. There'll be a few smaller showcases along the way too, will send those as they come up.\n\nExcited to see what people come up with this year.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2",
+            "served_date": "2026-06-06",
+            "sender": "VP_PRODUCT",
+            "subject": "re: Pitch comp is on, locking in the final date",
+            "body": "Thanks Mark, makes sense. I'll keep you off the calendar for the team showcases and just have you down for the final. Will loop you back in closer to the date.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.judges-prep-session-want-in",
+            "served_date": "2026-06-07",
+            "sender": "BIZDEV",
+            "subject": "Judges prep session, want in?",
+            "body": "Hey Mark, we're running a quick prep session with the judging panel before the final to align on scoring criteria. Figured I'd ask in case you wanted to sit in, no pressure either way.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+            "served_date": "2026-06-08",
+            "sender": "GC",
+            "subject": "Heads up, one of the pitches might step on toes",
+            "body": "Heads up, one of the pitcHey Mark, quick flag, one of the team pitches involves a sole design that's pretty close to something we already have a patent filed on internally. Not a big deal, just want to make sure we don't accidentally green light something that creates an internal conflict. Can you make a note to ask about it after the final?\n\nGeneral Counsel"
+          },
+          {
+            "email_id": "Innovation-comp.a-kid-drew-the-new-logo-concept",
+            "served_date": "2026-06-09",
+            "sender": "",
+            "subject": "A kid drew the new logo concept",
+            "body": "Hey Mark, funny one for you, one of the engineer's kids was at the office during the showcase and apparently sketched their own \"shoe of the future\" on a napkin. The team loved it so much they pinned it up in the design room. Just a nice morale moment, nothing to do.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.one-of-our-designers-got-a-job-offer",
+            "served_date": "2026-06-09",
+            "sender": "HR",
+            "subject": "One of our designers got a job offer",
+            "body": "Hey Mark, slightly awkward timing but one of the designers on team two, who's been doing great work on the comp, got an external offer this week. I'd like to put together a retention conversation before she makes a decision. Can we make sure that happens this week?\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.storm-warning-for-finals-week",
+            "served_date": "2026-06-10",
+            "sender": "OPS",
+            "subject": "Storm warning for finals week",
+            "body": "Hey Mark, forecast is calling for some pretty rough weather the same week as the final. We've got a backup plan to move everything to the larger conference room if needed, just wanted you aware in case travel gets messy.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.two-weeks-out-from-the-final",
+            "served_date": "2026-06-10",
+            "sender": "OPS",
+            "subject": "Two weeks out from the final",
+            "body": "Hey Mark, just a heads up, we're two weeks out from the final pitch event. Venue's booked, AV is sorted, and the agenda is locked. You're all set, nothing to action.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.found-a-typo-on-the-trophy",
+            "served_date": "2026-06-11",
+            "sender": "DESIGN",
+            "subject": "Found a typo on the trophy",
+            "body": "Hey Mark, small but annoying, the trophy engraving has a typo in the company name, missing a letter. We caught it before it shipped to the engraver, just need a quick approval on the corrected text before we reorder.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.press-preview-ahead-of-the-final",
+            "served_date": "2026-06-12",
+            "sender": "COMMS",
+            "subject": "Press preview ahead of the final",
+            "body": "Hey Mark, we've got a small press preview set up the morning of the final, giving a couple of trade outlets early access to the concepts under embargo. You're not needed for it but wanted to keep you posted since it's the same day.\n\nCommunications / PR"
+          },
+          {
+            "email_id": "Innovation-comp.today-s-the-day",
+            "served_date": "2026-06-13",
+            "sender": "VP_PRODUCT",
+            "subject": "Today's the day",
+            "body": "Hey Mark, good luck to everyone presenting today. Room's set up, judges are briefed, see you there.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.new-sponsor-wants-to-chat",
+            "served_date": "2026-06-14",
+            "sender": "IR",
+            "subject": "New sponsor wants to chat",
+            "body": "Hey Mark, a new potential sponsor reached out after hearing about the comp, they'd like an intro call. Proposed Tuesday, August 25th, 2026, let me know if you'd rather I take it solo.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.vp-product",
+            "served_date": "2026-06-14",
+            "sender": "VP_PRODUCT",
+            "subject": "Quick reminder on the final",
+            "body": "Hey Mark, just confirming you're still good for the final on the date we locked in. Also wanted to flag, the day before we're doing a full dry run with all five teams back to back, probably useful context if you wanted to drop in but no obligation at all.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.brief-for-the-new-sponsor-call",
+            "served_date": "2026-06-15",
+            "sender": "BIZDEV",
+            "subject": "Brief for the new sponsor call",
+            "body": "Hey Mark, attaching a short brief on the new sponsor ahead of your call with them. Covers who they are, what they're looking for, and a couple of talking points. Nothing to action, just background.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.great-session-today",
+            "served_date": "2026-06-15",
+            "sender": "VP_MARKETING",
+            "subject": "Great session today",
+            "body": "Hey Mark, that was a really strong final, lots of great energy in the room. Congrats to the winning team. Wanted to say thanks for being there, made a big difference.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.final-lineup-confirmed",
+            "served_date": "2026-06-17",
+            "sender": "VP_PRODUCT",
+            "subject": "Final lineup confirmed",
+            "body": "Hey Mark, just confirming the final five teams are locked in for the pitch event. Everyone's prepped and ready to go, nothing needed from you, just wanted to keep you in the loop ahead of time.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.trophy-design-quick-look",
+            "served_date": "2026-06-18",
+            "sender": "DESIGN",
+            "subject": "Trophy design, quick look?",
+            "body": "Hey Mark, we landed on a design for the winner's trophy, nothing fancy but wanted you to see it before we order. Attaching a render, let me know if anything feels off, otherwise we'll go ahead.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.travel-heads-up-for-finals-week",
+            "served_date": "2026-06-21",
+            "sender": "OPS",
+            "subject": "Travel heads up for finals week",
+            "body": "Hey Mark, just a heads up, a few of the visiting partners will be in town finals week, so the office might be a bit busier than usual. Nothing for you to do, just a heads up in case you notice extra faces around.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.need-your-sign-off-on-prize-amounts",
+            "served_date": "2026-06-23",
+            "sender": "FINANCE",
+            "subject": "Need your sign off on prize amounts",
+            "body": "Hey Mark, before we announce anything to the teams, can you give a quick thumbs up on the prize amounts we discussed? Just need a yes or no, shouldn't take long.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.kickoff-went-well",
+            "served_date": "2026-06-25",
+            "sender": "OPS",
+            "subject": "Kickoff went well",
+            "body": "Hey Mark, quick update, kickoff this morning went great and we've got five teams signed up already. Attaching the agenda and team list for you, nothing needed from you, just wanted you in the loop.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.board-slot-the-week-after-finals",
+            "served_date": "2026-06-26",
+            "sender": "VP_PRODUCT",
+            "subject": "Board slot the week after finals?",
+            "body": "Hey Mark, one more ask. Could we grab a slot with the board about a week after the final, so we can walk them through whatever wins? Same time as the final would be ideal if it works for you, just makes it easier to plan around.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.thanks-for-the-sign-off",
+            "served_date": "2026-06-27",
+            "sender": "FINANCE",
+            "subject": "Thanks for the sign off",
+            "body": "Hey Mark, got your thumbs up, thanks for the quick turnaround. We'll let the teams know the prize amounts today.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.team-morale-lunch-during-the-comp",
+            "served_date": "2026-07-02",
+            "sender": "HR",
+            "subject": "Team morale lunch during the comp",
+            "body": "Hey Mark, a few of us are organizing a casual lunch for everyone involved in the pitch comp, just a small thank you for the extra hours people are putting in. Would be a nice touch if you could pop by but totally understand if you can't.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.quick-favor-before-the-final",
+            "served_date": "2026-07-03",
+            "sender": "IR",
+            "subject": "Quick favor before the final",
+            "body": "Hey Mark, ahead of the board presentation, could you put together a one pager on the comp for the board deck? Doesn't need to be polished, just bullet points on what's coming up.\n\nInvestor Relations"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-wants-a-follow-up-call",
+            "served_date": "2026-07-03",
+            "sender": "BIZDEV",
+            "subject": "Sponsor wants a follow-up call",
+            "body": "Hey Mark, one of our retail sponsors wants a quick call to talk about extending the partnership next year. Proposed Wednesday, August 12th, 2026, let me know if that works or if you'd rather I find another time.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.she-s-staying",
+            "served_date": "2026-07-04",
+            "sender": "HR",
+            "subject": "She's staying",
+            "body": "Hey Mark, good news, the retention conversation went really well and she's decided to stay. Huge relief, especially with the comp wrapping up soon. Thanks for prioritizing it.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-call-no-longer-needed",
+            "served_date": "2026-07-05",
+            "sender": "BIZDEV",
+            "subject": "Sponsor call no longer needed",
+            "body": "Hey Mark, good news, the sponsor said they're happy to just continue as is for now, so we don't need that call after all. Sorry for the back and forth, feel free to drop it from your calendar.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.let-s-set-up-a-recap",
+            "served_date": "2026-07-06",
+            "sender": "VP_PRODUCT",
+            "subject": "Let's set up a recap",
+            "body": "Hey Mark, now that the final's done, could we grab some time to recap how the whole comp went, what worked, what we'd change for next year? Thinking Friday, September 25th, 2026 if that works.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.great-year-overall",
+            "served_date": "2026-07-07",
+            "sender": "VP_PRODUCT",
+            "subject": "Great year overall",
+            "body": "Hey Mark, just wanted to say thanks for being so involved this year, especially with everything else on your plate. The teams really noticed and it made a difference. Looking forward to next year already.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.confirmed-for-the-new-sponsor-call",
+            "served_date": "2026-07-08",
+            "sender": "BIZDEV",
+            "subject": "Confirmed for the new sponsor call",
+            "body": "Hey Mark, just confirming the intro call with the new sponsor is locked in. I'll send over a quick brief beforehand so you've got context.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.press-wants-a-short-interview",
+            "served_date": "2026-07-09",
+            "sender": "COMMS",
+            "subject": "Press wants a short interview",
+            "body": "Hey Mark, one of the trade outlets that came to the press preview wants a short follow up interview with you about the comp, maybe 20 minutes. Could we pencil in Friday, September 18th, 2026?\n\nCommunications / PR"
+          },
+          {
+            "email_id": "Innovation-comp.mid-comp-check-in-with-the-teams",
+            "served_date": "2026-07-10",
+            "sender": "OPS",
+            "subject": "Mid-comp check-in with the teams",
+            "body": "Hey Mark, we're doing a quick mid-point check-in with all five teams this Thursday, mostly just progress updates and Q&A. Happy to send you the notes afterward if you can't make it.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.press-interview-confirmed",
+            "served_date": "2026-07-11",
+            "sender": "COMMS",
+            "subject": "Press interview confirmed",
+            "body": "Hey Mark, just confirming the interview slot with the trade outlet is locked in, they're excited to chat. I'll send a couple of likely questions beforehand so you're not caught off guard.\n\nCommunications / PR"
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "Innovation-comp.prep-doc-for-the-board-presentation",
+            "served_date": "2026-07-12",
+            "sender": "VP_PRODUCT",
+            "subject": "Prep doc for the board presentation",
+            "body": "Hey Mark, ahead of the board presentation, could you skim through the slide draft and flag anything that feels off? Doesn't need to be a deep review, just a gut check.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.mixer-was-a-hit",
+            "served_date": "2026-07-12",
+            "sender": "VP_MARKETING",
+            "subject": "Mixer was a hit",
+            "body": "Hey Mark, just wanted to say the sponsor mixer went really well, good turnout and a few of the partners mentioned they'd love to be more involved next year. No action needed, just sharing the good news.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.final-headcount-for-the-recap",
+            "served_date": "2026-07-12",
+            "sender": "OPS",
+            "subject": "Final headcount for the recap",
+            "body": "Hey Mark, just confirming numbers for the recap session, looks like it'll be a small group, six or seven of us. Nothing needed from you, just prepping the room.\n\nOperations"
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E18",
+        "target_email_id": "Innovation-comp.post-recap-follow-ups",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": 0,
+            "operation": {
+              "verb": "create",
+              "name": " thank_judges",
+              "kind": "todo",
+              "match": [
+                "judges"
+              ],
+              "on": {
+                "eq": "@recap_meeting+2d"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` ** thank_judges** as a **todo**; identity words: `judge, thank`\n- date predicate `{\"eq\": \"@recap_meeting+2d\"}` → **to-do ~\" thank judges\" @ Sun Sep 27**\n  - `@recap_meeting` = Fri Sep 25 2026, set by `Innovation-comp.let-s-set-up-a-recap`",
+            "current_grader_target_result": "FAIL — on the wrong day  \n**Grader's `actual`:** \"Send thank you note to pitch comp judges\" Sat Sep 26 5 PM"
+          }
+        ],
+        "other_keyed_operations": [],
+        "capture_day": 42,
+        "capture_date": "2026-07-12",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_042.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e18r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E18-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E18-r1/final.json",
+          "stage_a_sha256": "8b69c14f9ba8c090b8c8aa75a7f896822b71d8301e757e6f6669cd279474b469",
+          "final_sha256": "d0b8d73dac322c6f88145a60cd75d3c503362f79392e86414c41c3a01ad1eb5f"
+        },
+        {
+          "agent_task": "/root/e18r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E18-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E18-r2/final.json",
+          "stage_a_sha256": "c41f4b38e406950d68913c8fd30d4087557520b09195db3b1913b4940aad9001",
+          "final_sha256": "213c32ab4ebf9b1503d2009ade84c4b7fa6e0cbfdb6fc2a164f7f44b2c0dfc4e"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/041.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/042.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_042.jsonl",
+        "history": "all raw days 001 through 041, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E18/history-actions.jsonl": "cafbd4121b5bdf72367f71aea9fde46a297091339fad6b7c403321e855cf8257",
+        "packets/E18/stage-a.json": "c34ce9112f2fd456a31190302a9445afb7f7f4dd9d6ff4b4e95f53f0af646164",
+        "packets/E18/day-tool-trace.json": "d7f46ab59f91f570fee72fb5933e42fc3f9670970170cabd3b48760951391fde",
+        "packets/E18/all_available_emails.json": "a4e37d34faa7958a7b2fa409d4ae5588dd8094f4cb4f1ca7cbf7a60f2845ab9e",
+        "packets/E18/full-state-after.json": "f728ea9fa7e710e5c76c9b24eec31f9536d17edb36d3af85090ee3c77c78bd00",
+        "packets/E18/full-state-before.json": "6826637559fdfd95ff41959eefb006dc3b3a358639b8d2c5e70dcc3e04ec38f5",
+        "packets/E18/stage-b.json": "e84b6df03fac8af64892718f6a7b4c934be557028779d5363fbe0a3eb90933fa"
+      }
+    },
+    {
+      "case_id": "E19",
+      "batch": 3,
+      "email_id": "Innovation-comp.prep-doc-for-the-board-presentation",
+      "day": 42,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "35",
+          "op_index": 0
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E19",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "Innovation-comp.prep-doc-for-the-board-presentation",
+          "served_date": "2026-07-12",
+          "sender": "VP_PRODUCT",
+          "subject": "Prep doc for the board presentation",
+          "body": "Hey Mark, ahead of the board presentation, could you skim through the slide draft and flag anything that feels off? Doesn't need to be a deep review, just a gut check.\n\nVP Product"
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "Innovation-comp.come-check-out-the-semifinal-showcase",
+            "served_date": "2026-06-01",
+            "sender": "DESIGN",
+            "subject": "Come check out the semifinal showcase?",
+            "body": "Hey Mark, we're doing the semifinal showcase next week, three teams presenting early concepts. Totally optional but if you've got time we'd love to have you swing by for even 15 minutes.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+            "served_date": "2026-06-01",
+            "sender": "FINANCE",
+            "subject": "Need a budget meeting for the pitch comp",
+            "body": "Hey Mark, VP Product and I want to grab some time with you to go over the pitch comp budget, mainly the prize money and event costs. Could we lock in Sunday, July 5th, 2026 for that?\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-mixer-before-the-final",
+            "served_date": "2026-06-01",
+            "sender": "VP_MARKETING",
+            "subject": "Sponsor mixer before the final",
+            "body": "Hey Mark, we're putting together a small mixer with a couple of our retail partners the night before the final, mostly informal. Would be great if you could make an appearance but completely understand if your schedule's packed.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-budget-review-optional-sit-in",
+            "served_date": "2026-06-03",
+            "sender": "FINANCE",
+            "subject": "Pitch comp budget review, optional sit-in",
+            "body": "Hey Mark, we're doing a quick internal budget review for the pitch comp spend so far, nothing major, just making sure we're tracking against plan. You're welcome to join if you want visibility but it's not necessary.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.quick-win-to-share",
+            "served_date": "2026-06-03",
+            "sender": "HR",
+            "subject": "Quick win to share",
+            "body": "Hey Mark, thought you'd want to know, one of the junior engineers on team three told me this comp is the reason she's staying with us another year. Just a nice moment, nothing needed from you.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+            "served_date": "2026-06-04",
+            "sender": "VP_PRODUCT",
+            "subject": " Pitch comp is on, locking in the final date",
+            "body": "Hey Mark,\n\nKicking off this year's innovation pitch competition starting next week. Teams will be working on new product concepts for about a month, then we'll do the final pitch event on Wednesday, July 15th, 2026. There'll be a few smaller showcases along the way too, will send those as they come up.\n\nExcited to see what people come up with this year.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2",
+            "served_date": "2026-06-06",
+            "sender": "VP_PRODUCT",
+            "subject": "re: Pitch comp is on, locking in the final date",
+            "body": "Thanks Mark, makes sense. I'll keep you off the calendar for the team showcases and just have you down for the final. Will loop you back in closer to the date.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.judges-prep-session-want-in",
+            "served_date": "2026-06-07",
+            "sender": "BIZDEV",
+            "subject": "Judges prep session, want in?",
+            "body": "Hey Mark, we're running a quick prep session with the judging panel before the final to align on scoring criteria. Figured I'd ask in case you wanted to sit in, no pressure either way.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+            "served_date": "2026-06-08",
+            "sender": "GC",
+            "subject": "Heads up, one of the pitches might step on toes",
+            "body": "Heads up, one of the pitcHey Mark, quick flag, one of the team pitches involves a sole design that's pretty close to something we already have a patent filed on internally. Not a big deal, just want to make sure we don't accidentally green light something that creates an internal conflict. Can you make a note to ask about it after the final?\n\nGeneral Counsel"
+          },
+          {
+            "email_id": "Innovation-comp.a-kid-drew-the-new-logo-concept",
+            "served_date": "2026-06-09",
+            "sender": "",
+            "subject": "A kid drew the new logo concept",
+            "body": "Hey Mark, funny one for you, one of the engineer's kids was at the office during the showcase and apparently sketched their own \"shoe of the future\" on a napkin. The team loved it so much they pinned it up in the design room. Just a nice morale moment, nothing to do.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.one-of-our-designers-got-a-job-offer",
+            "served_date": "2026-06-09",
+            "sender": "HR",
+            "subject": "One of our designers got a job offer",
+            "body": "Hey Mark, slightly awkward timing but one of the designers on team two, who's been doing great work on the comp, got an external offer this week. I'd like to put together a retention conversation before she makes a decision. Can we make sure that happens this week?\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.storm-warning-for-finals-week",
+            "served_date": "2026-06-10",
+            "sender": "OPS",
+            "subject": "Storm warning for finals week",
+            "body": "Hey Mark, forecast is calling for some pretty rough weather the same week as the final. We've got a backup plan to move everything to the larger conference room if needed, just wanted you aware in case travel gets messy.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.two-weeks-out-from-the-final",
+            "served_date": "2026-06-10",
+            "sender": "OPS",
+            "subject": "Two weeks out from the final",
+            "body": "Hey Mark, just a heads up, we're two weeks out from the final pitch event. Venue's booked, AV is sorted, and the agenda is locked. You're all set, nothing to action.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.found-a-typo-on-the-trophy",
+            "served_date": "2026-06-11",
+            "sender": "DESIGN",
+            "subject": "Found a typo on the trophy",
+            "body": "Hey Mark, small but annoying, the trophy engraving has a typo in the company name, missing a letter. We caught it before it shipped to the engraver, just need a quick approval on the corrected text before we reorder.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.press-preview-ahead-of-the-final",
+            "served_date": "2026-06-12",
+            "sender": "COMMS",
+            "subject": "Press preview ahead of the final",
+            "body": "Hey Mark, we've got a small press preview set up the morning of the final, giving a couple of trade outlets early access to the concepts under embargo. You're not needed for it but wanted to keep you posted since it's the same day.\n\nCommunications / PR"
+          },
+          {
+            "email_id": "Innovation-comp.today-s-the-day",
+            "served_date": "2026-06-13",
+            "sender": "VP_PRODUCT",
+            "subject": "Today's the day",
+            "body": "Hey Mark, good luck to everyone presenting today. Room's set up, judges are briefed, see you there.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.new-sponsor-wants-to-chat",
+            "served_date": "2026-06-14",
+            "sender": "IR",
+            "subject": "New sponsor wants to chat",
+            "body": "Hey Mark, a new potential sponsor reached out after hearing about the comp, they'd like an intro call. Proposed Tuesday, August 25th, 2026, let me know if you'd rather I take it solo.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.vp-product",
+            "served_date": "2026-06-14",
+            "sender": "VP_PRODUCT",
+            "subject": "Quick reminder on the final",
+            "body": "Hey Mark, just confirming you're still good for the final on the date we locked in. Also wanted to flag, the day before we're doing a full dry run with all five teams back to back, probably useful context if you wanted to drop in but no obligation at all.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.brief-for-the-new-sponsor-call",
+            "served_date": "2026-06-15",
+            "sender": "BIZDEV",
+            "subject": "Brief for the new sponsor call",
+            "body": "Hey Mark, attaching a short brief on the new sponsor ahead of your call with them. Covers who they are, what they're looking for, and a couple of talking points. Nothing to action, just background.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.great-session-today",
+            "served_date": "2026-06-15",
+            "sender": "VP_MARKETING",
+            "subject": "Great session today",
+            "body": "Hey Mark, that was a really strong final, lots of great energy in the room. Congrats to the winning team. Wanted to say thanks for being there, made a big difference.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.final-lineup-confirmed",
+            "served_date": "2026-06-17",
+            "sender": "VP_PRODUCT",
+            "subject": "Final lineup confirmed",
+            "body": "Hey Mark, just confirming the final five teams are locked in for the pitch event. Everyone's prepped and ready to go, nothing needed from you, just wanted to keep you in the loop ahead of time.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.trophy-design-quick-look",
+            "served_date": "2026-06-18",
+            "sender": "DESIGN",
+            "subject": "Trophy design, quick look?",
+            "body": "Hey Mark, we landed on a design for the winner's trophy, nothing fancy but wanted you to see it before we order. Attaching a render, let me know if anything feels off, otherwise we'll go ahead.\n\nDesign Lead"
+          },
+          {
+            "email_id": "Innovation-comp.travel-heads-up-for-finals-week",
+            "served_date": "2026-06-21",
+            "sender": "OPS",
+            "subject": "Travel heads up for finals week",
+            "body": "Hey Mark, just a heads up, a few of the visiting partners will be in town finals week, so the office might be a bit busier than usual. Nothing for you to do, just a heads up in case you notice extra faces around.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.need-your-sign-off-on-prize-amounts",
+            "served_date": "2026-06-23",
+            "sender": "FINANCE",
+            "subject": "Need your sign off on prize amounts",
+            "body": "Hey Mark, before we announce anything to the teams, can you give a quick thumbs up on the prize amounts we discussed? Just need a yes or no, shouldn't take long.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.kickoff-went-well",
+            "served_date": "2026-06-25",
+            "sender": "OPS",
+            "subject": "Kickoff went well",
+            "body": "Hey Mark, quick update, kickoff this morning went great and we've got five teams signed up already. Attaching the agenda and team list for you, nothing needed from you, just wanted you in the loop.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.board-slot-the-week-after-finals",
+            "served_date": "2026-06-26",
+            "sender": "VP_PRODUCT",
+            "subject": "Board slot the week after finals?",
+            "body": "Hey Mark, one more ask. Could we grab a slot with the board about a week after the final, so we can walk them through whatever wins? Same time as the final would be ideal if it works for you, just makes it easier to plan around.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.thanks-for-the-sign-off",
+            "served_date": "2026-06-27",
+            "sender": "FINANCE",
+            "subject": "Thanks for the sign off",
+            "body": "Hey Mark, got your thumbs up, thanks for the quick turnaround. We'll let the teams know the prize amounts today.\n\nFinance"
+          },
+          {
+            "email_id": "Innovation-comp.team-morale-lunch-during-the-comp",
+            "served_date": "2026-07-02",
+            "sender": "HR",
+            "subject": "Team morale lunch during the comp",
+            "body": "Hey Mark, a few of us are organizing a casual lunch for everyone involved in the pitch comp, just a small thank you for the extra hours people are putting in. Would be a nice touch if you could pop by but totally understand if you can't.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.quick-favor-before-the-final",
+            "served_date": "2026-07-03",
+            "sender": "IR",
+            "subject": "Quick favor before the final",
+            "body": "Hey Mark, ahead of the board presentation, could you put together a one pager on the comp for the board deck? Doesn't need to be polished, just bullet points on what's coming up.\n\nInvestor Relations"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-wants-a-follow-up-call",
+            "served_date": "2026-07-03",
+            "sender": "BIZDEV",
+            "subject": "Sponsor wants a follow-up call",
+            "body": "Hey Mark, one of our retail sponsors wants a quick call to talk about extending the partnership next year. Proposed Wednesday, August 12th, 2026, let me know if that works or if you'd rather I find another time.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.she-s-staying",
+            "served_date": "2026-07-04",
+            "sender": "HR",
+            "subject": "She's staying",
+            "body": "Hey Mark, good news, the retention conversation went really well and she's decided to stay. Huge relief, especially with the comp wrapping up soon. Thanks for prioritizing it.\n\nHead of HR"
+          },
+          {
+            "email_id": "Innovation-comp.sponsor-call-no-longer-needed",
+            "served_date": "2026-07-05",
+            "sender": "BIZDEV",
+            "subject": "Sponsor call no longer needed",
+            "body": "Hey Mark, good news, the sponsor said they're happy to just continue as is for now, so we don't need that call after all. Sorry for the back and forth, feel free to drop it from your calendar.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.let-s-set-up-a-recap",
+            "served_date": "2026-07-06",
+            "sender": "VP_PRODUCT",
+            "subject": "Let's set up a recap",
+            "body": "Hey Mark, now that the final's done, could we grab some time to recap how the whole comp went, what worked, what we'd change for next year? Thinking Friday, September 25th, 2026 if that works.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.great-year-overall",
+            "served_date": "2026-07-07",
+            "sender": "VP_PRODUCT",
+            "subject": "Great year overall",
+            "body": "Hey Mark, just wanted to say thanks for being so involved this year, especially with everything else on your plate. The teams really noticed and it made a difference. Looking forward to next year already.\n\nVP Product"
+          },
+          {
+            "email_id": "Innovation-comp.confirmed-for-the-new-sponsor-call",
+            "served_date": "2026-07-08",
+            "sender": "BIZDEV",
+            "subject": "Confirmed for the new sponsor call",
+            "body": "Hey Mark, just confirming the intro call with the new sponsor is locked in. I'll send over a quick brief beforehand so you've got context.\n\nBusiness Development"
+          },
+          {
+            "email_id": "Innovation-comp.press-wants-a-short-interview",
+            "served_date": "2026-07-09",
+            "sender": "COMMS",
+            "subject": "Press wants a short interview",
+            "body": "Hey Mark, one of the trade outlets that came to the press preview wants a short follow up interview with you about the comp, maybe 20 minutes. Could we pencil in Friday, September 18th, 2026?\n\nCommunications / PR"
+          },
+          {
+            "email_id": "Innovation-comp.mid-comp-check-in-with-the-teams",
+            "served_date": "2026-07-10",
+            "sender": "OPS",
+            "subject": "Mid-comp check-in with the teams",
+            "body": "Hey Mark, we're doing a quick mid-point check-in with all five teams this Thursday, mostly just progress updates and Q&A. Happy to send you the notes afterward if you can't make it.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.press-interview-confirmed",
+            "served_date": "2026-07-11",
+            "sender": "COMMS",
+            "subject": "Press interview confirmed",
+            "body": "Hey Mark, just confirming the interview slot with the trade outlet is locked in, they're excited to chat. I'll send a couple of likely questions beforehand so you're not caught off guard.\n\nCommunications / PR"
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "Innovation-comp.post-recap-follow-ups",
+            "served_date": "2026-07-12",
+            "sender": "OPS",
+            "subject": "Post recap follow ups",
+            "body": "Hey Mark, after the recap, could you send a short thank you note to the judges? They put in a lot of time and a few words from you would mean a lot.\n\nOperations"
+          },
+          {
+            "email_id": "Innovation-comp.mixer-was-a-hit",
+            "served_date": "2026-07-12",
+            "sender": "VP_MARKETING",
+            "subject": "Mixer was a hit",
+            "body": "Hey Mark, just wanted to say the sponsor mixer went really well, good turnout and a few of the partners mentioned they'd love to be more involved next year. No action needed, just sharing the good news.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Innovation-comp.final-headcount-for-the-recap",
+            "served_date": "2026-07-12",
+            "sender": "OPS",
+            "subject": "Final headcount for the recap",
+            "body": "Hey Mark, just confirming numbers for the recap session, looks like it'll be a small group, six or seven of us. Nothing needed from you, just prepping the room.\n\nOperations"
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E19",
+        "target_email_id": "Innovation-comp.prep-doc-for-the-board-presentation",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": 0,
+            "operation": {
+              "verb": "create",
+              "name": "review_board_slides",
+              "kind": "todo",
+              "match": [
+                "slides"
+              ],
+              "on": {
+                "eq": "@__obl_Innovation_comp__board_presentation-2d"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` **review_board_slides** as a **todo**; identity words: `board, slide`\n- date predicate `{\"eq\": \"@__obl_Innovation_comp__board_presentation-2d\"}` → **to-do ~\"review board slides\" @ Mon Jul 20**\n  - `@board_presentation` = Wed Jul 22 2026, set by `Innovation-comp.board-slot-the-week-after-finals`",
+            "current_grader_target_result": "FAIL — on the wrong day  \n**Grader's `actual`:** \"Review board presentation slide draft\" Tue Jul 21 5 PM"
+          }
+        ],
+        "other_keyed_operations": [],
+        "capture_day": 42,
+        "capture_date": "2026-07-12",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_042.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e19r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E19-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E19-r1/final.json",
+          "stage_a_sha256": "5610f20159fae74f5ab32f9adb8afeebe5ab589f48d073a9aef52df8ad9c8774",
+          "final_sha256": "2679dc9d3dd4c37fe24776da5e0b9f852eb46c2dcff42c130013a74d0e438d21"
+        },
+        {
+          "agent_task": "/root/e19r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E19-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E19-r2/final.json",
+          "stage_a_sha256": "5575b608345c665728e52f9434d31db9ce2bdc2258a11cd3d95ef9d715366b99",
+          "final_sha256": "81c46209648d4f7049d2af22df18ab0ecab4b8cf9e65f532b21312d779dea57f"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/041.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/042.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_042.jsonl",
+        "history": "all raw days 001 through 041, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E19/history-actions.jsonl": "cafbd4121b5bdf72367f71aea9fde46a297091339fad6b7c403321e855cf8257",
+        "packets/E19/stage-a.json": "872b5aa036c2e3f9e92ea825b48f8bcf888d4292ef614e0126763d69d27ce28f",
+        "packets/E19/day-tool-trace.json": "d7f46ab59f91f570fee72fb5933e42fc3f9670970170cabd3b48760951391fde",
+        "packets/E19/all_available_emails.json": "a4e37d34faa7958a7b2fa409d4ae5588dd8094f4cb4f1ca7cbf7a60f2845ab9e",
+        "packets/E19/full-state-after.json": "f728ea9fa7e710e5c76c9b24eec31f9536d17edb36d3af85090ee3c77c78bd00",
+        "packets/E19/full-state-before.json": "6826637559fdfd95ff41959eefb006dc3b3a358639b8d2c5e70dcc3e04ec38f5",
+        "packets/E19/stage-b.json": "e6b496f46c20363c453649a2ec73e338989189bf59096bbdabfd1e7ba365eeea"
+      }
+    },
+    {
+      "case_id": "E20",
+      "batch": 3,
+      "email_id": "shoe-product-launch-delays.budget-exceeded",
+      "day": 43,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "36",
+          "op_index": 1
+        },
+        {
+          "target_id": "T2",
+          "worksheet_item": "37",
+          "op_index": 2
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E20",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "shoe-product-launch-delays.budget-exceeded",
+          "served_date": "2026-07-13",
+          "sender": "CFO",
+          "subject": "Budget Exceeded",
+          "body": "Hello Mark,\n\nOur budget has been exceeded by 20% and projected to cost even more since we haven’t done advertising yet.\n\nWe really need another week to discuss this budget problem. I understand the advertising was suppose to launch on Wednesday, July 15th, 2026 but we need to push this back to Wednesday, July 22nd, 2026. Let’s reschedule that back a week to the 22nd of this month, and we’ll have a budget meeting on Wednesday, July 15th, 2026 instead.\n\nIt’s also good to have another meeting every two weeks. For now, let’s schedule one for Wednesday, July 29th, 2026.\n\nThank you,\nBill"
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "shoe-product-launch-delays.product-launch-ready",
+            "served_date": "2026-06-05",
+            "sender": "VP_MARKETING",
+            "subject": "Product launch ready",
+            "body": "Hey Mark,\n\nEverything is on track to proceed with the product launch! We were only delayed by a week or so.\n\nThanks,\nJosh"
+          },
+          {
+            "email_id": "shoe-product-launch-delays.product-launch-ready-soon",
+            "served_date": "2026-06-12",
+            "sender": "COO",
+            "subject": "Product launch ready soon!",
+            "body": "Hey Mark,\n\nHappy to report, I’ve talked to our lead of design Melissa and it looks like the new batch of shoe designs for Acme will be ready very soon. Afterwards, I will arrange some final look-overs and then we can start producing the new shoes! Let me know if you have any questions.\n\nThanks,\nDamien"
+          },
+          {
+            "email_id": "shoe-product-launch-delays.design-team-meeting",
+            "served_date": "2026-06-19",
+            "sender": "COO",
+            "subject": "Design Team Meeting",
+            "body": "Hey Mark,\n\nI spoke with Melissa as I believe you have too. We came to the agreement that half their team is effectively non-productive.\n\nLet’s schedule a meeting Monday, June 22nd, 2026 to discuss who we can let go.\n\nBefore then, can you have 1-2 people in mind? I’m thinking between Alice, Drake, and Bobby.\n\nThanks,\nDamien"
+          },
+          {
+            "email_id": "shoe-product-launch-delays.design-delays-internal-conflicts",
+            "served_date": "2026-07-08",
+            "sender": "DESIGN",
+            "subject": "Design delays - internal conflicts",
+            "body": "Hi Mark,\n\nUnfortunately this second batch of shoes’ designs were not completed in time. I understand we scheduled the release for next week but there were some internal conflicts within our department.\n\nI assure you we will have the designs ready in two weeks and at the same time, our marketing lead will work on advertisements. I believe Josh wanted you to double check his work the day he's done, could you please do that? He said it would be ready on Wednesday, July 15th, 2026.\n\nP.S. I also wanted to discuss privately with you the future of the design team to ensure these internal conflicts never happen again. Let’s schedule a meeting, I was thinking Wednesday, July 8th, 2026.\n\nBest,\nMelissa"
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "Partnership-with-deeptech-companies.boston-partnership-trip",
+            "served_date": "2026-07-13",
+            "sender": "CTO",
+            "subject": "Boston Partnership Trip",
+            "body": "Hi Mark,\n\nGuys from R&D and I are planning to visit WHOOP's HQ in Boston to advise on the fabrication process. We'd love you to join. We'll decide on dates during our ad-hoc strategy meeting on Monday, July 20th, 2026. If you have any other companies we can pay a visit to on your mind, please let me know till then."
+          },
+          {
+            "email_id": "Planning.locked-in-for",
+            "served_date": "2026-07-13",
+            "sender": "BOARD_CHAIR",
+            "subject": "Locked in for sign-off meeting",
+            "body": "Mark, we're good to go!"
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E20",
+        "target_email_id": "shoe-product-launch-delays.budget-exceeded",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": 1,
+            "operation": {
+              "verb": "create",
+              "name": "First bill meeting",
+              "kind": "event",
+              "match": [
+                "first"
+              ],
+              "on": {
+                "eq": "@budget_meeting_bill"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` **First bill meeting** as a **event**; identity words: `bill, first`\n- date predicate `{\"eq\": \"@budget_meeting_bill\"}` → **event ~\"First bill meeting\" @ Wed Jul 15**\n  - `@budget_meeting_bill` = Wed Jul 15 2026, set by `shoe-product-launch-delays.budget-exceeded`\n- other ops in this email: move `Double check Josh's advertising work`; create `Second bill meeting`",
+            "current_grader_target_result": "FAIL — no event titled like \"First bill meeting\" was created  \n**Grader's `actual`:** (nothing matching created)"
+          },
+          {
+            "target_id": "T2",
+            "operation_index": 2,
+            "operation": {
+              "verb": "create",
+              "name": "Second bill meeting",
+              "kind": "event",
+              "match": [
+                "second"
+              ],
+              "on": {
+                "eq": "@second_bill_meeting"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` **Second bill meeting** as a **event**; identity words: `bill, second`\n- date predicate `{\"eq\": \"@second_bill_meeting\"}` → **event ~\"Second bill meeting\" @ Wed Jul 29**\n  - `@second_bill_meeting` = Wed Jul 29 2026, set by `shoe-product-launch-delays.budget-exceeded`\n- other ops in this email: move `Double check Josh's advertising work`; create `First bill meeting`",
+            "current_grader_target_result": "FAIL — no event titled like \"Second bill meeting\" was created  \n**Grader's `actual`:** (nothing matching created)"
+          }
+        ],
+        "other_keyed_operations": [
+          {
+            "verb": "move",
+            "name": "Double check Josh's advertising work",
+            "kind": "todo",
+            "match": [
+              "advertising"
+            ],
+            "on": {
+              "eq": "dom:22,0m"
+            },
+            "tolerance": "exact_day"
+          }
+        ],
+        "capture_day": 43,
+        "capture_date": "2026-07-13",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e20r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E20-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E20-r1/final.json",
+          "stage_a_sha256": "4b9427f9d1b158160bf449eb278fe5961000e079e3a93e2e6b45167b55610559",
+          "final_sha256": "d7ffb8bffb73d48859f37d49e06f1de7ba05edbf2172810dab1c163cd3b70eef"
+        },
+        {
+          "agent_task": "/root/e20r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E20-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E20-r2/final.json",
+          "stage_a_sha256": "7f83ca4253a807ae4e35c289c0f9df0883f1e425044b2f8adaade5ae9aabc4d6",
+          "final_sha256": "9c01902c97ca63ea51070eac91e50eb3c9bfc51bec672aca1de6fb7d3f384a2f"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/042.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/043.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_043.jsonl",
+        "history": "all raw days 001 through 042, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E20/history-actions.jsonl": "f6924c319f986498e281762f6c21aa77f12ee09cb9c731b31769e402f08fe830",
+        "packets/E20/stage-a.json": "61a947a361b1d924160b353d42b31205f2344b5c933b3739a926ff655c53c308",
+        "packets/E20/day-tool-trace.json": "ef6047f041450c72d00174827a5be8e946d761337a98058ea4ced761c6dcbfa0",
+        "packets/E20/all_available_emails.json": "7d36d8a76588bbfb22a5eeb6f2c27069dde964d908e2019863d38a70f9a9b6f2",
+        "packets/E20/full-state-after.json": "5327f6a072b92036a7792db65df801cf446850bd38a95f09943f926e0aad87a4",
+        "packets/E20/full-state-before.json": "f728ea9fa7e710e5c76c9b24eec31f9536d17edb36d3af85090ee3c77c78bd00",
+        "packets/E20/stage-b.json": "189647fb680d578af10543dd77e92fffd3db9da341293a33e1c3b8f467ed28b5"
+      }
+    },
+    {
+      "case_id": "E21",
+      "batch": 3,
+      "email_id": "Partnership-with-deeptech-companies.boston-partnership-trip",
+      "day": 43,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "38",
+          "op_index": 0
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E21",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "Partnership-with-deeptech-companies.boston-partnership-trip",
+          "served_date": "2026-07-13",
+          "sender": "CTO",
+          "subject": "Boston Partnership Trip",
+          "body": "Hi Mark,\n\nGuys from R&D and I are planning to visit WHOOP's HQ in Boston to advise on the fabrication process. We'd love you to join. We'll decide on dates during our ad-hoc strategy meeting on Monday, July 20th, 2026. If you have any other companies we can pay a visit to on your mind, please let me know till then."
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "Partnership-with-deeptech-companies.whoop-collaboration-meeting",
+            "served_date": "2026-06-16",
+            "sender": "CTO",
+            "subject": "WHOOP Collaboration Meeting",
+            "body": "Hi Mark,\n\nI just had a call with a WHOOP's CSO, and he shared that they designed a new device that can be integrated in running shoes to track any runner's performance and can potentially be used to improve performance. We can start working on a new shoe line with it. Let's have a meeting with them on Wednesday, June 24th, 2026."
+          },
+          {
+            "email_id": "Partnership-with-deeptech-companies.whoop-meeting-reschedule",
+            "served_date": "2026-06-17",
+            "sender": "CTO",
+            "subject": "WHOOP Meeting Reschedule",
+            "body": "Hi Mark,\nWHOOP just gave me a call and asked to reschedule our meeting to earlier on Wednesday morning, now we start at 9:00am."
+          },
+          {
+            "email_id": "Partnership-with-deeptech-companies.caltech-conference-invitation",
+            "served_date": "2026-06-19",
+            "sender": "COO",
+            "subject": "FBS Invitation",
+            "body": "Hello Mark,\n\nWe received an invitation to attend and present during Footwear Biomechanics Symposium in Oslo on Tuesday, August 25th, 2026 . They would like us to tell more about our recently released line of shoes with degradable technology. Let's have a meeting on Friday, June 19th, 2026 to gather a delegation. Please talk to CTO about best candidates before then."
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "shoe-product-launch-delays.budget-exceeded",
+            "served_date": "2026-07-13",
+            "sender": "CFO",
+            "subject": "Budget Exceeded",
+            "body": "Hello Mark,\n\nOur budget has been exceeded by 20% and projected to cost even more since we haven’t done advertising yet.\n\nWe really need another week to discuss this budget problem. I understand the advertising was suppose to launch on Wednesday, July 15th, 2026 but we need to push this back to Wednesday, July 22nd, 2026. Let’s reschedule that back a week to the 22nd of this month, and we’ll have a budget meeting on Wednesday, July 15th, 2026 instead.\n\nIt’s also good to have another meeting every two weeks. For now, let’s schedule one for Wednesday, July 29th, 2026.\n\nThank you,\nBill"
+          },
+          {
+            "email_id": "Planning.locked-in-for",
+            "served_date": "2026-07-13",
+            "sender": "BOARD_CHAIR",
+            "subject": "Locked in for sign-off meeting",
+            "body": "Mark, we're good to go!"
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E21",
+        "target_email_id": "Partnership-with-deeptech-companies.boston-partnership-trip",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": 0,
+            "operation": {
+              "verb": "create",
+              "name": "Boston Companies Brainstorm",
+              "kind": "todo",
+              "match": [
+                "brainstorm"
+              ],
+              "on": {
+                "by": "@strategy_meeting"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` **Boston Companies Brainstorm** as a **todo**; identity words: `boston, brainstorm, company`\n- date predicate `{\"by\": \"@strategy_meeting\"}` → **to-do ~\"Boston Companies Brainstorm\" @ by Mon Jul 20**\n  - `@strategy_meeting` = Mon Jul 20 2026, set by `Partnership-with-deeptech-companies.boston-partnership-trip`\n- other ops in this email: create `Ad-hoc Strategy Meeting for Boston Trip`",
+            "current_grader_target_result": "FAIL — no to-do titled like \"Boston Companies Brainstorm\" was created  \n**Grader's `actual`:** (nothing matching created)"
+          }
+        ],
+        "other_keyed_operations": [
+          {
+            "verb": "create",
+            "name": "Ad-hoc Strategy Meeting for Boston Trip",
+            "kind": "event",
+            "match": [
+              "strategy"
+            ],
+            "on": {
+              "eq": "@strategy_meeting"
+            },
+            "tolerance": "exact_day"
+          }
+        ],
+        "capture_day": 43,
+        "capture_date": "2026-07-13",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e21r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E21-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E21-r1/final.json",
+          "stage_a_sha256": "79022c400ffa73b0c6873ba0ab5957043d1c3096a08dbd21ea23219b43dc8704",
+          "final_sha256": "e5a25ddf7bab2ae763051eeafda905d7a53acbe02b1e4fbdde1246d4311771d7"
+        },
+        {
+          "agent_task": "/root/e21r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E21-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E21-r2/final.json",
+          "stage_a_sha256": "743375bab06a2048b2a57083efae9e8feefaf192deac3cfac77d01f5cbcb1037",
+          "final_sha256": "9229c49e8624d51b58a62f560ca13f806f8d7e9c6773f03b2f4220b1b8df0a53"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/042.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/043.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_043.jsonl",
+        "history": "all raw days 001 through 042, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E21/history-actions.jsonl": "f6924c319f986498e281762f6c21aa77f12ee09cb9c731b31769e402f08fe830",
+        "packets/E21/stage-a.json": "f3b8b306b4b744427d1d03700f69d4b58be8ebff229e7c12d27ca2fd51bb4722",
+        "packets/E21/day-tool-trace.json": "ef6047f041450c72d00174827a5be8e946d761337a98058ea4ced761c6dcbfa0",
+        "packets/E21/all_available_emails.json": "7d36d8a76588bbfb22a5eeb6f2c27069dde964d908e2019863d38a70f9a9b6f2",
+        "packets/E21/full-state-after.json": "5327f6a072b92036a7792db65df801cf446850bd38a95f09943f926e0aad87a4",
+        "packets/E21/full-state-before.json": "f728ea9fa7e710e5c76c9b24eec31f9536d17edb36d3af85090ee3c77c78bd00",
+        "packets/E21/stage-b.json": "91d0368c39aa30c922a67576c5874cbbc23adba50f6e4eaeb12e82cad824702f"
+      }
+    },
+    {
+      "case_id": "E22",
+      "batch": 3,
+      "email_id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue-2",
+      "day": 49,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "39",
+          "op_index": 1
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E22",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue-2",
+          "served_date": "2026-07-19",
+          "sender": "VP_MARKETING",
+          "subject": "Reveal event date and venue",
+          "body": "Hi Mark,\n\nQuick note. The striker can only do media the week of the reveal, so we want a short run-through with him the day before the main event. Adding a reveal rehearsal to your calendar for the Sunday, July 12th, 2026. I'm also locking the run of show. You and the Design Lead both have speaking slots on stage at the reveal, so I'm putting her design walk-through slot on the calendar for the reveal date as well.\n\nBest,\nVP Marketing"
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight",
+            "served_date": "2026-06-10",
+            "sender": "DESIGN",
+            "subject": "Prototype status ahead of greenlight",
+            "body": "Hi Mark,\n\nQuick update before the board greenlight. Two of our three samples are here and look great. The third one, the outsole from our tooling vendor, is running late and may not make it in time for the review. A push from your office would mean more than one from me. Could you ask them to get it to us by Friday, June 12th, 2026?\n\nBest,\nDesign Lead"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.project-design-kickoff",
+            "served_date": "2026-06-14",
+            "sender": "VP_MARKETING",
+            "subject": "WC cleat launch window options",
+            "body": "Hi Mark,\n\nWe have it down to two good windows for the World Cup cleat reveal. The earlier one gives us a clean run of press and plenty of time to get the shoe into stores before the first match. The later one is closer to kickoff and may get more buzz, but it leaves a tight window to make and ship the shoe in time, since the tournament starts on a fixed date no matter what.\nBoth choices affect when we book the venue and lock in athletes. I need your call by this Friday, June 12th, 2026 so I can start booking. I think we should go with the earlier window.\n\nBest,\nVP Marketing"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.wc-cleat-launch-window-options",
+            "served_date": "2026-06-22",
+            "sender": "",
+            "subject": "WC cleat launch window options",
+            "body": "Hi Mark,\n\nJust following up so we stay on track. If I don't hear back by Monday, June 29th, 2026, I'll go with the earlier window and start holding venues. I'd rather not do that without your okay, since it locks in spending.\n\nBest,\nVP Marketing"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2",
+            "served_date": "2026-06-23",
+            "sender": "DESIGN",
+            "subject": "Prototype status ahead of greenlight",
+            "body": "Hi Mark,\n\nOne more thing. The vendor says they can hit our deadline only if we confirm the PO Friday, June 26th, 2026. I'm flagging it because the greenlight assumes all three samples are on the table. If the outsole isn't there, the board will probably push the decision back.\n\nBest,\nDesign Lead"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat",
+            "served_date": "2026-06-27",
+            "sender": "BOARD_CHAIR",
+            "subject": "Greenlight call for the WC cleat",
+            "body": "Hi Mark,\n\nThe board is ready to greenlight the World Cup cleat. We want a live call instead of a written sign-off, since the spend is large. I'd like to hold it Monday, June 29th, 2026, while the samples are still fresh. Can you put this on the calendar?\n\nBest,\nBoard Chair"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.final-colorway-for-sign-off",
+            "served_date": "2026-07-01",
+            "sender": "DESIGN",
+            "subject": "Final colorway for sign-off",
+            "body": "Hi Mark,\n\nWith the greenlight done, we're ready to lock the design. The final colorway is attached. Once you sign the design freeze, no more changes go in and we hand off to manufacturing. I need your sign-off by Sunday, July 19th, 2026 to keep the factory slot we're holding.\n\nBest,\nDesign Lead"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.final-colorway-for-sign-off-2",
+            "served_date": "2026-07-02",
+            "sender": "DESIGN",
+            "subject": "Final colorway for sign-off",
+            "body": "Hi Mark,\n\nWe hit a snag. Marketing wants a tweak to the heel logo for the cameras, and the factory needs the change drawn up and re-checked. That pushes the design freeze sign-off to Wednesday, July 8th, 2026. I know this is tight against manufacturing, so flagging it early.\n\nBest,\nDesign Lead"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue",
+            "served_date": "2026-07-05",
+            "sender": "VP_MARKETING",
+            "subject": "Reveal event date and venue",
+            "body": "Hi Mark,\n\nVenue is confirmed for the reveal. Based on the earlier window you picked, we are set to hold the reveal event on the Thursday, August 13th, 2026. It needs you on stage, so I'm putting it on your calendar now.\nLet me know if anything on your end conflicts.\n\nBest,\nVP Marketing"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal",
+            "served_date": "2026-07-07",
+            "sender": "BOARD_CHAIR",
+            "subject": "Endorsement terms for the reveal",
+            "body": "Hi Mark,\n\nThe greenlight is done, so we can move on the athlete. We have draft terms from the striker's camp to headline the reveal. The numbers are large but in line with what a World Cup face costs. I need you to review the letter of intent and give a yes or no by Friday, July 10th, 2026. His agent is holding the slot for us only until then.\n\nBest,\nBoard Chair"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.press-briefing-and-embargo",
+            "served_date": "2026-07-07",
+            "sender": "VP_MARKETING",
+            "subject": "Press briefing and embargo",
+            "body": "Hi Mark,\n\nWe want to brief press under embargo before the public reveal. I'm setting the press briefing for the Thursday, August 6th, 2026, a week ahead of the reveal.\nThe embargo plan needs your sign-off so legal can send it to outlets. Can you approve it by next Tuesday, July 14th, 2026?\n\nBest,\nVP Marketing"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.reveal-event-budget-is-over",
+            "served_date": "2026-07-15",
+            "sender": "CFO",
+            "subject": "Reveal event budget is over",
+            "body": "Friday, July 17th, 2026Hi Mark,\n\nThe reveal event plan came in about 30 percent over the cap the board set. The overage is mostly venue and the athlete's media day.\nI've built a trimmed version that lands under the cap. I need you to approve the revised event budget by Friday, July 17th, 2026 so marketing can keep booking without overcommitting.\n\nBest,\nChief Financial Officer"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal-2",
+            "served_date": "2026-07-18",
+            "sender": "BOARD_CHAIR",
+            "subject": "Endorsement terms for the reveal",
+            "body": "Hi Mark,\n\nThe agent now says he can hold the slot until next Wednesday, July 22nd, 2026, so we have a little more room. Pushing the review date back to then. No need to rush it through today.\n\nBest,\nBoard Chair"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat-2",
+            "served_date": "2026-07-18",
+            "sender": "BOARD_CHAIR",
+            "subject": "Greenlight call for the WC cleat",
+            "body": "Hi Mark,\n\nOne condition before the call. The greenlight only holds if we stay under the budget cap the CFO sent around. If the numbers have changed, I'd rather know before we meet. If not, the call stands.\n\nBest,\nBoard Chair"
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "Innovation-comp.last-year-s-recap-notes-for-reference",
+            "served_date": "2026-07-19",
+            "sender": "VP_PRODUCT",
+            "subject": "Last year's recap notes, for reference",
+            "body": "Hey Mark, digging through old files and found last year's recap notes from the comp, might be useful context before our recap this time. Attaching here, no action needed.\n\nVP Product"
+          },
+          {
+            "email_id": "World_Cup_Cleat_Launch.tooling-po-needs-approval",
+            "served_date": "2026-07-19",
+            "sender": "CFO",
+            "subject": "Tooling PO needs approval",
+            "body": "Hi Mark,\n\nThe factory won't start cutting tooling until the purchase order is approved. It's a big number, so it needs your name on it, not mine.\nPlease approve the tooling PO by Friday, July 17th, 2026. Any later and we lose the production slot that the reveal date depends on.\n\nBest,\nChief Financial Officer"
+          },
+          {
+            "email_id": "Partnership-with-deeptech-companies.boston-trip-details",
+            "served_date": "2026-07-19",
+            "sender": "CTO",
+            "subject": "Boston Trip Details",
+            "body": "Hi Mark,\n\nWe finalized dates to for the trip to be from the week of August 3rd, 2026 till Sunday, August 9th, 2026. We will visit WHOOP on the first day, and Boston Dynamics on the third one. I'll notify you if other tech companies respond."
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E22",
+        "target_email_id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue-2",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": 1,
+            "operation": {
+              "verb": "create",
+              "name": "Design Lead Stage Slot",
+              "kind": "event",
+              "match": [
+                "Design Lead Stage Slot"
+              ],
+              "on": {
+                "eq": "dom:20,0m"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` **Design Lead Stage Slot** as a **event**; identity words: `design, lead, slot, stage`\n- date predicate `{\"eq\": \"dom:20,0m\"}` → **event ~\"Design Lead Stage Slot\" @ Mon Jul 20**\n- other ops in this email: create `Reveal Rehearsal`",
+            "current_grader_target_result": "FAIL — on the wrong day  \n**Grader's `actual`:** \"Design walk-through at WC reveal\" Thu Aug 13 6:30 PM (15m)"
+          }
+        ],
+        "other_keyed_operations": [
+          {
+            "verb": "create",
+            "name": "Reveal Rehearsal",
+            "kind": "event",
+            "match": [
+              "rehearsal"
+            ],
+            "on": {
+              "eq": "dom:12,+1m"
+            },
+            "tolerance": "exact_day"
+          }
+        ],
+        "capture_day": 49,
+        "capture_date": "2026-07-19",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e22r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E22-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E22-r1/final.json",
+          "stage_a_sha256": "9c53654350825ebbd0cfbb560c5d69a3d6dd0332502ec8cb09873690e3c55963",
+          "final_sha256": "c9528582e85009df475a1ed838b23047807bbbb70bb20dc784d4407e2b789d3d"
+        },
+        {
+          "agent_task": "/root/e22r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E22-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E22-r2/final.json",
+          "stage_a_sha256": "0e4dc24f800bce1a6847f5eecdb473be86c74592c866cef75c292c07c013b62a",
+          "final_sha256": "8a3ec7c2172f32ed436fd71817c6c28c104ef6c5d8da958325c0fa76d7ac177e"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/048.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/049.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_049.jsonl",
+        "history": "all raw days 001 through 048, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E22/history-actions.jsonl": "2100160739a62ef19c0677db516b746976b41f2f964574043883bc738b996094",
+        "packets/E22/stage-a.json": "561f2e5d07c2ee764c4eafb7e94530cba7ababc6098e4a65b95f4494d9bfd7c4",
+        "packets/E22/day-tool-trace.json": "04f8408cf5c2dadd8c49935d79b6376325a92cb4d78bb279ac5956cf7fe37674",
+        "packets/E22/all_available_emails.json": "e80bafef01b666290dc401bc315dedb707c92c7fe6e1c53fa9239c1c7cf8304e",
+        "packets/E22/full-state-after.json": "bb25279e850b8e067dff9f967ac0c475908e6e3f19917a1d9643edcda0c54457",
+        "packets/E22/full-state-before.json": "fa2fc8111c23ab9363897e1b2a0adb2bad85812361e806f982235b327cc36e3f",
+        "packets/E22/stage-b.json": "8f6f5710c6ff3dcd136f366c11389aafbb07a3bae8e2262761d7b8a47139fb27"
+      }
+    },
+    {
+      "case_id": "E23",
+      "batch": 3,
+      "email_id": "Rebrand-goes-company-wide.we-need-to-talk-about-morale",
+      "day": 13,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "B7",
+          "op_index": 0
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E23",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "Rebrand-goes-company-wide.we-need-to-talk-about-morale",
+          "served_date": "2026-06-13",
+          "sender": "HR",
+          "subject": "We need to talk about morale",
+          "body": "I've got a steady stream of worried people at my door about the rebrand, and it's turning into a real retention risk. Can we grab 45 minutes on Friday, July 10th, 2026?"
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "Rebrand-goes-company-wide.hard-no-on-teasers",
+            "served_date": "2026-06-01",
+            "sender": "VP_MARKETING",
+            "subject": "Hard no on teasers",
+            "body": "Hey Mark, heard that PR wants a slow warm-up. I think that's a big mistake. The impact here lies in shock value; teasers would ruin that. My recommendation is that we go completely dark until Monday, August 10th, 2026."
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "Enterprise_Ai_Selection.fridays-meeting-time",
+            "served_date": "2026-06-13",
+            "sender": "CTO",
+            "subject": "Fridays Meeting Time",
+            "body": "Let's meet Friday, June 19th, 2026. Im packed the rest of the day."
+          },
+          {
+            "email_id": "press-tour.news-hit-fell-through",
+            "served_date": "2026-06-13",
+            "sender": "COMMS",
+            "subject": "News hit fell through",
+            "body": "The station had to bump us and couldn't reslot in time. Cancel the news segment, we'll catch the next cycle."
+          },
+          {
+            "email_id": "Innovation-comp.today-s-the-day",
+            "served_date": "2026-06-13",
+            "sender": "VP_PRODUCT",
+            "subject": "Today's the day",
+            "body": "Hey Mark, good luck to everyone presenting today. Room's set up, judges are briefed, see you there.\n\nVP Product"
+          },
+          {
+            "email_id": "Pre-Launch.dry-run-of-the-flip",
+            "served_date": "2026-06-13",
+            "sender": "VP_ENG",
+            "subject": "Dry run of the flip",
+            "body": "I want a full dress rehearsal of the site flip before the real thing, the whole team on the call watching the cutover end to end. Hold Thursday, August 6th, 2026 for the launch dry run."
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E23",
+        "target_email_id": "Rebrand-goes-company-wide.we-need-to-talk-about-morale",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": 0,
+            "operation": {
+              "verb": "create",
+              "name": "HR_morale_sync",
+              "kind": "event",
+              "match": [
+                "morale"
+              ],
+              "on": {
+                "eq": "@HR_morale_sync"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` **HR_morale_sync** as a **event**; identity words: `hr, morale`\n- date predicate `{\"eq\": \"@HR_morale_sync\"}` → **event ~\"HR morale sync\" @ Fri Jul 10**\n  - `@HR_morale_sync` = Fri Jul 10 2026, set by `Rebrand-goes-company-wide.we-need-to-talk-about-morale`",
+            "current_grader_target_result": "PASS — matched  \n**Grader's `actual`:** \"Morale discussion with HR\" Fri Jul 10 10 AM (45m)"
+          }
+        ],
+        "other_keyed_operations": [],
+        "capture_day": 13,
+        "capture_date": "2026-06-13",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e23r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E23-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E23-r1/final.json",
+          "stage_a_sha256": "214bbcdacd748bf92a09d96069c75cb7470c65d978f461d76a96ca21044b93a2",
+          "final_sha256": "845e1a50171399bf211cd43bc9090b8590776977c05f9a82b64fb610fbe9583c"
+        },
+        {
+          "agent_task": "/root/e23r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E23-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E23-r2/final.json",
+          "stage_a_sha256": "b78edd36e5bf70a654dafd5cf95dd5b38c199126edee6d4bc4eb4a5270da764a",
+          "final_sha256": "e986d166647bbe9da0c284434d50f5ca5a77996efadcabd75ba5f344bad6087c"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/012.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/013.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_013.jsonl",
+        "history": "all raw days 001 through 012, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E23/history-actions.jsonl": "427c2494c874c8bd34cb88e6d8c7270ddd467f0dbe21bbb11badacf2353c5560",
+        "packets/E23/stage-a.json": "ca3c6996699158d1676a0ae0943166ac511a1e59115f30d9bc4ddede7d596a59",
+        "packets/E23/day-tool-trace.json": "e2c7513cc54c6bf31339e54362cb684a172cf8f12f2a47467fd4e72f925b8c48",
+        "packets/E23/all_available_emails.json": "9e78fe762b7b2bd98d312e652224d765abe9bcfe0b26222917e027f1bb9c0990",
+        "packets/E23/full-state-after.json": "e4ef66cb93cbcbf679b6804944c3464a80a16890d4885930040ecc9f25074f90",
+        "packets/E23/full-state-before.json": "e7dce26d6f4f84f91f86cfd86494fd4132ca2bc2a84e089166a41ea481bfc3d5",
+        "packets/E23/stage-b.json": "4b3b1f184ef6feef8aa5e7296118e4493c888f7825cc3d68ac9bd52ae2793dd4"
+      }
+    },
+    {
+      "case_id": "E24",
+      "batch": 3,
+      "email_id": "Enterprise_Ai_Selection.ai-selection-finalization",
+      "day": 15,
+      "targets": [
+        {
+          "target_id": "T1",
+          "worksheet_item": "B8",
+          "op_index": 0
+        }
+      ],
+      "stage_a_input": {
+        "case_id": "E24",
+        "assistant_instructions": "You are an executive assistant managing one person's calendar and to-dos from their email inbox. You work ONE simulated day at a time, and you keep ONE continuous memory across all of them.\n\nEach turn is a new day. You are told only the date and that new mail has arrived — you are NOT handed the emails. You must work your own inbox:\n\n1. Call list_new_emails to see everything that arrived today (id, sender, subject — no body).\n2. For each one, call get_email(email_id) to read it, then decide the correct action(s) and call the matching tool — or do nothing.\n3. Work through the whole day's batch, then stop. Do not narrate.\n\nTOOLS:\n- list_new_emails — today's arrivals (ids + subjects). Always start here.\n- get_email(email_id) — read the full body of one email (today's or any earlier one).\n- create_event / update_event / delete_event — the calendar.\n- create_todo / update_todo / delete_todo — tasks that have a deadline.\n- search_inbox — look back at earlier emails. USE THIS whenever an email refers to a fact, date, policy, person, or decision you don't fully remember (e.g. \"two weeks after the signing\", \"per the new meeting policy\"). The information was usually set in an earlier email.\n- (no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\n\nEVERY create_event and create_todo REQUIRES the email_id of the email you are acting on — the id you got from list_new_emails. Copy it exactly.\n\nDATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\n\nRESCHEDULING: to move an event, update_event it (delete-and-recreate is also fine). To cancel, delete it. Never leave duplicates.",
+        "target_email": {
+          "email_id": "Enterprise_Ai_Selection.ai-selection-finalization",
+          "served_date": "2026-06-15",
+          "sender": "CFO",
+          "subject": "Ai Selection Finalization",
+          "body": "Mark,\n\nI have drafted up the documents to sign our deal with Anthropic. We have agreed on terms of 1Y/120k for full access employee accounts.  Please sign the formal docs by Sunday, June 21st, 2026.\n\nThank you,\nCFO"
+        },
+        "preceding_storyline_emails": [
+          {
+            "email_id": "Enterprise_Ai_Selection.final-review",
+            "served_date": "2026-06-06",
+            "sender": "CTO",
+            "subject": "Final Meeting Review",
+            "body": "Mark, \n\nThis week is busy but while it is still fresh in our heads lets meet Friday, June 5th, 2026. Not sure what time works yet but I will email you closer to Friday."
+          },
+          {
+            "email_id": "Enterprise_Ai_Selection.fridays-meeting-time",
+            "served_date": "2026-06-13",
+            "sender": "CTO",
+            "subject": "Fridays Meeting Time",
+            "body": "Let's meet Friday, June 19th, 2026. Im packed the rest of the day."
+          }
+        ],
+        "other_emails_available_in_same_day_batch": [
+          {
+            "email_id": "Company-Retreat.tasks-before-the-retreat",
+            "served_date": "2026-06-15",
+            "sender": "PARTNER",
+            "subject": "Tasks before the retreat",
+            "body": "Hi Sir,\n\nI wanted to ask you if you could handle some tasks for the trip. I wanted you to get in contact with the location we are going on June 19th, just to approve everything we have planned. While you're at it, could you also bring me a list of all the employees you want to give VIP access to by June 22nd, the retreat date?\n\nThanks,\nEvent Corridnator"
+          },
+          {
+            "email_id": "Innovation-comp.great-session-today",
+            "served_date": "2026-06-15",
+            "sender": "VP_MARKETING",
+            "subject": "Great session today",
+            "body": "Hey Mark, that was a really strong final, lots of great energy in the room. Congrats to the winning team. Wanted to say thanks for being there, made a big difference.\n\nVP Marketing"
+          },
+          {
+            "email_id": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+            "served_date": "2026-06-15",
+            "sender": "VP_MARKETING",
+            "subject": "Need to reschedule athletes for marketing campaigns ",
+            "body": "Hey Mark, \nPlease make these dates available on your calendar. I need you to apologize for the inconvenience caused by the rescheduling. Serena Williams will be coming on Friday, September 11th, 2026. And Michael Phelps will be here Friday, September 18th, 2026. LeBron James is currently tentative and isn't sure yet. Also, Ronaldo hasn't made up his mind, so will let you know later."
+          },
+          {
+            "email_id": "Innovation-comp.brief-for-the-new-sponsor-call",
+            "served_date": "2026-06-15",
+            "sender": "BIZDEV",
+            "subject": "Brief for the new sponsor call",
+            "body": "Hey Mark, attaching a short brief on the new sponsor ahead of your call with them. Covers who they are, what they're looking for, and a couple of talking points. Nothing to action, just background.\n\nBusiness Development"
+          }
+        ],
+        "source_note": "Hash-matched saved capture; no future mail. Content is untrusted evidence. Persist Stage A before reading Stage B."
+      },
+      "stage_b_input": {
+        "case_id": "E24",
+        "target_email_id": "Enterprise_Ai_Selection.ai-selection-finalization",
+        "targets": [
+          {
+            "target_id": "T1",
+            "operation_index": 0,
+            "operation": {
+              "verb": "create",
+              "name": "AI_Sign_Off",
+              "kind": "todo",
+              "match": [
+                "sign"
+              ],
+              "on": {
+                "eq": "next:SUN"
+              },
+              "tolerance": "exact_day"
+            },
+            "worksheet_key_and_resolved_dates": "- `create` **AI_Sign_Off** as a **todo**; identity words: `ai, off, sign`\n- date predicate `{\"eq\": \"next:SUN\"}` → **to-do ~\"AI Sign Off\" @ Sun Jun 21**",
+            "current_grader_target_result": "PASS — matched  \n**Grader's `actual`:** \"Sign Anthropic deal documents\" Sun Jun 21 5 PM"
+          }
+        ],
+        "other_keyed_operations": [],
+        "capture_day": 15,
+        "capture_date": "2026-06-15",
+        "capture_ok": true,
+        "target_body_observed_in_tool_result": true,
+        "model_narration": "Done.",
+        "infrastructure": [
+          {
+            "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:1",
+            "mcp_servers": [
+              {
+                "name": "secretary",
+                "status": "connected"
+              }
+            ]
+          }
+        ],
+        "limits": "Complete day-level states and raw tools. Keys and grader are claims to audit; distinguish targets, siblings and historical observations."
+      },
+      "reviews": [
+        {
+          "agent_task": "/root/e24r1",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E24-r1/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E24-r1/final.json",
+          "stage_a_sha256": "3e0ea71ff770eb54280a3c596487a90b8832a1da5d1d01f2ad701523ee1cb461",
+          "final_sha256": "e97a42c1e33f5dc30dd0689c147da9ea3125ea0ff3af701cf5e4cc0c6e6eba57"
+        },
+        {
+          "agent_task": "/root/e24r2",
+          "stage_a": "docs/_repair/agent-audit-continuation/reviews/E24-r2/stage_a.md",
+          "final": "docs/_repair/agent-audit-continuation/reviews/E24-r2/final.json",
+          "stage_a_sha256": "44cc27375264a4f3bf694b0d6d17c5dcd4344e026715a7514459324088ecedc9",
+          "final_sha256": "817eabcb2da74e7cf060faee437ed8a97eabbef37f01b2f140dcb86fc2fda113"
+        }
+      ],
+      "large_evidence_sources": {
+        "before": "captures/baseline-sonnet-4-5/days/014.json#state",
+        "after": "captures/baseline-sonnet-4-5/days/015.json#state",
+        "trace": "captures/baseline-sonnet-4-5/raw/day_015.jsonl",
+        "history": "all raw days 001 through 014, mutations and paired results only"
+      },
+      "packet_sha256": {
+        "packets/E24/history-actions.jsonl": "d713c5051b0b9088ef811b602dbf836425dea4b5fe6c0ca47d3654a600f067ef",
+        "packets/E24/stage-a.json": "8b43cc6a251e089d579bef5128cfb87476f47a700068c92085d06b61b0f9149d",
+        "packets/E24/day-tool-trace.json": "75b6d1a55f319d60b2165a2292911e3093eb2ace3e11ec9ed9ec8ec73a48fea6",
+        "packets/E24/all_available_emails.json": "a597fcdc9ac7a3ec0767aa5b4f6331556b84ceb2b1f9b47f4f6f2562702372fa",
+        "packets/E24/full-state-after.json": "22b09c5d20187ed361cb200c1ba594b9d188a799d2c5b25c3f6affc88d1ebf80",
+        "packets/E24/full-state-before.json": "8cd8fc31778fbc32cafe02c5f03896cc0bc517b09d9d11ef8fa57bde6665ae4d",
+        "packets/E24/stage-b.json": "bf612b5229cf9e99a7c3a96be9faa669582067057d2a00c0789c92c10d4a501c"
+      }
+    }
+  ],
+  "verification": {
+    "packet_hashes": 336,
+    "targets": 9,
+    "initial_reviewers": 16,
+    "stage_a_precedes_final": true,
+    "no_future_mail": true,
+    "original_human_text_preserved": true,
+    "raw_source_lines_resolve": true,
+    "seed": 42,
+    "spot_checks": [
+      "34",
+      "B7"
+    ],
+    "python_suite": "107 passed in 2.77s; unchanged benchmark sources",
+    "webapp": "typecheck/lint unavailable: dependencies absent; build blocked; no app source or UI changes"
+  }
+}

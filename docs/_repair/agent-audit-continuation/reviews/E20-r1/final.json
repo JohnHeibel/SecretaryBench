@@ -1,0 +1,93 @@
+{
+  "case_id": "E20",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "GRADER",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The exact-day target is satisfied: evt_72 is a newly created budget meeting on July 15, stamped with the target email and describing the 20% overrun. Nothing requires its title to contain 'first' or 'bill'. The grader's claim that no matching meeting was created is a title-matching false negative. YES here concerns the targeted day-level operation, not complete instruction compliance: the model separately chose 10:00 rather than the required default 09:00. That timing defect warrants MODEL as a secondary category, but does not justify this exact-day rejection or its stated reason.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:18 (day-tool-trace.json)",
+          "observation": "Observed target body: 'we’ll have a budget meeting on Wednesday, July 15th, 2026 instead.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:40-41 (day-tool-trace.json)",
+          "observation": "Successful create_event returned evt_72: title 'Budget meeting', email_id 'shoe-product-launch-delays.budget-exceeded', start '2026-07-15T10:00:00', end '2026-07-15T11:00:00', description 'Budget exceeded by 20% - discuss before advertising launch'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json:300-305",
+          "observation": "Complete stores inspected. evt_72 is absent before and present after. The unrelated pre-existing evt_2 is the pitch-comp budget meeting on July 5, not this requested meeting."
+        },
+        {
+          "source": "stage-b.json:9-21; stage-a.json assistant_instructions",
+          "observation": "Key uses match ['first'] and tolerance 'exact_day'; reported result is 'nothing matching created'. Actual assistant instructions say 'Defaults unless the email says otherwise: events 9am, 1 hour long'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    },
+    {
+      "target_id": "T2",
+      "primary_category": "GRADER",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The exact-day target is independently satisfied by evt_73, a newly created budget follow-up on July 29 with the target email's provenance and the two-week description. 'Budget follow-up meeting' expresses the requested second meeting without requiring the literal word 'second'. There is no need to infer an indefinite recurring series because the sender says 'For now' and specifies this occurrence. The false negative is title matching. YES concerns the day-level target: the separate unsupported 10:00 start violates the 09:00 default and is recorded as secondary MODEL, not used to endorse this grader rejection.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:18 (day-tool-trace.json)",
+          "observation": "Observed target body: 'It’s also good to have another meeting every two weeks. For now, let’s schedule one for Wednesday, July 29th, 2026.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_043.jsonl:42-43 (day-tool-trace.json)",
+          "observation": "Successful create_event returned evt_73: title 'Budget follow-up meeting', email_id 'shoe-product-launch-delays.budget-exceeded', start '2026-07-29T10:00:00', end '2026-07-29T11:00:00', description 'Recurring budget meeting - every two weeks'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json:308-313",
+          "observation": "Complete stores inspected. evt_73 is newly present after the day and is distinct from the July 15 meeting evt_72. No pre-existing object already fulfilled this requested July 29 occurrence."
+        },
+        {
+          "source": "stage-b.json:27-39; stage-a.json assistant_instructions",
+          "observation": "Key uses match ['second'] and tolerance 'exact_day'; rejection says 'nothing matching created'. The instructions supply a 09:00 default, whereas evt_73 starts at 10:00 without email authority."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "KEY",
+      "observation": "The sibling key moves 'Double check Josh's advertising work' to July 22, although the target email explicitly postpones the advertising launch. The July 8 email separately fixes the review to the day Josh finishes, July 15. No supplied message expressly changes that readiness/review date. The key conflates two objects and makes an unsupported mandatory review-date change.",
+      "evidence": [
+        "stage-b.json:42-54 keys a move of the review todo to dom:22,0m.",
+        "stage-a.json preceding_storyline_emails: 'Josh wanted you to double check his work the day he's done' and 'He said it would be ready on Wednesday, July 15th, 2026.'",
+        "captures/baseline-sonnet-4-5/raw/day_043.jsonl:18 says 'the advertising was suppose to launch' July 15 and 'push this back' to July 22."
+      ]
+    },
+    {
+      "category": "MODEL",
+      "observation": "The model also makes that unsupported review-date change, updating todo_66 from July 15 to July 22 and describing Josh's ads as pushed back. No distinct advertising-launch object exists in either complete store. A launch postponement may imply downstream workflow changes, but the available text does not establish that Josh's review itself moved. This sibling issue does not undermine the two created budget meetings.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_043.jsonl:38-39 updates todo_66 to '2026-07-22T17:00:00'.",
+        "full-state-before.json and full-state-after.json identify todo_66 as 'Review Josh's marketing advertisements', not an advertising-launch event."
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "observation": "Provenance confirms todo_66 originally represented the review request, supporting the object distinction without attributing a historical review failure.",
+      "evidence": [
+        "history-actions.jsonl:151-152, source captures/baseline-sonnet-4-5/raw/day_038.jsonl:45-46: create_todo returned todo_66, 'Review Josh's marketing advertisements', due '2026-07-15T17:00:00', description 'Josh (marketing lead) will have ads ready Wednesday July 15th - needs CEO review'."
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

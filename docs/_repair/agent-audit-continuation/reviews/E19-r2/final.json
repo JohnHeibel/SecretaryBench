@@ -1,0 +1,70 @@
+{
+  "case_id": "E19",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "GRADER"
+      ],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The request requires a light slide review ahead of the board presentation, with no two-day lead time. The model created todo_71 for July 21 at the default 17:00, before the July 22 presentation. Its title and description faithfully capture the review and flagging request, and it is distinct from the existing one-pager task todo_54. The exact July 20 key imports an unsupported two-day offset. The resulting wrong-day rejection is therefore unjustified against the supported request. This is successful task capture, not evidence that Mark actually reviewed the slides.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_042.jsonl:20",
+          "observation": "Observed target body: \"Hey Mark, ahead of the board presentation, could you skim through the slide draft and flag anything that feels off? Doesn't need to be a deep review, just a gut check.\""
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails, Innovation-comp.board-slot-the-week-after-finals",
+          "observation": "\"Could we grab a slot with the board about a week after the final\" establishes the board anchor; no slide-review lead time is specified."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: evt_42",
+          "observation": "Board presentation on pitch comp results remains at \"start\": \"2026-07-22T14:00:00\", \"end\": \"2026-07-22T15:30:00\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_042.jsonl:41-42",
+          "observation": "create_todo and successful result create todo_71, \"Review board presentation slide draft\", \"due_date\": \"2026-07-21T17:00:00\", description \"Skim through and flag anything that feels off - gut check, not deep review\", stamped with the target email ID."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key uses \"eq\": \"@__obl_Innovation_comp__board_presentation-2d\" and \"tolerance\": \"exact_day\". Result: \"FAIL \u2014 on the wrong day\"; actual July 21 at 5 PM."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events/todos stores",
+          "observation": "Only todo_70 and todo_71 were added; no prior objects were changed or removed. Existing todo_54 remains the separate \"Prepare comp one-pager for board deck\" task."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The storyline has inconsistent relative references to the final, but the explicit July 15 final date and July 22 stored board presentation are usable anchors. No supplied evidence establishes a mandatory July 20 review deadline."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "observation": "No other keyed operations exist for this email. Same-day todo_70 captures the separate request to thank judges after the recap, due September 26 at 17:00, after evt_62 on September 25. The two same-day FYIs produced no calendar or to-do changes. These do not affect T1.",
+      "evidence": [
+        "stage-b.json: other_keyed_operations=[]",
+        "captures/baseline-sonnet-4-5/raw/day_042.jsonl:18,22,24,39-40",
+        "full-state-after.json: todo_70 and evt_62"
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "Earlier event times/durations depart from the supplied defaults without support in their source emails: evt_5 was created July 15 14:00-16:00, and evt_42 July 22 14:00-15:30. The board request asks for the same time as the final but does not establish a 90-minute duration. These are historical scheduling defects, not grounds to reject a July 21 slide-review reminder.",
+      "evidence": [
+        "stage-a.json: assistant_instructions, Innovation-comp.pitch-comp-is-on-locking-in-the-final-da, Innovation-comp.board-slot-the-week-after-finals",
+        "captures/baseline-sonnet-4-5/raw/day_004.jsonl:35-36 (evt_5)",
+        "captures/baseline-sonnet-4-5/raw/day_026.jsonl:50-51 (evt_42)"
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

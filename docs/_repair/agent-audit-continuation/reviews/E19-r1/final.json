@@ -1,0 +1,53 @@
+{
+  "case_id": "E19",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["GRADER"],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The model created the correct slide-review task, including flagging concerns and the requested light-review scope, due July 21 at the default 17:00. That precedes the July 22 board presentation. The request says only 'ahead of the board presentation'; it does not require two days ahead or an exact July 20 deadline. The key's board_presentation-2d exact-day predicate therefore adds an unsupported requirement, and its rejection of the July 21 task is unjustified. The full stores show a new, correctly stamped todo_71 and no duplicate or replacement of the distinct one-pager task todo_54. This establishes correct task management, not that the user actually reviewed the slides.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_042.jsonl:20",
+          "observation": "Observed target body: 'ahead of the board presentation, could you skim through the slide draft and flag anything that feels off? Doesn't need to be a deep review, just a gut check.' No two-day deadline appears."
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails / Innovation-comp.board-slot-the-week-after-finals",
+          "observation": "The June 26 request says 'about a week after the final'; the June 4 final email explicitly gives 'Wednesday, July 15th, 2026'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_042.jsonl:41-42",
+          "observation": "create_todo returned id 'todo_71', email_id 'Innovation-comp.prep-doc-for-the-board-presentation', title 'Review board presentation slide draft', due_date '2026-07-21T17:00:00', description 'Skim through and flag anything that feels off - gut check, not deep review'."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Both retain evt_42 on '2026-07-22T14:00:00' and todo_54, 'Prepare comp one-pager for board deck'. Only todo_70 and todo_71 are added; no events or earlier tasks are revised or removed."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key requires 'eq': '@__obl_Innovation_comp__board_presentation-2d' with 'tolerance': 'exact_day'; resolved date is July 20. Reported verdict is 'FAIL — on the wrong day' for the July 21 task."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "Historical event times depart from the supplied defaults: evt_5 was created for July 15 14:00-16:00 even though its invitation specifies only the date; default would be 09:00 for one hour. evt_42 inherits 14:00 and uses 90 minutes without a stated duration. These prior time choices do not undermine a July 21 slide-review deadline, which precedes either board time on July 22.",
+      "evidence": [
+        "stage-a.json: assistant_instructions and Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+        "captures/baseline-sonnet-4-5/raw/day_004.jsonl:35-36 (evt_5)",
+        "captures/baseline-sonnet-4-5/raw/day_026.jsonl:50-51 (evt_42)"
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

@@ -25,8 +25,20 @@
   },
   "Q5": {
     "title": "Conflicting timing within available emails",
-    "question": "Which date controls athlete preparation (#26/#27), and does the one-pager (#28) need to precede the final or only the board presentation?",
-    "recommendation": "Keep the definite KEY findings. Leave model credit unresolved unless an evidence-based reading resolves the conflict; #28 has reviewer disagreement.",
+    "question": "Which date controls athlete preparation (#26/#27), and does the one-pager (#28) need to precede the final or only the board presentation? Two uncounted sibling questions also need interpretation: does delaying launch move the ad-review deadline, and which rehearsal date controls?",
+    "recommendation": "Keep the definite KEY findings. Leave model credit unresolved unless an evidence-based reading resolves the conflict; #28 has reviewer disagreement. Preserve the ancillary sibling questions without adding them to the 75-check coverage totals.",
     "alternatives": "The athlete\u2019s explicit August 22 date versus the newer next-week wording; the one-pager\u2019s before-final subject versus its ahead-of-board body. Neither supports the key\u2019s exact deadlines."
+  },
+  "Q6": {
+    "title": "Confirmations that repair a missing appointment",
+    "question": "May the #33 confirmation create the still-future August 25 intro when no matching appointment exists?",
+    "recommendation": "Leave attribution AMBIGUOUS unless the supplied confirmation guidance is interpreted to settle repair of missing state. The creation is not a duplicate or a revival of the cancelled retail-sponsor call.",
+    "alternatives": "Confirmation-only no-op under explicit guidance; or reconcile the absent, previously requested appointment. Neither authorizes the invented 14:00 start."
+  },
+  "Q7": {
+    "title": "Conditional requests and ownership of work",
+    "question": "Does #38 require brainstorming when the email only asks for companies if Mark already has any in mind?",
+    "recommendation": "Keep AMBIGUOUS, with no model-failure attribution absent a supplied rule turning the conditional request into mandatory work.",
+    "alternatives": "A deadline can justify a reminder to consider/send ideas; the conditional wording and avoid-over-acting instruction also support no task."
   }
 }

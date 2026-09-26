@@ -1,6 +1,6 @@
 # NEEDS_JAMES
 
-Independent reviews continue while these decisions remain open. Saved labels and notes are preserved. A new benchmark rule should be recorded prospectively rather than treated as an instruction the saved model received.
+Independent reviews continue while these decisions remain open. Saved labels and notes are preserved. Entries marked uncounted are ancillary sibling observations, outside the 75-check totals. A new benchmark rule should be recorded prospectively rather than treated as an instruction the saved model received.
 
 ## Q1: Announcements versus required calendar milestones
 
@@ -37,11 +37,11 @@ For these stale requests, how should model credit be treated: backfill required,
 
 ## Q5: Conflicting timing within available emails
 
-Items: 26, 27, 28.
+Items: 26, 27, 28, S1 (uncounted E20 sibling), S2 (uncounted E22 sibling).
 
-Which date controls athlete preparation (#26/#27), and does the one-pager (#28) need to precede the final or only the board presentation?
+Which date controls athlete preparation (#26/#27), and does the one-pager (#28) need to precede the final or only the board presentation? Two uncounted sibling questions also need interpretation: does delaying launch move the ad-review deadline, and which rehearsal date controls?
 
-**Recommendation:** Keep the definite KEY findings. Leave model credit unresolved unless an evidence-based reading resolves the conflict; #28 has reviewer disagreement.
+**Recommendation:** Keep the definite KEY findings. Leave model credit unresolved unless an evidence-based reading resolves the conflict; #28 has reviewer disagreement. Preserve the ancillary sibling questions without adding them to the 75-check coverage totals.
 
 **Competing readings:** The athlete’s explicit August 22 date versus the newer next-week wording; the one-pager’s before-final subject versus its ahead-of-board body. Neither supports the key’s exact deadlines.
 
@@ -50,6 +50,36 @@ Which date controls athlete preparation (#26/#27), and does the one-pager (#28) 
 | 26 | All this before the visit, of course! | The key anchors preparation to July 22 despite the earlier explicit August 22 visit and conflicting next-week wording. todo_53 records the guest list due August 15. That fits August 22 but not next week; model credit remains unresolved. |
 | 27 | make sure to contact the people you've selected,letting them know! | Contacting invitees is a task before the visit, not an event exactly July 22. Both the keyed kind and date are unsupported. The combined todo_53 explicitly includes contacting invitees. Content is represented, but the conflicting visit date prevents a model pass; no actual outreach is established. |
 | 28 | Subject: Quick favor before the final; body: ahead of the board presentation | The exact July 15 deadline is unsupported by either the body’s pre-board window or a literal before-final reading of the subject. todo_54 is due July 21 before the July 22 board presentation, but after the July 15 final. Reviewers disagree on model credit; queued without overturning the definite key defect. |
+| S1 (uncounted E20 sibling) | the advertising was suppose to launch ... push this back | The July 13 email moves the advertising launch; July 8 separately requires reviewing Josh’s work when ready on July 15. todo_66 and the sibling key both move the review to July 22. Whether postponing launch also postpones readiness/review is unstated. Keep this ancillary observation unadjudicated; it does not change #36/#37 or coverage. |
+| S2 (uncounted E22 sibling) | the day before the main event ... Sunday, July 12th, 2026 | The rehearsal’s explicit July 12 date conflicts with day-before the established August 13 reveal; it is already past at July 19 delivery. evt_81 and the sibling key choose August 12. Both reviewers find that reading defensible but not uniquely established. Keep this ancillary question unadjudicated; #39 remains a clear KEY finding. |
+
+## Q6: Confirmations that repair a missing appointment
+
+Items: 33.
+
+May the #33 confirmation create the still-future August 25 intro when no matching appointment exists?
+
+**Recommendation:** Leave attribution AMBIGUOUS unless the supplied confirmation guidance is interpreted to settle repair of missing state. The creation is not a duplicate or a revival of the cancelled retail-sponsor call.
+
+**Competing readings:** Confirmation-only no-op under explicit guidance; or reconcile the absent, previously requested appointment. Neither authorizes the invented 14:00 start.
+
+| Item | Email excerpt | Observed action and settled facts |
+|---|---|---|
+| 33 | just confirming the intro call with the new sponsor is locked in | The sponsor confirmation adds no new date, but its previously requested August 25 intro is absent from the before-store. evt_68 creates that missing call, distinct from the cancelled August 12 retail-sponsor call. Repair versus confirmation-only no-op is unsettled. Its 14:00 start independently violates the 09:00 default. |
+
+## Q7: Conditional requests and ownership of work
+
+Items: 38.
+
+Does #38 require brainstorming when the email only asks for companies if Mark already has any in mind?
+
+**Recommendation:** Keep AMBIGUOUS, with no model-failure attribution absent a supplied rule turning the conditional request into mandatory work.
+
+**Competing readings:** A deadline can justify a reminder to consider/send ideas; the conditional wording and avoid-over-acting instruction also support no task.
+
+| Item | Email excerpt | Observed action and settled facts |
+|---|---|---|
+| 38 | If you have any other companies we can pay a visit to on your mind, please let me know till then. | Sharing other company ideas is conditional on having them in mind; a mandatory brainstorm task is not clearly established. No company-suggestions task or equivalent exists. evt_74 covers only the strategy meeting; uncertainty about obligation, not a hidden match or outage, prevents attribution. |
 
 ## Q2: Explicit delegation to choose a slot
 

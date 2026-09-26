@@ -1,0 +1,7 @@
+The July 8 message confirms the new sponsor intro call and introduces no new date, reschedule, cancellation, or task for Mark. Sending a brief is Business Development's responsibility. The assistant instructions explicitly allow no action for confirmations.
+
+The matching earlier request is June 14, “New sponsor wants to chat”: “Proposed Tuesday, August 25th, 2026.” Thus the supported intro date is August 25, with the stated default 09:00–10:00 if a calendar entry is required. The July 3 retail-sponsor partnership-extension call is a different object, proposed August 12. The July 5 cancellation, “happy to just continue as is for now,” naturally refers to that existing retail partnership, not the new sponsor intro.
+
+The complete before-store contains no new sponsor intro or retail-sponsor follow-up event. This raises a provenance question: was the intro omitted, or mistakenly removed with the other call? The confirmation supports maintaining the August 25 intro and, if its absence is established, restoring it. It does not support deleting unrelated sponsor events or creating a briefing task. Historical actions can distinguish an inherited omission from current misunderstanding.
+
+Some preceding competition messages contradict their served dates, but the sponsor proposal's explicit date is clear and has no observed revision. Uncertainty remains about whether the confirmation should independently require repairing an absent older event, given the instruction to avoid over-acting on confirmations.

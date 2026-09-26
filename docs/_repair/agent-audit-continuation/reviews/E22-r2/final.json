@@ -1,0 +1,91 @@
+{
+  "case_id": "E22",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "MODEL"
+      ],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The supported day-level target is a separate Design Lead speaking-slot event on the confirmed reveal date, August 13. The model created exactly that event as evt_82 and preserved the main reveal evt_60. July 20 is unsupported by the target or preceding reveal confirmation. Thus the reported wrong-day failure is not justified. YES refers to the supported day-level target. Separately, the model invented 18:30 and a 15-minute duration despite the 09:00/one-hour defaults; that is an independent MODEL issue, not a reason to uphold this day-level verdict. The contradictory rehearsal date belongs to the sibling and does not authorize changing the reveal date.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:21 (day-tool-trace.json)",
+          "observation": "Observed target body: \"You and the Design Lead both have speaking slots on stage at the reveal, so I'm putting her design walk-through slot on the calendar for the reveal date as well.\""
+        },
+        {
+          "source": "stage-a.json, preceding_storyline_emails / World_Cup_Cleat_Launch.reveal-event-date-and-venue",
+          "observation": "July 5 email: \"we are set to hold the reveal event on the Thursday, August 13th, 2026.\""
+        },
+        {
+          "source": "stage-b.json, targets[0]",
+          "observation": "The key uses {\"eq\":\"dom:20,0m\"}, resolved to July 20; the reported verdict is \"FAIL — on the wrong day\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:53-54 (day-tool-trace.json)",
+          "observation": "create_event returned evt_82, \"Design walk-through at WC reveal\", start \"2026-08-13T18:30:00\", end \"2026-08-13T18:45:00\", description \"Design Lead speaking slot on stage at reveal\", with the exact target email_id."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Complete stores inspected. evt_82 is new and the only design walk-through; evt_60 remains on August 13. No preexisting objects were changed or removed."
+        },
+        {
+          "source": "stage-a.json, assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\" No exact walk-through time or duration appears in the source."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "operation": "Reveal Rehearsal",
+      "categories": [
+        "AMBIGUOUS",
+        "PLAN",
+        "MODEL"
+      ],
+      "observation": "The rehearsal explicitly names July 12 but also says the day before the reveal and within reveal week, which supports August 12 given the confirmed August 13 reveal. Literal July 12 was stale at July 19 delivery. evt_81 uses August 12, matching the supplied sibling key and the relative reading, but the source contradiction prevents unqualified day-level compliance. Separately, 10:00-12:00 violates the 09:00/one-hour defaults and stretches the stated short run-through. No sibling verdict was supplied; these issues do not determine T1.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:21",
+          "observation": "\"the week of the reveal\"; \"the day before the main event\"; \"Sunday, July 12th, 2026.\" served_date is \"2026-07-19\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:51-52",
+          "observation": "evt_81, \"WC reveal rehearsal with striker\", start \"2026-08-12T10:00:00\", end \"2026-08-12T12:00:00\"."
+        },
+        {
+          "source": "stage-b.json, other_keyed_operations[0]",
+          "observation": "Sibling key is {\"eq\":\"dom:12,+1m\"}, corresponding to August 12."
+        }
+      ],
+      "suggested_human_question": "Was the rehearsal intended for July 12 or August 12, the day before the confirmed August 13 reveal?"
+    }
+  ],
+  "historical_observations": [
+    {
+      "categories": [
+        "MODEL"
+      ],
+      "observation": "The preexisting main reveal evt_60 has the supported August 13 date, but its 18:00-20:00 timing was created without an email-specified time or duration. It cannot provide authority for the new walk-through timing. This earlier default violation is distinct from T1's incorrect July 20 key.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_035.jsonl:55-56 (history-actions.jsonl)",
+          "observation": "The original creation and returned evt_60 specify \"2026-08-13T18:00:00\" through \"2026-08-13T20:00:00\"."
+        },
+        {
+          "source": "stage-a.json, World_Cup_Cleat_Launch.reveal-event-date-and-venue",
+          "observation": "The supplied July 5 email specifies August 13 without a clock time or duration."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

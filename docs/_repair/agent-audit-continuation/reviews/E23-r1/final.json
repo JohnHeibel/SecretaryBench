@@ -1,0 +1,49 @@
+{
+  "case_id": "E23",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The day-level target passes correctly: the model created exactly one HR morale event on July 10, linked to the target email, with the requested 45-minute duration. The event identity, kind and exact day are supported by the observed email. Full instruction compliance is NO because the model selected 10:00 despite the explicit 09:00 default and no stated start time. This separate time/default defect does not invalidate the day-level PASS or show a key defect. No duplicate or competing morale object appears in either complete store.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:26",
+          "observation": "Observed target body: \"Can we grab 45 minutes on Friday, July 10th, 2026?\" The email_id is Rebrand-goes-company-wide.we-need-to-talk-about-morale."
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\" The 45-minute duration is explicit; a 10:00 start is not."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:52-53",
+          "observation": "create_event requested and returned evt_19, \"Morale discussion with HR\", \"start\": \"2026-07-10T10:00:00\", \"end\": \"2026-07-10T10:45:00\", with the exact target email_id."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "The complete before-store contains no morale event; the after-store contains evt_19 as the sole corresponding event. todo_12 remains the separate designer-retention task."
+        },
+        {
+          "source": "stage-b.json:targets[0]",
+          "observation": "The operation keys an event matching \"morale\" on July 10 with \"tolerance\": \"exact_day\"; the reported result is \"PASS — matched\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "source": "captures/baseline-sonnet-4-5/raw/day_013.jsonl:30,54-55; full-state-after.json:evt_20",
+      "observation": "The separate launch rehearsal email supplies August 6 but no time or duration. evt_20 was created at 14:00–16:00, deviating from the 09:00/one-hour defaults. This is outside T1."
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

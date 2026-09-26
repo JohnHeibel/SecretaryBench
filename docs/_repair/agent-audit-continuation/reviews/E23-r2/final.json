@@ -1,0 +1,43 @@
+{
+  "case_id": "E23",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The targeted day-level check is satisfied: the model created one identifiable HR morale event on July 10, with the requested 45-minute duration and correct source email. The key's event kind and exact date are explicitly supported, so its PASS is justified. Separately, full instruction compliance fails the stated default time: the model selected 10:00 instead of the required default 09:00, although no clock time was supplied. This is a model time/default issue outside the day-level predicate, not a reason to reject the targeted PASS. Complete before/after stores show no prior or duplicate morale event, and the observed tool result confirms successful creation.",
+      "evidence": [
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_013.jsonl:26",
+          "observation": "Observed get_email body: \"I've got a steady stream of worried people at my door about the rebrand, and it's turning into a real retention risk. Can we grab 45 minutes on Friday, July 10th, 2026?\""
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\" The email overrides duration only."
+        },
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_013.jsonl:52-53",
+          "observation": "create_event successfully produced evt_19 with email_id Rebrand-goes-company-wide.we-need-to-talk-about-morale, title \"Morale discussion with HR\", start \"2026-07-10T10:00:00\", and end \"2026-07-10T10:45:00\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores contain no morale event before the turn and exactly one afterward, evt_19. All five preexisting todos remain; no duplicate morale object is present."
+        },
+        {
+          "source": "stage-b.json:targets[0]",
+          "observation": "Operation is create HR_morale_sync as event, match [\"morale\"], tolerance \"exact_day\", resolved to July 10. Reported result is \"PASS — matched\" with actual \"Morale discussion with HR\" on July 10 at 10 AM for 45 minutes."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

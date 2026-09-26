@@ -1,0 +1,56 @@
+{
+  "case_id": "E24",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The CFO explicitly requests signing the Anthropic documents by June 21. The assistant created a correctly identified to-do for June 21 at the instructed 17:00 default, with the exact source email ID and deal terms. The complete before-store has no prior signing task; the complete after-store has exactly one, todo_26. The earlier CTO meeting, evt_18, is preserved. The key's next:SUN resolves to the explicitly stated deadline, so the targeted PASS is supported. This establishes successful task recording, not actual execution of the signature.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:28",
+          "observation": "Observed get_email result for Enterprise_Ai_Selection.ai-selection-finalization states: ‘Please sign the formal docs by Sunday, June 21st, 2026.’"
+        },
+        {
+          "source": "stage-a.json assistant_instructions",
+          "observation": "‘Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.’"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:59",
+          "observation": "create_todo input: email_id ‘Enterprise_Ai_Selection.ai-selection-finalization’, title ‘Sign Anthropic deal documents’, due_date ‘2026-06-21T17:00:00’, description ‘1Y/120k for full access employee accounts’."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:60; full-state-after.json",
+          "observation": "Successful result and final store contain todo_26 with the requested title, source ID, and June 21 17:00 deadline. Full before/after stores preserve evt_18 at June 19 09:00–10:00 without a signing duplicate."
+        },
+        {
+          "source": "stage-b.json targets[T1]",
+          "observation": "The key specifies kind ‘todo’, match [‘sign’], on {‘eq’: ‘next:SUN’}, and exact_day; the reported actual is ‘Sign Anthropic deal documents’ Sun Jun 21 5 PM."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "scope": "Separate same-day marketing email, outside T1",
+      "observation": "evt_24 and evt_25 use 10:00–12:00 despite the instructed default 09:00–10:00. The marketing email provides dates only, and the available prior inbox supplies no athlete times. This is a separate time/default issue and does not undermine the signing target's PASS.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_015.jsonl:27", "captures/baseline-sonnet-4-5/raw/day_015.jsonl:55-58", "all_available_emails.json"]
+    },
+    {
+      "category": "MODEL",
+      "scope": "Separate same-day retreat email, outside T1",
+      "observation": "todo_23 records the VIP list for June 22 at 09:00 rather than the explicit 17:00 default. Its source email says ‘by June 22nd, the retreat date’ and supplies no time. The earlier calendar entry's 09:00 retreat start can explain the practical choice but is not an explicit override in the mail.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_015.jsonl:22", "captures/baseline-sonnet-4-5/raw/day_015.jsonl:53-54", "full-state-before.json evt_4"]
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

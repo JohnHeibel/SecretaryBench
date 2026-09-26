@@ -1,0 +1,5 @@
+The CFO's email, served June 15, explicitly requests: “Please sign the formal docs by Sunday, June 21st, 2026.” The supported assistant action is a to-do to sign the Anthropic deal documents, due June 21, 2026 at the instructed default 17:00. The agreed terms are 1Y/120k for full-access employee accounts; those identify the documents but do not create separate calendar obligations.
+
+This is a deadline-bearing task, not a scheduled signing meeting. The June 19 CTO meeting already exists as evt_18 and concerns the preceding selection storyline. Nothing in the CFO email reschedules or cancels that meeting, and the before-store contains no signing task requiring revision. A newly created signing to-do should use Enterprise_Ai_Selection.ai-selection-finalization as email_id. No basis exists to infer actual document signing from a calendar or task entry.
+
+The target request and deadline are clear. “By” permits completing the real-world action earlier, while June 21 is the natural due date to preserve in the task. Same-day retreat tasks, marketing scheduling, and innovation FYIs are separate obligations and do not alter this deadline.
