@@ -1,0 +1,60 @@
+{
+  "case_id": "E05",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "MODEL",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The Chair explicitly requests July 15 for the existing Thursday board sign-off meeting. The model reads that request but never moves or replaces the meeting. Full-store comparison leaves evt_11 unchanged on June 11, with no alternate board sign-off event on July 15. The keyed event kind and exact day are supported. The only July 15 event is evt_5, the unrelated innovation pitch final. The old meeting date being past is a delivery chronology defect, but the requested replacement is future and still actionable, so it does not explain away the missed update. The grader's wrong-day failure is justified independently of historical time/default issues.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_032.jsonl:21",
+          "observation": "Observed get_email result for Planning.can-t-do-thursday: \"I'm traveling Thursday; no can do. Can we push it to Wednesday, July 15th, 2026, same time of day? \""
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails / Planning.might-be-too-much",
+          "observation": "CFO asks: \"Can you get a board sign-off meeting on the books for Thursday, June 11th, 2026\" and requires at least three board members. This identifies evt_11 as the Thursday meeting in this storyline."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: events evt_11",
+          "observation": "Both stores contain identical evt_11, email_id Planning.might-be-too-much, title Board sign-off meeting, start 2026-06-11T10:00:00, end 2026-06-11T11:30:00. All 29 events are unchanged; no replacement was created."
+        },
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_032.jsonl:59-60",
+          "observation": "The day's only mutation updates unrelated todo_51 to 2026-07-08T17:00:00. There is no event update, deletion, recreation, or inbox search."
+        },
+        {
+          "source": "stage-b.json: infrastructure; captures/baseline-sonnet-4-5/raw/day_032.jsonl:1",
+          "observation": "Secretary MCP is connected, capture_ok is true, and the target body is observed in the tool result."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The pronoun 'it' relies on storyline context, and the original June 11 meeting is already past on July 2. The supplied storyline and Thursday match support its identity; the explicit July 15 replacement remains future."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The original board meeting was created at 10:00 for 90 minutes although the CFO provided no hour or duration and assistant defaults were 09:00 for one hour. This inherited timing defect is separate from the July 2 failure to move the event; the day-level target does not test it.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_009.jsonl:40-41",
+          "observation": "create_event for Planning.might-be-too-much uses start 2026-06-11T10:00:00 and end 2026-06-11T11:30:00, returning evt_11."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions and preceding_storyline_emails",
+          "observation": "Instructions say 'Defaults unless the email says otherwise: events 9am, 1 hour long'; the CFO supplies June 11 without an hour or duration."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

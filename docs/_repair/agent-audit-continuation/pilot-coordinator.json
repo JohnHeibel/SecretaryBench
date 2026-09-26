@@ -1,0 +1,36 @@
+{
+  "pilot_reused": true,
+  "new_reviewer_assignments": 0,
+  "packet_hashes_verified": 56,
+  "targets": [
+    {
+      "worksheet_item": "21",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The rescheduling email does not revise the explicitly June 19 location-contact task or establish June 29 as its new deadline. No model pass for the entire email is implied.",
+      "model_assessment": "Leaving todo_22 unchanged is supported for this target; real-world contact completion is unknown.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_015.jsonl:51-52",
+        "captures/baseline-sonnet-4-5/raw/day_028.jsonl:17,46-49",
+        "captures/baseline-sonnet-4-5/days/027.json#state.todos.todo_22",
+        "captures/baseline-sonnet-4-5/days/028.json#state.todos.todo_22"
+      ],
+      "review_source": "../agent-audit-pilot-sonnet-4-5.json#cases/C07",
+      "decision_group": null
+    },
+    {
+      "worksheet_item": "B9",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The date-only reschedule updates Serena evt_24 from September 11 to September 22 with no duplicate; Michael evt_25 remains unchanged.",
+      "model_assessment": "Targeted move satisfied. Earlier unsupported 10:00-12:00 hours are a historical observation, not a defect introduced by the move.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_024.jsonl:25-26",
+        "captures/baseline-sonnet-4-5/days/023.json#state",
+        "captures/baseline-sonnet-4-5/days/024.json#state"
+      ],
+      "review_source": "../agent-audit-pilot-sonnet-4-5.json#cases/C08",
+      "decision_group": null
+    }
+  ]
+}

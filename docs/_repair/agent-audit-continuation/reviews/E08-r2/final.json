@@ -1,0 +1,43 @@
+{
+  "case_id": "E08",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The HR email expressly says nothing is needed. The assistant retrieved its body and made no calendar or to-do changes. Complete before/after stores are identical, so the no-action key and PASS are supported without relying only on email stamps or titles. No date, deadline, or prior-object revision is requested.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_003.jsonl:15",
+          "observation": "Observed mcp__secretary__get_email call for Innovation-comp.quick-win-to-share, tool-use ID toolu_01WsXTJDwvxGemBFAM56vDhr."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_003.jsonl:16",
+          "observation": "Returned body includes the exact sentence: 'Just a nice moment, nothing needed from you.'"
+        },
+        {
+          "source": "day-tool-trace.json",
+          "observation": "The full day trace contains list_new_emails and two get_email calls, with no create, update, or delete calls."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "All four events, evt_1, evt_2, evt_3, and evt_4, are unchanged in every field; both to-do stores are empty. Existing competition budget meeting evt_2 remains July 5, 2026, 09:00 to 10:00."
+        },
+        {
+          "source": "stage-b.json: targets[T1]",
+          "observation": "The key is '- take no action (FYI / no scheduling needed)' and the grader reports 'PASS — correctly took no action' with actual '(nothing)'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

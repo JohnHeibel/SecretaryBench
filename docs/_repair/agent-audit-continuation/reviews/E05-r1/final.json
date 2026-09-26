@@ -1,0 +1,61 @@
+{
+  "case_id": "E05",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "MODEL",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The explicit July 15 replacement date supports the key. The chair's Thursday referent is sufficiently identified by the Planning storyline and the existing Board sign-off meeting, evt_11. The assistant read the request but made no event mutation or inquiry. All 29 events remain identical across complete before/after stores, including evt_11 on June 11; no alternative object satisfies the move. The failure is therefore a missed supported reschedule, and the grader correctly reports the wrong day. The late arrival creates awkward chronology but does not make a future, explicit replacement date stale or authorize leaving the old booking untouched.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_032.jsonl:21",
+          "observation": "Observed get_email result for Planning.can-t-do-thursday: \"I'm traveling Thursday; no can do. Can we push it to Wednesday, July 15th, 2026, same time of day? \""
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails / Planning.might-be-too-much",
+          "observation": "CFO requests a \"board sign-off meeting on the books for Thursday, June 11th, 2026\" and at least three board members."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: events / evt_11",
+          "observation": "Both contain the same object: email_id Planning.might-be-too-much; title Board sign-off meeting; start 2026-06-11T10:00:00; end 2026-06-11T11:30:00. Complete-store comparison finds all 29 events unchanged."
+        },
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_032.jsonl:59-60",
+          "observation": "The only mutation is successful update_todo(todo_51) for the unrelated cleat design sign-off. No event update, deletion, creation or search_inbox occurs after reading the chair's request."
+        },
+        {
+          "source": "stage-b.json: targets[0] and infrastructure",
+          "observation": "Key requests move board_signoff as event to dom:15,0m, exact_day. The reported failure identifies Board sign-off meeting on June 11. The secretary server is connected and capture_ok is true."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The target uses only 'it'; identity relies on available storyline context and the prior Thursday board meeting.",
+        "July 2 delivery follows the June 11 original date. No supplied evidence confirms the old meeting occurred or was cancelled; the explicit July 15 replacement remains actionable."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The original evt_11 creation used 10:00-11:30 although the CFO email supplies no time or duration and assistant defaults specify 09:00 for one hour. This historical time/default error is separate from the day-level July 15 move failure. Today's 'same time of day' reasonably preserves the existing booking's time.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_009.jsonl:40-41",
+          "observation": "create_event for Planning.might-be-too-much uses start 2026-06-11T10:00:00 and end 2026-06-11T11:30:00; result assigns evt_11."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions and preceding_storyline_emails",
+          "observation": "Defaults are 'events 9am, 1 hour long'; the CFO's June 11 meeting request specifies neither time nor duration."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

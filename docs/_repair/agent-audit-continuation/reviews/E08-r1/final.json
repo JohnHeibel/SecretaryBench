@@ -1,0 +1,43 @@
+{
+  "case_id": "E08",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The target is an explicit FYI with no scheduling or task obligation. The assistant read its body and made no calendar or to-do mutations. The entire before and after stores are identical, including all four events and the empty to-do list. The keyed no-action requirement and passing verdict are both supported.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_003.jsonl:15",
+          "observation": "mcp__secretary__get_email input is {\"email_id\":\"Innovation-comp.quick-win-to-share\"}; tool-use ID toolu_01WsXTJDwvxGemBFAM56vDhr."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_003.jsonl:16",
+          "observation": "The successful target-body result states: 'Just a nice moment, nothing needed from you.'"
+        },
+        {
+          "source": "day-tool-trace.json, captures/baseline-sonnet-4-5/raw/day_003.jsonl:6-16",
+          "observation": "The complete day's trace contains list_new_emails and get_email for both arrivals, with no create, update, or delete operations."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "All fields of evt_1, evt_2, evt_3, and evt_4 are unchanged; both stores have todos: []. No target-stamped or differently stamped new object appears."
+        },
+        {
+          "source": "stage-b.json, targets[0]",
+          "observation": "The key is '- take no action (FYI / no scheduling needed)' and the reported result is 'PASS — correctly took no action' with actual '(nothing)'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

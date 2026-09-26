@@ -1,0 +1,60 @@
+{
+  "case_id": "E03",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["GRADER"],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The supported calendar/to-do action is a pizza-selection task by Friday. Explicit assistant instructions anchor relative dates to the June 28 turn, making Friday July 3 with the default 17:00 deadline. The model created exactly that task, including memo review. The key instead requires Monday June 29 with exact-day tolerance, unsupported by the email under either the turn-date or appended authored-date reading. The rejection therefore reflects a wrong key and rejection of a supported action. This finding concerns tracking the request, not proof that the memo was reviewed or a reply sent.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "\"Compute all relative dates from it\" refers to the supplied Today date; defaults include \"to-dos due 5pm\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:22",
+          "observation": "Observed body says \"Could you look at the memo I left in your inbox and let me know which option by Friday? Wednesday, June 24th, 2026\"; served_date is \"2026-06-28\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:50-51",
+          "observation": "create_todo used email_id \"pizza-party.pizza-place-selection\", title \"Select pizza place from 3 options\", due_date \"2026-07-03T17:00:00\", description \"Review memo and choose from 3 pizza places for party\"; successful result is todo_47."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores show todo_47 newly present after the day, with the July 3 deadline. No preexisting selection task or competing duplicate is present. The distinct party evt_7 and order reminder todo_30 are unchanged."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key is {\"by\":\"next:MON\"} with \"exact_day\", resolved to June 29; grader reports \"FAIL — on the wrong day\" and actual Friday July 3 at 5 PM."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The appended June 24 date would imply June 26 under an authored-date reading, but the turn-date instruction resolves the operational anchor. Neither reading supports Monday June 29.",
+        "No separate pizza memo appears in the available-email search; the day trace contains no inbox search. This does not prevent creating the supported reminder or establish actual completion."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "observation": "The pizza storyline is chronologically inconsistent: the June 19 order email says the place was already chosen, and the June 26 room confirmation names a June 8 party, before the June 28 selection delivery. This is a possible delivery-order problem, but the packet does not establish that the current selection request was withdrawn or completed, and it cannot support the Monday key.",
+      "evidence": [
+        {
+          "source": "stage-a.json: preceding_storyline_emails",
+          "observation": "pizza-party.pizza-order-deadline says \"The place you chose\"; pizza-party.conference-room-reservation says \"booked on 6/8\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_006.jsonl:46-47; day_019.jsonl:48-49",
+          "observation": "History created evt_7 for June 8 and todo_30 for June 19. These existing objects track a party and order reminder, not proof of a completed choice."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

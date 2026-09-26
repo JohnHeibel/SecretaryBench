@@ -1,0 +1,61 @@
+{
+  "case_id": "E04",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": ["KEY", "MODEL", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "Delivery on June 29 made the explicit pre-June-19 request stale. The model created the correct kind of task with the correct tier/budget subject, but replaced the sender's deadline with July 3 without supporting authority or preserving its overdue status. The 17:00 time follows the default. Separately, the key's exact June 19 requirement is too narrow and likely one day late: 'before Friday, June 19th' supports an earlier deadline, not a mandatory task on June 19. A wrong-day rejection identifies a real unsupported model date, but the expired, exact-day key does not establish a clean model-only failure. Whether a choice was still needed is also uncertain because earlier delivered mail says Gold was secured, followed by later requests to choose and sign off. Thus NO concerns the unsupported date representation, not a claim that the model could have met the already-expired real-world deadline.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:19 (day-tool-trace.json)",
+          "observation": "Observed target body: 'CEO please let me know which option we will go with before Friday, June 19th, 2026 and make sure it aligns with budget.' Its served_date is '2026-06-29'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:38-39 (day-tool-trace.json)",
+          "observation": "create_todo used email_id 'Sponsoring-Marathon.sponsorship-tiers', title 'Select Eugene Marathon sponsorship tier', and due_date '2026-07-03T17:00:00'; successful result assigned todo_49. Description: 'Choose from Gold (+15k), Silver (+8k), or Bronze (+3k) tier - ensure it aligns with budget'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Inspection of both complete stores shows no earlier sponsorship-choice todo and one new matching object, todo_49. evt_6 remains the distinct August 10 attendance event. The other day change is the unrelated Atlas evt_48 move."
+        },
+        {
+          "source": "stage-b.json targets[0]",
+          "observation": "Key: kind 'todo', on.eq 'dom:19,0m', tolerance 'exact_day'. Verdict: 'FAIL — on the wrong day', actual July 3."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No instruction states how to handle an explicit deadline that expired before delivery.",
+        "June 5 says Gold Tier was secured; June 23 and June 28 discuss tier selection and CEO sign-off. Their reconciliation and actual completion status are unavailable.",
+        "The trace supplies no reason for choosing July 3; it cannot establish whether this was deliberate recovery scheduling or a date mistake."
+      ],
+      "suggested_human_question": "Should the request be delivered before its stated deadline, and should 'before June 19' allow earlier task dates?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "observation": "The storyline already delivered a Gold Tier approval before its selection request. This is relevant uncertainty about whether a fresh choice remains necessary, not evidence that creating a calendar reminder completed the choice.",
+      "evidence": [
+        {
+          "source": "stage-a.json preceding_storyline_emails: Sponsoring-Marathon.approval-of-event (served June 5)",
+          "observation": "'We have secured our Gold Tier'."
+        },
+        {
+          "source": "stage-a.json preceding_storyline_emails: Sponsoring-Marathon.race-sponsorship-budget-goals (served June 28)",
+          "observation": "'CEO will need to sign off on the final sponsorship tier/budget you choose from.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_005.jsonl:34-35 (history-actions.jsonl)",
+          "observation": "The approval email produced evt_6, 'Event Pop Up', August 10, with description 'Gold Tier sponsorship event - all involved expected to be present'. This event is not the identity of T1's decision task."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

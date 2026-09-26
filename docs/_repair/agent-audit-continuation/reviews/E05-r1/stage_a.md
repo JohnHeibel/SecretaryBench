@@ -1,0 +1,7 @@
+# E05 Stage A
+
+The chair requests moving an existing Thursday meeting to Wednesday, July 15, 2026, preserving its time of day. The strongest identity is the Planning board sign-off meeting requested by the CFO for Thursday, June 11. The target says only “it,” but storyline continuity, chair sender, and the prior Thursday support that identity. Update that event, or delete and recreate without a duplicate; there is no supported new to-do.
+
+The before store has one matching board sign-off event, `evt_11`, sourced to `Planning.might-be-too-much`, on `2026-06-11T10:00:00` through `2026-06-11T11:30:00`, with the three-board-member condition. Thus the direct rescheduling result would be July 15 at 10:00, retaining the existing duration and description. The original CFO email supplies no time or duration, so the assistant defaults would originally have required 09:00 for one hour. That is a historical time/default issue, distinct from today's explicit “same time” revision.
+
+The July 2 arrival follows the June 11 original meeting date, making “traveling Thursday” and “push” temporally awkward. However, the explicit July 15 replacement is still future and actionable; the record does not establish cancellation or completion. The nearby Planning vision sync was requested for June 15 and is not the Thursday referent. Other board meetings in the before store concern separate projects and do not fit the Planning context. No evidence supports changing their dates.

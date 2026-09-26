@@ -1,0 +1,7 @@
+# E03 Stage A
+
+The target explicitly asks the recipient to review a memo, select one of three pizza places, and communicate the choice “by Friday.” This supports a deadline task, not a meeting or a fresh pizza-party calendar entry. No option or memo content is supplied in the target. The assistant should search the earlier inbox for the referenced memo when needed; a task can preserve that requirement without pretending the selection is complete.
+
+The governing date rule says to compute relative dates from the turn date. Served Sunday, 2026-06-28, the prospective Friday is 2026-07-03, with the default 17:00 deadline. The body ends “Wednesday, June 24th, 2026,” which would make the author's intended Friday June 26 if used as its anchor, but that conflicts with the explicit turn-date rule. A June 26 interpretation is a delivery/source inconsistency, not an unqualified prospective deadline under these instructions.
+
+Before-state has no selection task. Existing pizza objects are `evt_7`, the end-of-year party on 2026-06-08, and `todo_30`, “Remind EA to submit pizza order,” due 2026-06-19. Neither is the selection obligation. Earlier order mail says “The place you chose,” and the room is already booked for June 8; this is an out-of-order storyline. It creates uncertainty about whether the new request is still practically useful, but no explicit rescission of the incoming selection request appears. Preserve the distinct obligation; do not infer real-world completion from the existing reminder or silently move the party/order.

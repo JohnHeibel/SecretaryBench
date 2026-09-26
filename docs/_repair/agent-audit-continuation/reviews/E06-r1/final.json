@@ -1,0 +1,59 @@
+{
+  "case_id": "E06",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The day-level target is supported and satisfied: the email explicitly requests a calendar entry for June 22, 2026, and evt_4 is the correctly identified Company Retreat event on that day with the correct email_id. The grader's PASS is justified for its exact-day creation check. Separately, full instruction compliance fails because the model made an eight-hour event despite the explicit one-hour default and no email-specified duration. This ungraded duration defect does not invalidate the date key or justify calling the day-level PASS a grader error.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "Exact instruction: 'Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:17 (day-tool-trace.json)",
+          "observation": "Observed get_email body states: 'We have chosen June 22ndMonday, June 22nd, 2026 as the official start, so make sure you mark that on your calendar!' It supplies no end time or duration."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:28-29 (day-tool-trace.json)",
+          "observation": "create_event used email_id 'Company-Retreat.company-retreat-date-conformed', title 'Company Retreat', start '2026-06-22T09:00:00', and end '2026-06-22T17:00:00'; the successful tool result assigned id 'evt_4'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Full before-store contains only unrelated evt_1 and evt_2, with no todos. Full after-store preserves both, adds morning-show evt_3 and exactly one retreat evt_4, and still has no todos. No competing retreat object or duplicate exists."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key is create/event 'Company Retreat', on.eq 'dom:22,0m', tolerance 'exact_day'. Reported result is 'PASS — matched' with actual 'Company Retreat' Mon Jun 22 9 AM (480m)."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "email_id": "press-tour.morning-show-launch-day",
+      "category": "MODEL",
+      "observation": "The same-day sibling evt_3 is correctly dated August 10, 2026, but its 07:00 start is an unsupported precise time. The email says 'national morning show' and 'launch-day breakfast' without an exact hour; the supplied instruction defaults events to 09:00. This does not change the retreat target's date verdict.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:15 (day-tool-trace.json)",
+          "observation": "Observed email specifies Monday, August 10th, 2026 and launch-day breakfast, but no exact time."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:26-27 (day-tool-trace.json); full-state-after.json",
+          "observation": "The model created evt_3 'Morning show' from 2026-08-10T07:00:00 to 2026-08-10T08:00:00."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

@@ -1,0 +1,59 @@
+{
+  "case_id": "E06",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The targeted calendar identity and exact day are correct: evt_4 records Company Retreat starting June 22, 2026, with the required source email attribution and no duplicate. The day-level PASS is justified. Full instruction compliance is nevertheless NO because the model chose an eight-hour duration although the email states no duration and the explicit default is one hour. This separate time/default issue does not invalidate the supported day-level key or its PASS. No key, delivery-plan, or rejection defect is established.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:17",
+          "observation": "Observed get_email result for Company-Retreat.company-retreat-date-conformed: 'We have chosen June 22ndMonday, June 22nd, 2026 as the official start, so make sure you mark that on your calendar!' No duration or end time is supplied."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:28-29",
+          "observation": "create_event supplied email_id Company-Retreat.company-retreat-date-conformed, title Company Retreat, start 2026-06-22T09:00:00, end 2026-06-22T17:00:00; successful result returned id evt_4."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Complete before store contains only evt_1 and evt_2, with no todos. Complete after store retains those unchanged and adds evt_3 Morning show and evt_4 Company Retreat, with no todos. There is exactly one retreat object."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "T1 keys create Company Retreat as event with on.eq dom:22,0m and tolerance exact_day. Result is 'PASS — matched' and actual is '\"Company Retreat\" Mon Jun 22 9 AM (480m)'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "object_id": "evt_3",
+      "category": "MODEL",
+      "observation": "The unrelated same-day Morning show event has the requested August 10 date and a one-hour duration, but uses 07:00 rather than the explicit 09:00 default. The email's 'launch-day breakfast' describes a morning context without supplying a specific hour. This is a separate time/default concern and does not determine T1.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:15",
+          "observation": "Morning-show email names Monday, August 10th, 2026 and says 'Block it as the morning show so nothing else creeps onto launch-day breakfast.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:26-27",
+          "observation": "create_event/result for evt_3 uses start 2026-08-10T07:00:00 and end 2026-08-10T08:00:00."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

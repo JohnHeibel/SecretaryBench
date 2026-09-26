@@ -1,0 +1,51 @@
+{
+  "case_id": "E04",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": ["KEY", "MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "Delivery on June 29 makes the June 19 deadline stale, and the earlier delivered Gold Tier confirmation further undermines a fresh prospective selection task. Independently, exact-day June 19 is not supported by 'before Friday, June 19th': the literal latest prior date is June 18, while other earlier dates could satisfy the deadline. The model created the correct general kind and identity with budget alignment, but silently substituted July 3, for which this request supplies no authority. Thus the model has a real unsupported-date defect, while the reported failure against mandatory June 19 should not be treated as a clean model-only miss. The 17:00 task time follows the stated default; it is not a separate defect. There is no evidence of a tool outage or an alternative matching object in the complete stores.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:19 (day-tool-trace.json)",
+          "observation": "Observed get_email body: 'CEO please let me know which option we will go with before Friday, June 19th, 2026 and make sure it aligns with budget.' The same result gives served_date '2026-06-29'."
+        },
+        {
+          "source": "stage-b.json, targets[0].operation",
+          "observation": "T1 requires create todo 'approval of tier', on {\"eq\":\"dom:19,0m\"}, tolerance 'exact_day'; current result is 'FAIL — on the wrong day'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:38-39 (day-tool-trace.json)",
+          "observation": "create_todo uses email_id 'Sponsoring-Marathon.sponsorship-tiers', title 'Select Eugene Marathon sponsorship tier', due_date '2026-07-03T17:00:00', and description 'Choose from Gold (+15k), Silver (+8k), or Bronze (+3k) tier - ensure it aligns with budget'; success returns id 'todo_49'."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "All events and todos were inspected. Before has no sponsorship-selection todo; after adds only todo_49. The separate event evt_6 persists with description 'Gold Tier sponsorship event - all involved expected to be present'."
+        },
+        {
+          "source": "stage-a.json, preceding_storyline_emails",
+          "observation": "The June 5 'Sponsoring-Marathon.approval-of-event' says 'We have secured our Gold Tier'. The June 28 CFO mail says 'CEO will need to sign off on the final sponsorship tier/budget you choose from.' Neither supplies July 3."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "Contradictory storyline chronology leaves unresolved whether selection was already complete or needed reopening.",
+        "No explicit policy determines how to record late-arriving deadlines; this uncertainty does not authorize July 3."
+      ],
+      "suggested_human_question": "Should this selection request arrive before June 19 and before the Gold Tier confirmation, and should its key accept a deadline window rather than exact June 19?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "history-actions.jsonl:11-12; captures/baseline-sonnet-4-5/raw/day_005.jsonl:34-35",
+      "observation": "The June 5 create_event already recorded evt_6 for the August 10 pop-up with the description 'Gold Tier sponsorship event - all involved expected to be present'. This establishes prior model exposure to that storyline state, not real-world completion of tier approval. The historical event is distinct from T1."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

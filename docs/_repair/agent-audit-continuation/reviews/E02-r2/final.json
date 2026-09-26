@@ -1,0 +1,94 @@
+{
+  "case_id": "E02",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "MODEL"
+      ],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The day-level target is satisfied: evt_46 is a new athlete meeting on the expressly requested August 22, with the correct originating email and no duplicate in either full store. The key instead resolves dom:22,0m to June 22, contradicting the named month, so the reported wrong-day failure is unjustified. The NO for full model compliance is limited to a separate time/default defect: the assistant scheduled 10:00\u201312:00 although its instructions require 09:00 and one hour when unspecified. That defect does not justify rejecting the correct calendar day. The primary attribution is KEY; MODEL records the independent time/default error.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:17",
+          "observation": "Observed get_email body: \"I need you to put the date of the meeting with the athlete on your calander for August 22nd now!\""
+        },
+        {
+          "source": "stage-b.json targets[T1]",
+          "observation": "Key: {\"eq\":\"dom:22,0m\"}, exact_day; worksheet resolves to \"Mon Jun 22\". Current result: \"FAIL \u2014 on the wrong day\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:48",
+          "observation": "create_event uses email_id \"Company-Retreat.in-town-and-would-love-to-connect\", title \"Meeting with major athlete\", start \"2026-08-22T10:00:00\", end \"2026-08-22T12:00:00\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:49; full-state-before.json; full-state-after.json",
+          "observation": "Successful result creates evt_46. Full before-store has no counterpart; full after-store has one matching athlete meeting on August 22."
+        },
+        {
+          "source": "stage-a.json assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\" The athlete email specifies neither time nor duration."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The July 22 body header and \"next week\" conflict with served_date June 28 and the explicit August 22 meeting date. Neither establishes support for June 22."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "operation": "move Company Retreat",
+      "category": "PASS",
+      "observation": "Day-level move is supported under the retained-weekday reading: original June 22 shifts one week to June 29. The request names a week, so an exact weekday is an inference. evt_4 is updated in place, with no duplicate.",
+      "evidence": [
+        {
+          "source": "stage-a.json preceding_storyline_emails",
+          "observation": "Original start: \"Monday, June 22nd, 2026\"; target asks for \"the week after the week we originally scheduled\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:46-47; full-state-after.json",
+          "observation": "evt_4 becomes 2026-06-29T09:00:00\u20132026-06-29T17:00:00."
+        }
+      ]
+    },
+    {
+      "operation": "move Contact Retreat Location",
+      "category": "KEY",
+      "observation": "The sibling key requires moving the location task to June 29, but the new message only reschedules the retreat and adds the athlete meeting. The earlier request names June 19 for location approval. No rule or new deadline supports moving it to the new retreat day. todo_22 remains June 19; its existence proves neither completion nor a need to renew it.",
+      "evidence": [
+        {
+          "source": "stage-b.json other_keyed_operations",
+          "observation": "Contact Retreat Location todo keyed to {\"eq\":\"next:MON\"}, exact_day."
+        },
+        {
+          "source": "stage-a.json preceding_storyline_emails; full-state-before.json; full-state-after.json",
+          "observation": "Original request: \"get in contact with the location we are going on June 19th, just to approve everything we have planned\"; todo_22 remains due 2026-06-19T17:00:00 in both stores."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "object_id": "evt_4",
+      "observation": "The retreat\u2019s eight-hour duration predates this target email. The original message supplies only a start date, so the historical creation ignored the one-hour default. The present move carries that old duration forward; it is separate from the athlete date failure.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_002.jsonl:28-29",
+          "observation": "create_event and returned evt_4 have start 2026-06-22T09:00:00 and end 2026-06-22T17:00:00."
+        },
+        {
+          "source": "stage-a.json preceding_storyline_emails; assistant_instructions",
+          "observation": "The original retreat email specifies June 22 as the official start without duration; instruction default is one hour."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

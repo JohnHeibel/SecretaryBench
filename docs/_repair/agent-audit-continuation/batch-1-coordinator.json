@@ -1,0 +1,133 @@
+{
+  "batch": 1,
+  "spot_check_items": [
+    "22",
+    "B1"
+  ],
+  "targets": [
+    {
+      "batch": 1,
+      "worksheet_item": "8",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "August 7 is explicit, but a mandatory calendar milestone is unstated. Both reviewers find the FYI and calendar interpretations defensible.",
+      "model_assessment": "No release event exists in the complete stores; only the separate keynote was added.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_012.jsonl:19,33-34",
+        "captures/baseline-sonnet-4-5/days/011.json#state",
+        "captures/baseline-sonnet-4-5/days/012.json#state"
+      ],
+      "excerpt": "we need to delay the release of the new product to Friday, August 7th",
+      "decision_group": "Q1",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 1,
+      "worksheet_item": "22",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The explicit athlete date is August 22; the key incorrectly requires June 22.",
+      "model_assessment": "evt_46 uses the correct day. Its 10:00-12:00 hours independently violate the 09:00, one-hour defaults.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_028.jsonl:17,48-49",
+        "corpus/nodes/Company-Retreat.json"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": "Direct raw email, create/result and corpus op inspected: August prose versus dom:22,0m key; evt_46 unique in full stores. Shared reviewers made no substantive error."
+    },
+    {
+      "batch": 1,
+      "worksheet_item": "23",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The key requires a June 29 cutoff unsupported by the Friday request. The explicit turn-date rule supports July 3.",
+      "model_assessment": "todo_47 records selection and memo review by July 3 at 17:00. This supports the scheduling target, not actual review or communication.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_028.jsonl:22,50-51",
+        "captures/baseline-sonnet-4-5/days/028.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 1,
+      "worksheet_item": "24",
+      "classification": "PLAN",
+      "status": "AGENT_RESOLVED",
+      "finding": "The June 29 delivery misses the explicitly pre-June-19 deadline; the exact June 19 key is also too restrictive.",
+      "model_assessment": "todo_49 substitutes unsupported July 3. Late-request handling and conflicting earlier Gold approval remain unresolved; no model pass is awarded.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_029.jsonl:19,38-39",
+        "captures/baseline-sonnet-4-5/days/029.json#state"
+      ],
+      "excerpt": "let me know which option we will go with before Friday, June 19th",
+      "decision_group": "Q3",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 1,
+      "worksheet_item": "25",
+      "classification": "MODEL",
+      "status": "AGENT_RESOLVED",
+      "finding": "The explicit future July 15 move is supported and the existing board meeting is identifiable as evt_11.",
+      "model_assessment": "The request was read, but every event remains unchanged and evt_11 stays June 11. Historical hours are separate.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_032.jsonl:21,59-60",
+        "captures/baseline-sonnet-4-5/days/031.json#state",
+        "captures/baseline-sonnet-4-5/days/032.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 1,
+      "worksheet_item": "B1",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The requested retreat date and event identity are satisfied by unique evt_4 on June 22.",
+      "model_assessment": "Day-level pass accepted. The eight-hour duration violates the one-hour default and is recorded separately.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_002.jsonl:17,28-29",
+        "corpus/nodes/Company-Retreat.json"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": "Direct raw June 22 calendar request and evt_4 create/result plus corpus key inspected. Exact date/identity correct; unsupported eight-hour duration retained as separate finding."
+    },
+    {
+      "batch": 1,
+      "worksheet_item": "B2",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "Optional invitation supplies no date or scheduling request; no action is supported.",
+      "model_assessment": "Target was read; complete stores are identical, with the distinct July 5 budget meeting unchanged.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_003.jsonl:14",
+        "captures/baseline-sonnet-4-5/days/002.json#state",
+        "captures/baseline-sonnet-4-5/days/003.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 1,
+      "worksheet_item": "B3",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The HR update explicitly says nothing is needed.",
+      "model_assessment": "Target was read and no mutation occurred; full stores are identical.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_003.jsonl:15-16",
+        "captures/baseline-sonnet-4-5/days/003.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    }
+  ],
+  "notes": "All 16 original reports and Stage A interpretations examined. Reviewer secondary GRADER labels for #23 describe rejection driven by a wrong key, not a separately demonstrated implementation defect. Classification agreement is 8/8; #8 remains unresolved."
+}

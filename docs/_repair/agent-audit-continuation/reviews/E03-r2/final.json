@@ -1,0 +1,68 @@
+{
+  "case_id": "E03",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["GRADER"],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The supported target is a pizza-selection task due Friday. With relative dates anchored to the June 28 turn as expressly instructed, that is July 3 at the default 17:00. The model created exactly that task, including memo review, with the correct email identity. The key instead demands next Monday, June 29, without support in the target or preceding pizza mail. The body-stamped June 24 could suggest an already-past June 26 author deadline, but neither defensible reading yields Monday June 29. Thus the wrong-day failure rejects the instruction-supported task because of an incorrect key. This finding concerns capturing the obligation, not proof that the memo was read, an option chosen, or a reply sent.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "DATES: the turn gives you \"Today: <date>\". Compute all relative dates from it. Use ISO 8601 in tool calls. Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:22",
+          "observation": "Observed target body: \"Could you look at the memo I left in your inbox and let me know which option by Friday? Wednesday, June 24th, 2026\"; served_date is 2026-06-28."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:50-51; full-state-after.json: todo_47",
+          "observation": "create_todo uses email_id pizza-party.pizza-place-selection, title \"Select pizza place from 3 options\", due_date \"2026-07-03T17:00:00\", description \"Review memo and choose from 3 pizza places for party\". Returned and retained object ID: todo_47."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key on={\"by\":\"next:MON\"}, tolerance=exact_day; resolved June 29. Grader reports \"FAIL — on the wrong day\" and identifies actual \"Select pizza place from 3 options\" Fri Jul 03 5 PM."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete stores",
+          "observation": "No selection task exists before; todo_47 is the only added pizza task. Existing evt_7 and todo_30 remain unchanged and concern party attendance and order submission, respectively. No competing selection object explains the failure."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The trailing June 24 source date conflicts with June 28 delivery; an author-date reading gives June 26. The explicit turn-date instruction supports July 3, and no reading supports the keyed Monday.",
+        "The referenced memo and three options are not supplied in available pizza mail. The task schedules their review; it does not establish completion."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "observation": "No search_inbox call appears in the complete day trace despite the target referring to an earlier memo. The task preserves memo review, so this possible retrieval-procedure miss does not justify the targeted wrong-day failure.",
+      "evidence": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_028.jsonl:22,50"
+    },
+    {
+      "category": "MODEL",
+      "observation": "Unrelated same-day events have unsupported times/durations: evt_46 is August 22 10:00-12:00, and evt_48 is July 6 10:00-11:30. Their observed emails supply dates but no times, so the instructed defaults are 09:00-10:00. These are separate from the pizza target.",
+      "evidence": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:17,23,48-49,52-53; full-state-after.json: evt_46, evt_48"
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "PLAN",
+      "observation": "Pizza delivery order is incoherent: the June 6 message schedules a June 8 party; the June 19 order email says \"The place you chose\"; the June 26 confirmation still names the June 8 room booking; the selection request arrives June 28. This makes a preparatory selection prospectively stale relative to the supplied party storyline, independently of the unsupported Monday key. There is no explicit cancellation or evidence that this new request was already completed.",
+      "evidence": "stage-a.json: preceding_storyline_emails; all_available_emails.json: pizza-party.end-of-year-pizza-party, pizza-party.pizza-order-deadline, pizza-party.conference-room-reservation; full-state-before.json: evt_7, todo_30"
+    },
+    {
+      "category": "MODEL",
+      "observation": "The pre-existing party evt_7 starts at noon, although its June 6 source supplies no time and the default is 09:00. This historical time error does not affect the selection task's day-level verdict.",
+      "evidence": "captures/baseline-sonnet-4-5/raw/day_006.jsonl:46-47; all_available_emails.json: pizza-party.end-of-year-pizza-party"
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

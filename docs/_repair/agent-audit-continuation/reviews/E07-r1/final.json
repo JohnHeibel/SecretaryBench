@@ -1,0 +1,39 @@
+{
+  "case_id": "E07",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "Taking no calendar or to-do action is supported. The invitation explicitly makes attendance optional, supplies no date or time, and asks for no scheduling change. The assistant read the target body and made no mutation calls. Inspection of both complete stores confirms that all four events remained identical and both to-do stores were empty. The earlier affirmative July 5 budget meeting, evt_2, remained intact. Nothing in the target identifies it as a revision of that meeting. The worksheet's no-action key and the grader's PASS are justified.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_003.jsonl:14 (day-tool-trace.json)",
+          "observation": "Observed get_email result for Innovation-comp.pitch-comp-budget-review-optional-sit-in says: \"You're welcome to join if you want visibility but it's not necessary.\" The full body contains no date or request to arrange attendance."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_003.jsonl:6, :8, :13-16 (day-tool-trace.json)",
+          "observation": "The complete supplied day trace contains list_new_emails and get_email calls for both arrivals, with no event or to-do mutation. The target body was observed at line 14, rather than inferred from a subject."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Complete stores are identical: evt_1, evt_2, evt_3, and evt_4 are unchanged, and todos is [] in both. evt_2 retains email_id Innovation-comp.need-a-budget-meeting-for-the-pitch-comp, start 2026-07-05T09:00:00, and end 2026-07-05T10:00:00. There is no new target-stamped or differently titled object."
+        },
+        {
+          "source": "stage-b.json, targets[0]",
+          "observation": "Key is \"- take no action (FYI / no scheduling needed)\"; reported result is \"PASS — correctly took no action\" with actual \"(nothing)\". Both match the observed behavior and supported request."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

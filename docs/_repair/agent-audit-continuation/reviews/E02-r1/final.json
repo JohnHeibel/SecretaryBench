@@ -1,0 +1,72 @@
+{
+  "case_id": "E02",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["MODEL"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The keyed June 22 date contradicts the explicit request for August 22. The model created the correctly identified event on August 22, with the exact originating email ID, and the complete stores show no duplicate of this meeting. The reported wrong-day failure is therefore unjustified. Separately, the model used 10:00–12:00 rather than the required default 09:00–10:00. The NO for model compliance refers only to that independent time/duration instruction failure: the supported day-level target is satisfied. This default violation cannot justify a day-level rejection claiming the event belongs on June 22. The misleading embedded July 22 date and 'next week' wording do not support the keyed June 22 date or override the explicit August date. Infrastructure was connected and the target body was observed.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:17",
+          "observation": "Observed get_email result includes: 'put the date of the meeting with the athlete on your calander for August 22nd now!' Served date is 2026-06-28."
+        },
+        {
+          "source": "stage-b.json targets[T1]",
+          "observation": "The create-event key uses {\"eq\":\"dom:22,0m\"}, resolved as Mon Jun 22, and reports 'FAIL — on the wrong day'."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:48-49",
+          "observation": "create_event input and successful result identify evt_46, title 'Meeting with major athlete', email_id 'Company-Retreat.in-town-and-would-love-to-connect', start '2026-08-22T10:00:00', end '2026-08-22T12:00:00'."
+        },
+        {
+          "source": "stage-a.json assistant_instructions",
+          "observation": "'Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.' The target supplies no time or duration override."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "The complete before store has no target athlete meeting; the after store has exactly evt_46 for this request. Existing named athlete marketing meetings evt_24, evt_25 and evt_41 are distinct and unchanged."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The embedded July 22 date and 'next week' narrative are internally inconsistent, but neither supplies a defensible June 22 meeting date.",
+        "At day-level the model satisfies T1; full instruction compliance fails only on default time and duration."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "PASS",
+      "object_id": "evt_4",
+      "observation": "The model moved the existing Company Retreat from June 22 to June 29 with no duplicate. This preserves its weekday in the week after the originally scheduled week, a supported interpretation. The exact day is inferred from retaining Monday; the email explicitly specifies only the next week.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_028.jsonl:46-47", "full-state-before.json events[evt_4]", "full-state-after.json events[evt_4]"]
+    },
+    {
+      "category": "KEY",
+      "object_id": "todo_22",
+      "observation": "The sibling key requires moving Contact Retreat Location to next Monday. The target email neither mentions that task nor gives it a new deadline. The earlier email explicitly requested contact on June 19. Leaving todo_22 unchanged does not establish a supported requirement was missed; preparation dependency alone cannot require exactly June 29. Whether renewed contact is useful or the old contact happened is unknown.",
+      "evidence": ["stage-b.json other_keyed_operations", "stage-a.json preceding_storyline_emails[Company-Retreat.tasks-before-the-retreat]", "full-state-before.json todos[todo_22]", "full-state-after.json todos[todo_22]"]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "object_id": "evt_4",
+      "observation": "The retreat's 09:00–17:00 duration predates this target. Its original email supplies a date only, so the eight-hour duration departs from the one-hour default. The current move preserves that existing duration; this historical defect does not determine T1.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_002.jsonl:28-29", "stage-a.json preceding_storyline_emails[Company-Retreat.company-retreat-date-conformed]"]
+    },
+    {
+      "category": "MODEL",
+      "object_id": "todo_23",
+      "observation": "The VIP-list task was previously created due June 22 at 09:00 rather than the 17:00 todo default, without an explicit time in its source email. It remains unchanged. Its explicit date and retreat-linked wording leave possible rescheduling intent uncertain, but no new exact deadline is stated in the target.",
+      "evidence": ["captures/baseline-sonnet-4-5/raw/day_015.jsonl:53-54", "stage-a.json preceding_storyline_emails[Company-Retreat.tasks-before-the-retreat]", "full-state-after.json todos[todo_23]"]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

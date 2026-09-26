@@ -295,6 +295,10 @@ _(nothing)_
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 8, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. August 7 is explicit, but a mandatory calendar milestone is unstated. Both reviewers find the FYI and calendar interpretations defensible. No release event exists in the complete stores; only the separate keynote was added. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q1](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 9. `Enterprise_Ai_Selection.fridays-meeting-time` · create `Friday_AI_Review` (event)
@@ -518,6 +522,10 @@ _(nothing)_
 **Your verdict:** `[ ]` MODEL   `[x ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** It would be the job of the CEO or whoever this secretary is reporting to choose the actual time, not necessarily the secretary. So the key is just wrong.
 
+<!-- agent-continuation:start -->
+**Agent review for 14, 2026-09-26:** NEEDS_JAMES · KEY (saved); MODEL proposed. Saved human KEY label preserved. Pilot reviewers read explicit delegation to choose an offered slot. Only a reminder to pick a date was created; no slot booked. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q2](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 15. `shoe-product-launch-delays.design-team-meeting` · create `Decide who to cut` (todo)
@@ -595,6 +603,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ x]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** doesn't specify a date for the todo to be set, just says soon so model picks the next day. But the key requires two days later instead of a window.
+
+<!-- agent-continuation:start -->
+**Agent review for 16, 2026-09-26:** HUMAN_REVIEWED; model credit pending · KEY (saved). Saved KEY label preserved: no support for the exact June 25 deadline. The June 24 reminder is discretionary; key invalidity does not establish full model compliance. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q4](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -713,6 +725,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ x]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** Model never made an event that was specified in the email that should have been on August 10th.
 
+<!-- agent-continuation:start -->
+**Agent review for 19, 2026-09-26:** NEEDS_JAMES · MODEL (saved); KEY/AMBIGUOUS proposed. Saved human MODEL label preserved. Pilot reviewers dispute a mandatory launch-calendar milestone. Sign-off reminder created; no launch event. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q1](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 20. `Planning.rebrand-pitch` · create `vision_sync` (event)
@@ -741,6 +757,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ x]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** email was served the 27th and asks for a meeting the 10th way before the meeting was served.
+
+<!-- agent-continuation:start -->
+**Agent review for 20, 2026-09-26:** HUMAN_REVIEWED; model credit pending · PLAN (saved). Saved PLAN label preserved: June 15 vision-sync request delivered June 27. No event created; whether to backfill stale requests is unspecified. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -800,6 +820,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 21, 2026-09-26:** AGENT_RESOLVED · KEY. The rescheduling email does not revise the explicitly June 19 location-contact task or establish June 29 as its new deadline. No model pass for the entire email is implied. Leaving todo_22 unchanged is supported for this target; real-world contact completion is unknown. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 22. `Company-Retreat.in-town-and-would-love-to-connect` · create `Athlete Meeting` (event)
@@ -858,6 +882,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 22, 2026-09-26:** AGENT_RESOLVED · KEY. The explicit athlete date is August 22; the key incorrectly requires June 22. evt_46 uses the correct day. Its 10:00-12:00 hours independently violate the 09:00, one-hour defaults. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 23. `pizza-party.pizza-place-selection` · create `Pizza_decision` (todo)
@@ -894,6 +922,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 23, 2026-09-26:** AGENT_RESOLVED · KEY. The key requires a June 29 cutoff unsupported by the Friday request. The explicit turn-date rule supports July 3. todo_47 records selection and memo review by July 3 at 17:00. This supports the scheduling target, not actual review or communication. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -941,6 +973,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 24, 2026-09-26:** AGENT_RESOLVED · PLAN. The June 29 delivery misses the explicitly pre-June-19 deadline; the exact June 19 key is also too restrictive. todo_49 substitutes unsupported July 3. Late-request handling and conflicting earlier Gold approval remain unresolved; no model pass is awarded. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 25. `Planning.can-t-do-thursday` · move `board_signoff` (event)
@@ -974,6 +1010,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 25, 2026-09-26:** AGENT_RESOLVED · MODEL. The explicit future July 15 move is supported and the existing board meeting is identifiable as evt_11. The request was read, but every event remains unchanged and evt_11 stays June 11. Historical hours are separate. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -2886,6 +2926,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for B1, 2026-09-26:** AGENT_RESOLVED · PASS. The requested retreat date and event identity are satisfied by unique evt_4 on June 22. Day-level pass accepted. The eight-hour duration violates the one-hour default and is recorded separately. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### B2. `Innovation-comp.pitch-comp-budget-review-optional-sit-in` · no-action email
@@ -2916,6 +2960,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for B2, 2026-09-26:** AGENT_RESOLVED · PASS. Optional invitation supplies no date or scheduling request; no action is supported. Target was read; complete stores are identical, with the distinct July 5 budget meeting unchanged. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### B3. `Innovation-comp.quick-win-to-share` · no-action email
@@ -2945,6 +2993,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for B3, 2026-09-26:** AGENT_RESOLVED · PASS. The HR update explicitly says nothing is needed. Target was read and no mutation occurred; full stores are identical. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -3155,6 +3207,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for B9, 2026-09-26:** AGENT_RESOLVED · PASS. The date-only reschedule updates Serena evt_24 from September 11 to September 22 with no duplicate; Michael evt_25 remains unchanged. Targeted move satisfied. Earlier unsupported 10:00-12:00 hours are a historical observation, not a defect introduced by the move. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
 
 ---
 

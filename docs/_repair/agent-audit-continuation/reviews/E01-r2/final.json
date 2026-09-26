@@ -1,0 +1,59 @@
+{
+  "case_id": "E01",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The date August 7 is explicit, but the required calendar operation is not. Recording the revised release milestone as an event is reasonable; treating this as a product-status FYI is also defensible under the instruction to avoid over-acting. There is no previously recorded release object to reschedule, no earlier target-storyline instruction to track the release, and no stated attendance or calendar-hold request. The observed no-op therefore cannot confidently be classified as either a supported omission or a correct FYI response. The grader accurately reports the absence of a new release event; its normative FAIL depends on resolving this ambiguity. There is no evidence of a title-matching false negative, disconnected tool, or stale delivery date.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:19",
+          "observation": "Observed get_email result: \"Sorry to inform you, but we need to delay the release of the new product to Friday, August 7th, 2026.\" The remaining sentence says a design problem needs fixing before production, without assigning Mark a task."
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "\"(no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change. Over-acting is the most common mistake; when in doubt, do nothing.\""
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; day-tool-trace.json",
+          "observation": "Complete stores contain no release milestone on August 7 under any email ID or title. All 10 prior events and 5 todos are unchanged; the sole added object is evt_17, Expo keynote. The trace has no target mutation or search."
+        },
+        {
+          "source": "stage-b.json:targets[0]",
+          "observation": "The key requires create/event, match [\"delayed\"], on @Delayed_Release_Date with exact_day tolerance; actual is \"(nothing matching created)\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No explicit policy says product release announcements require standalone calendar milestones regardless of personal attendance.",
+        "No prior release entry or instruction establishes whether this email revises an existing tracked commitment.",
+        "Other launch communications name August 10, but this email does not identify their relationship to its new product."
+      ],
+      "suggested_human_question": "Should this announcement itself require a standalone release milestone on Mark's calendar, even with no prior release entry, attendance requirement, or request to hold the date?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:17,33,34; full-state-after.json:evt_17",
+      "observation": "The expo keynote is correctly recorded on August 12, but evt_17 starts at 10:00 rather than the instructed default 09:00. The email supplies no time. This is a sibling time defect, independent of T1's day-level outcome."
+    },
+    {
+      "category": "PASS",
+      "source": "captures/baseline-sonnet-4-5/raw/day_012.jsonl:16,21; day-tool-trace.json",
+      "observation": "No action on the press preview ('You're not needed for it') or shoe readiness update ('I will arrange some final look-overs') is supported."
+    }
+  ],
+  "historical_observations": [
+    {
+      "source": "full-state-before.json:evt_1,evt_3,evt_13,todo_15; history-actions.jsonl entries citing day_001.jsonl:94-95, day_002.jsonl:26-27, day_010.jsonl:47-48, day_011.jsonl:33-34",
+      "observation": "Existing interview, morning show, livestream and metrics objects have distinct source emails and explicit August dates. No historical release milestone is present. Nothing in the target establishes that these objects must shift to August 7; their unchanged state does not independently establish a missed reschedule."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

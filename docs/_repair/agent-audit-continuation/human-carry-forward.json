@@ -1,0 +1,41 @@
+{
+  "source": "../agent-audit-pilot-sonnet-4-5.json",
+  "targets": [
+    {
+      "worksheet_item": "14",
+      "classification": "KEY (saved); MODEL proposed",
+      "status": "NEEDS_JAMES",
+      "finding": "Saved human KEY label preserved. Pilot reviewers read explicit delegation to choose an offered slot.",
+      "model_assessment": "Only a reminder to pick a date was created; no slot booked.",
+      "excerpt": "Any of these afternoons works, pick one",
+      "decision_group": "Q2"
+    },
+    {
+      "worksheet_item": "19",
+      "classification": "MODEL (saved); KEY/AMBIGUOUS proposed",
+      "status": "NEEDS_JAMES",
+      "finding": "Saved human MODEL label preserved. Pilot reviewers dispute a mandatory launch-calendar milestone.",
+      "model_assessment": "Sign-off reminder created; no launch event.",
+      "excerpt": "site launch is official and its date fixed",
+      "decision_group": "Q1"
+    },
+    {
+      "worksheet_item": "16",
+      "classification": "KEY (saved)",
+      "status": "HUMAN_REVIEWED; model credit pending",
+      "finding": "Saved KEY label preserved: no support for the exact June 25 deadline.",
+      "model_assessment": "The June 24 reminder is discretionary; key invalidity does not establish full model compliance.",
+      "excerpt": "before we announce anything to the teams, can you give a quick thumbs up",
+      "decision_group": "Q4"
+    },
+    {
+      "worksheet_item": "20",
+      "classification": "PLAN (saved)",
+      "status": "HUMAN_REVIEWED; model credit pending",
+      "finding": "Saved PLAN label preserved: June 15 vision-sync request delivered June 27.",
+      "model_assessment": "No event created; whether to backfill stale requests is unspecified.",
+      "excerpt": "get a vision sync on your calendar for Monday, June 15th, 2026",
+      "decision_group": "Q3"
+    }
+  ]
+}

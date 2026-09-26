@@ -1,0 +1,26 @@
+{
+  "Q1": {
+    "title": "Announcements versus required calendar milestones",
+    "question": "Should #8 require an event, and should the existing MODEL label for #19 remain or be reopened as KEY/AMBIGUOUS?",
+    "recommendation": "Keep #8 AMBIGUOUS and reopen #19 as AMBIGUOUS unless you can identify a supplied rule requiring these milestones. Record any new mandatory-milestone policy as a future rule.",
+    "alternatives": "Operational dates belong on the executive calendar; or the no-action/FYI instruction permits leaving announcements without attendance or hold requests unbooked."
+  },
+  "Q2": {
+    "title": "Explicit delegation to choose a slot",
+    "question": "Approve changing #14 from saved KEY to MODEL?",
+    "recommendation": "Yes. The explicit instruction to pick one grants scheduling discretion; creating only a decision reminder does not fulfill it.",
+    "alternatives": "Treat pick one as delegated choice; or require the principal to choose despite no such restriction in the supplied instructions."
+  },
+  "Q3": {
+    "title": "Requests delivered after their deadlines",
+    "question": "For these stale requests, how should model credit be treated: backfill required, no action acceptable, or unresolved/excluded from capability attribution?",
+    "recommendation": "Retain the settled PLAN defects and leave model credit unresolved. Do not invent a backfill requirement or treat arbitrary new dates as authorized.",
+    "alternatives": "Historical calendar/task recording remains mechanically possible; prospective fulfillment is already impossible and instructions supply no recovery policy."
+  },
+  "Q4": {
+    "title": "Undated or incompletely anchored reminders",
+    "question": "Which reminder timing, if any, should receive model credit when the key specifies an unsupported exact day?",
+    "recommendation": "Preserve definite KEY findings while withholding model credit unless the email establishes a deadline or admissible window.",
+    "alternatives": "A pragmatic reminder can be useful; usefulness alone may not satisfy an unstated timing requirement."
+  }
+}

@@ -1,5 +1,15 @@
 # SecretaryBench repair register
 
+<!-- agent-continuation:register:start -->
+
+## Current phase 1d continuation checkpoint, 2026-09-26
+
+1/6 batches; 8/54 fresh checks; 8/48 emails; 16/96 initial reviewer assignments. New classifications resolved: 9 (including two reused pilot checks); new checks needing James: 1. 29/75 worksheet checks accounted for, including 19 preserved human judgments.
+
+James approved the full six-batch plan and its reviewer usage. This supersedes historical awaiting-approval language below. [Findings](_repair/agent-audit-continuation/RESULTS.md), [decision queue](_repair/agent-audit-continuation/NEEDS_JAMES.md), paired reports and batch archives provide provenance. No repair status is promoted, no benchmark score is changed, and no future grader is implemented. Original human labels remain intact; #14/#19 remain pending human decisions. Python tests: 107 passed. Webapp checks blocked by absent dependencies; audit integrity checks pass at each committed batch.
+
+<!-- agent-continuation:register:end -->
+
 The single living record of what is wrong with this benchmark, what we changed, and
 what has actually been proven. Read this before starting work; update it in the same
 turn as any code change.
