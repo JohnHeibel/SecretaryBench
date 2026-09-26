@@ -1,0 +1,62 @@
+{
+  "case_id": "E33",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The supported date is August 10, immediately before the launch livestream. The key resolves to September 10 and is definitively unsupported. Full before/after stores are identical, with 48 events and 33 todos, and contain no green-room block, so the requested outcome was not delivered. The grader's absence observation is accurate even against a corrected date, but attribution to model reasoning is not justified: the secretary server failed, no tool calls occurred, and the target body was not observed. Thus FAIL describes the unmet state while its use as a model-quality verdict remains ambiguous. Do not classify this as a demonstrated MODEL error. The target's relative hour should be evaluated separately from the day-level key.",
+      "evidence": [
+        {
+          "source": "all_available_emails.json:164-168",
+          "observation": "Day-of-execution_and_Aftermath.launch-livestream: \"We're running it Monday, August 10th, 2026. Get the launch livestream blocked.\""
+        },
+        {
+          "source": "all_available_emails.json:1060-1064",
+          "observation": "Target: \"I want you in the green room an hour before the livestream for a mic check and a last run of the talking points. Block the hour right before it as green room.\""
+        },
+        {
+          "source": "stage-b.json:15-21",
+          "observation": "Key has \"eq\": \"dom:10,+2m\", resolved to Thu Sep 10; grader reports \"(nothing matching created)\"."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json, complete stores; lines 68-72",
+          "observation": "Stores are identical; evt_13 remains Launch livestream, 2026-08-10T20:00:00 to 2026-08-10T21:30:00. No green-room equivalent exists anywhere in either store."
+        },
+        {
+          "source": "day-tool-trace.json:1; stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_052.jsonl:1 as quoted in stage-b",
+          "observation": "Trace is []; target_body_observed_in_tool_result is false; secretary status is \"failed\". Model says: \"I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed target retrieval or functioning secretary tools, so no evidence of how the model would interpret and act on this request.",
+        "The exact livestream hour originates in an earlier model-created event; mail says launch night without a precise time. This does not make September 10 defensible."
+      ],
+      "suggested_human_question": "Should this disconnected day be excluded from model-compliance scoring while the green-room key is corrected to August 10?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "AMBIGUOUS",
+      "object_id": "evt_13",
+      "observation": "History records create_event for the livestream at 20:00–21:30 on August 10. Its mail establishes launch night and the date, but neither that precise hour nor 90-minute duration. The one-hour default would normally govern duration. Relative to the existing start, the green-room block would be 19:00–20:00; the day-level target cannot resolve this historical time issue.",
+      "evidence": [
+        {
+          "source": "history-actions.jsonl:27-28; captures/baseline-sonnet-4-5/raw/day_010.jsonl:47-48",
+          "observation": "create_event input: \"start\": \"2026-08-10T20:00:00\", \"end\": \"2026-08-10T21:30:00\"; returned id evt_13."
+        },
+        {
+          "source": "stage-a.json:assistant_instructions; all_available_emails.json:168",
+          "observation": "Instructions: \"Defaults unless the email says otherwise: events 9am, 1 hour long\". Mail: \"The public moment is a livestream launch night\"."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

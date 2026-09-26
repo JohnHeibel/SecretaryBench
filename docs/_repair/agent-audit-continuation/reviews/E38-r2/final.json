@@ -1,0 +1,51 @@
+{
+  "case_id": "E38",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The event kind and identity are supported, but the date key is off by one day: the second day of a trip starting August 3 is August 4, not August 5. The complete stores contain no SpadXTech event, so the grader's factual absence finding is accurate even against the corrected date. However, this is not an attributable model reasoning failure: no target body was observed, the tool trace is empty, and the secretary server failed. Model compliance is therefore unassessable as a behavioral judgment; the requested calendar state was not achieved. The overall fail is ambiguous as a model-quality verdict because it combines a defective date key with an infrastructure-blocked day. No supported event was present and rejected, so this is not a GRADER false negative. The meeting remains prospective relative to July 23, so no PLAN defect applies. Default time would be 09:00–10:00, separately from the exact-day key.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"I've scheduled a meeting with them on the second day of our Boston trip, since we'll be nearby.\" This supports a distinct scheduled SpadXTech event."
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails, Partnership-with-deeptech-companies.boston-trip-details",
+          "observation": "\"We finalized dates to for the trip to be from the week of August 3rd, 2026 till Sunday, August 9th, 2026. We will visit WHOOP on the first day, and Boston Dynamics on the third one.\" The natural start anchor is August 3."
+        },
+        {
+          "source": "stage-b.json: targets[0].operation.on and worksheet_key_and_resolved_dates",
+          "observation": "The key uses {\"eq\": \"@boston_trip_start+2d\"}, resolves to \"Wed Aug 05\", and itself identifies the anchor as \"Mon Aug 03 to Sun Aug 09\". Second day requires +1d."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; day-tool-trace.json",
+          "observation": "Complete before and after stores are unchanged and contain no SpadXTech event or equivalent object. The day tool trace is exactly []."
+        },
+        {
+          "source": "stage-b.json: target_body_observed_in_tool_result, model_narration, infrastructure; captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+          "observation": "target_body_observed_in_tool_result is false. The infrastructure reports {\"name\": \"secretary\", \"status\": \"failed\"}. The model states: \"I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed target-email retrieval or operational secretary tools for this day, preventing attribution of the missing calendar entry to reasoning.",
+        "The earlier phrase 'week of August 3' is less explicit than an exact departure date, but it does not justify the key's arithmetic of treating the second day as start+2d."
+      ],
+      "suggested_human_question": "Should this disconnected-server day be excluded from model-quality scoring, while independently correcting the second-day key to start+1d?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "history-actions.jsonl:197-200; captures/baseline-sonnet-4-5/raw/day_049.jsonl:57-60; full-state-before.json",
+      "observation": "Historical creates produced evt_84, Boston trip - WHOOP HQ visit, at 2026-08-04T09:00:00–17:00:00, and evt_85, Boston trip - Boston Dynamics visit, at 2026-08-06T09:00:00–17:00:00. These dates imply an August 4 start, unlike the August 3 anchor in the trip-details mail. They predate this target and cannot supply authority for its August 5 key. Their eight-hour durations also exceed the stated one-hour default without support in the supplied trip-details body."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

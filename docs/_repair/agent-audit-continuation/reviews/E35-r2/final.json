@@ -1,0 +1,42 @@
+{
+  "case_id": "E35",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The requested Actnano visit is absent, so the grader's missing-event verdict is justified as an end-state check. An Actnano event on August 9 is supported by the trip's stated Sunday end and the natural reading of visiting on the day of departure from Boston. However, this saved day cannot establish a model reasoning failure: the secretary MCP server is explicitly marked failed, the model reports unavailable tools, no tool calls occurred, and the target body was not observed in a get_email result. AMBIGUOUS reflects attribution under this infrastructure failure, not uncertainty that the event is missing. No KEY, PLAN, or GRADER defect is established. The instruction defaults would make the visit 09:00–10:00, though the targeted check concerns only its day.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"We'll also visit Actnano, Inc.\" and \"We'll go to them right the day we're leaving.\" support a new visit."
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails, Partnership-with-deeptech-companies.boston-trip-details",
+          "observation": "\"We finalized dates to for the trip to be from the week of August 3rd, 2026 till Sunday, August 9th, 2026.\" supplies the trip end."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events and todos stores",
+          "observation": "Both stores are identical, with 48 events and 33 todos. No event or todo represents Actnano. Existing evt_84 (Boston trip - WHOOP HQ visit) and evt_85 (Boston trip - Boston Dynamics visit) are distinct company visits and do not satisfy this request."
+        },
+        {
+          "source": "day-tool-trace.json; stage-b.json: target_body_observed_in_tool_result, model_narration, infrastructure",
+          "observation": "The tool trace is []; target_body_observed_in_tool_result is false. Narration: \"I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.\" Infrastructure from captures/baseline-sonnet-4-5/raw/day_052.jsonl:1 records secretary status \"failed\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "There is no observed target-body retrieval or usable-tool reasoning trace for this day; inability to execute must not be attributed to a reasoning error.",
+        "Departure wording does not explicitly distinguish leaving home from leaving Boston, but trip-end departure is the stronger contextual reading and no event was created on either possible day."
+      ],
+      "suggested_human_question": "Should this disconnected-server day be excluded from model-reasoning error counts while retaining its unmet end-state check?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

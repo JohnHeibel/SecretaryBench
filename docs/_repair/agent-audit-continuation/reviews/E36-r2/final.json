@@ -1,0 +1,56 @@
+{
+  "case_id": "E36",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The cancellation key is supported and the grader correctly identifies a retained Design Lead stage slot. Full before/after stores are identical (48 events and 33 todos); evt_82 remains unchanged. The request was therefore not satisfied as a state outcome. Attribution to model reasoning is not supported: the target body was not observed, the day's tool trace is empty, and the infrastructure explicitly reports the secretary server failed. AMBIGUOUS records that attribution limit, not ambiguity about the cancellation requirement. This is an infrastructure-blocked outcome, not evidence that the model misunderstood the mail.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"Until the credit question is settled, I'm pulling myself from the reveal lineup, so please take my stage slot off the run of show.\" The next sentence limits this to the stage, not the boot project."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: events[id=evt_82]",
+          "observation": "Both contain \"title\": \"Design walk-through at WC reveal\", \"start\": \"2026-08-13T18:30:00\", \"end\": \"2026-08-13T18:45:00\", and \"description\": \"Design Lead speaking slot on stage at reveal\". No deletion or replacement appears anywhere in the complete stores."
+        },
+        {
+          "source": "history-actions.jsonl:193-194; captures/baseline-sonnet-4-5/raw/day_049.jsonl:53-54",
+          "observation": "create_event for World_Cup_Cleat_Launch.reveal-event-date-and-venue-2 returned evt_82 with the same stage-slot description, confirming object identity."
+        },
+        {
+          "source": "stage-b.json: infrastructure; captures/baseline-sonnet-4-5/raw/day_053.jsonl:1; day-tool-trace.json",
+          "observation": "Infrastructure has \"name\": \"secretary\", \"status\": \"failed\". The trace is []. Stage B sets target_body_observed_in_tool_result to false and records: \"I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed inbox read or action-capable secretary connection on this day; model comprehension of the target cannot be evaluated.",
+        "The grader's failure is justified as a calendar-state check, but not as attribution of a reasoning error."
+      ],
+      "suggested_human_question": "Should infrastructure-blocked days be excluded from the model-reasoning failure count while retaining their unsatisfied state checks?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "source": "stage-a.json: other_emails_available_in_same_day_batch, World_Cup_Cleat_Launch.reveal-event-date-and-venue-3; full-state-after.json: evt_60 and evt_81",
+      "observation": "Same-day Marketing proposes July 20 reveal and July 19 rehearsal, says \"Holding for your okay before I tell the venue\", and conflicts with the earlier August 13 reveal. The stored reveal and rehearsal remain August 13 and August 12. These stale and conditional sibling dates do not invalidate the explicit withdrawal of evt_82; the disconnected day also prevents reasoning attribution for sibling inaction."
+    }
+  ],
+  "historical_observations": [
+    {
+      "source": "stage-a.json: World_Cup_Cleat_Launch.manufacturing-kickoff-2; full-state-before.json and full-state-after.json",
+      "observation": "The earlier message asks \"Can we meet Friday, July 24th, 2026?\" No design-credit meeting appears in either complete store. This omission predates the target turn; the current withdrawal does not cancel that distinct meeting. No attribution is assigned from this packet's evidence."
+    },
+    {
+      "source": "stage-a.json: assistant_instructions and World_Cup_Cleat_Launch.reveal-event-date-and-venue-2; history-actions.jsonl:193-194",
+      "observation": "The original stage-slot message supplied no clock time or duration. Its creation as evt_82 at 18:30 for 15 minutes conflicts with the stated event defaults of 9am and one hour. This historical time issue does not affect a cancellation check with no keyed date."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

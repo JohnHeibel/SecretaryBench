@@ -1,0 +1,51 @@
+{
+  "case_id": "E37",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["PLAN", "AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The key requires an August 2 event, whereas the supplied message explicitly says July 2. Nothing authorizes changing the month. Delivery on July 23 makes the prospective request stale, and the earlier July 30 deck deadline further contradicts a July 2 preparation meeting. No briefing exists in either complete store, but interpreting this absence as a model reasoning failure is unsupported: the secretary server failed, the trace is empty, and no target-body read was observed. The mechanical absence finding is accurate; failure against the unsupported August 2 requirement is not justified. Literal historical booking versus withholding an incoherent prospective event remains ambiguous. Event defaults would be 09:00–10:00 if an event were warranted; no time-level outcome exists to assess.",
+      "evidence": [
+        {
+          "source": "stage-a.json:6,9",
+          "observation": "served_date is 2026-07-23; exact body: 'Yes lets schedule a meeting for July 2nd that preps the pitch team for this. VP of marketing will lead the briefing.'"
+        },
+        {
+          "source": "stage-a.json:66",
+          "observation": "Earlier pitch-deck request says: 'We need this byThursday, July 30th, 2026 so that we have a week for the Pitch team to get prepared.' It supplies no August 2 meeting date."
+        },
+        {
+          "source": "stage-b.json:16,20",
+          "observation": "The exact-day key is {\"eq\":\"dom:2,+1m\"}, resolved as 'Pitch Breifing' on Sun Aug 02."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Both complete stores are identical: 48 events and 33 todos. Neither contains a marathon pitch briefing under any title or email stamp. todo_86 is the separate marathon pitch-deck task due 2026-07-30T17:00:00; evt_6 is the August 10 Event Pop Up."
+        },
+        {
+          "source": "day-tool-trace.json; stage-b.json:28-36; infrastructure source captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+          "observation": "Trace is []; target_body_observed_in_tool_result is false; secretary status is 'failed'. Narration says: 'I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.'"
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The intended valid briefing date is unknown; July 2 is past at delivery and August 2 is unsupported.",
+        "No observed inbox/body read or tool action permits evaluation of the model's interpretation of this target; tool unavailability explains the unchanged state."
+      ],
+      "suggested_human_question": "Should the message retain July 2 and be delivered before that date, or should the authored meeting date be explicitly revised?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "stage-a.json preceding_storyline_emails: Sponsoring-Marathon.approval-of-event",
+      "observation": "The June 5 email already says 'Pitch went amazing!' and 'We have secured our Gold Tier', predating the June 20 launch and July pitch-deck requests. This chronology inconsistency does not establish an alternative briefing date."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

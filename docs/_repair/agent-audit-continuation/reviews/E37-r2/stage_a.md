@@ -1,0 +1,7 @@
+# E37 Stage A
+
+The target asks to schedule a meeting to prepare the marathon pitch team, led by the VP of Marketing: “Yes lets schedule a meeting for July 2nd that preps the pitch team for this.” The explicit date is July 2, 2026; absent a stated time, the assistant defaults make a literal calendar entry 09:00–10:00. This is a distinct pitch briefing, not the launch meeting, budget approval meeting, pitch-deck task, or marathon event.
+
+However, delivery is July 23, so July 2 is already past. The preceding July 20 email requests the deck by July 30, allowing a week for preparation. The storyline also contains an already-announced successful pitch and secured Gold Tier on June 5, followed by later budget and preparation requests. This sequence makes the target's prospective request temporally stale or internally inconsistent. It supplies no authority to silently substitute August 2, July 30, or another future date. Literal past-date scheduling and withholding a stale action are materially different defensible responses given the instruction to avoid over-acting.
+
+The supported meeting identity and leader are clear; its useful execution date is uncertain. An exact July 2 calendar key would track the raw request but must be assessed separately from the delivery-plan defect. No evidence establishes that this briefing already exists or revises an earlier object. Same-day refusal to move the launch meeting concerns a different event and cannot determine this briefing's date.

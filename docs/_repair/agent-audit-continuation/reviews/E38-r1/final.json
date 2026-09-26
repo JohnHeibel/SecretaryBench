@@ -1,0 +1,71 @@
+{
+  "case_id": "E38",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "AMBIGUOUS"
+      ],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The key makes the second day of a trip starting August 3 equal August 5. The supported ordinal calculation is start + 1 day, August 4. No SpadXTech meeting exists anywhere in the complete before or after stores, so the requested calendar state is unsatisfied and the grader accurately reports an absent creation. However, the secretary server was failed, the target body was not observed, and the day has no tool calls. This cannot establish a model reasoning failure or its behavior with functioning tools. The invalid date key and infrastructure-limited attribution coexist; correcting the key alone would not create a passing saved state. Defaults would place a functioning implementation at August 4, 09:00-10:00; this is separate from day-level grading.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "Exact sentence: \"I've scheduled a meeting with them on the second day of our Boston trip, since we'll be nearby.\""
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails, Partnership-with-deeptech-companies.boston-trip-details",
+          "observation": "Exact sentences: \"We finalized dates to for the trip to be from the week of August 3rd, 2026 till Sunday, August 9th, 2026. We will visit WHOOP on the first day, and Boston Dynamics on the third one.\""
+        },
+        {
+          "source": "stage-b.json: targets[0].operation.on and worksheet_key_and_resolved_dates",
+          "observation": "Raw predicate {\"eq\": \"@boston_trip_start+2d\"} resolves to \"Wed Aug 05\" while the stated anchor is \"Mon Aug 03 to Sun Aug 09\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores are equal: 48 events and 33 todos, with no SpadXTech event or alternative object representing this meeting."
+        },
+        {
+          "source": "stage-b.json: infrastructure, citing captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+          "observation": "Raw server record: {\"name\": \"secretary\", \"status\": \"failed\"}. target_body_observed_in_tool_result is false."
+        },
+        {
+          "source": "day-tool-trace.json; stage-b.json: model_narration",
+          "observation": "Trace is []. Model says: \"I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed get_email result for the target or functioning secretary tools on this day; model reasoning on the request is unobserved.",
+        "The trip-start sentence is awkwardly worded, but neither it nor any provided authoritative instruction supports counting the second day as start + 2 days."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "object_ids": [
+        "evt_84",
+        "evt_85"
+      ],
+      "observation": "Before this target day, the model created the WHOOP first-day visit on August 4 and Boston Dynamics third-day visit on August 6, each one day later than the August 3 trip start implies. Both are eight-hour events despite the one-hour default and no duration in the trip-details email. These historical artifacts do not establish a new trip start or justify the current key.",
+      "evidence": [
+        {
+          "source": "history-actions.jsonl:197-198, citing captures/baseline-sonnet-4-5/raw/day_049.jsonl:57-58",
+          "observation": "create_event for \"Boston trip - WHOOP HQ visit\" uses \"start\": \"2026-08-04T09:00:00\", \"end\": \"2026-08-04T17:00:00\"; returned ID evt_84."
+        },
+        {
+          "source": "history-actions.jsonl:199-200, citing captures/baseline-sonnet-4-5/raw/day_049.jsonl:59-60",
+          "observation": "create_event for \"Boston trip - Boston Dynamics visit\" uses \"start\": \"2026-08-06T09:00:00\", \"end\": \"2026-08-06T17:00:00\"; returned ID evt_85."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

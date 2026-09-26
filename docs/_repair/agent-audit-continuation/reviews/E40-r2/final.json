@@ -1,0 +1,82 @@
+{
+  "case_id": "E40",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The supported day-level operation is to move the existing Atlas board demo to July 3. The model updated evt_48 in place from July 6 to July 3, preserving its stored start time and duration. Full before/after stores show one demo and no July 6 duplicate, with the independent beta-feedback task and code-freeze event unchanged. The key's freeze-plus-11-days resolves to the explicitly requested July 3, so the PASS is justified. The inherited nondefault time/duration is a historical issue recorded separately, not a failure of this date-move check.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:18 (day-tool-trace.json)",
+          "observation": "Observed get_email result: \"Scheduling is tight that week, so we are pulling the Atlas board demo in to Friday, July 3rd, 2026, same hour.\""
+        },
+        {
+          "source": "full-state-before.json: events[id=evt_48]",
+          "observation": "evt_48, email_id project_atlas.board-demo, title \"Atlas live board demo\", start \"2026-07-06T10:00:00\", end \"2026-07-06T11:30:00\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:36-37 (day-tool-trace.json)",
+          "observation": "update_event input: {\"event_id\":\"evt_48\",\"start\":\"2026-07-03T10:00:00\",\"end\":\"2026-07-03T11:30:00\"}; successful result preserves evt_48 and project_atlas.board-demo."
+        },
+        {
+          "source": "full-state-after.json: complete events and todos",
+          "observation": "Only evt_48 represents the Atlas board demo, now July 3. evt_31 remains June 22 and todo_43 remains due July 6. The unrelated new object is todo_49."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key: kind event, verb move, on.eq \"@atlas_freeze+11d\", tolerance \"exact_day\"; reported verdict \"PASS — matched\" with actual \"Atlas live board demo\" Fri Jul 03 10 AM (90m)."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The original demo email supplies no hour or duration, so 10:00–11:30 lacks support under the 09:00/one-hour defaults. Keeping the existing stored hour is nevertheless a defensible interpretation of this target's explicit 'same hour'; no timing claim is inferred from the day-level pass."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "email_id": "Sponsoring-Marathon.sponsorship-tiers",
+      "categories": ["MODEL", "PLAN"],
+      "observation": "The same-day action creates todo_49 due July 3, although the observed request explicitly says 'before Friday, June 19th, 2026.' July 3 is an unsupported replacement deadline. The request also arrives June 29 after its stated deadline, creating a delivery/chronology problem independent of the Atlas target. Prior mail already says Gold Tier was secured, while later supplied mail again discusses choosing a tier; whether this is a renewed choice is unclear.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:19",
+          "observation": "\"CEO please let me know which option we will go with before Friday, June 19th, 2026 and make sure it aligns with budget.\"; served_date \"2026-06-29\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_029.jsonl:38-39",
+          "observation": "create_todo sets due_date \"2026-07-03T17:00:00\"; result id \"todo_49\", title \"Select Eugene Marathon sponsorship tier\"."
+        },
+        {
+          "source": "all_available_emails.json: Sponsoring-Marathon.approval-of-event and Sponsoring-Marathon.race-sponsorship-budget-goals",
+          "observation": "June 5: \"We have secured our Gold Tier\". June 28: \"CEO will need to sign off on the final sponsorship tier/budget you choose from.\""
+        }
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "email_id": "project_atlas.board-demo",
+      "object_id": "evt_48",
+      "category": "MODEL",
+      "observation": "The prior demo creation chose 10:00–11:30 despite the supplied request having no time or duration and instructions defaulting events to 09:00 for one hour. This predates the rescheduling and is preserved by the current move.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions and preceding_storyline_emails[project_atlas.board-demo]",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long\"; original request: \"The board wants a live Atlas demo two weeks after freeze. Please put it on the calendar for Monday, July 6th, 2026.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_028.jsonl:52-53 (history-actions.jsonl:107-108)",
+          "observation": "create_event input uses \"start\":\"2026-07-06T10:00:00\", \"end\":\"2026-07-06T11:30:00\"; result creates evt_48."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

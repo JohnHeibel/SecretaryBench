@@ -18,10 +18,10 @@
     "alternatives": "Historical calendar/task recording remains mechanically possible; prospective fulfillment is already impossible and instructions supply no recovery policy."
   },
   "Q4": {
-    "title": "Undated or incompletely anchored reminders",
-    "question": "Which reminder timing, if any, should receive model credit when the key specifies an unsupported exact day?",
-    "recommendation": "Preserve definite KEY findings while withholding model credit unless the email establishes a deadline or admissible window.",
-    "alternatives": "A pragmatic reminder can be useful; usefulness alone may not satisfy an unstated timing requirement."
+    "title": "Undated reminders and qualitative event times",
+    "question": "Which reminder timing should receive credit without a stated deadline, and how should launch night constrain an unspecified event hour?",
+    "recommendation": "Preserve definite KEY findings while withholding model credit unless the email establishes an admissible window. Keep the uncounted livestream-hour disagreement separate from the definite duration issue.",
+    "alternatives": "A pragmatic reminder may be useful without satisfying an unstated deadline. Night may override a morning default, but the source does not uniquely select 20:00."
   },
   "Q5": {
     "title": "Conflicting timing within available emails",

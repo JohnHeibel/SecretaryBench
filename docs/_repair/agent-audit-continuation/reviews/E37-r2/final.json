@@ -1,0 +1,49 @@
+{
+  "case_id": "E37",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "PLAN",
+        "AMBIGUOUS"
+      ],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The key requires August 2, but the email explicitly requests July 2. Nothing authorizes changing the named month. Delivery on July 23 also makes the prospective meeting stale; the preceding July 30 deck deadline does not establish August 2 as a replacement. No pitch briefing exists in either complete store, but the target body was not observed by the model, the tool trace is empty, and infrastructure records the secretary server as failed. Thus the missing action is real, while model reasoning failure is not established. The FAIL accurately describes absence against its key but is unjustified as a supported-request failure. Literal July 2 scheduling and withholding an already-past action remain defensible readings. Default time would be 09:00\u201310:00; no time error can be assessed without an event.",
+      "evidence": [
+        {
+          "source": "stage-a.json:6,9",
+          "observation": "served_date is \"2026-07-23\"; body: \"Yes lets schedule a meeting for July 2nd that preps the pitch team for this. VP of marketing will lead the briefing.\""
+        },
+        {
+          "source": "stage-a.json:66",
+          "observation": "Prior deck request says: \"We need this byThursday, July 30th, 2026 so that we have a week for the Pitch team to get prepared.\" It gives no August 2 briefing date."
+        },
+        {
+          "source": "stage-b.json:15-21",
+          "observation": "Key uses \"eq\": \"dom:2,+1m\", resolved to \"Sun Aug 02\"; current result reports \"(nothing matching created)\"."
+        },
+        {
+          "source": "stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_053.jsonl:1 (quoted infrastructure)",
+          "observation": "\"target_body_observed_in_tool_result\": false; secretary server \"status\": \"failed\". Model says: \"I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.\""
+        },
+        {
+          "source": "day-tool-trace.json:1; full-state-before.json; full-state-after.json",
+          "observation": "Trace is []; complete stores are identical (48 events, 33 todos), with no marathon pitch briefing. todo_86 is the distinct marathon pitch-deck task due \"2026-07-30T17:00:00\"; evt_6 is the distinct Event Pop Up on August 10."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed target get_email result or usable tool session supports attribution to model interpretation.",
+        "The intended remedy for a July 2 request delivered July 23 is unspecified."
+      ],
+      "suggested_human_question": "Should this packet be delivered before July 2, or should the email explicitly request a different briefing date, and should the disconnected capture be excluded from model-error attribution?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

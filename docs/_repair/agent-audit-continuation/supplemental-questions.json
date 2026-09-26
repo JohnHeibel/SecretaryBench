@@ -21,6 +21,17 @@
       "coordinator_evidence": [
         "captures/baseline-sonnet-4-5/raw/day_049.jsonl:21,51-52"
       ]
+    },
+    {
+      "worksheet_item": "S3 (uncounted E33 historical time)",
+      "decision_group": "Q4",
+      "excerpt": "The public moment is a livestream launch night",
+      "finding": "The earlier email supplies August 10 and night, but no exact start; evt_13 uses 20:00-21:30. Reviewers differ MODEL versus AMBIGUOUS for its historical clock choices.",
+      "model_assessment": "The target green-room hour is relative to that event. A qualitative night constraint may override 09:00, but does not select one precise hour. Keep the hour question distinct from the unsupported 90-minute duration and the settled #48 month defect.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_010.jsonl:47-48",
+        "corpus/nodes/Day-of-execution_and_Aftermath.json"
+      ]
     }
   ]
 }

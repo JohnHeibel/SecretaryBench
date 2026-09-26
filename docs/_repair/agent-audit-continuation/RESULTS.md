@@ -1,6 +1,6 @@
 # Saved-run audit continuation results
 
-4/6 batches; 37/54 fresh checks; 32/48 emails; 64/96 initial reviewer assignments. New classifications resolved: 31 (including two reused pilot checks); unresolved new classifications: 8. 21 checks have queued interpretation, model-credit or saved-label decisions. 58/75 worksheet checks accounted for, including 19 preserved human judgments.
+5/6 batches; 45/54 fresh checks; 40/48 emails; 80/96 initial reviewer assignments. New classifications resolved: 36 (including two reused pilot checks); unresolved new classifications: 11. 27 checks have queued interpretation, model-credit or saved-label decisions. 66/75 worksheet checks accounted for, including 19 preserved human judgments.
 
 No benchmark scores were changed. AGENT_RESOLVED means coordinator-verified agent review, not human adjudication. Pending revisions to #14/#19 do not replace their saved human labels. Classification and model credit are separate; a KEY/PLAN finding does not establish model correctness.
 
@@ -12,19 +12,20 @@ No benchmark scores were changed. AGENT_RESOLVED means coordinator-verified agen
 | 2 | 10 | 10 | 0 | 31, B4 |
 | 3 | 9 | 7 | 2 | 34, B7 |
 | 4 | 10 | 5 | 5 | 47, B10 |
+| 5 | 8 | 5 | 3 | 53, B12 |
 
 ## Classification totals
 
 | Classification | Saved human | New agent-resolved | New pending |
 |---|---:|---:|---:|
 | MODEL | 4 | 3 | 0 |
-| KEY | 9 | 13 | 0 |
+| KEY | 9 | 16 | 0 |
 | PLAN | 4 | 2 | 0 |
 | GRADER | 2 | 2 | 0 |
-| AMBIGUOUS | 0 | 0 | 8 |
-| PASS | 0 | 11 | 0 |
+| AMBIGUOUS | 0 | 0 | 11 |
+| PASS | 0 | 13 | 0 |
 
-Sampled passes: 11 accepted for their targeted day-level check; 0 pending. Time/default discrepancies remain separately recorded. This selected-failure and sampled-pass audit is not a benchmark-wide accuracy estimate.
+Sampled passes: 13 accepted for their targeted day-level check; 0 pending. Time/default discrepancies remain separately recorded. This selected-failure and sampled-pass audit is not a benchmark-wide accuracy estimate.
 
 ## Per-target findings
 
@@ -58,6 +59,12 @@ Sampled passes: 11 accepted for their targeted day-level check; 0 pending. Time/
 | 45 | NEEDS_JAMES | AMBIGUOUS | The July 22 manufacturing kickoff is explicit and absent; the key and state-level failure are supported. Day 51 secretary MCP failed, no tools or observed target read occurred, and complete stores are unchanged. Missing outcome is not demonstrated model reasoning failure. | [review archive](batch-4-archive.json) |
 | 46 | NEEDS_JAMES | AMBIGUOUS | The revised budget approval clearly moves to July 22, but todo_76 remains July 17; state-level failure is supported. No update or substitute exists. Day 51 MCP failure and no observed read prevent attribution to model decision-making. | [review archive](batch-4-archive.json) |
 | 47 | AGENT_RESOLVED | KEY | Adding a promotion item to the recap does not require a new task exactly on September 25; an earlier reminder or agenda-description update can satisfy the request. No agenda update or equivalent task exists, but day 52 has failed tools and no observed read. The definite key defect does not prove correct model behavior. | [review archive](batch-4-archive.json) |
+| 48 | AGENT_RESOLVED | KEY | The green-room block belongs immediately before the August 10 livestream, not on the keyed September 10. No green-room event exists. Day 52 failed tools and no observed read preclude model-reasoning attribution. The exact hour depends on inherited livestream timing, separate from the clear month defect. | [review archive](batch-5-archive.json) |
+| 49 | NEEDS_JAMES | AMBIGUOUS | A July 24 Design Lead credit discussion is explicitly requested and absent; the state-level failure is supported. No equivalent event exists, including under the shared Manufacturing kickoff subject. Failed tools and no observed read prevent attribution to model reasoning. | [review archive](batch-5-archive.json) |
+| 50 | NEEDS_JAMES | AMBIGUOUS | The new Actnano visit is absent. Departure from Boston most naturally refers to the explicit August 9 trip end, independently of the start-window dispute. No Actnano event exists on any date. Day 52 failed tools and no observed read prevent model-quality attribution; the missing-event outcome is factual. | [review archive](batch-5-archive.json) |
+| 51 | NEEDS_JAMES | AMBIGUOUS | The Design Lead explicitly withdraws only her stage slot; identifiable evt_82 survives, so the cancellation remains unmet. Main reveal evt_60 and rehearsal evt_81 are distinct. Day 53 tools failed with no observed read or action, preventing attribution of the retained slot to a model decision. | [review archive](batch-5-archive.json) |
+| 52 | AGENT_RESOLVED | KEY | The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale. No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness. | [review archive](batch-5-archive.json) |
+| 53 | AGENT_RESOLVED | KEY | Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed. No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution. | [review archive](batch-5-archive.json) |
 | B1 | AGENT_RESOLVED | PASS | The requested retreat date and event identity are satisfied by unique evt_4 on June 22. Day-level pass accepted. The eight-hour duration violates the one-hour default and is recorded separately. | [review archive](batch-1-archive.json) |
 | B2 | AGENT_RESOLVED | PASS | Optional invitation supplies no date or scheduling request; no action is supported. Target was read; complete stores are identical, with the distinct July 5 budget meeting unchanged. | [review archive](batch-1-archive.json) |
 | B3 | AGENT_RESOLVED | PASS | The HR update explicitly says nothing is needed. Target was read and no mutation occurred; full stores are identical. | [review archive](batch-1-archive.json) |
@@ -69,6 +76,8 @@ Sampled passes: 11 accepted for their targeted day-level check; 0 pending. Time/
 | B9 | AGENT_RESOLVED | PASS | The date-only reschedule updates Serena evt_24 from September 11 to September 22 with no duplicate; Michael evt_25 remains unchanged. Targeted move satisfied. Earlier unsupported 10:00-12:00 hours are a historical observation, not a defect introduced by the move. | [review archive](../agent-audit-pilot-sonnet-4-5.json#cases/C08) |
 | B10 | AGENT_RESOLVED | PASS | The kickoff update explicitly says nothing is needed; no target action is supported. Target body was read. Only unrelated all-hands and LeBron events were added, with no kickoff-related mutation or alternate object. | [review archive](batch-4-archive.json) |
 | B11 | AGENT_RESOLVED | PASS | Trademark clearance is informational, with no request for a meeting or task. Observed read produces no target mutation. The day’s two additions belong to distinct emails; existing objects remain unchanged. | [review archive](batch-4-archive.json) |
+| B12 | AGENT_RESOLVED | PASS | The Atlas beta summary is explicitly due by July 6 and is uniquely recorded as todo_43 on that day. Content, identity and 17:00 default are correct. Task creation does not establish completion of the feedback summary. | [review archive](batch-5-archive.json) |
+| B13 | AGENT_RESOLVED | PASS | The explicit Atlas board-demo move to July 3 is correctly applied to the same evt_48, with its existing hour preserved. No duplicate or alternate Atlas demo remains. Historical 10:00 start and 90-minute duration were unsupported in the original creation; the current same-hour revision correctly preserves them. | [review archive](batch-5-archive.json) |
 
 See [saved tool outage evidence](saved-tool-outage.json) for the 16 emails/17 checks without observed reads. See [NEEDS_JAMES](NEEDS_JAMES.md) for grouped decisions and [protocol](REVIEWER.md) for the closure rules. Original reviewer reports remain in `reviews/`; batch coordinator records contain source checks and spot-check findings.
 

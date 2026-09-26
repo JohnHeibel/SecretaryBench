@@ -1,0 +1,54 @@
+{
+  "case_id": "E33",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "AMBIGUOUS"
+      ],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The key resolves the green-room event to September 10, but the referenced livestream is explicitly August 10. The requested hour must precede that livestream on August 10. Complete stores contain no green-room block, so the supported request is unsatisfied as an observable state outcome. Nevertheless, this is not attributable to a model reasoning error: the secretary server failed, the trace is empty, and the target body was not observed being delivered. The grader's missing-object observation is accurate, but its date requirement is unsupported and this failed run cannot establish a model capability failure. Correcting the date alone would not create the missing event.",
+      "evidence": [
+        {
+          "source": "all_available_emails.json:1064",
+          "observation": "Exact target body: \"I want you in the green room an hour before the livestream for a mic check and a last run of the talking points. Block the hour right before it as green room.\""
+        },
+        {
+          "source": "all_available_emails.json:168",
+          "observation": "Livestream source says: \"We're running it Monday, August 10th, 2026. Get the launch livestream blocked.\""
+        },
+        {
+          "source": "stage-b.json:16,20-21",
+          "observation": "Key eq is \"dom:10,+2m\", resolved to \"Thu Sep 10\"; recorded verdict is 'FAIL — no event titled like \"green room\" was created'."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; day-tool-trace.json",
+          "observation": "Full stores are identical: 48 events and 33 todos in each, with no green-room or equivalent mic-check block. evt_13 remains Launch livestream, 2026-08-10T20:00:00 to 2026-08-10T21:30:00. Day trace is []."
+        },
+        {
+          "source": "stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_052.jsonl:1 as reproduced there",
+          "observation": "target_body_observed_in_tool_result is false; server entry is {\"name\": \"secretary\", \"status\": \"failed\"}. Narration: \"I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed delivery of the target body or functioning secretary tools; NO describes missing calendar fulfillment, not demonstrated model reasoning failure.",
+        "The existing 20:00 livestream time lacks exact support in the original email; the supported day is clear regardless."
+      ],
+      "suggested_human_question": "Should this disconnected day be excluded from model-error scoring while correcting the green-room key to August 10?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "source": "history-actions.jsonl:27-28 (captures/baseline-sonnet-4-5/raw/day_010.jsonl:47-48); all_available_emails.json:168; stage-a.json assistant_instructions",
+      "observation": "Prior create_event created evt_13 at 2026-08-10T20:00:00 to 2026-08-10T21:30:00. The source says launch night but supplies no exact start or 90-minute duration; instructions default to 09:00 and one hour. This inherited unsupported clock-time/duration choice is separate from the target's day-level key defect. Relative to the stored event, the requested green-room block would be 19:00–20:00 on August 10."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

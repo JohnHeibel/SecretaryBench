@@ -33,7 +33,7 @@ Approve changing #14 from saved KEY to MODEL?
 
 ## Q3: Requests delivered after their deadlines
 
-Items: 24, 29, 31, 32, 40, 20.
+Items: 24, 29, 31, 32, 40, 52, 20.
 
 For these stale requests, how should model credit be treated: backfill required, no action acceptable, or unresolved/excluded from capability attribution?
 
@@ -48,21 +48,23 @@ For these stale requests, how should model credit be treated: backfill required,
 | 31 | join a call with me and some of my people on June 21st | The planning call explicitly names June 21, not the keyed July 21; July 8 delivery also makes it stale. No planning-call event exists or was created. Model credit depends on the unspecified treatment of historical requests, not on the invalid July key. |
 | 32 | fill out these forms I've attached before the meeting | Forms are due before the June 21 call, not exactly July 21. The key has the wrong month and wrongly narrows a deadline window. No forms task exists or was created. A default 17:00 due time on the 09:00 call day would itself be late; delivery and missing backfill policy leave model credit unresolved. |
 | 40 | Please approve the tooling PO by Friday, July 17th, 2026. | The explicit July 17 tooling-approval deadline predates July 19 delivery, making on-time prospective fulfillment impossible. todo_83 is due July 19 and preserves the missed July 17 deadline in its description. Reviewers disagree whether this is acceptable recovery or an incorrect deadline replacement; no model pass is awarded. |
+| 52 | schedule a meeting for July 2nd | The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale. No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness. |
 | 20 | get a vision sync on your calendar for Monday, June 15th, 2026 | Saved PLAN label preserved: June 15 vision-sync request delivered June 27. No event created; whether to backfill stale requests is unspecified. |
 
-## Q4: Undated or incompletely anchored reminders
+## Q4: Undated reminders and qualitative event times
 
-Items: 16.
+Items: 16, S3 (uncounted E33 historical time).
 
-Which reminder timing, if any, should receive model credit when the key specifies an unsupported exact day?
+Which reminder timing should receive credit without a stated deadline, and how should launch night constrain an unspecified event hour?
 
-**Recommendation:** Preserve definite KEY findings while withholding model credit unless the email establishes a deadline or admissible window.
+**Recommendation:** Preserve definite KEY findings while withholding model credit unless the email establishes an admissible window. Keep the uncounted livestream-hour disagreement separate from the definite duration issue.
 
-**Competing readings:** A pragmatic reminder can be useful; usefulness alone may not satisfy an unstated timing requirement.
+**Competing readings:** A pragmatic reminder may be useful without satisfying an unstated deadline. Night may override a morning default, but the source does not uniquely select 20:00.
 
 | Item | Email excerpt | Observed action and settled facts |
 |---|---|---|
 | 16 | before we announce anything to the teams, can you give a quick thumbs up | Saved KEY label preserved: no support for the exact June 25 deadline. The June 24 reminder is discretionary; key invalidity does not establish full model compliance. |
+| S3 (uncounted E33 historical time) | The public moment is a livestream launch night | The earlier email supplies August 10 and night, but no exact start; evt_13 uses 20:00-21:30. Reviewers differ MODEL versus AMBIGUOUS for its historical clock choices. The target green-room hour is relative to that event. A qualitative night constraint may override 09:00, but does not select one precise hour. Keep the hour question distinct from the unsupported 90-minute duration and the settled #48 month defect. |
 
 ## Q5: Conflicting timing within available emails
 
@@ -113,7 +115,7 @@ Does #38 require brainstorming despite conditional wording, and may #44 track Ma
 
 ## Q8: Failed tool connection and model-quality attribution
 
-Items: 45, 46, 47.
+Items: 45, 46, 47, 48, 49, 50, 51, 52, 53.
 
 Should the affected saved checks be reported separately or excluded from model-capability attribution while retaining their factual state results?
 
@@ -126,10 +128,16 @@ Should the affected saved checks be reported separately or excluded from model-c
 | 45 | putting the manufacturing kickoff on your calendar for Wednesday, July 22nd, 2026 | The July 22 manufacturing kickoff is explicit and absent; the key and state-level failure are supported. Day 51 secretary MCP failed, no tools or observed target read occurred, and complete stores are unchanged. Missing outcome is not demonstrated model reasoning failure. |
 | 46 | I've moved the approval deadline to this Wednesday, July 22nd, 2026 | The revised budget approval clearly moves to July 22, but todo_76 remains July 17; state-level failure is supported. No update or substitute exists. Day 51 MCP failure and no observed read prevent attribution to model decision-making. |
 | 47 | could we add a short item to the recap about how we promote next year's comp earlier | Adding a promotion item to the recap does not require a new task exactly on September 25; an earlier reminder or agenda-description update can satisfy the request. No agenda update or equivalent task exists, but day 52 has failed tools and no observed read. The definite key defect does not prove correct model behavior. |
+| 48 | Block the hour right before it as green room. | The green-room block belongs immediately before the August 10 livestream, not on the keyed September 10. No green-room event exists. Day 52 failed tools and no observed read preclude model-reasoning attribution. The exact hour depends on inherited livestream timing, separate from the clear month defect. |
+| 49 | Can we meet Friday, July 24th, 2026? | A July 24 Design Lead credit discussion is explicitly requested and absent; the state-level failure is supported. No equivalent event exists, including under the shared Manufacturing kickoff subject. Failed tools and no observed read prevent attribution to model reasoning. |
+| 50 | We'll go to them right the day we're leaving. | The new Actnano visit is absent. Departure from Boston most naturally refers to the explicit August 9 trip end, independently of the start-window dispute. No Actnano event exists on any date. Day 52 failed tools and no observed read prevent model-quality attribution; the missing-event outcome is factual. |
+| 51 | please take my stage slot off the run of show | The Design Lead explicitly withdraws only her stage slot; identifiable evt_82 survives, so the cancellation remains unmet. Main reveal evt_60 and rehearsal evt_81 are distinct. Day 53 tools failed with no observed read or action, preventing attribution of the retained slot to a model decision. |
+| 52 | schedule a meeting for July 2nd | The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale. No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness. |
+| 53 | I've scheduled a meeting with them on the second day of our Boston trip | Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed. No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution. |
 
 ## Q9: Trip start window and calendar representation
 
-Items: 41, 43.
+Items: 41, 43, 53.
 
 Does from the week of August 3 fix departure to Monday, and what counts as representing the trip start?
 
@@ -141,3 +149,4 @@ Does from the week of August 3 fix departure to Monday, and what counts as repre
 |---|---|---|
 | 41 | from the week of August 3rd, 2026 till Sunday, August 9th, 2026 | Both reviewers call the missing trip start MODEL, but closure depends on interpreting from the week of August 3 as a unique Monday start and on the required trip representation. Only WHOOP August 4 and Dynamics August 6 visits exist, with no overall trip span. A separate start marker is unsupported; whether the first visit adequately records an allowed start is unresolved. Coordinator withholds automatic closure. |
 | 43 | WHOOP on the first day, and Boston Dynamics on the third one | Both reviewers infer August 5 as the third day of a Monday-start trip. The coordinator finds from the week of insufficiently precise to close that exact-date judgment. evt_85 is August 6 and evt_84 is August 4, preserving a first/third-day relationship if the trip starts Tuesday. That start is not explicitly selected either. Eight-hour visits independently violate the one-hour default. |
+| 53 | I've scheduled a meeting with them on the second day of our Boston trip | Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed. No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution. |

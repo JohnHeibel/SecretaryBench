@@ -1,0 +1,55 @@
+{
+  "case_id": "E36",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The requested cancellation is supported and unambiguous: remove only the Design Lead's reveal speaking slot. The matching object evt_82 survives unchanged, so the grader correctly reports the requested state was not achieved. However, attribution to model reasoning is unsupported: the secretary server failed, the target body was not observed, and there are no day tool calls. AMBIGUOUS captures that attribution limit, not uncertainty about the requested cancellation or the surviving object. NO records the unmet request in the resulting calendar; it is not evidence that the assistant read and misunderstood the email. There is no target key or matching defect, and conflicting sibling reveal dates do not invalidate cancellation of this identified slot.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "Exact request: \"Until the credit question is settled, I'm pulling myself from the reveal lineup, so please take my stage slot off the run of show.\" Scope: \"I'm not walking away from the boot, just the stage, and only for now.\""
+        },
+        {
+          "source": "history-actions.jsonl:193-194; captures/baseline-sonnet-4-5/raw/day_049.jsonl:53-54",
+          "observation": "create_event toolu_01WURXJSHtXXrpLATo9ReR7c created evt_82 from World_Cup_Cleat_Launch.reveal-event-date-and-venue-2 with title \"Design walk-through at WC reveal\" and description \"Design Lead speaking slot on stage at reveal\"."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events and todos",
+          "observation": "Complete stores are identical. evt_82 remains at 2026-08-13T18:30:00 through 2026-08-13T18:45:00. Main reveal evt_60 and rehearsal evt_81 are separate surviving objects; no replacement or cancellation action is present."
+        },
+        {
+          "source": "stage-b.json: targets[0].current_grader_target_result",
+          "observation": "Raw verdict: \"FAIL — should be cancelled, but still on the calendar\"; actual identifies \"Design walk-through at WC reveal\" on August 13 at 6:30 PM."
+        },
+        {
+          "source": "stage-b.json: infrastructure, target_body_observed_in_tool_result, model_narration; day-tool-trace.json",
+          "observation": "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1 reports secretary status \"failed\". target_body_observed_in_tool_result is false; day-tool-trace.json is []. Narration: \"I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed target-email read or operational secretary tools on the evaluated day. The evidence does not support a model-reasoning error attribution despite the unmet calendar requirement."
+      ],
+      "suggested_human_question": "Should this disconnected-server day be excluded from model-quality attribution while retaining its unmet-state result?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "source": "stage-a.json: World_Cup_Cleat_Launch.reveal-event-date-and-venue-3",
+      "observation": "Same-day mail proposes reveal July 20 and rehearsal July 19 while \"Holding for your okay before I tell the venue.\" Both dates precede July 23 delivery and conflict with the previously confirmed August 13 reveal. This is separate from the target's clear cancellation request; no sibling operation is keyed in this target email."
+    }
+  ],
+  "historical_observations": [
+    {
+      "source": "stage-a.json: assistant_instructions and World_Cup_Cleat_Launch.reveal-event-date-and-venue-2; history-actions.jsonl:193-194",
+      "observation": "The prior request supports a Design Lead walk-through on the reveal date but supplies no time or duration. evt_82 was created at 18:30 for 15 minutes instead of the stated default of 09:00 for one hour. This historical default issue does not affect the correctness of identifying evt_82 for cancellation."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

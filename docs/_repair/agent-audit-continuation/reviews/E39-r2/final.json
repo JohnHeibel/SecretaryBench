@@ -1,0 +1,43 @@
+{
+  "case_id": "E39",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The email explicitly requests one task to compile and summarize Atlas beta feedback by July 6, 2026. The model created exactly that task, todo_43, with the correct current email ID and July 6 at the default 17:00 deadline. The complete before-state contains no existing equivalent task; the complete after-state contains one matching task and no duplicate. The keyed business-day expression resolves to the explicit deadline, so the target PASS is supported. This establishes that the reminder was recorded, not that the compilation was completed.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_026.jsonl:23",
+          "observation": "Observed get_email result for project_atlas.beta: \"One to-do for you: the Atlas beta feedback needs to be compiled and summarized by Monday, July 6th, 2026. Add it to your list so it doesn't slip.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_026.jsonl:52",
+          "observation": "create_todo input: email_id=\"project_atlas.beta\", title=\"Compile and summarize Atlas beta feedback\", due_date=\"2026-07-06T17:00:00\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_026.jsonl:53",
+          "observation": "Successful tool result returns id=\"todo_43\" with the requested title, email ID, and due_date=\"2026-07-06T17:00:00\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Full stores inspected. No Atlas feedback task exists before the day; todo_43 is the sole Atlas feedback task afterward. The earlier Atlas event evt_31 is a separate code-freeze object and remains unchanged."
+        },
+        {
+          "source": "stage-b.json, targets[0]",
+          "observation": "T1 keys kind=\"todo\", by=\"@atlas_freeze+10bd\", resolved to Mon Jul 06; current_grader_target_result is \"PASS — matched\" with actual \"Compile and summarize Atlas beta feedback\" Mon Jul 06 5 PM."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

@@ -1,0 +1,7 @@
+The target is a scheduled SpadXTech meeting during the Boston trip, distinct from the earlier WHOOP collaboration meeting, FBS delegation meeting, and FBS presentation. Its statement, "I've scheduled a meeting with them on the second day of our Boston trip," supports recording a calendar event, if absent.
+
+The prior trip-details email gives the trip as "from the week of August 3rd, 2026 till Sunday, August 9th, 2026" and places WHOOP on the first day and Boston Dynamics on the third. The natural date anchor is Monday August 3: SpadXTech therefore belongs on Tuesday August 4, 2026. No hour or duration is supplied; the actual assistant instructions specify 09:00 and one hour. "Week of" is somewhat less precise than an explicit departure date, but nothing in the supplied mail supports starting August 4.
+
+The complete before-store has no SpadXTech event or to-do. It contains WHOOP visit evt_84 on August 4 and Boston Dynamics visit evt_85 on August 6. Those dates imply a different trip start than the source email and should not silently override the mail. Any preexisting itinerary error is separate from adding this distinct meeting.
+
+"I'm sure we'll need to invite some guys from SpadXTech" explains the meeting and potential FBS delegation. It supplies neither a definite separate invitation assignment nor a deadline; no exact-dated invitation to-do is supported. The CTO reports the meeting as scheduled, rather than merely proposing it. There is no cancellation or revision of an existing SpadXTech object.

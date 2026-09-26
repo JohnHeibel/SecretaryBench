@@ -1,0 +1,7 @@
+The July 23 target supports removing the Design Lead's reveal speaking slot: “I'm pulling myself from the reveal lineup, so please take my stage slot off the run of show.” Her qualification, “I'm not walking away from the boot, just the stage,” confines cancellation to the stage slot. It does not cancel the main reveal, manufacturing kickoff, rehearsal, or the separately requested July 24 credit discussion.
+
+The corresponding existing object is evt_82, “Design walk-through at WC reveal,” stamped World_Cup_Cleat_Launch.reveal-event-date-and-venue-2, on August 13 at 18:30. Deleting this object without a surviving duplicate satisfies the target. No new date or deadline is requested; cancellation is applicable regardless of the reveal-date confusion.
+
+Prior mail explicitly put the reveal on August 13 and the Design Lead's walk-through on the reveal date. The same-day proposed move cites July 13 to July 20 and rehearsal July 19, while awaiting approval. Those dates conflict with prior scheduling and are already past on July 23. The earlier rehearsal mail similarly conflicts between July 12 and “the day before” the August 13 reveal. These issues affect sibling scheduling but do not change which stage slot to remove.
+
+The before-store contains the main reveal evt_60 and rehearsal evt_81 as separate objects. No manufacturing kickoff or credit-discussion event appears in that complete store; historical handling is not yet known. Do not infer withdrawal from manufacturing or cancellation of a credit discussion merely from the subject “Manufacturing kickoff.”

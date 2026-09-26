@@ -1,0 +1,150 @@
+{
+  "batch": 5,
+  "spot_check_items": [
+    "53",
+    "B12"
+  ],
+  "targets": [
+    {
+      "batch": 5,
+      "worksheet_item": "48",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The green-room block belongs immediately before the August 10 livestream, not on the keyed September 10.",
+      "model_assessment": "No green-room event exists. Day 52 failed tools and no observed read preclude model-reasoning attribution. The exact hour depends on inherited livestream timing, separate from the clear month defect.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/raw/day_010.jsonl:47-48",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/Day-of-execution_and_Aftermath.json"
+      ],
+      "excerpt": "Block the hour right before it as green room.",
+      "decision_group": "Q8",
+      "related_decision_groups": [],
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 5,
+      "worksheet_item": "49",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "A July 24 Design Lead credit discussion is explicitly requested and absent; the state-level failure is supported.",
+      "model_assessment": "No equivalent event exists, including under the shared Manufacturing kickoff subject. Failed tools and no observed read prevent attribution to model reasoning.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ],
+      "excerpt": "Can we meet Friday, July 24th, 2026?",
+      "decision_group": "Q8",
+      "related_decision_groups": [],
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 5,
+      "worksheet_item": "50",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "The new Actnano visit is absent. Departure from Boston most naturally refers to the explicit August 9 trip end, independently of the start-window dispute.",
+      "model_assessment": "No Actnano event exists on any date. Day 52 failed tools and no observed read prevent model-quality attribution; the missing-event outcome is factual.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/Partnership-with-deeptech-companies.json"
+      ],
+      "excerpt": "We'll go to them right the day we're leaving.",
+      "decision_group": "Q8",
+      "related_decision_groups": [],
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 5,
+      "worksheet_item": "51",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "The Design Lead explicitly withdraws only her stage slot; identifiable evt_82 survives, so the cancellation remains unmet.",
+      "model_assessment": "Main reveal evt_60 and rehearsal evt_81 are distinct. Day 53 tools failed with no observed read or action, preventing attribution of the retained slot to a model decision.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:53-54",
+        "captures/baseline-sonnet-4-5/days/053.json#state"
+      ],
+      "excerpt": "please take my stage slot off the run of show",
+      "decision_group": "Q8",
+      "related_decision_groups": [],
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 5,
+      "worksheet_item": "52",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale.",
+      "model_assessment": "No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/053.json#state",
+        "corpus/nodes/Sponsoring-Marathon.json"
+      ],
+      "excerpt": "schedule a meeting for July 2nd",
+      "decision_group": "Q8",
+      "related_decision_groups": [
+        "Q3"
+      ],
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 5,
+      "worksheet_item": "53",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed.",
+      "model_assessment": "No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/053.json#state",
+        "corpus/nodes/Partnership-with-deeptech-companies.json"
+      ],
+      "excerpt": "I've scheduled a meeting with them on the second day of our Boston trip",
+      "decision_group": "Q8",
+      "related_decision_groups": [
+        "Q9"
+      ],
+      "additional_source_spot_check": "Direct original corpus second-day wording and +2d key inspected with trip context, raw failed-server evidence and full stores. Wrong offset is independent of the unsettled start day; no shared substantive classification error."
+    },
+    {
+      "batch": 5,
+      "worksheet_item": "B12",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The Atlas beta summary is explicitly due by July 6 and is uniquely recorded as todo_43 on that day.",
+      "model_assessment": "Content, identity and 17:00 default are correct. Task creation does not establish completion of the feedback summary.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_026.jsonl:23,52-53",
+        "captures/baseline-sonnet-4-5/days/026.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "related_decision_groups": [],
+      "additional_source_spot_check": "Direct original raw July 6 deadline, create/result todo_43 and original corpus key inspected. Unique task faithfully captures compiling and summarizing feedback at 17:00."
+    },
+    {
+      "batch": 5,
+      "worksheet_item": "B13",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The explicit Atlas board-demo move to July 3 is correctly applied to the same evt_48, with its existing hour preserved.",
+      "model_assessment": "No duplicate or alternate Atlas demo remains. Historical 10:00 start and 90-minute duration were unsupported in the original creation; the current same-hour revision correctly preserves them.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_029.jsonl:18,36-37",
+        "captures/baseline-sonnet-4-5/days/028.json#state",
+        "captures/baseline-sonnet-4-5/days/029.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "related_decision_groups": [],
+      "additional_source_spot_check": null
+    }
+  ],
+  "notes": "All 16 original reports and Stage A interpretations examined. All primary classifications agree. #53\u2019s settled offset defect is retained without adopting a uniquely determined Monday trip start. The no-read outage limits model attribution for six targets in this batch; supported stale/key facts are separate. Inherited clock choices are not automatically new errors in a same-hour revision."
+}

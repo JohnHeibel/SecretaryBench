@@ -1,0 +1,43 @@
+{
+  "case_id": "E34",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The requested July 24 meeting is absent, so the grader's outcome-level FAIL is supported. The event kind and exact day follow directly from the email. However, this capture cannot support a model reasoning-failure attribution: the secretary server is recorded as failed, no tools ran, and no observed get_email result exposed the target body. AMBIGUOUS identifies attribution under the available category set, not uncertainty about the missing calendar event. No alternate-title event or task satisfies the request anywhere in the complete unchanged stores. The 09:00 one-hour default would apply if the event had been created; the day-level failure does not turn on time.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"I'd like to talk it through with you directly. Can we meet Friday, July 24th, 2026?\" supports a new Design Lead meeting on July 24."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events and todos",
+          "observation": "Both stores contain the same 48 events and 33 todos, with no Design Lead credit discussion or July 24 meeting. Existing evt_82 is 'Design walk-through at WC reveal' on 2026-08-13, a different object."
+        },
+        {
+          "source": "day-tool-trace.json:1",
+          "observation": "[]"
+        },
+        {
+          "source": "stage-b.json:28-36; supplied infrastructure source captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+          "observation": "\"target_body_observed_in_tool_result\": false; narration: \"I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.\" Infrastructure records \"name\": \"secretary\", \"status\": \"failed\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The unavailable secretary tools prevented observed delivery and execution. A functioning-tool response to this email is not available, so a reasoning omission cannot be established."
+      ],
+      "suggested_human_question": "Should this failed-server day be excluded from model reasoning error counts while preserving the recorded unmet-request outcome?"
+    }
+  ],
+  "sibling_observations": [
+    "The condition 'I'm not willing to stand on stage at the reveal unless my team is named as the designers of this boot' does not establish an unconditional cancellation. Retaining evt_82 and the distinct main reveal evt_60 is not itself a supported sibling failure. No additional keyed operation is supplied."
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

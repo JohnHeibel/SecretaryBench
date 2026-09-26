@@ -1,0 +1,45 @@
+{
+  "case_id": "E34",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The request clearly supports a new Design Lead meeting on July 24, with 09:00\u201310:00 defaults; the keyed event kind and day are correct. No such event exists under any title in either complete store, and all 48 events and 33 to-dos are unchanged. Thus the recorded FAIL accurately describes the unsatisfied calendar requirement. However, the supplied infrastructure record says the secretary MCP server failed, the target body was not observed, and the day trace is empty. The missing event cannot responsibly be attributed to model interpretation or reasoning. AMBIGUOUS denotes model-error attribution, not uncertainty about the requested meeting or its absence.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"I'd like to talk it through with you directly. Can we meet Friday, July 24th, 2026?\" explicitly requests a meeting. \"I need to raise something separate from the timeline\" separates it from manufacturing."
+        },
+        {
+          "source": "stage-b.json: targets[0].operation",
+          "observation": "\"verb\": \"create\", \"name\": \"Design Lead 1:1\", \"kind\": \"event\", \"on\": {\"eq\": \"this:FRI\"}; the resolved date is Fri Jul 24."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events and todos",
+          "observation": "Complete stores are identical: 48 events, 33 to-dos. No July 24 Design Lead credit discussion is present. evt_82 remains \"Design walk-through at WC reveal\" at \"2026-08-13T18:30:00\"; evt_67 remains \"Design team meeting with Melissa\" at \"2026-07-08T14:00:00\". Neither satisfies the new meeting."
+        },
+        {
+          "source": "day-tool-trace.json",
+          "observation": "Raw contents: []"
+        },
+        {
+          "source": "stage-b.json: target_body_observed_in_tool_result; model_narration; infrastructure[0]",
+          "observation": "\"target_body_observed_in_tool_result\": false. Narration: \"I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.\" Infrastructure sourced to captures/baseline-sonnet-4-5/raw/day_052.jsonl:1 records \"name\": \"secretary\", \"status\": \"failed\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed target get_email result or tool actions establish how the model would interpret or execute the request with working tools. The failed MCP connection prevents attribution to a model reasoning error."
+      ],
+      "suggested_human_question": "Should this disconnected-server day be excluded from model-error attribution while retaining its unmet-state FAIL?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}
