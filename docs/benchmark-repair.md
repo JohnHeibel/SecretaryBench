@@ -76,8 +76,13 @@ author was confident about; a further one is warranted for any material change.
 
 C-10 (which corpus is authoritative) is **resolved for working purposes**: `corpus/` is
 authoritative, production is a stale backup. One yes/no remains outstanding for the corpus
-authors — see `docs/corpus-provenance.md`. Phase 1d (hand-grade) stays deferred, so nothing
-in phase 2 can reach `verified`.
+authors — see `docs/corpus-provenance.md`. **Phase 1d audit checkpoint, 2026-09-25:**
+James's worksheet has 19 checked judgments through item 20 (item 8 is blank). The
+approved eight-case, two-reviewer agent-assisted pilot is complete; its proposed
+findings await human adjudication in
+[`docs/_repair/agent-audit-pilot-sonnet-4-5.md`](_repair/agent-audit-pilot-sonnet-4-5.md).
+The original worksheet is unchanged. This does not complete the hand-grade or move
+any phase-2 finding to `verified`; no further audit batch is authorized by this entry.
 
 Phase 1 (freeze the lever record) remains free, offline and unblocked if you want progress
 in the meantime.
@@ -194,7 +199,7 @@ Revised table. Old phase numbers in brackets.
 | **1a** | **O-1, O-3, O-5a** *(new)* | the minimum re-gradeable capture slice: `--out DIR`, an end-of-run store dump, and **recording objects that matched no keyword**. Built before any run so the run is a permanent asset rather than a fourth disposable log | free |
 | **1b** | — *(new)* | bounded smoke (`--limit`, background) to prove the capture writes what phase 2 needs, and that the runner certifies the served model | cheap, bounded |
 | **1c** | — *(new)* | **the baseline run**: certified model, known config, fully re-gradeable. Run at seed 42 / `daily_max=5` so it is directly comparable to `outputs/opus.md` and `outputs/sonnet.md`, which retroactively validates them | **paid** |
-| **1d** | **the hand-grade** *(deferred 2026-08-19)* | ~30 emails judged by a human against the 1c capture. **On hold pending C-10**: judging against answer keys now known to be partly machine-generated measures an artifact that may be replaced. **Worksheet regenerated 2026-08-29 under the shipped grader**: `docs/_repair/audit-baseline-sonnet-4-5.md` (all 60 failing ops + 15 sampled passes, with resolved dates, anchors, dependency emails and the model's objects side by side), built by `docs/_repair/audit_worksheet.py`. The annotated copy comes back as an `.md` and is committed next to it | free |
+| **1d** | **the hand-grade** *(bounded audit pilot completed 2026-09-25; adjudication pending)* | The worksheet `docs/_repair/audit-baseline-sonnet-4-5.md` contains all 60 failing checks and 15 sampled passes under the shipped grader. James has 19 saved judgments through item 20, with item 8 blank. The approved pilot separately reviewed six existing judgments and two new checks, twice each: `docs/_repair/agent-audit-pilot-sonnet-4-5.md` and its JSON evidence archive. Proposed labels have not replaced human judgments; the complete reference audit remains unfinished. No future benchmark grader was implemented | approved agent usage; no new benchmark run |
 | 2 | G *[was 2]* | the grader. Now testable against **real recorded behaviour** from 1c, and against 1d's human reference. **Fix G-1, G-2, G-7 and the kind filter as ONE contract** — 1c proved that widening identity alone relocates failures rather than removing them | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
 | 4 | V *(part)*, C *[was 5]* | pin one lever and one config (C-2, C-3, K-2) and fix the **reporting** gaps: report V-3's null floor beside every score, make V-6's by-tier report exist, stamp provenance. **Does not decide what the benchmark claims** — see phase 8 | free |
@@ -1749,6 +1754,18 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-09-25** — Phase 1d, approved agent-assisted audit pilot. Six previously
+  reviewed checks (6, 9, 14, 16, 19, 20), one unreviewed failure (21), and one sampled
+  pass (B9) received two fresh reviews each. Both reviewers agreed on 8/8 primary
+  categories; they matched 4/6 saved James labels and challenged items 14 and 19.
+  These are agreement counts, not accuracy estimates or finalized corrections.
+  Evidence: `docs/_repair/agent-audit-pilot-sonnet-4-5.md` and the adjacent JSON archive
+  containing all 16 initial interpretations and final reports. Full stores and raw
+  tool actions were checked; packet checksums and the original worksheet hash are
+  unchanged. Existing suite: 107 passed. No source, corpus, capture, score, worksheet
+  verdict, or repair verification status changed. Human adjudication and any further
+  audit scope remain pending.
 
 - **2026-08-29** (later) — Phase 2, iteration 4, after the second adversarial pass
   (`docs/_repair/VERIFY-phase2-iter3.md`) rejected iteration 3. **Still `fix proposed`;
