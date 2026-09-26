@@ -1,0 +1,59 @@
+{
+  "case_id": "E48",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The target is a confirmation that the existing recap agenda already includes the requested promo item. No new calendar or task action is supported. The complete before/after stores are identical (48 events, 33 todos), and the day trace is empty. Thus the targeted no-action check passes legitimately as a state outcome. However, the assistant explicitly reported disconnected secretary tools and did not observe this email body, so the pass does not establish successful reading or reasoning about the message. The infrastructure failure is not a model reasoning failure.",
+      "evidence": [
+        {
+          "source": "stage-a.json:9",
+          "observation": "Exact target body: \"Hey Mark, agenda for the recap is locked, including the promo timing item that was flagged. Should be a tight, useful session. See you then.\\n\\nOperations\""
+        },
+        {
+          "source": "stage-a.json:3",
+          "observation": "Assistant instructions allow \"(no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change.\""
+        },
+        {
+          "source": "stage-b.json:10-11",
+          "observation": "Key: \"- take no action (FYI / no scheduling needed)\"; recorded result: \"PASS — correctly took no action\" and actual \"(nothing)\"."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json, complete stores; day-tool-trace.json:1",
+          "observation": "All 81 stored objects are unchanged; the trace is exactly []. Event evt_62 remains the September 25 recap. There is no promo-agenda task needing closure and no new object attributable to the target."
+        },
+        {
+          "source": "stage-b.json:17-25; captures/baseline-sonnet-4-5/raw/day_055.jsonl:1",
+          "observation": "\"target_body_observed_in_tool_result\": false; model says \"I cannot process today's emails\" because the MCP server disconnected. Infrastructure reports secretary server \"status\": \"failed\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed get_email result for this target. YES records supported no-action behavior only; whether the model would have understood the email with working tools is unobserved."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "source": "stage-a.json, other_emails_available_in_same_day_batch; full-state-after.json:380-386; stage-b.json:18-25",
+      "observation": "The unrelated same-day Boston Dynamics cancellation leaves evt_85 (Boston trip - Boston Dynamics visit, 2026-08-06T09:00:00 to 17:00:00) present. That cancellation is not E48 T1 or an E48 sibling key; the disconnected secretary server prevents attributing the missed cancellation to model reasoning. It does not invalidate this confirmation target."
+    }
+  ],
+  "historical_observations": [
+    {
+      "source": "stage-a.json:3,241; history-actions.jsonl:143-144 (captures/baseline-sonnet-4-5/raw/day_036.jsonl:32-33); full-state-before.json:260-265",
+      "observation": "The earlier recap creation made evt_62 start at \"2026-09-25T10:00:00\" despite no specified time in the recap request and the assistant instruction default of 9am. This inherited time discrepancy is separate from the July 25 confirmation and is unchanged today."
+    },
+    {
+      "source": "stage-a.json:339; full-state-before.json and full-state-after.json",
+      "observation": "The July 22 request asked to add the early-promotion topic. Neither complete store contains a dedicated agenda task or that item in evt_62 description. The July 25 message itself says the item is included, so absence of local agenda text does not create a new required scheduling action for E48."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

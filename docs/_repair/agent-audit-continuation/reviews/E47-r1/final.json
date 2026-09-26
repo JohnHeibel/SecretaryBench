@@ -1,0 +1,56 @@
+{
+  "case_id": "E47",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The target confirms existing availability without requesting a new meeting, revision, cancellation, or task. The instructions explicitly allow no action for confirmations. The model read the target, made no calendar changes, and made only two supported sibling to-do changes. The full stores show the four athlete bookings retained on their latest stated days, with no duplicate target object. Historical time/default errors are separate from this justified no-action pass.",
+      "evidence": [
+        {
+          "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_045.jsonl:21-22",
+          "observation": "get_email read Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o. The returned body states: 'Everyone has confirmed meeting availability, and no more scheduling issues.'"
+        },
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "'(no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change.'"
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json, complete-store comparison",
+          "observation": "All 41 events are unchanged. evt_24 remains September 22, evt_25 September 18, evt_41 August 24, and evt_50 August 8. The only changes among 30 prior and 31 final to-dos are addition of todo_76 and revision of todo_23; neither belongs to the target storyline. No target-stamped object exists in either store."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key: '- take no action (FYI / no scheduling needed)'; result: 'PASS — correctly took no action' with actual '(nothing)'. These agree with the request and trace."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "PASS",
+      "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_045.jsonl:18,36-37; full-state-after.json: todo_76",
+      "observation": "The budget email explicitly requests approval by July 17. todo_76, 'Approve revised WC reveal event budget', was created due 2026-07-17T17:00:00 with the correct source email. This records the task, not real-world approval."
+    },
+    {
+      "category": "PASS",
+      "source": "day-tool-trace.json; captures/baseline-sonnet-4-5/raw/day_045.jsonl:20,38-39; full-state-before.json and full-state-after.json: todo_23",
+      "observation": "The VIP-list email requests completion by tomorrow, July 16. Existing todo_23, 'Provide VIP employee list for retreat', was updated from 2026-06-22T09:00:00 to 2026-07-16T17:00:00, preserving identity without duplication."
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "source": "stage-a.json: assistant_instructions and preceding_storyline_emails; history-actions.jsonl: captures/baseline-sonnet-4-5/raw/day_015.jsonl:55-58, day_023.jsonl:48-49, day_024.jsonl:25-26, day_025.jsonl:43-44, day_031.jsonl:44-45",
+      "observation": "Earlier untimed athlete bookings evt_24, evt_25, evt_41, and evt_50 were created at 10:00-12:00 instead of the instructed 09:00-10:00 default; evt_24 retained those times when rescheduled. The untimed PR meeting evt_37 was created at 14:00-15:00 instead of 09:00-10:00. Their calendar days match the prior emails, but their times do not. These predate the confirmation and do not invalidate its day-level no-action result."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

@@ -1,0 +1,102 @@
+{
+  "case_id": "E42",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "PLAN",
+        "AMBIGUOUS"
+      ],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The key requires an unconditional July 20 reveal move although the sender explicitly awaits approval. July 20 is already past when delivered July 23, and the asserted old July 13 date conflicts with the previously confirmed August 13 event. A literal proposed replacement is stated, but a mandatory completed calendar move is unsupported without resolving approval and chronology. No move occurred: all 48 events and 33 todos are identical before and after. The grader's \"moved\" and \"2 stale copy\" diagnosis also conflates the actual reveal with a press briefing and a separate Design Lead stage slot. These are distinct objects, not duplicate main events. The failed secretary server and absent observed target body prevent attributing the unchanged calendar to model reasoning. This is not a demonstrated successful reschedule, so the diagnostic defect does not establish a clean model pass.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body and served_date",
+          "observation": "\"I need to push the reveal event back to the Monday, July 20th, 2026\" and \"Holding for your okay before I tell the venue.\" Served 2026-07-23."
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails / World_Cup_Cleat_Launch.reveal-event-date-and-venue",
+          "observation": "\"we are set to hold the reveal event on the Thursday, August 13th, 2026.\""
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Identical complete stores. evt_60: \"WC cleat reveal event\", start \"2026-08-13T18:00:00\"; evt_64: \"WC cleat press briefing\", start \"2026-08-06T11:00:00\"; evt_82: \"Design walk-through at WC reveal\", start \"2026-08-13T18:30:00\". No July 20 reveal exists."
+        },
+        {
+          "source": "stage-b.json: targets[0].current_grader_target_result",
+          "observation": "\"FAIL — moved, but 2 stale copy left behind (double-booked)\" lists evt_60, evt_64 and evt_82 by their titles/dates."
+        },
+        {
+          "source": "stage-b.json: infrastructure / captures/baseline-sonnet-4-5/raw/day_053.jsonl:1; day-tool-trace.json",
+          "observation": "Server entry is {\"name\":\"secretary\",\"status\":\"failed\"}; target_body_observed_in_tool_result is false; day tool trace is []."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No approval or explanation of the July/August inconsistency is supplied.",
+        "No target-body retrieval or functioning secretary tools are observed."
+      ],
+      "suggested_human_question": "Was this intended as an approved prospective move, and which delivery date and reveal month were intended?"
+    },
+    {
+      "target_id": "T2",
+      "primary_category": "KEY",
+      "secondary_categories": [
+        "PLAN",
+        "AMBIGUOUS"
+      ],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The rehearsal is a separate target with an explicit proposed July 19 date. However, it moves with the reveal proposal that is awaiting Mark's okay, and July 19 is four days before delivery. Requiring a completed July 19 move ignores the approval condition and stale prospective scheduling. The stored rehearsal remains August 12, so the grader correctly observes a mismatch to its literal date key; that alone does not justify a supported-request failure. The existing August date predates this target turn and follows the earlier confirmed August 13 reveal, despite the contradictory July 12 rehearsal wording. The current turn has no tools or mutations because the secretary server failed, so the evidence cannot show whether the assistant would have accepted, deferred, or clarified the proposed change.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body and served_date",
+          "observation": "\"The rehearsal moves with it, to the Sunday, July 19th, 2026.\" The same email says \"Holding for your okay before I tell the venue.\" Served 2026-07-23."
+        },
+        {
+          "source": "stage-a.json: preceding_storyline_emails / World_Cup_Cleat_Launch.reveal-event-date-and-venue-2",
+          "observation": "\"the day before the main event\" and \"Adding a reveal rehearsal to your calendar for the Sunday, July 12th, 2026.\" That predecessor was served 2026-07-19."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: evt_81",
+          "observation": "Identical rehearsal object: \"WC reveal rehearsal with striker\", start \"2026-08-12T10:00:00\", end \"2026-08-12T12:00:00\". Complete stores contain no replacement July 19 rehearsal."
+        },
+        {
+          "source": "history-actions.jsonl:191-192 / captures/baseline-sonnet-4-5/raw/day_049.jsonl:51-52",
+          "observation": "create_event used \"start\": \"2026-08-12T10:00:00\" and returned \"id\": \"evt_81\". This state was created before the target day."
+        },
+        {
+          "source": "stage-b.json: targets[1], infrastructure and target_body_observed_in_tool_result; day-tool-trace.json",
+          "observation": "Key is move / rehearsal / \"dom:19,0m\"; verdict is \"FAIL — on the wrong day\". Secretary server status is \"failed\", observed target body is false, and trace is []."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "Whether approval was granted, and whether historical correction or a future reschedule was intended, is unknown.",
+        "No current-day processing is observed, so missing mutation is not evidence of a reasoning error."
+      ],
+      "suggested_human_question": "Should rehearsal await approval of the reveal change, and was July 19 intended to be future relative to delivery?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "source": "stage-a.json: other_emails_available_in_same_day_batch / World_Cup_Cleat_Launch.manufacturing-kickoff-3; full-state-after.json: evt_82",
+      "observation": "\"please take my stage slot off the run of show\" supports cancellation of the Design Lead stage slot. evt_82 remains. This separate cancellation was not performed during the disconnected day; it is not a duplicate reveal and does not decide either target."
+    }
+  ],
+  "historical_observations": [
+    {
+      "source": "history-actions.jsonl:139-140,147-148,191-194; stage-a.json: assistant_instructions and predecessor bodies",
+      "observation": "evt_60, evt_64, evt_81 and evt_82 were separately created before this turn. Their 18:00/120m, 11:00/60m, 10:00/120m and 18:30/15m times differ from the supplied 09:00/60m event default without support in the supplied mail. These inherited time issues are separate from day-level date checks."
+    },
+    {
+      "source": "stage-a.json: preceding_storyline_emails / World_Cup_Cleat_Launch.reveal-event-date-and-venue-2; history-actions.jsonl:191-192",
+      "observation": "The prior rehearsal creation chose August 12, one day before the confirmed August 13 reveal, rather than the contradictory explicit July 12 date in mail delivered July 19. This inherited conflict cannot be attributed to the current target turn."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

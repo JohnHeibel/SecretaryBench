@@ -1,6 +1,6 @@
 # Saved-run audit continuation results
 
-5/6 batches; 45/54 fresh checks; 40/48 emails; 80/96 initial reviewer assignments. New classifications resolved: 36 (including two reused pilot checks); unresolved new classifications: 11. 27 checks have queued interpretation, model-credit or saved-label decisions. 66/75 worksheet checks accounted for, including 19 preserved human judgments.
+6/6 batches; 54/54 fresh checks; 48/48 emails; 96/96 initial reviewer assignments. New classifications resolved: 40 (including two reused pilot checks); unresolved new classifications: 16. 35 checks have queued interpretation, model-credit or saved-label decisions. 75/75 worksheet checks accounted for, including 19 preserved human judgments.
 
 No benchmark scores were changed. AGENT_RESOLVED means coordinator-verified agent review, not human adjudication. Pending revisions to #14/#19 do not replace their saved human labels. Classification and model credit are separate; a KEY/PLAN finding does not establish model correctness.
 
@@ -13,6 +13,7 @@ No benchmark scores were changed. AGENT_RESOLVED means coordinator-verified agen
 | 3 | 9 | 7 | 2 | 34, B7 |
 | 4 | 10 | 5 | 5 | 47, B10 |
 | 5 | 8 | 5 | 3 | 53, B12 |
+| 6 | 9 | 4 | 5 | 58, B14 |
 
 ## Classification totals
 
@@ -20,12 +21,12 @@ No benchmark scores were changed. AGENT_RESOLVED means coordinator-verified agen
 |---|---:|---:|---:|
 | MODEL | 4 | 3 | 0 |
 | KEY | 9 | 16 | 0 |
-| PLAN | 4 | 2 | 0 |
+| PLAN | 4 | 4 | 0 |
 | GRADER | 2 | 2 | 0 |
-| AMBIGUOUS | 0 | 0 | 11 |
-| PASS | 0 | 13 | 0 |
+| AMBIGUOUS | 0 | 0 | 16 |
+| PASS | 0 | 15 | 0 |
 
-Sampled passes: 13 accepted for their targeted day-level check; 0 pending. Time/default discrepancies remain separately recorded. This selected-failure and sampled-pass audit is not a benchmark-wide accuracy estimate.
+Sampled passes: 15 accepted for their targeted day-level check; 0 pending. Time/default discrepancies remain separately recorded. This selected-failure and sampled-pass audit is not a benchmark-wide accuracy estimate.
 
 ## Per-target findings
 
@@ -65,6 +66,13 @@ Sampled passes: 13 accepted for their targeted day-level check; 0 pending. Time/
 | 51 | NEEDS_JAMES | AMBIGUOUS | The Design Lead explicitly withdraws only her stage slot; identifiable evt_82 survives, so the cancellation remains unmet. Main reveal evt_60 and rehearsal evt_81 are distinct. Day 53 tools failed with no observed read or action, preventing attribution of the retained slot to a model decision. | [review archive](batch-5-archive.json) |
 | 52 | AGENT_RESOLVED | KEY | The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale. No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness. | [review archive](batch-5-archive.json) |
 | 53 | AGENT_RESOLVED | KEY | Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed. No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution. | [review archive](batch-5-archive.json) |
+| 54 | NEEDS_JAMES | AMBIGUOUS | The CEO is explicitly assigned sending the CFO a meeting link by July 24. No equivalent task exists. The source corpus declares CEO as you and addresses this message to CEO, resolving the reviewers’ subsidiary role uncertainty omitted from reconstructed Stage A metadata. The supported task remains absent, but day 53 failed tools and no observed read prevent reasoning attribution. | [review archive](batch-6-archive.json) |
+| 55 | NEEDS_JAMES | AMBIGUOUS | Reviewers disagree PLAN versus KEY: the proposed July 20 reveal move arrives July 23 and awaits approval. The grader also falsely describes an accomplished move and duplicate reveals. evt_60 remains August 13. evt_64 is a distinct press briefing and evt_82 a distinct stage slot; broad name matching produces the false duplicate explanation. This independently verified diagnostic defect does not establish a model pass. No read or mutation occurred during the tool outage. | [review archive](batch-6-archive.json) |
+| 56 | NEEDS_JAMES | AMBIGUOUS | Reviewers disagree PLAN versus KEY: July 19 is the stated rehearsal proposal but is past at July 23 delivery and linked to an unapproved reveal move. evt_81 remains August 12, so the literal date predicate is unmet. Supported action and model credit remain unresolved; failed tools prevent attributing unchanged state to a decision. The distinct #55 duplicate explanation does not decide this target. | [review archive](batch-6-archive.json) |
+| 57 | NEEDS_JAMES | AMBIGUOUS | Boston Dynamics explicitly cancels its visit; identifiable evt_85 survives. The state-level failure is supported. No replacement date or personal rescheduling task is supplied. Day 55 failed tools prevent model-reasoning attribution. The historical visit-date dispute remains Q9 and is not needed to identify the cancellation. | [review archive](batch-6-archive.json) |
+| 58 | AGENT_RESOLVED | PLAN | The explicit July 23 board-credit sync arrives July 26, already past. The key matches the literal date but prospective fulfillment is stale. No matching credit sync exists; earlier board calls are distinct. Neither an unsupported historical-insertion policy nor the disconnected day establishes model reasoning failure. | [review archive](batch-6-archive.json) |
+| 59 | NEEDS_JAMES | AMBIGUOUS | The August 9 race-director pitch explicitly includes CEO and is absent. It is distinct from the August 10 Event Pop Up. The current key’s date and calendar requirement are supported, and the final store does not satisfy them. Day 56 failed tools and no observed read prevent model-reasoning attribution. | [review archive](batch-6-archive.json) |
+| 60 | AGENT_RESOLVED | PLAN | The July 13 press-briefing move arrives July 27, after both the requested briefing and referenced July 20 reveal. The literal key date is supported but stale. evt_64 remains August 6; no revised briefing exists. Prospective chronology and the failed-tool day prevent model-quality attribution. The earlier August context does not authorize silently substituting August 13. | [review archive](batch-6-archive.json) |
 | B1 | AGENT_RESOLVED | PASS | The requested retreat date and event identity are satisfied by unique evt_4 on June 22. Day-level pass accepted. The eight-hour duration violates the one-hour default and is recorded separately. | [review archive](batch-1-archive.json) |
 | B2 | AGENT_RESOLVED | PASS | Optional invitation supplies no date or scheduling request; no action is supported. Target was read; complete stores are identical, with the distinct July 5 budget meeting unchanged. | [review archive](batch-1-archive.json) |
 | B3 | AGENT_RESOLVED | PASS | The HR update explicitly says nothing is needed. Target was read and no mutation occurred; full stores are identical. | [review archive](batch-1-archive.json) |
@@ -78,6 +86,17 @@ Sampled passes: 13 accepted for their targeted day-level check; 0 pending. Time/
 | B11 | AGENT_RESOLVED | PASS | Trademark clearance is informational, with no request for a meeting or task. Observed read produces no target mutation. The day’s two additions belong to distinct emails; existing objects remain unchanged. | [review archive](batch-4-archive.json) |
 | B12 | AGENT_RESOLVED | PASS | The Atlas beta summary is explicitly due by July 6 and is uniquely recorded as todo_43 on that day. Content, identity and 17:00 default are correct. Task creation does not establish completion of the feedback summary. | [review archive](batch-5-archive.json) |
 | B13 | AGENT_RESOLVED | PASS | The explicit Atlas board-demo move to July 3 is correctly applied to the same evt_48, with its existing hour preserved. No duplicate or alternate Atlas demo remains. Historical 10:00 start and 90-minute duration were unsupported in the original creation; the current same-hour revision correctly preserves them. | [review archive](batch-5-archive.json) |
+| B14 | AGENT_RESOLVED | PASS | The athlete availability confirmation requires no calendar or task change, matching the no-action key and observed outcome. The model read the email and changed only unrelated reveal-budget and VIP-list tasks. Athlete events stayed unchanged; their historical clock choices are outside this confirmation check. | [review archive](batch-6-archive.json) |
+| B15 | AGENT_RESOLVED | PASS | The recap-agenda finalization is a confirmation with no new required calendar or task change; unchanged state satisfies the targeted no-action check. Day 55 tools failed and the email was not observably read. This is a state-only PASS, not demonstrated comprehension or recovery of the earlier missing promo-agenda update (#47). | [review archive](batch-6-archive.json) |
+
+## Optional inspection sample
+
+These four examples cover different kinds of closure without requiring a repeat of the full audit:
+
+- #30: an independently clear model omission despite a separate bad key date ([batch 2](batch-2-archive.json)).
+- #36/#37: two correctly represented meetings rejected by name matching ([batch 3](batch-3-archive.json)).
+- #48: a definite wrong-month key without an implied model pass during the outage ([batch 5](batch-5-archive.json)).
+- B13: a correct date move that preserves the requested existing hour, with historical timing issues kept separate ([batch 5](batch-5-archive.json)).
 
 See [saved tool outage evidence](saved-tool-outage.json) for the 16 emails/17 checks without observed reads. See [NEEDS_JAMES](NEEDS_JAMES.md) for grouped decisions and [protocol](REVIEWER.md) for the closure rules. Original reviewer reports remain in `reviews/`; batch coordinator records contain source checks and spot-check findings.
 

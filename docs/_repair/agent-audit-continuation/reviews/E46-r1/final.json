@@ -1,0 +1,68 @@
+{
+  "case_id": "E46",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The email explicitly moves the existing press briefing to July 13, so the event kind, identity and exact-day key are supported. The complete after-store still contains only evt_64 on August 6; the grader correctly reports that literal state mismatch. However, delivery on July 27 makes the prospective rescheduling fourteen days stale. More decisively for attribution, the target body was not observed, the secretary server failed, and there are no day tool calls. This is not evidence of a model reasoning failure. NO describes the unsatisfied stored request, and YES describes the grader's factual wrong-day check, not the validity of treating this capture as an unconfounded capability failure. Historical correction remains a possible interpretation of the stale instruction.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email",
+          "observation": "served_date is 2026-07-27; the body says, 'Moving the press briefing to the Monday, July 13th, 2026 to keep it a week ahead of the new reveal date.'"
+        },
+        {
+          "source": "stage-b.json: targets[0].operation and current_grader_target_result",
+          "observation": "The operation is move / event / Press Briefing with eq dom:13,0m and exact_day; the result says 'FAIL — on the wrong day' and identifies 'WC cleat press briefing' Thu Aug 06 11 AM (60m)."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: events, todos",
+          "observation": "The full stores are unchanged. evt_64 remains sourced to World_Cup_Cleat_Launch.press-briefing-and-embargo with start 2026-08-06T11:00:00 and end 2026-08-06T12:00:00. No alternate July 13 briefing exists. todo_65 remains the distinct embargo approval due July 14."
+        },
+        {
+          "source": "stage-b.json: infrastructure, model_narration, target_body_observed_in_tool_result; day-tool-trace.json",
+          "observation": "Infrastructure cites captures/baseline-sonnet-4-5/raw/day_057.jsonl:1 with secretary status failed. Narration: 'The secretary email tools are unavailable - I cannot process emails without the MCP server connection.' target_body_observed_in_tool_result is false; day-tool-trace is []."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The saved run supplies no observed target get_email result or tool access on this day, preventing reasoning-failure attribution.",
+        "The briefing and reveal dates are already past at delivery; the email does not explain whether retrospective calendar correction is intended.",
+        "The assertion that the old briefing is too early conflicts with the original August 6 briefing being after the stated July 20 reveal."
+      ],
+      "suggested_human_question": "Should this disconnected, late-delivered day be excluded from model-error attribution and rerun only after the delivery chronology and tool connection are repaired?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The original briefing was created at 11:00 despite no time in the original email and the instruction default of 09:00. This predates the target and is separate from its day-level wrong-date result.",
+      "evidence": [
+        {
+          "source": "history-actions.jsonl:147-148; captures/baseline-sonnet-4-5/raw/day_037.jsonl:50-51",
+          "observation": "create_event for World_Cup_Cleat_Launch.press-briefing-and-embargo used start 2026-08-06T11:00:00 and end 2026-08-06T12:00:00; the tool returned evt_64."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions and preceding_storyline_emails",
+          "observation": "'Defaults unless the email says otherwise: events 9am, 1 hour long'; original briefing mail names Thursday, August 6, 2026 without a time."
+        }
+      ]
+    },
+    {
+      "category": "AMBIGUOUS",
+      "observation": "The reveal chronology was inconsistent before the target: original mail set August 13, but July 23 mail described moving a July 13 reveal to July 20 and holding for approval. evt_60 still records August 13 in both stores. This contextual inconsistency does not make the target's explicit July 13 briefing key unsupported.",
+      "evidence": [
+        {
+          "source": "stage-a.json: World_Cup_Cleat_Launch.reveal-event-date-and-venue and reveal-event-date-and-venue-3; full-state-before.json: evt_60",
+          "observation": "Original: 'Thursday, August 13th, 2026.' Revision: 'push the reveal event back to the Monday, July 20th, 2026' and 'Holding for your okay before I tell the venue.' evt_60 start is 2026-08-13T18:00:00."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": true,
+  "interpretation_change": "The supported move and late-delivery assessment are unchanged, and stage_a.md was not edited. Stage B adds decisive infrastructure evidence: lack of action cannot be attributed to the model interpreting this email incorrectly because the target was not observed and the secretary connection failed."
+}

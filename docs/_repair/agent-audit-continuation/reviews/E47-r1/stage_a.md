@@ -1,0 +1,7 @@
+The July 15 target email is a confirmation: “Everyone has confirmed meeting availability, and no more scheduling issues.” It supplies no new date, cancellation, deadline, or request to alter calendar/to-dos. The assistant instructions explicitly permit no tool action for confirmations. Supported target behavior is to preserve the existing schedule without duplicate objects or inferred tasks.
+
+Prior storyline establishes product release August 7, 2026; Serena Williams initially September 11, revised June 24 to September 22; Michael Phelps September 18; LeBron James initially tentative, cancelled June 17, then rescheduled June 25 for August 24; Ronaldo confirmed July 1 for August 8. Defaults for these otherwise untimed events are 9am for one hour. The target's general availability confirmation does not restore superseded dates or authorize new meetings with the VP of product.
+
+Same-day siblings independently request a revised event-budget approval to-do due July 17, 2026, and a retreat VIP-list to-do due July 16, 2026, default 5pm. They do not change the target's interpretation.
+
+I have not inspected preexisting stores, so whether all historical objects are present, correctly dated, or duplicated remains unknown. Confirmation does not certify completed real-world actions. Historical omissions or stale objects require attribution to their own earlier messages, not automatically to this target.

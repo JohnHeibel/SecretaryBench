@@ -1,0 +1,54 @@
+{
+  "case_id": "E44",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": [
+        "AMBIGUOUS"
+      ],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The requested board sync is absent, and no equivalent appears anywhere in the complete stores. The key correctly identifies an event and the explicitly named July 23 date. However, delivery on July 26 makes the prospective scheduling request stale. Literal historical entry and refraining from creating a past meeting are defensible readings; no future replacement date is supported. The grader accurately reports no creation, but its FAIL is not a clean supported-request or model-reasoning failure. Stage B independently documents a failed secretary MCP connection, an empty tool trace, and no observed target-body retrieval. The model never demonstrably reached the decision evaluated by this check. Thus the definite defect is delivery timing, with infrastructure preventing reasoning attribution. No time-default error can be assessed because nothing was created.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body and served_date",
+          "observation": "\"I'm calling a board sync for Thursday, July 23rd, 2026 to get ahead of it. Putting it on your calendar.\" The served_date is \"2026-07-26\"."
+        },
+        {
+          "source": "stage-b.json: targets[0].operation and worksheet_key_and_resolved_dates",
+          "observation": "The key is create / Board Sync / event, with {\"eq\": \"this:THU\"}, resolved to \"Thu Jul 23\". This date agrees with the explicit body, though it predates delivery."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events and todos",
+          "observation": "Both complete stores are identical: 48 events and 33 todos. No credit-issue board sync exists. evt_45 is \"WC cleat greenlight call with board\" at \"2026-06-29T10:00:00\", a different meeting. Other board events concern the rebrand, pitch competition, or Atlas."
+        },
+        {
+          "source": "day-tool-trace.json",
+          "observation": "The entire trace is []."
+        },
+        {
+          "source": "stage-b.json: target_body_observed_in_tool_result, model_narration, infrastructure",
+          "observation": "target_body_observed_in_tool_result is false. Model narration: \"I cannot list or process emails - the secretary email management tools are not available due to MCP server disconnection.\" Infrastructure cites captures/baseline-sonnet-4-5/raw/day_056.jsonl:1 with {\"name\": \"secretary\", \"status\": \"failed\"}."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No explicit policy states whether an invitation first delivered after its meeting date must be backfilled.",
+        "No evidence establishes whether the July 23 sync actually occurred or needs a replacement date.",
+        "The target body was reconstructed without an observed get_email result; the disconnected tools prevent assessment of how the model would interpret it."
+      ],
+      "suggested_human_question": "Should a prospective meeting request delivered three days after its date be excluded as a delivery-plan defect, and should this disconnected capture be excluded from model-reasoning attribution?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "stage-a.json: World_Cup_Cleat_Launch.manufacturing-kickoff-3; full-state-before.json and full-state-after.json: evt_82",
+      "observation": "The earlier email says \"please take my stage slot off the run of show.\" evt_82, \"Design walk-through at WC reveal\", remains in both stores at \"2026-08-13T18:30:00\". This is a pre-existing unresolved cancellation, separate from the target sync; this target day has no tools and cannot establish its earlier cause."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

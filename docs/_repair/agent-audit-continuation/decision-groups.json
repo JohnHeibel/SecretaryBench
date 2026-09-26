@@ -52,5 +52,11 @@
     "question": "Does from the week of August 3 fix departure to Monday, and what counts as representing the trip start?",
     "recommendation": "Keep #41/#43 unresolved. The literal wording and earlier mail do not uniquely establish Monday; require neither invented separate boundary markers nor an arbitrary Tuesday start. #42\u2019s missing explicit August 9 endpoint is independently established.",
     "alternatives": "Treat the phrase as a Monday-through-Sunday trip, making the Dynamics visit one day late; or allow a start within that week, making August 4/6 first/third-day visits plausible. A coherent trip interval is another valid representation."
+  },
+  "Q10": {
+    "title": "Calendar changes awaiting approval",
+    "question": "Should the reveal and rehearsal be moved before the sender receives Mark\u2019s okay?",
+    "recommendation": "Keep #55/#56 unresolved. Preserve the certain stale-delivery and false duplicate-diagnostic findings separately; do not treat an unapproved proposal or invalid diagnostic as proof of a correct model decision.",
+    "alternatives": "Treat the proposal as authority to tentatively update the calendar; or keep existing bookings until approval. Neither interpretation supplies a future correction to the already-past July dates."
   }
 }

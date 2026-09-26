@@ -1,0 +1,42 @@
+{
+  "case_id": "E44",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The explicit board-sync date and event kind support the literal key, but the invitation was served July 26 for July 23. Delivery made prospective scheduling stale; the instructions do not resolve whether to backfill past invitations. The full stores are unchanged and contain no credit-issue board sync, so the grader correctly describes the missing object. That cannot establish a model reasoning failure: the secretary MCP server failed, no tools ran, and the target body was not observed. Thus neither a deliberate stale-mail decision nor a missed understood instruction is demonstrated. The key is not an invented date, and no supported event was created and wrongly rejected. If historical insertion were required, its default time would be 09:00–10:00; there is no created object on which to assess that separately.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email",
+          "observation": "\"served_date\": \"2026-07-26\"; exact body text: \"I'm calling a board sync for Thursday, July 23rd, 2026 to get ahead of it. Putting it on your calendar.\""
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "The key is create Board Sync as event, with date predicate {\"eq\":\"this:THU\"} resolved to Thu Jul 23; the reported actual is \"(nothing matching created)\"."
+        },
+        {
+          "source": "stage-b.json: target_body_observed_in_tool_result, model_narration, infrastructure",
+          "observation": "\"target_body_observed_in_tool_result\": false. Model narration: \"I cannot list or process emails - the secretary email management tools are not available due to MCP server disconnection.\" Infrastructure cites captures/baseline-sonnet-4-5/raw/day_056.jsonl:1 with {\"name\":\"secretary\",\"status\":\"failed\"}."
+        },
+        {
+          "source": "day-tool-trace.json; full-state-before.json; full-state-after.json",
+          "observation": "Trace is exactly []. All 48 events and 33 todos are identical before and after. No board credit sync exists; evt_45 is the distinct June 29 WC cleat greenlight call and evt_42 is the distinct July 22 pitch-comp board presentation."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No stated policy determines whether an already-past meeting invitation must be inserted historically.",
+        "Failed MCP availability and absent observed get_email result prevent attribution to the model's interpretation of this email."
+      ],
+      "suggested_human_question": "Should this invitation have arrived before July 23, and should the disconnected day be excluded from model-error attribution?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

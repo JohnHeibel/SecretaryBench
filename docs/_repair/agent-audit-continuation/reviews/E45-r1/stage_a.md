@@ -1,0 +1,7 @@
+# E45 Stage A
+
+The July 26 recap explicitly schedules the race-director pitch for Sunday, August 9, 2026, attended by the CEO, COO and VP of Marketing. A calendar event for that date is supported. With no stated time or duration, the assistant instructions prescribe 09:00–10:00. No existing event in the complete before-store represents that pitch. The August 10 Event Pop Up (`evt_6`) is a separate event and should remain distinct.
+
+The recap assigns continuing financial support to CFO, sponsorship-tier research/submission to Ops and pitch-deck preparation to Marketing once logistics finish. It supplies no new task deadline. Earlier messages already provide the master budget (June 28), sponsorship options (June 29), and confirmation that budget and tier are settled (July 20). Treating these retrospective assignments as fresh overdue tasks is not clearly supported. The existing `todo_86`, “Ensure marketing creates marathon pitch deck,” is due July 30 at 17:00, matching the earlier explicit deadline; preserve it without duplication unless substantive revision is needed.
+
+The storyline chronology is inconsistent: June 5 says the pitch succeeded and Gold Tier was secured, while later mail announces the future pitch. July 23 proposes pitch preparation on the already-past July 2. These delivery anomalies do not erase the latest explicit August 9 appointment, but prevent inferring coherent completion timing for every recap assignment. Do not infer an exact deadline for Ops research or CFO responsibilities, or interpret reminder creation as completion.

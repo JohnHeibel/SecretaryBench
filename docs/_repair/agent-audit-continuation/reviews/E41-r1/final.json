@@ -1,0 +1,55 @@
+{
+  "case_id": "E41",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "No launch-link task exists, so the reported empty state match is accurate. A July 24 to-do is supported if the managed person is CEO: the email explicitly promises CEO will send CFO a link by that date. However, the managed person is not named in the assistant instructions, and the email addressed to CFO can also be an informational promise by someone else. More decisively, the saved capture reports a failed secretary MCP server, an empty tool trace, and no observed reading of this target. The unchanged stores therefore cannot establish a model reasoning omission. Treat this as an infrastructure-confounded unsatisfied keyed outcome, not a demonstrated MODEL failure. The future link deadline itself is explicit and is not made stale by the separate historical meeting-date problem.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "\"You are an executive assistant managing one person's calendar and to-dos from their email inbox.\" No managed-person role is named."
+        },
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"Hi CFO, \\nNo worries at all, unfortunately we cannot push the meeting to Friday, we have the employee party that day. CEO will send you a meeting link by Friday, July 24th, 2026 so you can hop on remotely.\""
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "T1 requires create todo \"send launch meeting link\", on {\"by\":\"serve+1d\"}, tolerance \"exact_day\"; reported actual is \"(nothing matching created)\"."
+        },
+        {
+          "source": "stage-b.json: infrastructure, citing captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+          "observation": "mcp_servers contains {\"name\":\"secretary\",\"status\":\"failed\"}; target_body_observed_in_tool_result is false."
+        },
+        {
+          "source": "stage-b.json: model_narration; day-tool-trace.json",
+          "observation": "\"I cannot list the inbox or process emails - the secretary email management tools (mcp__secretary__*) are unavailable because the MCP server disconnected.\" Day trace is []."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events/todos arrays",
+          "observation": "All 48 events and 33 to-dos are unchanged; no launch-link task or equivalent is present. evt_6 is \"Event Pop Up\" on August 10 and todo_86 is \"Ensure marketing creates marathon pitch deck\" due July 30, neither a link-delivery task."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "Secretary MCP failure prevents attribution of missing state to the model's interpretation or chosen action; no target body was observed in a tool result.",
+        "The packet does not explicitly establish whether the managed person is CEO or CFO. A CEO commitment and a CFO FYI yield different personal to-do obligations."
+      ],
+      "suggested_human_question": "Should this disconnected-server day be excluded from model-reasoning attribution, and is the managed person explicitly intended to be CEO?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "stage-a.json: preceding_storyline_emails, Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2",
+      "observation": "Served June 26 but says \"Lets do Thursday, June 25th, 2026.\" The historical launch-meeting date precedes delivery. July 22 proposed July 24 and July 23 rejected that move. This chronology does not erase the target's explicit future July 24 link deadline."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

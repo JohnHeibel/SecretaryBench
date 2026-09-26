@@ -1,0 +1,58 @@
+{
+  "case_id": "E46",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": [
+        "AMBIGUOUS"
+      ],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The literal July 13 event-move key matches the explicit revised date, but delivery on July 27 makes the prospective briefing and its July 20 reveal stale. The complete stores are identical (48 events, 33 todos); evt_64 remains August 6, with no alternative briefing or successful move. Thus the grader correctly detects a literal date mismatch, but attribution as a model error is unsupported: the secretary server failed, the target body was not observed, and the trace is empty. Model compliance is uncertain as an evaluative judgment, although the literal calendar change plainly did not happen. Historical correction versus stale-message handling is also unspecified. This is not evidence of a bad date calculation or a satisfied request rejected by the grader.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email",
+          "observation": "served_date is \"2026-07-27\". Body: \"Moving the press briefing to the Monday, July 13th, 2026 to keep it a week ahead of the new reveal date.\""
+        },
+        {
+          "source": "stage-b.json: targets[0].operation",
+          "observation": "\"verb\": \"move\", \"kind\": \"event\", \"on\": {\"eq\": \"dom:13,0m\"}, \"tolerance\": \"exact_day\"."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: evt_64",
+          "observation": "Both contain \"title\": \"WC cleat press briefing\", \"start\": \"2026-08-06T11:00:00\", \"end\": \"2026-08-06T12:00:00\", linked to World_Cup_Cleat_Launch.press-briefing-and-embargo. All objects in both complete stores were inspected and compared."
+        },
+        {
+          "source": "stage-b.json: infrastructure, citing captures/baseline-sonnet-4-5/raw/day_057.jsonl:1",
+          "observation": "\"name\": \"secretary\", \"status\": \"failed\". Also \"target_body_observed_in_tool_result\": false."
+        },
+        {
+          "source": "day-tool-trace.json; stage-b.json: model_narration",
+          "observation": "Trace is []. Narration: \"The secretary email tools are unavailable - I cannot process emails without the MCP server connection.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed get_email result or tool availability permits evaluation of how the model would interpret this request.",
+        "No policy resolves whether a July 27 arrival should rewrite a July 13 historical calendar entry.",
+        "The earlier August 6 briefing is later than the new July 20 reveal, contradicting the target narrative that the briefing is too early."
+      ],
+      "suggested_human_question": "Should this disconnected day be excluded from model-error attribution, and should the delivery schedule be repaired before testing this prospective reschedule?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "history-actions.jsonl:147-148; captures/baseline-sonnet-4-5/raw/day_037.jsonl:50-51; stage-a.json assistant_instructions and original briefing email",
+      "observation": "evt_64 was originally created at 11:00-12:00 despite no supplied time and the 09:00 default. This is an inherited time/default issue, separate from the target day-level failure."
+    },
+    {
+      "source": "full-state-before.json and full-state-after.json: evt_60, evt_81, evt_82; stage-a.json preceding_storyline_emails",
+      "observation": "The reveal remains August 13, rehearsal August 12, and Design Lead stage slot August 13. Earlier mail requested July 20/July 19 revisions and removal of the stage slot. These pre-existing unresolved calendar states are separate from T1; the target-day trace does not establish their cause."
+    }
+  ],
+  "stage_a_changed_after_reveal": true,
+  "interpretation_change": "Supported mail interpretation is unchanged. Stage B adds a failed MCP connection and absent observed target-body delivery, preventing attribution of unchanged state to model reasoning; Stage A was not edited."
+}

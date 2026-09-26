@@ -1,0 +1,82 @@
+{
+  "date": "2026-09-26",
+  "audit_source_head": "9a506fb",
+  "scope": "Saved-run audit documentation only; no score recalculation or new benchmark runs",
+  "fresh_targets": 54,
+  "fresh_emails": 48,
+  "fresh_reviewers": 96,
+  "pilot_targets_reused": [
+    "21",
+    "B9"
+  ],
+  "human_judgments_preserved": 19,
+  "total_worksheet_coverage": 75,
+  "immutable_packet_files_verified": 336,
+  "pilot_packet_files_reverified": 56,
+  "original_human_text_sha256": "cea96bae113130e9f310cb42f66a178f3fcc49f20735fc85a1b8db34377a4e2f",
+  "capture_manifest_sha256": "b53edf7d7172d210cf9de1ad7bd90f4ac17272415e785fcc1c2efcbb67bf2e02",
+  "corpus_hash": "03e0d963b9866d8f",
+  "serve_plan_matches_saved_manifest": true,
+  "system_prompt_matches_pilot_archive": true,
+  "reviewer_archive_hashes_verified": 192,
+  "stage_a_precedes_final": true,
+  "no_future_email_leakage": true,
+  "source_scope_unchanged": true,
+  "spot_checks": [
+    {
+      "batch": 1,
+      "items": [
+        "22",
+        "B1"
+      ]
+    },
+    {
+      "batch": 2,
+      "items": [
+        "31",
+        "B4"
+      ]
+    },
+    {
+      "batch": 3,
+      "items": [
+        "34",
+        "B7"
+      ]
+    },
+    {
+      "batch": 4,
+      "items": [
+        "47",
+        "B10"
+      ]
+    },
+    {
+      "batch": 5,
+      "items": [
+        "53",
+        "B12"
+      ]
+    },
+    {
+      "batch": 6,
+      "items": [
+        "58",
+        "B14"
+      ]
+    }
+  ],
+  "python_tests": "107 passed in 2.77 seconds; unchanged sources throughout",
+  "webapp_checks": "typecheck/lint attempted but dependencies absent; build blocked without running vendor step",
+  "outage": {
+    "emails": 16,
+    "targets": 17,
+    "raw_days": 6
+  },
+  "limitations": [
+    "Fresh-context isolation is procedural, not a filesystem security boundary.",
+    "Input Stage A reconstructs sender/subject/body/date, not recipient metadata. Where role matters, coordinator separately checks source metadata and records it.",
+    "A day-level accepted check does not validate historical clock choices or real-world task completion.",
+    "This selected-failure and sampled-pass audit is not a benchmark-wide performance estimate."
+  ]
+}

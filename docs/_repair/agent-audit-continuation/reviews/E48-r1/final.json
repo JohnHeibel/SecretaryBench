@@ -1,0 +1,57 @@
+{
+  "case_id": "E48",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The supported outcome is no calendar/to-do change: this email confirms that the existing recap agenda already includes the requested promotion item. The complete stores are identical and the trace is empty, so the day-level no-action check passes. This supports the grader's state-based verdict, but not an inference that the model read and correctly reasoned about this email. The secretary server failed, the body was not observed, and the model explicitly reported being unable to process mail. This is an infrastructure-qualified pass, not evidence of model scheduling competence or a reasoning failure.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "Innovation-comp.recap-agenda-finalized: \"agenda for the recap is locked, including the promo timing item that was flagged.\" No scheduling revision or new task is requested."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "\"(no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change.\""
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; day-tool-trace.json",
+          "observation": "Full-store comparison is identical; day-tool-trace.json is []. evt_62 remains on 2026-09-25T10:00:00 through 2026-09-25T11:00:00. No new object or unrelated existing object was used to represent this confirmation."
+        },
+        {
+          "source": "stage-b.json; captures/baseline-sonnet-4-5/raw/day_055.jsonl:1",
+          "observation": "target_body_observed_in_tool_result is false; secretary status is \"failed\". Model narration: \"I cannot process today's emails - the secretary MCP tools (list_new_emails, get_email, create_event, create_todo, etc.) are unavailable because the MCP server has disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "There is no observed get_email result or deliberative decision about this target. YES denotes satisfaction of the supported state outcome only."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "object_id": "evt_62",
+      "observation": "The recap was originally created at 10:00 despite the explicit 09:00 event default and no supplied time in its source email. This historical time issue does not invalidate the current no-action target; grading is day-level.",
+      "evidence": [
+        {
+          "source": "stage-a.json: Innovation-comp.let-s-set-up-a-recap",
+          "observation": "\"Thinking Friday, September 25th, 2026 if that works.\""
+        },
+        {
+          "source": "history-actions.jsonl:143-144; captures/baseline-sonnet-4-5/raw/day_036.jsonl:32-33",
+          "observation": "create_event input has \"start\": \"2026-09-25T10:00:00\", \"end\": \"2026-09-25T11:00:00\"; the result identifies evt_62."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

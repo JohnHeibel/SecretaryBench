@@ -1,0 +1,93 @@
+{
+  "case_id": "E47",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The message confirms existing availability without requesting a new appointment, date revision, or deadline. The instructions explicitly permit no tool action for confirmations. The model read the target and made no campaign-related mutation. Full-store comparison finds all 41 events unchanged, no removed tasks, and only the two sibling task changes. Thus the no-action key and PASS verdict are supported. Historical timing errors in existing campaign objects do not create a new obligation in this confirmation.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "\"(no tool) — for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_045.jsonl:21-22 (day-tool-trace.json)",
+          "observation": "get_email reads Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o; returned body: \"Hey, Mark\\nEveryone has confirmed meeting availability, and no more scheduling issues. \""
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "All 41 event objects are identical, including evt_24 on 2026-09-22, evt_25 on 2026-09-18, evt_41 on 2026-08-24, and evt_50 on 2026-08-08. No object is added under the target email ID or with equivalent confirmation/meeting content."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_045.jsonl:36-39 (day-tool-trace.json)",
+          "observation": "The only mutations create todo_76 for revised reveal-budget approval and update todo_23 for the VIP list. Neither acts on the target campaign confirmation."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "Key: \"- take no action (FYI / no scheduling needed)\"; grader result: \"PASS — correctly took no action\" with actual \"(nothing)\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "email_id": "World_Cup_Cleat_Launch.reveal-event-budget-is-over",
+      "observation": "todo_76 represents the explicitly requested revised budget approval, due July 17 at the 17:00 default. Creation of the reminder does not establish actual approval.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_045.jsonl:18",
+          "observation": "\"I need you to approve the revised event budget by Friday, July 17th, 2026\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_045.jsonl:36-37",
+          "observation": "Creates todo_76, \"Approve revised WC reveal event budget\", due_date \"2026-07-17T17:00:00\"."
+        }
+      ]
+    },
+    {
+      "email_id": "Company-Retreat.inquiry-on-vip-list",
+      "observation": "The model updates existing todo_23 to the explicitly requested July 16 deadline rather than creating a duplicate. This separate object change does not undermine E47 no-action compliance.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_045.jsonl:20",
+          "observation": "\"Could you plan on making that list by tomorrow, Thursday, July 16th, 2026?\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_045.jsonl:38-39",
+          "observation": "update_todo for \"todo_23\", due_date \"2026-07-16T17:00:00\"; the stored source remains Company-Retreat.tasks-before-the-retreat."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "object_ids": [
+        "evt_24",
+        "evt_25",
+        "evt_41",
+        "evt_50"
+      ],
+      "observation": "Earlier campaign appointments use 10:00–12:00 without time or duration in the available campaign mail, contrary to the 09:00, one-hour defaults. This predates E47 and is not a failure of the targeted no-action check; day-level scoring does not resolve these timing errors.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions; all_available_emails.json: campaign storyline",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long\"; campaign scheduling emails supply dates only."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_015.jsonl:56,58; day_024.jsonl:25-26; day_025.jsonl:44; day_031.jsonl:45 (history-actions.jsonl)",
+          "observation": "Historical results establish evt_24 and evt_25 at 10:00–12:00, Serena updated to September 22 with those times, and evt_41 and evt_50 created at 10:00–12:00. Full before and after stores preserve those values."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

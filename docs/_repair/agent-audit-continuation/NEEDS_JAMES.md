@@ -1,6 +1,21 @@
 # NEEDS_JAMES
 
-Independent reviews continue while these decisions remain open. Saved labels and notes are preserved. Entries marked uncounted are ancillary sibling observations, outside the 75-check totals. A new benchmark rule should be recorded prospectively rather than treated as an instruction the saved model received.
+All six review batches are complete; these human decisions remain open. Saved labels and notes are preserved. Entries marked uncounted are ancillary sibling or historical observations, outside the 75-check totals. A new benchmark rule should be recorded prospectively rather than treated as an instruction the saved model received.
+
+## Decision shortcuts
+
+| Group | Decision | Recommendation |
+|---|---|---|
+| Q1 | Must announcements become calendar milestones? | Keep #8 pending; consider reopening #19. |
+| Q2 | Change #14 from KEY to MODEL? | Yes, explicit pick one delegates the choice. |
+| Q3 | Must stale requests be backfilled? | Leave model credit unresolved; retain delivery defects. |
+| Q4 | How should undated reminders and launch night be timed? | Do not require an unsupported exact date or hour. |
+| Q5 | Which conflicting date or dependency controls? | Keep supported key defects; defer disputed model credit. |
+| Q6 | May a confirmation repair a missing appointment? | Keep #33 pending under the supplied no-action guidance. |
+| Q7 | Do conditional or other-owner requests require personal tasks? | Keep #38/#44 pending. |
+| Q8 | Separate failed-tool outcomes from model capability? | Yes; retain factual state results and independent defects. |
+| Q9 | Does week of August 3 require a Monday start? | No unique day is established; keep #41/#43 pending. |
+| Q10 | Move reveal and rehearsal before approval? | Keep #55/#56 pending; stale dates also need interpretation. |
 
 ## Q1: Announcements versus required calendar milestones
 
@@ -33,7 +48,7 @@ Approve changing #14 from saved KEY to MODEL?
 
 ## Q3: Requests delivered after their deadlines
 
-Items: 24, 29, 31, 32, 40, 52, 20.
+Items: 24, 29, 31, 32, 40, 52, 55, 56, 58, 60, 20.
 
 For these stale requests, how should model credit be treated: backfill required, no action acceptable, or unresolved/excluded from capability attribution?
 
@@ -49,6 +64,10 @@ For these stale requests, how should model credit be treated: backfill required,
 | 32 | fill out these forms I've attached before the meeting | Forms are due before the June 21 call, not exactly July 21. The key has the wrong month and wrongly narrows a deadline window. No forms task exists or was created. A default 17:00 due time on the 09:00 call day would itself be late; delivery and missing backfill policy leave model credit unresolved. |
 | 40 | Please approve the tooling PO by Friday, July 17th, 2026. | The explicit July 17 tooling-approval deadline predates July 19 delivery, making on-time prospective fulfillment impossible. todo_83 is due July 19 and preserves the missed July 17 deadline in its description. Reviewers disagree whether this is acceptable recovery or an incorrect deadline replacement; no model pass is awarded. |
 | 52 | schedule a meeting for July 2nd | The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale. No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness. |
+| 55 | Holding for your okay before I tell the venue. | Reviewers disagree PLAN versus KEY: the proposed July 20 reveal move arrives July 23 and awaits approval. The grader also falsely describes an accomplished move and duplicate reveals. evt_60 remains August 13. evt_64 is a distinct press briefing and evt_82 a distinct stage slot; broad name matching produces the false duplicate explanation. This independently verified diagnostic defect does not establish a model pass. No read or mutation occurred during the tool outage. |
+| 56 | The rehearsal moves with it, to the Sunday, July 19th, 2026. | Reviewers disagree PLAN versus KEY: July 19 is the stated rehearsal proposal but is past at July 23 delivery and linked to an unapproved reveal move. evt_81 remains August 12, so the literal date predicate is unmet. Supported action and model credit remain unresolved; failed tools prevent attributing unchanged state to a decision. The distinct #55 duplicate explanation does not decide this target. |
+| 58 | I'm calling a board sync for Thursday, July 23rd, 2026 | The explicit July 23 board-credit sync arrives July 26, already past. The key matches the literal date but prospective fulfillment is stale. No matching credit sync exists; earlier board calls are distinct. Neither an unsupported historical-insertion policy nor the disconnected day establishes model reasoning failure. |
+| 60 | Moving the press briefing to the Monday, July 13th, 2026 | The July 13 press-briefing move arrives July 27, after both the requested briefing and referenced July 20 reveal. The literal key date is supported but stale. evt_64 remains August 6; no revised briefing exists. Prospective chronology and the failed-tool day prevent model-quality attribution. The earlier August context does not authorize silently substituting August 13. |
 | 20 | get a vision sync on your calendar for Monday, June 15th, 2026 | Saved PLAN label preserved: June 15 vision-sync request delivered June 27. No event created; whether to backfill stale requests is unspecified. |
 
 ## Q4: Undated reminders and qualitative event times
@@ -115,7 +134,7 @@ Does #38 require brainstorming despite conditional wording, and may #44 track Ma
 
 ## Q8: Failed tool connection and model-quality attribution
 
-Items: 45, 46, 47, 48, 49, 50, 51, 52, 53.
+Items: 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, B15.
 
 Should the affected saved checks be reported separately or excluded from model-capability attribution while retaining their factual state results?
 
@@ -134,6 +153,14 @@ Should the affected saved checks be reported separately or excluded from model-c
 | 51 | please take my stage slot off the run of show | The Design Lead explicitly withdraws only her stage slot; identifiable evt_82 survives, so the cancellation remains unmet. Main reveal evt_60 and rehearsal evt_81 are distinct. Day 53 tools failed with no observed read or action, preventing attribution of the retained slot to a model decision. |
 | 52 | schedule a meeting for July 2nd | The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale. No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness. |
 | 53 | I've scheduled a meeting with them on the second day of our Boston trip | Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed. No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution. |
+| 54 | CEO will send you a meeting link by Friday, July 24th, 2026 | The CEO is explicitly assigned sending the CFO a meeting link by July 24. No equivalent task exists. The source corpus declares CEO as you and addresses this message to CEO, resolving the reviewers’ subsidiary role uncertainty omitted from reconstructed Stage A metadata. The supported task remains absent, but day 53 failed tools and no observed read prevent reasoning attribution. |
+| 55 | Holding for your okay before I tell the venue. | Reviewers disagree PLAN versus KEY: the proposed July 20 reveal move arrives July 23 and awaits approval. The grader also falsely describes an accomplished move and duplicate reveals. evt_60 remains August 13. evt_64 is a distinct press briefing and evt_82 a distinct stage slot; broad name matching produces the false duplicate explanation. This independently verified diagnostic defect does not establish a model pass. No read or mutation occurred during the tool outage. |
+| 56 | The rehearsal moves with it, to the Sunday, July 19th, 2026. | Reviewers disagree PLAN versus KEY: July 19 is the stated rehearsal proposal but is past at July 23 delivery and linked to an unapproved reveal move. evt_81 remains August 12, so the literal date predicate is unmet. Supported action and model credit remain unresolved; failed tools prevent attributing unchanged state to a decision. The distinct #55 duplicate explanation does not decide this target. |
+| 57 | Boston Dynamics had to cancel our visit. | Boston Dynamics explicitly cancels its visit; identifiable evt_85 survives. The state-level failure is supported. No replacement date or personal rescheduling task is supplied. Day 55 failed tools prevent model-reasoning attribution. The historical visit-date dispute remains Q9 and is not needed to identify the cancellation. |
+| 58 | I'm calling a board sync for Thursday, July 23rd, 2026 | The explicit July 23 board-credit sync arrives July 26, already past. The key matches the literal date but prospective fulfillment is stale. No matching credit sync exists; earlier board calls are distinct. Neither an unsupported historical-insertion policy nor the disconnected day establishes model reasoning failure. |
+| 59 | We have our pitch to the race director on Sunday, August 9th, 2026 | The August 9 race-director pitch explicitly includes CEO and is absent. It is distinct from the August 10 Event Pop Up. The current key’s date and calendar requirement are supported, and the final store does not satisfy them. Day 56 failed tools and no observed read prevent model-reasoning attribution. |
+| 60 | Moving the press briefing to the Monday, July 13th, 2026 | The July 13 press-briefing move arrives July 27, after both the requested briefing and referenced July 20 reveal. The literal key date is supported but stale. evt_64 remains August 6; no revised briefing exists. Prospective chronology and the failed-tool day prevent model-quality attribution. The earlier August context does not authorize silently substituting August 13. |
+| B15 | agenda for the recap is locked, including the promo timing item that was flagged | The recap-agenda finalization is a confirmation with no new required calendar or task change; unchanged state satisfies the targeted no-action check. Day 55 tools failed and the email was not observably read. This is a state-only PASS, not demonstrated comprehension or recovery of the earlier missing promo-agenda update (#47). |
 
 ## Q9: Trip start window and calendar representation
 
@@ -150,3 +177,18 @@ Does from the week of August 3 fix departure to Monday, and what counts as repre
 | 41 | from the week of August 3rd, 2026 till Sunday, August 9th, 2026 | Both reviewers call the missing trip start MODEL, but closure depends on interpreting from the week of August 3 as a unique Monday start and on the required trip representation. Only WHOOP August 4 and Dynamics August 6 visits exist, with no overall trip span. A separate start marker is unsupported; whether the first visit adequately records an allowed start is unresolved. Coordinator withholds automatic closure. |
 | 43 | WHOOP on the first day, and Boston Dynamics on the third one | Both reviewers infer August 5 as the third day of a Monday-start trip. The coordinator finds from the week of insufficiently precise to close that exact-date judgment. evt_85 is August 6 and evt_84 is August 4, preserving a first/third-day relationship if the trip starts Tuesday. That start is not explicitly selected either. Eight-hour visits independently violate the one-hour default. |
 | 53 | I've scheduled a meeting with them on the second day of our Boston trip | Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed. No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution. |
+
+## Q10: Calendar changes awaiting approval
+
+Items: 55, 56.
+
+Should the reveal and rehearsal be moved before the sender receives Mark’s okay?
+
+**Recommendation:** Keep #55/#56 unresolved. Preserve the certain stale-delivery and false duplicate-diagnostic findings separately; do not treat an unapproved proposal or invalid diagnostic as proof of a correct model decision.
+
+**Competing readings:** Treat the proposal as authority to tentatively update the calendar; or keep existing bookings until approval. Neither interpretation supplies a future correction to the already-past July dates.
+
+| Item | Email excerpt | Observed action and settled facts |
+|---|---|---|
+| 55 | Holding for your okay before I tell the venue. | Reviewers disagree PLAN versus KEY: the proposed July 20 reveal move arrives July 23 and awaits approval. The grader also falsely describes an accomplished move and duplicate reveals. evt_60 remains August 13. evt_64 is a distinct press briefing and evt_82 a distinct stage slot; broad name matching produces the false duplicate explanation. This independently verified diagnostic defect does not establish a model pass. No read or mutation occurred during the tool outage. |
+| 56 | The rehearsal moves with it, to the Sunday, July 19th, 2026. | Reviewers disagree PLAN versus KEY: July 19 is the stated rehearsal proposal but is past at July 23 delivery and linked to an unapproved reveal move. evt_81 remains August 12, so the literal date predicate is unmet. Supported action and model credit remain unresolved; failed tools prevent attributing unchanged state to a decision. The distinct #55 duplicate explanation does not decide this target. |

@@ -1,0 +1,7 @@
+The July 26 launch recap explicitly says, “We have our pitch to the race director on Sunday, August 9th, 2026” and names CEO, COO and VP of Marketing as the pitch team. This supports one pitch event on August 9, default 09:00–10:00 because no time is given. No existing event in the complete before-store represents that pitch, so this is distinct from evt_6, the August 10 Event Pop Up.
+
+The CFO budget responsibility and Ops research/sign-off instructions supply no new deadline. Earlier mail already supplies the budget, tiers and confirmation that budget/tier are settled. They do not support inventing new due dates or duplicating tasks. Marketing's pitch deck is conditional on completed logistics, but July 20 mail says budget and tier are confirmed and explicitly requires the deck by July 30. Existing todo_86 already tracks that exact deliverable and date, so retaining it is appropriate.
+
+The chronology is internally awkward: June 5 approval says “Pitch went amazing!” and Gold Tier secured before later launch and preparation messages. This is uncertainty about storyline consistency, not a clear cancellation of the latest explicit August 9 pitch. The July 23 request for a July 2 briefing is a different prep meeting, not evidence to move the race-director pitch.
+
+The same-day board email separately calls a July 23 board sync, already past on July 26. It does not revise the marathon request. Preserve object identity and avoid duplicates; stale historical tasks are not proof of real-world completion or of failure on this target.
