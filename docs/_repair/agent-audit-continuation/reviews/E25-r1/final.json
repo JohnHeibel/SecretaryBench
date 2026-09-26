@@ -1,0 +1,43 @@
+{
+  "case_id": "E25",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": [
+        "MODEL"
+      ],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The request arrived July 19 with an explicit July 17 deadline and a stated loss of the production slot afterward. Delivery therefore made prospective fulfillment stale. The key correctly represents the explicit approval task and deadline. The model created the correct distinct approval task, used the correct source email and 17:00 default, and acknowledged the original deadline in its description, but changed the structured due date to July 19 without a revised deadline. An immediate recovery reminder is understandable; it does not preserve the requested deadline. The wrong-day rejection is justified as a deadline-record check, although the result should not be attributed solely to model failure because on-time action was impossible at delivery. No tool failure or evidence of real-world approval appears.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:24 (day-tool-trace.json)",
+          "observation": "Observed get_email result: \"Please approve the tooling PO by Friday, July 17th, 2026. Any later and we lose the production slot that the reveal date depends on.\" The same result has \"served_date\": \"2026-07-19\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:55-56 (day-tool-trace.json)",
+          "observation": "create_todo succeeds as todo_83, \"Approve tooling PO for factory\", \"due_date\": \"2026-07-19T17:00:00\"; description: \"Large PO needed for factory to start cutting tooling - was due Friday July 17th, critical for production slot\"."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Complete stores inspected. todo_83 is the only newly added approval to-do and survives in the after-state. All 31 prior todos and 44 prior events are unchanged. todo_39 remains the distinct June 26 prototype-vendor PO confirmation; todo_76 remains the separate July 17 reveal-budget approval. Neither satisfies this manufacturing tooling request."
+        },
+        {
+          "source": "stage-b.json, targets[0]",
+          "observation": "T1 keys create/todo \"Approve tooling PO\", resolved July 17, with exact_day tolerance. The reported result is \"FAIL — on the wrong day\" for July 19."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No late-arrival handling policy specifies whether to preserve an overdue date or additionally create an immediate recovery reminder. No revised PO deadline or confirmation that the lost production slot remains recoverable is supplied."
+      ],
+      "suggested_human_question": "Should this email be delivered before July 17, or should its explicit approval deadline be revised to remain prospective?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

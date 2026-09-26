@@ -1,0 +1,83 @@
+{
+  "case_id": "E32",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The email is an informational report of completed trademark clearance and requests no calendar or task change. The assistant retrieved its body and made no related mutation. Inspection of the complete stores shows only two unrelated event additions, with all 22 prior events and all 15 todos unchanged. The no-action key and passing verdict are supported. The earlier board meeting's date and time issues do not create a scheduling obligation in this target.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:19",
+          "observation": "Observed get_email result for Planning.acme-trademark-clear: 'The trademark search on the new ACME logo came back clean- no conflicts. Just wanted it in your hands before the board meets.'"
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "'(no tool) \u2014 for FYIs, newsletters, confirmations, or anything needing no calendar/to-do change.'"
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; captures/baseline-sonnet-4-5/raw/day_025.jsonl:41-44",
+          "observation": "Only evt_40 (All-hands rebrand webinar) and evt_41 (LeBron James - marketing campaign) were added. No existing objects changed or disappeared, no todos were added, and no action was attributed to Planning.acme-trademark-clear. Board meeting evt_11 remained unchanged."
+        },
+        {
+          "source": "stage-b.json:targets[T1]",
+          "observation": "Key: '- take no action (FYI / no scheduling needed)'; result: 'PASS \u2014 correctly took no action'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "scope": "Same-day webinar, separate from T1",
+      "observation": "evt_40 uses 2026-08-07T14:00:00 to 15:00:00 although the webinar email specifies August 7 without a time. The assistant instruction defaults events to 9am for one hour. This is a time/default defect outside the target's day-level no-action check.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:18",
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:41-42",
+        "stage-a.json:assistant_instructions"
+      ]
+    },
+    {
+      "category": "MODEL",
+      "scope": "Same-day LeBron event, separate from T1",
+      "observation": "evt_41 uses 2026-08-24T10:00:00 to 12:00:00. The rescheduling email provides August 24 but no time or duration; the available earlier LeBron messages supply no scheduled time to preserve. The instruction defaults to 09:00-10:00. This does not undermine the trademark no-action verdict.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:21",
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:43-44",
+        "all_available_emails.json:Marketing-campaign-new-product-delay messages",
+        "stage-a.json:assistant_instructions"
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "scope": "Prior board event evt_11",
+      "observation": "The CFO's June 9 email requested June 11 without a time or duration. evt_11 was created for 10:00-11:30 instead of the instructed 09:00-10:00 default and remains unchanged. This predates the target.",
+      "evidence": [
+        "stage-a.json:preceding_storyline_emails[0]",
+        "captures/baseline-sonnet-4-5/raw/day_009.jsonl:40-41",
+        "full-state-before.json:evt_11",
+        "full-state-after.json:evt_11"
+      ]
+    },
+    {
+      "category": "AMBIGUOUS",
+      "scope": "Storyline timing, separate from target compliance",
+      "observation": "The target's June 25 delivery says 'before the board meets' although the supplied prior board request and evt_11 place a board meeting on June 11. If these refer to the same meeting, the sequence is inconsistent; a different meeting is also possible. Neither reading creates a target scheduling obligation.",
+      "evidence": [
+        "stage-a.json:target_email.served_date",
+        "stage-a.json:preceding_storyline_emails[0]",
+        "full-state-before.json:evt_11"
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

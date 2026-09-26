@@ -1,0 +1,58 @@
+{
+  "case_id": "E30",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The key requires creation of a to-do due exactly September 25, although the request is to add an agenda topic. Updating the existing recap event would directly satisfy it, and a preparatory reminder before the recap is defensible; neither a separate to-do nor that exact deadline is required. This is a definite key defect. However, the saved outcome contains no addition in any event or task and therefore does not demonstrate satisfaction by an alternative implementation. The entire day's trace is empty, the target body was not observed, and the secretary server is explicitly recorded as failed. The absence of work cannot be attributed to a model interpretation or reasoning error. The grader accurately observes no created task, but its failure conflates a restrictive key with infrastructure-driven noncompletion. This is not an observed GRADER false negative against completed supported work.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"could we add a short item to the recap about how we promote next year's comp earlier\" requests an agenda addition without an exact task date."
+        },
+        {
+          "source": "stage-b.json:9-21",
+          "observation": "The operation uses \"verb\": \"create\", \"kind\": \"todo\", \"eq\": \"@recap_meeting\", and \"tolerance\": \"exact_day\"; the resolved date is September 25. The verdict states \"FAIL — no to-do titled like \\\"add promo agenda item\\\" was created\"."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json:260-265; complete stores",
+          "observation": "Both stores retain evt_62, \"Pitch comp recap with VP Product\", start \"2026-09-25T10:00:00\", description \"Recap how comp went, what worked, what to change for next year\". Full-store inspection finds no promotion agenda item represented elsewhere."
+        },
+        {
+          "source": "day-tool-trace.json:1; stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_052.jsonl:1 as quoted in stage-b.json",
+          "observation": "Trace is []; \"target_body_observed_in_tool_result\": false. The secretary server has \"status\": \"failed\". Narration: \"I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed get_email result or target-directed model action; the reconstructed email alone does not establish that the model could read it.",
+        "The request leaves the representation and preparation deadline open, though it clearly identifies the promotion topic for the recap."
+      ],
+      "suggested_human_question": "Should this disconnected-tool day be excluded from model-quality attribution, and should the key accept a recap-description update or a reminder before the recap?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "object_id": "evt_62",
+      "observation": "The original recap event was created for 10:00 even though its source email specifies September 25 without a time and the assistant instructions default events to 09:00. This preexisting time issue is separate from the agenda request and its day-level key.",
+      "evidence": [
+        {
+          "source": "history-actions.jsonl:143-144; captures/baseline-sonnet-4-5/raw/day_036.jsonl:32-33",
+          "observation": "create_event for Innovation-comp.let-s-set-up-a-recap uses \"start\": \"2026-09-25T10:00:00\" and returns \"id\": \"evt_62\"."
+        },
+        {
+          "source": "stage-a.json: assistant_instructions and Innovation-comp.let-s-set-up-a-recap",
+          "observation": "Instructions say \"Defaults unless the email says otherwise: events 9am, 1 hour long\"; the recap email says \"Thinking Friday, September 25th, 2026 if that works.\""
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

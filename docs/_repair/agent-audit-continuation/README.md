@@ -13,3 +13,7 @@ Packets reconstruct available inbox text from the unchanged corpus and exact cap
 Coverage and findings will be recorded at each batch checkpoint. A deterministic additional source spot-check uses seed 42, one otherwise resolvable failed check and one passing check per batch. These are coordinator checks, not a third independent vote.
 
 Verification baseline: existing Python tests passed, 107/107 in 2.77 seconds. Webapp typecheck and lint could not run because dependencies are absent (`tsc: command not found`). Build is blocked by the same missing dependencies; its vendor step is not run because this task must not alter the generated application copy. No application/UI source changes or server startup are included. No new benchmark runs or score recalculation are performed. Repair statuses are not promoted.
+
+The [saved tool outage evidence](saved-tool-outage.json) covers 16 emails and 17 targeted checks. A successful capture wrapper did not mean functioning secretary tools. Disconnected days have no observed target-body retrieval, so state failure and model-quality attribution remain separate.
+
+Coordinator disagreement can withhold closure even when reviewers agree: batch 4 leaves #41/#43 pending after expanded source inspection of the trip wording. E27-r2 disclosed a changed ownership interpretation after recipient metadata appeared in the captured result; the original Stage A is retained and #44 is pending. Uncounted sibling questions remain in the decision queue without increasing coverage.

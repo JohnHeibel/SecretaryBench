@@ -1,0 +1,59 @@
+{
+  "case_id": "E31",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The kickoff message explicitly reports a completed event and says nothing is needed. The assistant read that body and made no calendar or todo change attributable to it. Inspection of both complete stores confirms that every preexisting object is unchanged and the only additions belong to two independent same-day emails. The no-action key and PASS are supported.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:22-23",
+          "observation": "get_email for Innovation-comp.kickoff-went-well returned: \"kickoff this morning went great\" and \"nothing needed from you, just wanted you in the loop.\""
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "All 22 preexisting events and 15 todos remain identical. Only evt_40 (All-hands rebrand webinar) and evt_41 (LeBron James - marketing campaign) are added, each with its own sibling email_id. No kickoff object exists or is modified."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:41-44",
+          "observation": "The day's only mutation calls create evt_40 for Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned and evt_41 for Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule."
+        },
+        {
+          "source": "stage-b.json",
+          "observation": "T1 keys \"take no action (FYI / no scheduling needed)\" and reports \"PASS — correctly took no action\". Target body was observed and secretary was connected."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "email_id": "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned",
+      "observation": "evt_40 uses the supported date 2026-08-07 but starts at 14:00 rather than the instructed 09:00 default. The email specifies neither time nor a deviation from the one-hour default. This sibling time error does not invalidate T1's day-level no-action pass.",
+      "evidence": [
+        "stage-a.json assistant_instructions: \"Defaults unless the email says otherwise: events 9am, 1 hour long\".",
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:18 gives the webinar date without a time; :41-42 create evt_40 from 2026-08-07T14:00:00 to 2026-08-07T15:00:00."
+      ]
+    },
+    {
+      "category": "MODEL",
+      "email_id": "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule",
+      "observation": "evt_41 uses the supported date 2026-08-24 but an unsupported 10:00 start and two-hour duration. No prior LeBron campaign event is present before this day, so creation does not duplicate an existing event; evt_37 is a separate cancellation PR discussion. These time/default issues are separate from T1.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:21 supplies Monday, August 24th, 2026 without a time or duration; :43-44 create evt_41 from 2026-08-24T10:00:00 to 2026-08-24T12:00:00.",
+        "all_available_emails.json:322 says LeBron is tentative; :350 reports cancellation; neither supplies time or duration.",
+        "full-state-before.json contains evt_37, LeBron cancellation PR discussion, on 2026-06-24, but no LeBron campaign event."
+      ]
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

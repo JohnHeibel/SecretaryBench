@@ -1,0 +1,251 @@
+{
+  "scope": "Source-level infrastructure observation, independent of per-target adjudication. Reconstructed emails are not observed reads. capture_ok does not establish secretary availability.",
+  "emails": 16,
+  "targets": 17,
+  "cases": [
+    {
+      "case_id": "E28",
+      "batch": 4,
+      "day": 51,
+      "targets": [
+        "45"
+      ],
+      "target_email_id": "World_Cup_Cleat_Launch.manufacturing-kickoff"
+    },
+    {
+      "case_id": "E29",
+      "batch": 4,
+      "day": 51,
+      "targets": [
+        "46"
+      ],
+      "target_email_id": "World_Cup_Cleat_Launch.reveal-event-budget-is-over-2"
+    },
+    {
+      "case_id": "E30",
+      "batch": 4,
+      "day": 52,
+      "targets": [
+        "47"
+      ],
+      "target_email_id": "Innovation-comp.add-this-to-the-recap-agenda"
+    },
+    {
+      "case_id": "E33",
+      "batch": 5,
+      "day": 52,
+      "targets": [
+        "48"
+      ],
+      "target_email_id": "Day-of-execution_and_Aftermath.green-room-before-we-go-live"
+    },
+    {
+      "case_id": "E34",
+      "batch": 5,
+      "day": 52,
+      "targets": [
+        "49"
+      ],
+      "target_email_id": "World_Cup_Cleat_Launch.manufacturing-kickoff-2"
+    },
+    {
+      "case_id": "E35",
+      "batch": 5,
+      "day": 52,
+      "targets": [
+        "50"
+      ],
+      "target_email_id": "Partnership-with-deeptech-companies.new-meeting-during-boston-trip"
+    },
+    {
+      "case_id": "E36",
+      "batch": 5,
+      "day": 53,
+      "targets": [
+        "51"
+      ],
+      "target_email_id": "World_Cup_Cleat_Launch.manufacturing-kickoff-3"
+    },
+    {
+      "case_id": "E37",
+      "batch": 5,
+      "day": 53,
+      "targets": [
+        "52"
+      ],
+      "target_email_id": "Sponsoring-Marathon.pitch-deck-2"
+    },
+    {
+      "case_id": "E38",
+      "batch": 5,
+      "day": 53,
+      "targets": [
+        "53"
+      ],
+      "target_email_id": "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs"
+    },
+    {
+      "case_id": "E41",
+      "batch": 6,
+      "day": 53,
+      "targets": [
+        "54"
+      ],
+      "target_email_id": "Sponsoring-Marathon.launch-meeting-conflict-2"
+    },
+    {
+      "case_id": "E42",
+      "batch": 6,
+      "day": 53,
+      "targets": [
+        "55",
+        "56"
+      ],
+      "target_email_id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue-3"
+    },
+    {
+      "case_id": "E43",
+      "batch": 6,
+      "day": 55,
+      "targets": [
+        "57"
+      ],
+      "target_email_id": "Partnership-with-deeptech-companies.boston-dynamics-cancel"
+    },
+    {
+      "case_id": "E44",
+      "batch": 6,
+      "day": 56,
+      "targets": [
+        "58"
+      ],
+      "target_email_id": "World_Cup_Cleat_Launch.board-sync-on-the-credit-issue"
+    },
+    {
+      "case_id": "E45",
+      "batch": 6,
+      "day": 56,
+      "targets": [
+        "59"
+      ],
+      "target_email_id": "Sponsoring-Marathon.launch-meeting-recap"
+    },
+    {
+      "case_id": "E46",
+      "batch": 6,
+      "day": 57,
+      "targets": [
+        "60"
+      ],
+      "target_email_id": "World_Cup_Cleat_Launch.press-briefing-and-embargo-2"
+    },
+    {
+      "case_id": "E48",
+      "batch": 6,
+      "day": 55,
+      "targets": [
+        "B15"
+      ],
+      "target_email_id": "Innovation-comp.recap-agenda-finalized"
+    }
+  ],
+  "days": [
+    {
+      "day": 51,
+      "source": "captures/baseline-sonnet-4-5/raw/day_051.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_calls": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "3d933bbd4a9590ee0d3883f077d83bab0f6ad81f261a15528faf82a5e1147099",
+      "before_source": "captures/baseline-sonnet-4-5/days/050.json#state",
+      "after_source": "captures/baseline-sonnet-4-5/days/051.json#state"
+    },
+    {
+      "day": 52,
+      "source": "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_calls": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "b449ef54558310600329267e9df208c1903aa0698688a927e80013c8e092e7ef",
+      "before_source": "captures/baseline-sonnet-4-5/days/051.json#state",
+      "after_source": "captures/baseline-sonnet-4-5/days/052.json#state"
+    },
+    {
+      "day": 53,
+      "source": "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_calls": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "0eea3363aaf8ef131c2fa27786ae086fa2e219e04652d733344a5e3d5c5b85a8",
+      "before_source": "captures/baseline-sonnet-4-5/days/052.json#state",
+      "after_source": "captures/baseline-sonnet-4-5/days/053.json#state"
+    },
+    {
+      "day": 55,
+      "source": "captures/baseline-sonnet-4-5/raw/day_055.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_calls": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "da6fb3af1fb76355770b651a266f2f7f00ada823deb53529ca25d763892a648d",
+      "before_source": "captures/baseline-sonnet-4-5/days/054.json#state",
+      "after_source": "captures/baseline-sonnet-4-5/days/055.json#state"
+    },
+    {
+      "day": 56,
+      "source": "captures/baseline-sonnet-4-5/raw/day_056.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_calls": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "6c948be16b1832b62484faa09feced0c4a4a0d52595771dd9fcc4ae2b013248b",
+      "before_source": "captures/baseline-sonnet-4-5/days/055.json#state",
+      "after_source": "captures/baseline-sonnet-4-5/days/056.json#state"
+    },
+    {
+      "day": 57,
+      "source": "captures/baseline-sonnet-4-5/raw/day_057.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_calls": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "ab4b510c287e8f1a6c7807bec95b48b5ff85db0763ae72dc3402666af281812c",
+      "before_source": "captures/baseline-sonnet-4-5/days/056.json#state",
+      "after_source": "captures/baseline-sonnet-4-5/days/057.json#state"
+    }
+  ],
+  "implication": "Missing actions on these days cannot establish model reasoning failure; supported keys, stale dates and matcher explanations can be audited independently. No scores changed."
+}

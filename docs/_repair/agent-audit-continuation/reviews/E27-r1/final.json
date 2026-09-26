@@ -1,0 +1,50 @@
+{
+  "case_id": "E27",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["GRADER"],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "NO",
+      "confidence": "medium",
+      "rationale": "The email makes an explicit request for a deliverable with a future deadline, so its characterization as an FYI requiring no scheduling is unsupported. The model created one task to ensure Marketing prepares the marathon pitch deck, preserving the requested owner and purpose, due July 30 at the instructed default 17:00. This records the obligation without claiming the deck is complete. The complete stores show exactly one new object, todo_86, and no duplicate deck task or other changes. The no-action key causes a supported reminder to be rejected. Marketing is the named producer rather than the CEO, which limits confidence about personal task ownership, but the instructions do not prohibit tracking a team deliverable requested in mail addressed to the managed person. The earlier successful-pitch message does not explicitly supersede this later request.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_050.jsonl:20",
+          "observation": "Observed get_email body: \"can the Marketing team please put together a pitch deck for the race director. We need this byThursday, July 30th, 2026 so that we have a week for the Pitch team to get prepared.\" Recipients are [\"CEO\"]."
+        },
+        {
+          "source": "stage-a.json:assistant_instructions",
+          "observation": "The assistant manages calendar and to-dos; create_todo is for \"tasks that have a deadline\" and defaults are \"to-dos due 5pm\"."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_050.jsonl:35-36",
+          "observation": "create_todo used email_id Sponsoring-Marathon.pitch-deck, title \"Ensure marketing creates marathon pitch deck\", and due_date \"2026-07-30T17:00:00\"; the successful result returned id todo_86."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Full-store comparison: all 48 events unchanged; 32 existing to-dos unchanged; sole addition todo_86. No existing task represented the requested marathon pitch deck."
+        },
+        {
+          "source": "stage-b.json:targets[T1]",
+          "observation": "The key is \"- take no action (FYI / no scheduling needed)\" and the verdict says \"FAIL — over-acted\" for the July 30 task."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "Marketing is explicitly responsible for producing the deck. No supplied rule clarifies whether the CEO's assistant must exclude team-deliverable oversight reminders."
+      ],
+      "suggested_human_question": "Should the managed CEO's to-do list include tracking explicitly requested Marketing deliverables addressed to the CEO?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "stage-a.json:preceding_storyline_emails[Sponsoring-Marathon.approval-of-event]",
+      "observation": "The June 5 message says \"Pitch went amazing!\" and \"We have secured our Gold Tier\", preceding later budget/tier discussions and this July 20 deck request. This chronology inconsistency does not establish cancellation of the later explicit request and is separate from T1's no-action key."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

@@ -1,0 +1,62 @@
+{
+  "case_id": "E30",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "KEY",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "NO",
+      "confidence": "high",
+      "rationale": "The key overconstrains both kind and date: the email asks for a recap agenda addition, which can be satisfied by updating existing evt_62, and gives no September 25 task deadline. An earlier agenda reminder would also be defensible. The full stores are unchanged and contain neither the specific promotion topic on evt_62 nor a preparatory task, so the supported request remains unfulfilled in the saved state. However, the trace is empty, the target body was not observed, and the supplied raw capture reports a failed secretary connection. This supports an infrastructure limitation rather than a model reasoning failure. The grader's narrow factual observation that no matching to-do was created is accurate, but its exact-day to-do requirement and attribution as a substantive model failure are unsupported. There is no satisfied action wrongly rejected here, so this is not GRADER.",
+      "evidence": [
+        {
+          "source": "stage-a.json target_email.body",
+          "observation": "\"could we add a short item to the recap about how we promote next year's comp earlier\" identifies agenda content, with no to-do deadline."
+        },
+        {
+          "source": "stage-a.json preceding_storyline_emails: Innovation-comp.let-s-set-up-a-recap",
+          "observation": "\"Thinking Friday, September 25th, 2026 if that works.\" establishes the recap date, not an exact date for adding its agenda item."
+        },
+        {
+          "source": "stage-b.json targets[0].operation",
+          "observation": "The key requires verb=create, kind=todo, on={\"eq\":\"@recap_meeting\"}, tolerance=exact_day; the resolved date is September 25."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json, evt_62; day-tool-trace.json",
+          "observation": "Both complete stores retain evt_62's description \"Recap how comp went, what worked, what to change for next year\" without the promotion item; no alternative calendar or task object supplies it. The trace is []."
+        },
+        {
+          "source": "stage-b.json infrastructure; captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+          "observation": "mcp_servers contains {\"name\":\"secretary\",\"status\":\"failed\"}; target_body_observed_in_tool_result=false. Model narration: \"I cannot process emails because the secretary email management tools are no longer available - the MCP server has disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed get_email result establishes that the model received the target body or had functioning tools on this day.",
+        "An agenda update and a timely preparatory reminder are defensible implementations; the email does not prescribe the keyed implementation."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "object_id": "evt_62",
+      "observation": "The recap was originally created at 10:00 despite the supplied source email giving only September 25 and the assistant instructions specifying events at 09:00 by default. This historical default-time issue predates the target agenda request and does not decide T1.",
+      "evidence": [
+        {
+          "source": "history-actions.jsonl:143; captures/baseline-sonnet-4-5/raw/day_036.jsonl:32",
+          "observation": "mcp__secretary__create_event for Innovation-comp.let-s-set-up-a-recap used start=2026-09-25T10:00:00 and end=2026-09-25T11:00:00."
+        },
+        {
+          "source": "history-actions.jsonl:144; captures/baseline-sonnet-4-5/raw/day_036.jsonl:33",
+          "observation": "The create result assigns id=evt_62 with the same 10:00 start."
+        }
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

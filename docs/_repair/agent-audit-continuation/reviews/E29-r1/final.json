@@ -1,0 +1,45 @@
+{
+  "case_id": "E29",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The requested state is unambiguous: move the existing revised reveal-event budget approval task to July 22. The full before and after stores retain todo_76 at July 17 with no alternative satisfying object. Thus the request is unsatisfied and the grader's wrong-day rejection is justified as a state check. However, this is not evidence of a model reasoning failure: the secretary server is explicitly recorded as failed, the day's tool trace is empty, and the target body was not observed in a tool result. AMBIGUOUS marks unavailable causal attribution to model performance, not an ambiguous date or key. The existing 17:00 time follows the default; there is no separate time defect. No key, plan, or grader defect is supported.",
+      "evidence": [
+        {
+          "source": "stage-a.json:9",
+          "observation": "CFO: \"I've moved the approval deadline to this Wednesday, July 22nd, 2026, but that's the last safe day before we lose the venue rate.\""
+        },
+        {
+          "source": "full-state-before.json:600-604; full-state-after.json:600-604",
+          "observation": "Both contain \"id\": \"todo_76\", \"title\": \"Approve revised WC reveal event budget\", and \"due_date\": \"2026-07-17T17:00:00\". Full stores show no moved or replacement budget-approval object."
+        },
+        {
+          "source": "stage-b.json:21",
+          "observation": "Grader reports \"FAIL — on the wrong day\" and actual \"Approve revised WC reveal event budget\" Fri Jul 17 5 PM."
+        },
+        {
+          "source": "stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_051.jsonl:1 as reproduced in stage-b.json",
+          "observation": "\"target_body_observed_in_tool_result\": false; model states \"the secretary tools (email management functions) are no longer available as the MCP server has disconnected.\" Infrastructure records \"name\": \"secretary\", \"status\": \"failed\"."
+        },
+        {
+          "source": "day-tool-trace.json:1",
+          "observation": "Exact complete trace: []"
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The saved run supplies no target-body retrieval or operational secretary tools on this day. Model compliance under working infrastructure cannot be assessed; NO describes the resulting task store, not a demonstrated reasoning error."
+      ],
+      "suggested_human_question": "Should this failed-server day be excluded from model-error attribution while preserving the valid state-level failure?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

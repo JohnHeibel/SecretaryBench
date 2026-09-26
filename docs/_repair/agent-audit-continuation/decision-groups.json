@@ -37,8 +37,20 @@
   },
   "Q7": {
     "title": "Conditional requests and ownership of work",
-    "question": "Does #38 require brainstorming when the email only asks for companies if Mark already has any in mind?",
-    "recommendation": "Keep AMBIGUOUS, with no model-failure attribution absent a supplied rule turning the conditional request into mandatory work.",
-    "alternatives": "A deadline can justify a reminder to consider/send ideas; the conditional wording and avoid-over-acting instruction also support no task."
+    "question": "Does #38 require brainstorming despite conditional wording, and may #44 track Marketing\u2019s deadline as a CEO oversight task?",
+    "recommendation": "Keep both AMBIGUOUS. Use the supplied personal-assistant instructions; do not infer a universal ownership or brainstorming rule from receipt alone.",
+    "alternatives": "A deadline may justify a coordination reminder; conditional wording or an explicitly different owner may instead make the message informational for the CEO."
+  },
+  "Q8": {
+    "title": "Failed tool connection and model-quality attribution",
+    "question": "Should the affected saved checks be reported separately or excluded from model-capability attribution while retaining their factual state results?",
+    "recommendation": "Report them separately as infrastructure-limited. Preserve independently established KEY/PLAN/GRADER facts, and withhold model-performance conclusions. This audit does not alter scores or authorize any rerun.",
+    "alternatives": "Judge the resulting store regardless of tool availability; or distinguish that outcome from model reasoning. Six audited capture days show failed secretary MCP, absent tools, no calls and unchanged stores; 16 emails/17 targets lack observed reads."
+  },
+  "Q9": {
+    "title": "Trip start window and calendar representation",
+    "question": "Does from the week of August 3 fix departure to Monday, and what counts as representing the trip start?",
+    "recommendation": "Keep #41/#43 unresolved. The literal wording and earlier mail do not uniquely establish Monday; require neither invented separate boundary markers nor an arbitrary Tuesday start. #42\u2019s missing explicit August 9 endpoint is independently established.",
+    "alternatives": "Treat the phrase as a Monday-through-Sunday trip, making the Dynamics visit one day late; or allow a start within that week, making August 4/6 first/third-day visits plausible. A coherent trip interval is another valid representation."
   }
 }

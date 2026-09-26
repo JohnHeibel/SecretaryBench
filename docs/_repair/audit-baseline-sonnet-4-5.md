@@ -1862,6 +1862,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 40, 2026-09-26:** AGENT_RESOLVED · PLAN. The explicit July 17 tooling-approval deadline predates July 19 delivery, making on-time prospective fulfillment impossible. todo_83 is due July 19 and preserves the missed July 17 deadline in its description. Reviewers disagree whether this is acceptable recovery or an incorrect deadline replacement; no model pass is awarded. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 41. `Partnership-with-deeptech-companies.boston-trip-details` · create `Boston Trip Start` (event)
@@ -1907,6 +1911,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 41, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Both reviewers call the missing trip start MODEL, but closure depends on interpreting from the week of August 3 as a unique Monday start and on the required trip representation. Only WHOOP August 4 and Dynamics August 6 visits exist, with no overall trip span. A separate start marker is unsupported; whether the first visit adequately records an allowed start is unresolved. Coordinator withholds automatic closure. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q9](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -1954,6 +1962,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 42, 2026-09-26:** AGENT_RESOLVED · MODEL. The explicit August 9 trip endpoint is absent from every calendar object and description; the August 9 floor reset is unrelated. The two visit entries do not represent the trip through August 9. This omission survives correction of the key’s separate-end-marker requirement: one coherent trip interval would also suffice. Exact start-day uncertainty does not erase the explicit endpoint. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 43. `Partnership-with-deeptech-companies.boston-trip-details` · create `Boston Dynamics Visit` (event)
@@ -2000,6 +2012,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 43, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Both reviewers infer August 5 as the third day of a Monday-start trip. The coordinator finds from the week of insufficiently precise to close that exact-date judgment. evt_85 is August 6 and evt_84 is August 4, preserving a first/third-day relationship if the trip starts Tuesday. That start is not explicitly selected either. Eight-hour visits independently violate the one-hour default. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q9](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 44. `Sponsoring-Marathon.pitch-deck` · no-action email
@@ -2031,6 +2047,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 44, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The email explicitly assigns a July 30 deliverable to Marketing, while its recipient is CEO. The personal-owner versus oversight-task rule is unstated. todo_86 accurately records ensuring Marketing prepares the deck by July 30. Reviewers disagree KEY versus AMBIGUOUS; the no-action key and model credit stay unresolved. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q7](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -2099,6 +2119,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 45, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The July 22 manufacturing kickoff is explicit and absent; the key and state-level failure are supported. Day 51 secretary MCP failed, no tools or observed target read occurred, and complete stores are unchanged. Missing outcome is not demonstrated model reasoning failure. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 46. `World_Cup_Cleat_Launch.reveal-event-budget-is-over-2` · move `Approve revised event budget` (todo)
@@ -2157,6 +2181,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for 46, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The revised budget approval clearly moves to July 22, but todo_76 remains July 17; state-level failure is supported. No update or substitute exists. Day 51 MCP failure and no observed read prevent attribution to model decision-making. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### 47. `Innovation-comp.add-this-to-the-recap-agenda` · create `add_promo_agenda_item` (todo)
@@ -2209,6 +2237,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Your verdict:** `[ ]` MODEL   `[ ]` KEY   `[ ]` PLAN   `[ ]` GRADER   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for 47, 2026-09-26:** AGENT_RESOLVED · KEY. Adding a promotion item to the recap does not require a new task exactly on September 25; an earlier reminder or agenda-description update can satisfy the request. No agenda update or equivalent task exists, but day 52 has failed tools and no observed read. The definite key defect does not prove correct model behavior. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+<!-- agent-continuation:end -->
 
 ---
 
@@ -3324,6 +3356,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
 
+<!-- agent-continuation:start -->
+**Agent review for B10, 2026-09-26:** AGENT_RESOLVED · PASS. The kickoff update explicitly says nothing is needed; no target action is supported. Target body was read. Only unrelated all-hands and LeBron events were added, with no kickoff-related mutation or alternate object. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
+
 ---
 
 ### B11. `Planning.acme-trademark-clear` · no-action email
@@ -3351,6 +3387,10 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 
 **Would you have passed it?** `[ ]` YES   `[ ]` NO   `[ ]` AMBIGUOUS  
 **Notes:** 
+
+<!-- agent-continuation:start -->
+**Agent review for B11, 2026-09-26:** AGENT_RESOLVED · PASS. Trademark clearance is informational, with no request for a meeting or task. Observed read produces no target mutation. The day’s two additions belong to distinct emails; existing objects remain unchanged. See [review results](agent-audit-continuation/RESULTS.md).
+<!-- agent-continuation:end -->
 
 ---
 

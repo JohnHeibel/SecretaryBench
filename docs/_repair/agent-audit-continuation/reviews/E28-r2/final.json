@@ -1,0 +1,46 @@
+{
+  "case_id": "E28",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The explicit July 22 manufacturing kickoff supports the keyed event and exact day. The full before/after stores are identical, with 48 events and 33 todos; neither contains this kickoff under another identity. Thus the supported request is unsatisfied and the grader's missing-event verdict accurately describes the saved outcome. However, this is not attributable to model reasoning: the secretary server is recorded as failed, the entire day trace is empty, and no target body was observed. AMBIGUOUS records this attribution limit, not an ambiguous request or defective key. The NO/YES fields concern persisted outcome and state-level grading only. The default event would be July 22 09:00–10:00; no actual event exists whose time needs separate assessment.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"I'm putting the manufacturing kickoff on your calendar for Wednesday, July 22nd, 2026.\" The email is World_Cup_Cleat_Launch.manufacturing-kickoff, served July 21."
+        },
+        {
+          "source": "stage-b.json:9-21",
+          "observation": "The key is create/event, match manufacturing, eq this:WED, exact_day, resolved July 22. The grader reports \"(nothing matching created)\"."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Complete stores inspected and equality checked: 48 events and 33 todos unchanged, no manufacturing kickoff. Existing evt_45, evt_60, evt_64, evt_81 and evt_82 concern separate greenlight/reveal/press/rehearsal objects."
+        },
+        {
+          "source": "day-tool-trace.json:1; stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_051.jsonl:1 (quoted infrastructure evidence)",
+          "observation": "Trace is []; target_body_observed_in_tool_result is false; the quoted server entry is {\"name\":\"secretary\",\"status\":\"failed\"}. Narration states: \"I'm unable to continue processing emails - the secretary tools (email management functions) are no longer available as the MCP server has disconnected.\""
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "There is no observed inbox read, target-body read, or tool action on this day. The evidence cannot establish how the model would interpret or execute the request with a working server."
+      ],
+      "suggested_human_question": "Should day 51 be excluded or reported separately as an infrastructure failure when attributing benchmark failures to model behavior?"
+    }
+  ],
+  "sibling_observations": [
+    {
+      "email_id": "World_Cup_Cleat_Launch.reveal-event-budget-is-over-2",
+      "observation": "The same-day CFO mail explicitly moves budget approval to July 22, but todo_76 remains due 2026-07-17T17:00:00 in both stores. This separate unmet update shares the day-wide infrastructure limitation and does not change T1's valid key."
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

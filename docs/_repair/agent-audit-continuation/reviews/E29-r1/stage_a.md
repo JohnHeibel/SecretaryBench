@@ -1,0 +1,7 @@
+The July 21 CFO email explicitly moves the outstanding revised reveal-event budget approval deadline from July 17 to Wednesday, July 22, 2026. The supported action is to update the existing approval task to July 22 at the instruction-default 17:00, preserving its identity and avoiding duplicates. This is a deadline task, not a budget meeting or reveal event reschedule.
+
+The before-state identifies the relevant object as todo_76, "Approve revised WC reveal event budget", originating from World_Cup_Cleat_Launch.reveal-event-budget-is-over, due 2026-07-17T17:00:00. Its description and the prior CFO email match the same trimmed budget, booking dependency, and original deadline. The extension is explicit and future relative to delivery, so no date inference is necessary.
+
+The budget approval is distinct from the striker endorsement review (todo_63, already due July 22), the tooling PO (todo_83), and the final colorway sign-off (todo_51). The same-day manufacturing email says tooling and freeze are approved; it does not say the reveal-event budget is approved. The target explicitly says that budget approval did not come through, so the task remains pending. The manufacturing kickoff separately calls for a July 22 calendar event; the IR thank-you is a confirmation. Neither changes the target deadline.
+
+No material uncertainty about target kind, identity, or day is apparent. The tools manage reminders; moving a task does not constitute the real-world budget approval.

@@ -1,0 +1,7 @@
+The July 22 email requests a short recap agenda item about promoting next year's innovation competition earlier because awareness was low. It supports recording that topic on the existing recap event, preserving the original recap purpose. A reminder to add it before the recap is also a defensible representation if the agenda cannot be directly maintained. It does not request a new meeting or specify an exact task deadline.
+
+The recap is identified by the July 6 email, "Let's set up a recap," proposing Friday, September 25, 2026. Before-state event evt_62, email_id Innovation-comp.let-s-set-up-a-recap, is "Pitch comp recap with VP Product," September 25 10:00–11:00, with description "Recap how comp went, what worked, what to change for next year." The target is an agenda revision to this object, not the July 22 board presentation or a sponsor call. No preceding recap reschedule is supplied.
+
+The agenda item should be recorded for the September 25 recap or prepared beforehand. No exact day earlier than that follows from the request. If a new task is used, its attribution must use the target email ID; default task time is 17:00. The original recap email gives no time, so its existing 10:00 start differs from the 09:00 default, but that is a preexisting scheduling issue rather than authority to change its time under this agenda request.
+
+Uncertainty: whether a separate reminder versus a direct calendar-description update is preferred is not stated. The tools and instructions permit update_event, making a direct update sufficient.

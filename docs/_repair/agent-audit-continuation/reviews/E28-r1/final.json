@@ -1,0 +1,45 @@
+{
+  "case_id": "E28",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The explicit July 22 manufacturing kickoff supports the keyed event and exact day. Complete before/after stores are identical and contain no kickoff under any identity, so the supported calendar outcome is absent and the grader's state-level FAIL is justified. This does not establish a model reasoning failure: the secretary server failed, no tools ran, and the target body was not observed in a get_email result. AMBIGUOUS records the inability to attribute the missing event to model decision-making under unavailable infrastructure. The date remained prospective on July 21; there is no stale-plan or unsupported-key defect. Default 09:00–10:00 would apply if execution were possible, but no time-specific error occurred because nothing was created.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body",
+          "observation": "\"I'm putting the manufacturing kickoff on your calendar for Wednesday, July 22nd, 2026.\" This directly supports a new kickoff event on July 22."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json: complete events and todos stores",
+          "observation": "Both stores were inspected in full and are byte-identical. No manufacturing kickoff exists. Existing cleat events evt_45, evt_60, evt_64, evt_81 and evt_82 represent the greenlight, reveal, press briefing, rehearsal and walk-through, not the kickoff."
+        },
+        {
+          "source": "stage-b.json:20-21",
+          "observation": "The key resolves this:WED to Wed Jul 22; the recorded verdict is \"FAIL — no event titled like \\\"Manufacturing Kickoff\\\" was created\". Its missing-event claim agrees with the stores."
+        },
+        {
+          "source": "stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_051.jsonl:1 as quoted in the packet",
+          "observation": "\"target_body_observed_in_tool_result\": false; server evidence is \"name\": \"secretary\", \"status\": \"failed\". Narration states: \"I'm unable to continue processing emails - the secretary tools (email management functions) are no longer available as the MCP server has disconnected.\""
+        },
+        {
+          "source": "day-tool-trace.json:1",
+          "observation": "The entire trace is []. There is no observed inbox read or attempted calendar action."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No observed delivery of the target body to the model and no functioning secretary tools. The capture cannot show how the model would reason about this email with access restored."
+      ],
+      "suggested_human_question": "Should days with a failed secretary MCP server be excluded from model-quality scoring or rerun after access is restored?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

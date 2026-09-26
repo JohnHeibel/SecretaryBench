@@ -1,0 +1,7 @@
+# E30 Stage A
+
+The July 22 email requests adding a short recap agenda item about promoting next year's competition earlier because awareness was low. The supported obligation is to preserve that topic for the existing recap, preferably by updating its description/agenda. It does not independently request a new meeting or specify a task deadline. A reminder to update the agenda before the recap could also preserve the request, but any exact earlier day would be discretionary.
+
+The recap is identified by Innovation-comp.let-s-set-up-a-recap, which proposes Friday, September 25, 2026. The complete before-state contains evt_62, “Pitch comp recap with VP Product,” on September 25 from 10:00 to 11:00, with description “Recap how comp went, what worked, what to change for next year.” This is the object to revise without duplication or date change. The target email does not authorize altering its schedule. The assistant instructions specify a 09:00 default for unspecific events, so evt_62's existing 10:00 start is a historical default-time issue unless other evidence supports it; the present agenda request need not re-date it.
+
+Earlier recap references confirm its identity but supply no agenda deadline. Last year's notes are explicitly reference-only. Several storyline messages contain inconsistent relative sequencing, but no supplied message supersedes the explicit September 25 recap date. The actionable agenda content and object identity are clear; implementation as a calendar-description change versus a preparatory reminder is less prescriptive.

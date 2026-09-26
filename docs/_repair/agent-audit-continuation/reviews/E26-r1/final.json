@@ -1,0 +1,112 @@
+{
+  "case_id": "E26",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "MODEL",
+      "secondary_categories": ["KEY"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The supported obligation is to represent the finalized Boston trip beginning August 3 and continuing through August 9. The complete after-store has neither a spanning trip event nor any Boston event beginning August 3. The only new Boston objects are the August 4 WHOOP visit and August 6 Dynamics visit. Failure for the absent trip start is therefore supported. Separately, the key's requirement for a distinct event identified by 'start' is over-specific: the email does not demand separate start/end markers, and a correctly dated spanning trip event would suffice. That key defect does not rescue this output, which supplies no equivalent representation.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25 (day-tool-trace.json)",
+          "observation": "Observed email: 'We finalized dates to for the trip to be from the week of August 3rd, 2026 till Sunday, August 9th, 2026.'"
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Full stores contain no spanning Boston trip entry. New Boston objects are evt_84, 'Boston trip - WHOOP HQ visit', start '2026-08-04T09:00:00', and evt_85, 'Boston trip - Boston Dynamics visit', start '2026-08-06T09:00:00'. Neither represents an August 3 departure/start."
+        },
+        {
+          "source": "stage-b.json targets[T1]",
+          "observation": "The operation is create 'Boston Trip Start', kind 'event', match ['start'], on eq '@boston_trip_start'; reported result is 'FAIL — no event titled like \"Boston Trip Start\" was created'. The factual omission supports failure, but this title/marker requirement is not uniquely prescribed by the mail."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "'From the week of' is awkward phrasing, but the first/third-day itinerary supports Monday August 3 as the trip start. Exact departure time is unspecified."
+      ],
+      "suggested_human_question": null
+    },
+    {
+      "target_id": "T2",
+      "primary_category": "MODEL",
+      "secondary_categories": ["KEY"],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "Sunday August 9 is the explicit end of the finalized trip. The model records two individual company visits, with no trip span or return/end marker conveying August 9. Thus the supported trip-end information is absent and this observed failure is justified. A separate 'Boston Trip End' event is not itself required by the email: a trip event ending August 9 could satisfy the same obligation. The key over-specifies the representation, but no acceptable equivalent exists in this run. This is independently assessable from the erroneous company-visit dates.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25 (day-tool-trace.json)",
+          "observation": "The target body states the trip runs 'till Sunday, August 9th, 2026'."
+        },
+        {
+          "source": "full-state-after.json",
+          "observation": "evt_84 ends '2026-08-04T17:00:00'; evt_85 ends '2026-08-06T17:00:00'. Neither description gives the travel period or return date. The August 9 event evt_57 is the unrelated 'Store floors reset overnight', linked to Pre-Launch.store-floors-reset-overnight. Full-store inspection finds no equivalent trip-end representation."
+        },
+        {
+          "source": "stage-b.json targets[T2]",
+          "observation": "The operation is create 'Boston Trip End', kind 'event', match ['end'], on eq '@boston_trip_end', resolved to Sunday August 9; the reported failure is absence of a titled end event. The date is supported; mandatory separate-marker identity is not."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The email does not give an exact return time. This does not affect the missing day-level trip endpoint."
+      ],
+      "suggested_human_question": null
+    },
+    {
+      "target_id": "T3",
+      "primary_category": "MODEL",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "Boston Dynamics is to be visited on the third day of the August 3 trip, which is Wednesday August 5. The model creates the correct visit identity on Thursday August 6. No other object satisfies the August 5 visit, so the day-level rejection is justified. Independently of grading, the model also assigns an unsupported eight-hour duration where the assistant instructions prescribe one hour by default. The body was actually retrieved and the create call succeeded, so the failure is attributable to the model's action rather than disconnected infrastructure.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25 (day-tool-trace.json)",
+          "observation": "Observed body: 'We will visit WHOOP on the first day, and Boston Dynamics on the third one.' The preceding sentence supplies the week beginning August 3."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:59-60 (day-tool-trace.json); full-state-after.json",
+          "observation": "Successful create_event returns evt_85, title 'Boston trip - Boston Dynamics visit', start '2026-08-06T09:00:00', end '2026-08-06T17:00:00', email_id 'Partnership-with-deeptech-companies.boston-trip-details'."
+        },
+        {
+          "source": "stage-b.json targets[T3]",
+          "observation": "The keyed date '@boston_trip_start+2d' resolves to Wednesday August 5. The grader reports 'FAIL — on the wrong day' and actual 'Boston trip - Boston Dynamics visit' Thursday August 6 at 9 AM (480m), matching the saved object."
+        },
+        {
+          "source": "stage-a.json assistant_instructions",
+          "observation": "'Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.' The target email supplies no eight-hour visit duration."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "The phrasing 'from the week of' is mildly imprecise, but it supplies no affirmative support for starting Tuesday August 4 or visiting Dynamics Thursday August 6."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "observation": "The untargeted WHOOP HQ Visit operation is also one day late: evt_84 is August 4 instead of first day August 3. Its 09:00-17:00 duration also exceeds the one-hour default without support. These defects are separate from T1/T2's missing trip span/endpoints.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25: 'WHOOP on the first day'",
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:57-58: evt_84, 'Boston trip - WHOOP HQ visit', start '2026-08-04T09:00:00', end '2026-08-04T17:00:00'"
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "observation": "The prior June WHOOP collaboration and July strategy meeting are distinct objects, unchanged across the full stores. Neither can satisfy the August itinerary. The new email does not explicitly cancel the strategy meeting.",
+      "evidence": [
+        "full-state-before.json and full-state-after.json: evt_27, 'WHOOP collaboration meeting', start '2026-06-24T09:00:00'",
+        "full-state-before.json and full-state-after.json: evt_74, 'WHOOP Boston trip strategy meeting', start '2026-07-20T10:00:00'"
+      ]
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

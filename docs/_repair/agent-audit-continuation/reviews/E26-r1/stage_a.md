@@ -1,0 +1,7 @@
+The July 19 email finalizes a Boston trip "from the week of August 3rd, 2026 till Sunday, August 9th, 2026" and says, "We will visit WHOOP on the first day, and Boston Dynamics on the third one." In context, the supported calendar dates are a trip beginning Monday August 3 and running through Sunday August 9, a WHOOP visit August 3, and a Boston Dynamics visit August 5. These are distinct commitments. No task with a deadline or action to contact additional companies is requested.
+
+The assistant instructions default events to 09:00 for one hour unless otherwise specified. Thus the two visit events should use that default. The trip's explicit multi-day span overrides a one-hour duration; precise departure/return times and all-day representation are unspecified. A calendar entry covering the stated trip dates is supported.
+
+The complete before-store contains no trip or August company visits. evt_27 is the separate June 24 WHOOP collaboration meeting and should not be moved into August. evt_74 is the July 20 trip strategy meeting, which previously was to determine dates. Receiving finalized dates early does not explicitly cancel that meeting. No supported request revises other calendar entries, even those overlapping the trip.
+
+The phrase "from the week of" is slightly awkward, but the first/third-day itinerary strongly supports August 3 and August 5 rather than unspecified dates within the week. Exact travel times remain uncertain. The message promises future notification of other companies' responses; it supplies no additional confirmed visit.

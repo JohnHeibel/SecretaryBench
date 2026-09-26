@@ -1,0 +1,72 @@
+{
+  "case_id": "E31",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The kickoff email explicitly requests no action. The assistant read its full body and made no calendar or task change attributable to it. Inspection of the complete stores confirms that every existing record stayed unchanged and the only additions belong to separate same-day scheduling emails. The no-action key and PASS are supported.",
+      "evidence": [
+        {
+          "source": "stage-a.json: target_email.body; captures/baseline-sonnet-4-5/raw/day_025.jsonl:23 (day-tool-trace.json)",
+          "observation": "The observed target body says: \"kickoff this morning went great\" and \"nothing needed from you, just wanted you in the loop.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:22-23 (day-tool-trace.json)",
+          "observation": "get_email requested Innovation-comp.kickoff-went-well and returned its complete body."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json; captures/baseline-sonnet-4-5/raw/day_025.jsonl:41-44 (day-tool-trace.json)",
+          "observation": "All 22 preexisting events and all 15 todos are unchanged. The only additions are evt_40 (Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned) and evt_41 (Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule). No record or mutation represents the kickoff FYI."
+        },
+        {
+          "source": "stage-b.json: targets[0]",
+          "observation": "The key is \"- take no action (FYI / no scheduling needed)\" and the reported result is \"PASS — correctly took no action\" with actual \"(nothing)\"."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "email_id": "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned",
+      "object_id": "evt_40",
+      "observation": "Separate same-day default-time error: the webinar is correctly dated August 7 but scheduled at 14:00 rather than the instructed 09:00 default. The observed email and available earlier rebrand emails supply no webinar time. This does not affect the kickoff no-action target.",
+      "evidence": [
+        {
+          "source": "stage-a.json: assistant_instructions",
+          "observation": "\"Defaults unless the email says otherwise: events 9am, 1 hour long; to-dos due 5pm.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:18,41-42 (day-tool-trace.json); full-state-after.json: evt_40",
+          "observation": "The email specifies Friday, August 7th, 2026 with no clock time; evt_40 starts \"2026-08-07T14:00:00\" and ends \"2026-08-07T15:00:00\"."
+        }
+      ]
+    },
+    {
+      "category": "MODEL",
+      "email_id": "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule",
+      "object_id": "evt_41",
+      "observation": "Separate same-day default-time and duration errors: the reinstated LeBron campaign is correctly dated August 24 but scheduled 10:00–12:00. The email and available earlier athlete emails provide no time or two-hour duration, and there is no existing LeBron campaign object in the complete before-state to preserve. The instructed defaults are 09:00–10:00. This does not affect the kickoff target.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:21,43-44 (day-tool-trace.json); full-state-before.json; full-state-after.json: evt_41",
+          "observation": "The email specifies \"Monday, August 24th, 2026\" without time; evt_41 starts \"2026-08-24T10:00:00\" and ends \"2026-08-24T12:00:00\". The before-state has a LeBron cancellation PR discussion (evt_37), a distinct meeting."
+        },
+        {
+          "source": "all_available_emails.json: Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+          "observation": "The preceding athlete scheduling email states \"LeBron James is currently tentative and isn't sure yet\" and provides no campaign clock time or duration."
+        }
+      ]
+    }
+  ],
+  "historical_observations": [],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

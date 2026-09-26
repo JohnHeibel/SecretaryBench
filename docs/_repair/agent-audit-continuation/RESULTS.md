@@ -1,6 +1,6 @@
 # Saved-run audit continuation results
 
-3/6 batches; 27/54 fresh checks; 24/48 emails; 48/96 initial reviewer assignments. New classifications resolved: 26 (including two reused pilot checks); unresolved new classifications: 3. 14 checks have queued interpretation, model-credit or saved-label decisions. 48/75 worksheet checks accounted for, including 19 preserved human judgments.
+4/6 batches; 37/54 fresh checks; 32/48 emails; 64/96 initial reviewer assignments. New classifications resolved: 31 (including two reused pilot checks); unresolved new classifications: 8. 21 checks have queued interpretation, model-credit or saved-label decisions. 58/75 worksheet checks accounted for, including 19 preserved human judgments.
 
 No benchmark scores were changed. AGENT_RESOLVED means coordinator-verified agent review, not human adjudication. Pending revisions to #14/#19 do not replace their saved human labels. Classification and model credit are separate; a KEY/PLAN finding does not establish model correctness.
 
@@ -11,19 +11,20 @@ No benchmark scores were changed. AGENT_RESOLVED means coordinator-verified agen
 | 1 | 8 | 7 | 1 | 22, B1 |
 | 2 | 10 | 10 | 0 | 31, B4 |
 | 3 | 9 | 7 | 2 | 34, B7 |
+| 4 | 10 | 5 | 5 | 47, B10 |
 
 ## Classification totals
 
-| Classification | Saved human | New agent-resolved |
-|---|---:|---:|
-| MODEL | 4 | 2 |
-| KEY | 9 | 12 |
-| PLAN | 4 | 1 |
-| GRADER | 2 | 2 |
-| AMBIGUOUS | 0 | 0 |
-| PASS | 0 | 9 |
+| Classification | Saved human | New agent-resolved | New pending |
+|---|---:|---:|---:|
+| MODEL | 4 | 3 | 0 |
+| KEY | 9 | 13 | 0 |
+| PLAN | 4 | 2 | 0 |
+| GRADER | 2 | 2 | 0 |
+| AMBIGUOUS | 0 | 0 | 8 |
+| PASS | 0 | 11 | 0 |
 
-Sampled passes: 9 accepted for their targeted day-level check; 0 pending. Time/default discrepancies remain separately recorded. This selected-failure and sampled-pass audit is not a benchmark-wide accuracy estimate.
+Sampled passes: 11 accepted for their targeted day-level check; 0 pending. Time/default discrepancies remain separately recorded. This selected-failure and sampled-pass audit is not a benchmark-wide accuracy estimate.
 
 ## Per-target findings
 
@@ -49,6 +50,14 @@ Sampled passes: 9 accepted for their targeted day-level check; 0 pending. Time/d
 | 37 | AGENT_RESOLVED | GRADER | The requested budget meeting on July 29 exists as evt_73; the no-matching-event rejection is a semantic identity false negative. Unique evt_73 has the correct source email, date and budget purpose. The 10:00 start separately violates the 09:00 default and does not justify this day-level rejection. | [review archive](batch-3-archive.json) |
 | 38 | NEEDS_JAMES | AMBIGUOUS | Sharing other company ideas is conditional on having them in mind; a mandatory brainstorm task is not clearly established. No company-suggestions task or equivalent exists. evt_74 covers only the strategy meeting; uncertainty about obligation, not a hidden match or outage, prevents attribution. | [review archive](batch-3-archive.json) |
 | 39 | AGENT_RESOLVED | KEY | The Design Lead slot is on the established August 13 reveal date. Nothing available supports the keyed July 20. evt_82 represents that distinct slot on August 13, leaving evt_60 intact. Its invented 18:30-18:45 timing violates defaults; the contradictory rehearsal wording is a separate sibling issue. | [review archive](batch-3-archive.json) |
+| 40 | AGENT_RESOLVED | PLAN | The explicit July 17 tooling-approval deadline predates July 19 delivery, making on-time prospective fulfillment impossible. todo_83 is due July 19 and preserves the missed July 17 deadline in its description. Reviewers disagree whether this is acceptable recovery or an incorrect deadline replacement; no model pass is awarded. | [review archive](batch-4-archive.json) |
+| 41 | NEEDS_JAMES | AMBIGUOUS | Both reviewers call the missing trip start MODEL, but closure depends on interpreting from the week of August 3 as a unique Monday start and on the required trip representation. Only WHOOP August 4 and Dynamics August 6 visits exist, with no overall trip span. A separate start marker is unsupported; whether the first visit adequately records an allowed start is unresolved. Coordinator withholds automatic closure. | [review archive](batch-4-archive.json) |
+| 42 | AGENT_RESOLVED | MODEL | The explicit August 9 trip endpoint is absent from every calendar object and description; the August 9 floor reset is unrelated. The two visit entries do not represent the trip through August 9. This omission survives correction of the key’s separate-end-marker requirement: one coherent trip interval would also suffice. Exact start-day uncertainty does not erase the explicit endpoint. | [review archive](batch-4-archive.json) |
+| 43 | NEEDS_JAMES | AMBIGUOUS | Both reviewers infer August 5 as the third day of a Monday-start trip. The coordinator finds from the week of insufficiently precise to close that exact-date judgment. evt_85 is August 6 and evt_84 is August 4, preserving a first/third-day relationship if the trip starts Tuesday. That start is not explicitly selected either. Eight-hour visits independently violate the one-hour default. | [review archive](batch-4-archive.json) |
+| 44 | NEEDS_JAMES | AMBIGUOUS | The email explicitly assigns a July 30 deliverable to Marketing, while its recipient is CEO. The personal-owner versus oversight-task rule is unstated. todo_86 accurately records ensuring Marketing prepares the deck by July 30. Reviewers disagree KEY versus AMBIGUOUS; the no-action key and model credit stay unresolved. | [review archive](batch-4-archive.json) |
+| 45 | NEEDS_JAMES | AMBIGUOUS | The July 22 manufacturing kickoff is explicit and absent; the key and state-level failure are supported. Day 51 secretary MCP failed, no tools or observed target read occurred, and complete stores are unchanged. Missing outcome is not demonstrated model reasoning failure. | [review archive](batch-4-archive.json) |
+| 46 | NEEDS_JAMES | AMBIGUOUS | The revised budget approval clearly moves to July 22, but todo_76 remains July 17; state-level failure is supported. No update or substitute exists. Day 51 MCP failure and no observed read prevent attribution to model decision-making. | [review archive](batch-4-archive.json) |
+| 47 | AGENT_RESOLVED | KEY | Adding a promotion item to the recap does not require a new task exactly on September 25; an earlier reminder or agenda-description update can satisfy the request. No agenda update or equivalent task exists, but day 52 has failed tools and no observed read. The definite key defect does not prove correct model behavior. | [review archive](batch-4-archive.json) |
 | B1 | AGENT_RESOLVED | PASS | The requested retreat date and event identity are satisfied by unique evt_4 on June 22. Day-level pass accepted. The eight-hour duration violates the one-hour default and is recorded separately. | [review archive](batch-1-archive.json) |
 | B2 | AGENT_RESOLVED | PASS | Optional invitation supplies no date or scheduling request; no action is supported. Target was read; complete stores are identical, with the distinct July 5 budget meeting unchanged. | [review archive](batch-1-archive.json) |
 | B3 | AGENT_RESOLVED | PASS | The HR update explicitly says nothing is needed. Target was read and no mutation occurred; full stores are identical. | [review archive](batch-1-archive.json) |
@@ -58,7 +67,9 @@ Sampled passes: 9 accepted for their targeted day-level check; 0 pending. Time/d
 | B7 | AGENT_RESOLVED | PASS | The requested July 10 morale meeting is uniquely represented by evt_19, with the expressly requested 45-minute duration. Day-level pass accepted. The unsupported 10:00 start separately violates the 09:00 default. | [review archive](batch-3-archive.json) |
 | B8 | AGENT_RESOLVED | PASS | The Anthropic-signing task is due June 21, satisfying the explicit by-June-21 deadline. todo_26 uniquely captures signing at the default 17:00. The key is narrower than the allowable before-or-on window, but correctly accepts this observed action; signing itself is not established. | [review archive](batch-3-archive.json) |
 | B9 | AGENT_RESOLVED | PASS | The date-only reschedule updates Serena evt_24 from September 11 to September 22 with no duplicate; Michael evt_25 remains unchanged. Targeted move satisfied. Earlier unsupported 10:00-12:00 hours are a historical observation, not a defect introduced by the move. | [review archive](../agent-audit-pilot-sonnet-4-5.json#cases/C08) |
+| B10 | AGENT_RESOLVED | PASS | The kickoff update explicitly says nothing is needed; no target action is supported. Target body was read. Only unrelated all-hands and LeBron events were added, with no kickoff-related mutation or alternate object. | [review archive](batch-4-archive.json) |
+| B11 | AGENT_RESOLVED | PASS | Trademark clearance is informational, with no request for a meeting or task. Observed read produces no target mutation. The day’s two additions belong to distinct emails; existing objects remain unchanged. | [review archive](batch-4-archive.json) |
 
-See [NEEDS_JAMES](NEEDS_JAMES.md) for grouped decisions and [protocol](REVIEWER.md) for the closure rules. Original reviewer reports remain in `reviews/`; batch coordinator records contain source checks and spot-check findings.
+See [saved tool outage evidence](saved-tool-outage.json) for the 16 emails/17 checks without observed reads. See [NEEDS_JAMES](NEEDS_JAMES.md) for grouped decisions and [protocol](REVIEWER.md) for the closure rules. Original reviewer reports remain in `reviews/`; batch coordinator records contain source checks and spot-check findings.
 
 Verification: all batch packet hashes, target coverage, Stage A-before-final ordering, source references, no future-email leakage, and original human text are checked by the private checkpoint validator. Existing Python suite: 107 passed. Webapp typecheck/lint and build are blocked by missing dependencies. No source, corpus, capture, grader, score, or production changes; no new benchmark runs.

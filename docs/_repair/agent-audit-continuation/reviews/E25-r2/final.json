@@ -1,0 +1,51 @@
+{
+  "case_id": "E25",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PLAN",
+      "secondary_categories": ["AMBIGUOUS"],
+      "model_satisfies_supported_request": "AMBIGUOUS",
+      "grader_verdict_justified": "AMBIGUOUS",
+      "confidence": "high",
+      "rationale": "The requested July 17 approval deadline is explicit, but the email first arrives July 19. Delivery therefore makes prospective, on-time approval impossible. The model creates the correct distinct approval task, attaches the correct source email, uses the default 17:00 time, and explicitly retains the missed July 17 deadline in its description. Its July 19 due_date is defensible as immediate overdue triage, while a strict deadline-preservation reading requires July 17 in that field. The instructions do not resolve this late-arrival policy. The grader accurately identifies a field-level day mismatch against a text-supported key, but that does not establish an unambiguous model failure in this stale scenario. There is no definite KEY defect: July 17 is stated, not invented. Creating todo_83 does not establish that Mark approved the PO or preserved the production slot.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:10 (day-tool-trace.json)",
+          "observation": "list_new_emails lists World_Cup_Cleat_Launch.tooling-po-needs-approval with served_date 2026-07-19."
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:24 (day-tool-trace.json)",
+          "observation": "Observed get_email body: \"Please approve the tooling PO by Friday, July 17th, 2026. Any later and we lose the production slot that the reveal date depends on.\""
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_049.jsonl:55-56 (day-tool-trace.json); full-state-after.json todo_83",
+          "observation": "create_todo succeeds as todo_83, title \"Approve tooling PO for factory\", due_date \"2026-07-19T17:00:00\", description \"Large PO needed for factory to start cutting tooling - was due Friday July 17th, critical for production slot\"."
+        },
+        {
+          "source": "stage-b.json targets[T1]",
+          "observation": "Key is create/todo, on {\"eq\":\"this:FRI\"}, tolerance exact_day, resolved to July 17. Verdict is FAIL on the wrong day, with actual July 19."
+        },
+        {
+          "source": "full-state-before.json and full-state-after.json",
+          "observation": "Complete stores contain no existing manufacturing-tooling approval task before this day; todo_83 is the only new to-do. Existing todos, including todo_39 and todo_76, remain unchanged."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No policy says whether overdue mail must retain its original deadline in due_date or may use the receipt day for triage while preserving the original deadline in the description.",
+        "No evidence establishes actual approval, a deadline extension, or whether the production slot remains available."
+      ],
+      "suggested_human_question": "For a request delivered after its explicit deadline, should the benchmark require the original overdue due_date, or accept a same-day triage task that clearly preserves the missed deadline?"
+    }
+  ],
+  "sibling_observations": [],
+  "historical_observations": [
+    {
+      "source": "stage-a.json preceding_storyline_emails; full-state-before.json todo_39 and todo_76",
+      "observation": "todo_39 is the June 26 outsole-vendor PO confirmation for prototype readiness before board greenlight. todo_76 is revised reveal-event budget approval due July 17. Neither is established as the manufacturing tooling PO now requiring Mark's signature, so neither proves duplication or prior satisfaction of T1."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

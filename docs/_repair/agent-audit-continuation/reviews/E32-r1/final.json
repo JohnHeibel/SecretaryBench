@@ -1,0 +1,56 @@
+{
+  "case_id": "E32",
+  "reviewer_id": "r1",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "PASS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "YES",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The trademark clearance email is an FYI with no scheduling or task request. The assistant read its body and made no attributable mutation. Complete store comparison shows only two new events for independently actionable same-day emails; all 22 preexisting events and all 15 todos are unchanged. The no-action key and passing verdict are supported. The already-past board date does not authorize a new date, and sibling time-default defects do not change this target's result.",
+      "evidence": [
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:17,19 (day-tool-trace.json)",
+          "observation": "get_email read Planning.acme-trademark-clear. Its observed body says: 'The trademark search on the new ACME logo came back clean- no conflicts. Just wanted it in your hands before the board meets.'"
+        },
+        {
+          "source": "captures/baseline-sonnet-4-5/raw/day_025.jsonl:41-44 (day-tool-trace.json)",
+          "observation": "The only mutation calls create evt_40 for Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned and evt_41 for Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule. Neither concerns trademark clearance."
+        },
+        {
+          "source": "full-state-before.json; full-state-after.json",
+          "observation": "Events increase from 22 to 24 only by adding evt_40 and evt_41; no existing event or todo changes. evt_11 remains Board sign-off meeting at 2026-06-11T10:00:00 through 2026-06-11T11:30:00. There is no event or todo attributable by content to the trademark FYI."
+        },
+        {
+          "source": "stage-b.json targets[0]",
+          "observation": "Key: '- take no action (FYI / no scheduling needed)'; result: 'PASS — correctly took no action' with actual '(nothing)'."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "category": "MODEL",
+      "source": "stage-a.json assistant_instructions; captures/baseline-sonnet-4-5/raw/day_025.jsonl:18,21,41-44",
+      "observation": "Separate default-time errors: the instructions say 'events 9am, 1 hour long' unless stated otherwise. Neither same-day scheduling email specifies a time or duration. evt_40 is August 7 at 14:00-15:00 and evt_41 is August 24 at 10:00-12:00. Their requested dates are preserved, but the supported defaults would be 09:00-10:00. These are not E32's no-action defect."
+    }
+  ],
+  "historical_observations": [
+    {
+      "category": "MODEL",
+      "source": "stage-a.json preceding_storyline_emails; history-actions.jsonl:23-24 (captures/baseline-sonnet-4-5/raw/day_009.jsonl:40-41); full-state-before.json evt_11",
+      "observation": "The prior board email specifies June 11 and at least three board members, without a time or duration. evt_11 was historically created for 10:00-11:30 rather than the 09:00-10:00 defaults. It is unchanged on the target day, so this is a prior error rather than a failed response to GC."
+    },
+    {
+      "category": "AMBIGUOUS",
+      "source": "stage-a.json target_email and preceding_storyline_emails",
+      "observation": "The June 25 message says 'before the board meets' although the supplied earlier board request is for June 11. This chronology mismatch supplies no replacement date or new actionable requirement and does not undermine the justified FYI pass."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

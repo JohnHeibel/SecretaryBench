@@ -1,0 +1,55 @@
+{
+  "case_id": "E29",
+  "reviewer_id": "r2",
+  "targets": [
+    {
+      "target_id": "T1",
+      "primary_category": "AMBIGUOUS",
+      "secondary_categories": [],
+      "model_satisfies_supported_request": "NO",
+      "grader_verdict_justified": "YES",
+      "confidence": "high",
+      "rationale": "The supported request is a deadline revision of the existing budget-approval task to July 22, 2026 at the default 17:00. The key matches that request. The full before/after stores are identical (48 events, 33 todos), with todo_76 still due July 17 and no alternate budget-approval object satisfying July 22. The wrong-day verdict is justified as an assessment of the final state. However, this is not evidence of a model reasoning failure: the secretary MCP server is explicitly failed, the day has no tool calls, and the target body was not observed in a tool result. AMBIGUOUS denotes unavailable attribution, not uncertainty about the requested date. NO describes the unfulfilled outcome.",
+      "evidence": [
+        {
+          "source": "stage-a.json:9",
+          "observation": "I've moved the approval deadline to this Wednesday, July 22nd, 2026, but that's the last safe day before we lose the venue rate."
+        },
+        {
+          "source": "full-state-before.json:600-604; full-state-after.json:600-604",
+          "observation": "\"id\": \"todo_76\", \"title\": \"Approve revised WC reveal event budget\", \"due_date\": \"2026-07-17T17:00:00\". Complete stores are identical; no replacement or duplicate satisfies the revision."
+        },
+        {
+          "source": "stage-b.json:28-36; captures/baseline-sonnet-4-5/raw/day_051.jsonl:1",
+          "observation": "\"target_body_observed_in_tool_result\": false; secretary MCP server \"status\": \"failed\". Narration: \"I'm unable to continue processing emails - the secretary tools (email management functions) are no longer available as the MCP server has disconnected.\""
+        },
+        {
+          "source": "day-tool-trace.json:1",
+          "observation": "[]"
+        },
+        {
+          "source": "stage-b.json:9-21",
+          "observation": "Key requires move, todo, this:WED (July 22); grader reports \"Approve revised WC reveal event budget\" Fri Jul 17 5 PM."
+        }
+      ],
+      "ambiguity_or_missing_evidence": [
+        "No successful target get_email or usable secretary tools on the capture day. The record cannot establish how the model would reason about this email with functioning infrastructure."
+      ],
+      "suggested_human_question": null
+    }
+  ],
+  "sibling_observations": [
+    {
+      "source": "stage-a.json other_emails_available_in_same_day_batch; full-state-before.json; full-state-after.json; day-tool-trace.json",
+      "observation": "The separate manufacturing-kickoff email requests a July 22 event, absent from both complete stores. The same failed infrastructure prevents attribution of that omission to model reasoning. It does not alter T1."
+    }
+  ],
+  "historical_observations": [
+    {
+      "source": "history-actions.jsonl:175-176; captures/baseline-sonnet-4-5/raw/day_045.jsonl:36-37",
+      "observation": "Original create_todo used email_id World_Cup_Cleat_Launch.reveal-event-budget-is-over and due_date 2026-07-17T17:00:00; successful tool result assigned todo_76. This supports exact object identity and the original deadline, not real-world approval completion."
+    }
+  ],
+  "stage_a_changed_after_reveal": false,
+  "interpretation_change": null
+}

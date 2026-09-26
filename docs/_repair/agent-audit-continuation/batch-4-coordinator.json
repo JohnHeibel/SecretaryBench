@@ -1,0 +1,173 @@
+{
+  "batch": 4,
+  "spot_check_items": [
+    "47",
+    "B10"
+  ],
+  "targets": [
+    {
+      "batch": 4,
+      "worksheet_item": "40",
+      "classification": "PLAN",
+      "status": "AGENT_RESOLVED",
+      "finding": "The explicit July 17 tooling-approval deadline predates July 19 delivery, making on-time prospective fulfillment impossible.",
+      "model_assessment": "todo_83 is due July 19 and preserves the missed July 17 deadline in its description. Reviewers disagree whether this is acceptable recovery or an incorrect deadline replacement; no model pass is awarded.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:24,55-56",
+        "captures/baseline-sonnet-4-5/days/049.json#state"
+      ],
+      "excerpt": "Please approve the tooling PO by Friday, July 17th, 2026.",
+      "decision_group": "Q3",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "41",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "Both reviewers call the missing trip start MODEL, but closure depends on interpreting from the week of August 3 as a unique Monday start and on the required trip representation.",
+      "model_assessment": "Only WHOOP August 4 and Dynamics August 6 visits exist, with no overall trip span. A separate start marker is unsupported; whether the first visit adequately records an allowed start is unresolved. Coordinator withholds automatic closure.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25,57-60",
+        "captures/baseline-sonnet-4-5/days/049.json#state"
+      ],
+      "excerpt": "from the week of August 3rd, 2026 till Sunday, August 9th, 2026",
+      "decision_group": "Q9",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "42",
+      "classification": "MODEL",
+      "status": "AGENT_RESOLVED",
+      "finding": "The explicit August 9 trip endpoint is absent from every calendar object and description; the August 9 floor reset is unrelated.",
+      "model_assessment": "The two visit entries do not represent the trip through August 9. This omission survives correction of the key\u2019s separate-end-marker requirement: one coherent trip interval would also suffice. Exact start-day uncertainty does not erase the explicit endpoint.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25,57-60",
+        "captures/baseline-sonnet-4-5/days/049.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "43",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "Both reviewers infer August 5 as the third day of a Monday-start trip. The coordinator finds from the week of insufficiently precise to close that exact-date judgment.",
+      "model_assessment": "evt_85 is August 6 and evt_84 is August 4, preserving a first/third-day relationship if the trip starts Tuesday. That start is not explicitly selected either. Eight-hour visits independently violate the one-hour default.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25,57-60"
+      ],
+      "excerpt": "WHOOP on the first day, and Boston Dynamics on the third one",
+      "decision_group": "Q9",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "44",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "The email explicitly assigns a July 30 deliverable to Marketing, while its recipient is CEO. The personal-owner versus oversight-task rule is unstated.",
+      "model_assessment": "todo_86 accurately records ensuring Marketing prepares the deck by July 30. Reviewers disagree KEY versus AMBIGUOUS; the no-action key and model credit stay unresolved.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_050.jsonl:20,35-36"
+      ],
+      "excerpt": "can the Marketing team please put together a pitch deck",
+      "decision_group": "Q7",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "45",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "The July 22 manufacturing kickoff is explicit and absent; the key and state-level failure are supported.",
+      "model_assessment": "Day 51 secretary MCP failed, no tools or observed target read occurred, and complete stores are unchanged. Missing outcome is not demonstrated model reasoning failure.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_051.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/050.json#state",
+        "captures/baseline-sonnet-4-5/days/051.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ],
+      "excerpt": "putting the manufacturing kickoff on your calendar for Wednesday, July 22nd, 2026",
+      "decision_group": "Q8",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "46",
+      "classification": "AMBIGUOUS",
+      "status": "NEEDS_JAMES",
+      "finding": "The revised budget approval clearly moves to July 22, but todo_76 remains July 17; state-level failure is supported.",
+      "model_assessment": "No update or substitute exists. Day 51 MCP failure and no observed read prevent attribution to model decision-making.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_051.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/051.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ],
+      "excerpt": "I've moved the approval deadline to this Wednesday, July 22nd, 2026",
+      "decision_group": "Q8",
+      "additional_source_spot_check": null
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "47",
+      "classification": "KEY",
+      "status": "AGENT_RESOLVED",
+      "finding": "Adding a promotion item to the recap does not require a new task exactly on September 25; an earlier reminder or agenda-description update can satisfy the request.",
+      "model_assessment": "No agenda update or equivalent task exists, but day 52 has failed tools and no observed read. The definite key defect does not prove correct model behavior.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/Innovation-comp.json"
+      ],
+      "excerpt": "could we add a short item to the recap about how we promote next year's comp earlier",
+      "decision_group": "Q8",
+      "additional_source_spot_check": "Direct original corpus request/key, recap identity/date, raw failed-server init and identical complete stores inspected. No exact September 25 task deadline or mandatory separate object appears; execution credit remains unavailable."
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "B10",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "The kickoff update explicitly says nothing is needed; no target action is supported.",
+      "model_assessment": "Target body was read. Only unrelated all-hands and LeBron events were added, with no kickoff-related mutation or alternate object.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:23,41-44",
+        "captures/baseline-sonnet-4-5/days/025.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": "Direct raw FYI, sole day mutations/results and original corpus key inspected. No target object or mutation exists; unrelated event timing errors remain separate."
+    },
+    {
+      "batch": 4,
+      "worksheet_item": "B11",
+      "classification": "PASS",
+      "status": "AGENT_RESOLVED",
+      "finding": "Trademark clearance is informational, with no request for a meeting or task.",
+      "model_assessment": "Observed read produces no target mutation. The day\u2019s two additions belong to distinct emails; existing objects remain unchanged.",
+      "coordinator_evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_025.jsonl:19,41-44",
+        "captures/baseline-sonnet-4-5/days/025.json#state"
+      ],
+      "excerpt": "",
+      "decision_group": null,
+      "additional_source_spot_check": null
+    }
+  ],
+  "notes": "All 16 original reports and Stage A interpretations examined. #41/#43 are withheld despite paired MODEL judgments: coordinator uncertainty about week-of precision and start representation remains material. #44 has direct reviewer disagreement; E27-r2 disclosed a post-reveal ownership interpretation change without rewriting Stage A. #40 PLAN is settled while model credit is disputed. Outage evidence is independently archived in saved-tool-outage.json.",
+  "expanded_source_review": {
+    "trigger": "Potential shared overprecision in E26\u2019s Monday-start inference; no automatic closure of affected #41/#43.",
+    "inspected": [
+      "All preceding Boston storyline emails and available inbox",
+      "Original raw day049:25,57-60 and complete before/after stores",
+      "Original raw day050:20,35-36 for team ownership",
+      "Explicit dates/requirements and full-state/trace evidence for all other batch targets",
+      "Original corpus wording/key and raw failed-server evidence for #47; raw FYI and mutations for B10"
+    ],
+    "outcome": "No independent source fixes a unique departure day. August 9 endpoint remains explicit and absent, so #42 can close independently. Other batch closures do not depend on the disputed inference. No extra reviewers were added."
+  }
+}
