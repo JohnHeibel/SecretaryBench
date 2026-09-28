@@ -1,0 +1,846 @@
+{
+  "date": "2026-09-28",
+  "source_head": "a9b0e53",
+  "authority": "James’s Q1-Q10 response in this task on 2026-09-28, including general approval of unanswered recommendations and delegated Q6 judgment",
+  "scope": "Audit adjudication only. No benchmark source, corpus, answer-key, grader, scoring or production change; no new reviewer/model/benchmark runs.",
+  "general_principle": "Grade only supported constraints. Allow multiple supported outcomes, and mark underdetermined dimensions unassessable rather than inventing a unique ground truth. Invalid keys do not automatically prove model correctness.",
+  "groups": {
+    "Q1": {
+      "basis": "Approval of recommendations for questions not otherwise answered",
+      "status": "RECOMMENDATION_ADOPTED",
+      "decision": "Keep #8 AMBIGUOUS and revise #19 from MODEL to AMBIGUOUS. The supplied instructions do not clearly require calendar events for announcements without a hold or attendance requirement.",
+      "limit": "An explicit date remains a fact to remember. Ambiguity about making an event is not a universal rule that all announcements are FYIs.",
+      "items": [
+        "8",
+        "19"
+      ]
+    },
+    "Q2": {
+      "basis": "Approval of recommendations for questions not otherwise answered",
+      "status": "LABEL_REVISION_APPROVED",
+      "decision": "Revise #14 from KEY to MODEL. The email explicitly delegates picking one of three August 3/4/5, 15:00-16:00 slots. A reminder to choose does not fulfill that event-booking instruction.",
+      "limit": "Multiple valid slots were already accepted by the key; this is a clear action omission, not punishment for selecting a different valid date.",
+      "items": [
+        "14"
+      ]
+    },
+    "Q3": {
+      "basis": "User asks whether every listed request arrived too late; general Q9 fairness principle applied",
+      "status": "CLARIFIED_AND_POLICY_RECORDED",
+      "decision": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure.",
+      "limit": "The shared late-delivery symptom does not prove the scheduler is the sole root cause; authored date tokens and storyline dependencies may contribute. No mandatory backfill rule or acceptance of arbitrary replacement dates is introduced.",
+      "items": [
+        "24",
+        "29",
+        "31",
+        "32",
+        "40",
+        "52",
+        "55",
+        "56",
+        "58",
+        "60",
+        "20"
+      ]
+    },
+    "Q4": {
+      "basis": "User rejects overly precise grading where timing is underspecified and asks for multiple acceptable outcomes",
+      "status": "FAIRNESS_POLICY_ADOPTED",
+      "decision": "Do not penalize a timing field merely for differing from an unsupported exact answer. #16 keeps KEY: the next-day reminder captures the approval request and before-announcement dependency; the available text does not distinguish June 24 from June 25 as the uniquely correct date. For S3, night does not uniquely require 20:00.",
+      "limit": "Accept supported ranges, relations and alternatives when they can be established. Otherwise mark that dimension underdetermined, not automatically passed. This does not prove the announcement prerequisite was met, and the explicit one-hour duration default still applies to S3’s 90-minute event. Little lead time alone is not a defect if a feasible deadline is clear.",
+      "items": [
+        "16",
+        "S3 (uncounted E33 historical time)"
+      ]
+    },
+    "Q5": {
+      "basis": "User attributes unreconciled narrative contradictions to the corpus and calls for corpus review",
+      "status": "CORPUS_CONCERNS_RECORDED",
+      "decision": "Keep #26/#27/#28 KEY and withhold strict model penalties on disputed timing. The athlete context says August 22 but later refers to next week; the one-pager subject/body imply different timing; rehearsal text conflicts with the established reveal. Record these for corpus/context review. S1 is an unstated dependency, not a proven direct date contradiction.",
+      "limit": "An explicit later reschedule can validly supersede an earlier date. No contradictory or missing fact may be resolved by inventing author intent. These findings do not show that every observed error was caused by the corpus, nor establish what confused the model. No corpus changes are made.",
+      "items": [
+        "26",
+        "27",
+        "28",
+        "S1 (uncounted E20 sibling)",
+        "S2 (uncounted E22 sibling)"
+      ]
+    },
+    "Q6": {
+      "basis": "User delegates judgment and accepts the recommendation",
+      "status": "DELEGATED_JUDGMENT_RECORDED",
+      "decision": "Retain #33 as AMBIGUOUS. Repairing the missing, previously requested August 25 appointment is defensible, while the supplied confirmation/no-action guidance also supports leaving it unchanged. Do not count the repair alone as a demonstrated model failure.",
+      "limit": "The invented 14:00 start independently violates the 09:00 default. Day-level action ambiguity does not excuse that separate timing issue or imply a full model pass.",
+      "items": [
+        "33"
+      ]
+    },
+    "Q7": {
+      "basis": "User explicitly selects AMBIGUOUS",
+      "status": "AMBIGUITY_CONFIRMED",
+      "decision": "Retain #38 and #44 as AMBIGUOUS. Neither a mandatory brainstorm task nor a universal CEO oversight-task rule was supplied.",
+      "limit": "The exact stated deadline may be factual even when personal ownership or whether a task is required is unresolved.",
+      "items": [
+        "38",
+        "44"
+      ]
+    },
+    "Q8": {
+      "basis": "User asks whether expected tools failed and agrees that model conclusions cannot yet be drawn",
+      "status": "INFRASTRUCTURE_LIMIT_RECORDED",
+      "decision": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "limit": "State mismatches, incorrect keys, stale delivery and false grader diagnostics remain independently knowable. B15 is not evidence of successful reading. Failure cause, recoverability and performance with working tools are not established. No scores, denominators or runs are changed.",
+      "items": [
+        "45",
+        "46",
+        "47",
+        "48",
+        "49",
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56",
+        "57",
+        "58",
+        "59",
+        "60",
+        "B15"
+      ]
+    },
+    "Q9": {
+      "basis": "User explicitly adopts a universal rule against strict penalties without sufficient context and favors hybrid grading",
+      "status": "FAIRNESS_POLICY_ADOPTED",
+      "decision": "Retain #41/#43 as AMBIGUOUS. Week of August 3 does not uniquely require Monday departure; no separate trip-start marker is mandated. Do not impose those unsupported exact requirements. #53’s second-day versus start-plus-two defect remains definite.",
+      "limit": "#42 remains MODEL because the explicit August 9 endpoint is absent under every representation inspected. Hybrid grading may assess supported alternatives, but it cannot supply a missing departure date or repair the corpus by guesswork.",
+      "items": [
+        "41",
+        "43",
+        "53"
+      ]
+    },
+    "Q10": {
+      "basis": "User explicitly accepts the recommendation",
+      "status": "RECOMMENDATION_ADOPTED",
+      "decision": "Retain #55/#56 as AMBIGUOUS because the proposal awaits approval and its dates are already past on delivery. Do not penalize the unresolved approval interpretation as if only one behavior were authorized.",
+      "limit": "The stale-date facts and #55’s false duplicate diagnostic remain established. The tool outage independently prevents attribution. No fulfilled move or model pass is inferred.",
+      "items": [
+        "55",
+        "56"
+      ]
+    }
+  },
+  "targets": [
+    {
+      "worksheet_item": "8",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q1"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Keep #8 AMBIGUOUS and revise #19 from MODEL to AMBIGUOUS. The supplied instructions do not clearly require calendar events for announcements without a hold or attendance requirement.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_012.jsonl:19,33-34",
+        "captures/baseline-sonnet-4-5/days/011.json#state",
+        "captures/baseline-sonnet-4-5/days/012.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "14",
+      "prior_classification": "KEY",
+      "classification": "MODEL",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q2"
+      ],
+      "model_attribution": [
+        "SUPPORTED_MODEL_FAILURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Revise #14 from KEY to MODEL. The email explicitly delegates picking one of three August 3/4/5, 15:00-16:00 slots. A reminder to choose does not fulfill that event-booking instruction.",
+      "evidence": [
+        "../agent-audit-pilot-sonnet-4-5.json"
+      ]
+    },
+    {
+      "worksheet_item": "16",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q4"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Do not penalize a timing field merely for differing from an unsupported exact answer. #16 keeps KEY: the next-day reminder captures the approval request and before-announcement dependency; the available text does not distinguish June 24 from June 25 as the uniquely correct date. For S3, night does not uniquely require 20:00.",
+      "evidence": [
+        "../agent-audit-pilot-sonnet-4-5.json"
+      ]
+    },
+    {
+      "worksheet_item": "19",
+      "prior_classification": "MODEL",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q1"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Keep #8 AMBIGUOUS and revise #19 from MODEL to AMBIGUOUS. The supplied instructions do not clearly require calendar events for announcements without a hold or attendance requirement.",
+      "evidence": [
+        "../agent-audit-pilot-sonnet-4-5.json"
+      ]
+    },
+    {
+      "worksheet_item": "20",
+      "prior_classification": "PLAN",
+      "classification": "PLAN",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3"
+      ],
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure.",
+      "evidence": [
+        "../agent-audit-pilot-sonnet-4-5.json"
+      ]
+    },
+    {
+      "worksheet_item": "24",
+      "prior_classification": "PLAN",
+      "classification": "PLAN",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3"
+      ],
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_029.jsonl:19,38-39",
+        "captures/baseline-sonnet-4-5/days/029.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "26",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q5"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Keep #26/#27/#28 KEY and withhold strict model penalties on disputed timing. The athlete context says August 22 but later refers to next week; the one-pager subject/body imply different timing; rehearsal text conflicts with the established reveal. Record these for corpus/context review. S1 is an unstated dependency, not a proven direct date contradiction.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18,43-44",
+        "captures/baseline-sonnet-4-5/raw/day_028.jsonl:17"
+      ]
+    },
+    {
+      "worksheet_item": "27",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q5"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Keep #26/#27/#28 KEY and withhold strict model penalties on disputed timing. The athlete context says August 22 but later refers to next week; the one-pager subject/body imply different timing; rehearsal text conflicts with the established reveal. Record these for corpus/context review. S1 is an unstated dependency, not a proven direct date contradiction.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_033.jsonl:18,43-44"
+      ]
+    },
+    {
+      "worksheet_item": "28",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q5"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Keep #26/#27/#28 KEY and withhold strict model penalties on disputed timing. The athlete context says August 22 but later refers to next week; the one-pager subject/body imply different timing; rehearsal text conflicts with the established reveal. Record these for corpus/context review. S1 is an unstated dependency, not a proven direct date contradiction.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_033.jsonl:19,45-46",
+        "captures/baseline-sonnet-4-5/days/033.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "29",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3"
+      ],
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_035.jsonl:24,49-56",
+        "captures/baseline-sonnet-4-5/days/035.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "31",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3"
+      ],
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17,45-50",
+        "corpus/nodes/Company-Retreat.json"
+      ]
+    },
+    {
+      "worksheet_item": "32",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3"
+      ],
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_038.jsonl:17,45-50",
+        "captures/baseline-sonnet-4-5/days/038.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "33",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q6"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Retain #33 as AMBIGUOUS. Repairing the missing, previously requested August 25 appointment is defensible, while the supplied confirmation/no-action guidance also supports leaving it unchanged. Do not count the repair alone as a demonstrated model failure.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_038.jsonl:21,49-50",
+        "captures/baseline-sonnet-4-5/raw/day_035.jsonl:49-50",
+        "captures/baseline-sonnet-4-5/days/037.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "38",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q7"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Retain #38 and #44 as AMBIGUOUS. Neither a mandatory brainstorm task nor a universal CEO oversight-task rule was supplied.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_043.jsonl:21,38-45",
+        "captures/baseline-sonnet-4-5/days/043.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "40",
+      "prior_classification": "PLAN",
+      "classification": "PLAN",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3"
+      ],
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:24,55-56",
+        "captures/baseline-sonnet-4-5/days/049.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "41",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q9"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Retain #41/#43 as AMBIGUOUS. Week of August 3 does not uniquely require Monday departure; no separate trip-start marker is mandated. Do not impose those unsupported exact requirements. #53’s second-day versus start-plus-two defect remains definite.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25,57-60",
+        "captures/baseline-sonnet-4-5/days/049.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "43",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q9"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Retain #41/#43 as AMBIGUOUS. Week of August 3 does not uniquely require Monday departure; no separate trip-start marker is mandated. Do not impose those unsupported exact requirements. #53’s second-day versus start-plus-two defect remains definite.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:25,57-60"
+      ]
+    },
+    {
+      "worksheet_item": "44",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q7"
+      ],
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Retain #38 and #44 as AMBIGUOUS. Neither a mandatory brainstorm task nor a universal CEO oversight-task rule was supplied.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_050.jsonl:20,35-36"
+      ]
+    },
+    {
+      "worksheet_item": "45",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_051.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/050.json#state",
+        "captures/baseline-sonnet-4-5/days/051.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ]
+    },
+    {
+      "worksheet_item": "46",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_051.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/051.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ]
+    },
+    {
+      "worksheet_item": "47",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/Innovation-comp.json"
+      ]
+    },
+    {
+      "worksheet_item": "48",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/raw/day_010.jsonl:47-48",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/Day-of-execution_and_Aftermath.json"
+      ]
+    },
+    {
+      "worksheet_item": "49",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ]
+    },
+    {
+      "worksheet_item": "50",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "corpus/nodes/Partnership-with-deeptech-companies.json"
+      ]
+    },
+    {
+      "worksheet_item": "51",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/raw/day_049.jsonl:53-54",
+        "captures/baseline-sonnet-4-5/days/053.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "52",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3",
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE",
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure. Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/053.json#state",
+        "corpus/nodes/Sponsoring-Marathon.json"
+      ]
+    },
+    {
+      "worksheet_item": "53",
+      "prior_classification": "KEY",
+      "classification": "KEY",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8",
+        "Q9"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE",
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17. Retain #41/#43 as AMBIGUOUS. Week of August 3 does not uniquely require Monday departure; no separate trip-start marker is mandated. Do not impose those unsupported exact requirements. #53’s second-day versus start-plus-two defect remains definite.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/053.json#state",
+        "corpus/nodes/Partnership-with-deeptech-companies.json"
+      ]
+    },
+    {
+      "worksheet_item": "54",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "corpus/nodes/Sponsoring-Marathon.json:5,71-72",
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/053.json#state"
+      ]
+    },
+    {
+      "worksheet_item": "55",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3",
+        "Q8",
+        "Q10"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE",
+        "UNSPECIFIED_STALE_REQUEST_HANDLING",
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure. Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17. Retain #55/#56 as AMBIGUOUS because the proposal awaits approval and its dates are already past on delivery. Do not penalize the unresolved approval interpretation as if only one behavior were authorized.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/052.json#state",
+        "captures/baseline-sonnet-4-5/days/053.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json",
+        "sb/grader.py:129,357-377"
+      ]
+    },
+    {
+      "worksheet_item": "56",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3",
+        "Q8",
+        "Q10"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE",
+        "UNSPECIFIED_STALE_REQUEST_HANDLING",
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure. Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17. Retain #55/#56 as AMBIGUOUS because the proposal awaits approval and its dates are already past on delivery. Do not penalize the unresolved approval interpretation as if only one behavior were authorized.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/053.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ]
+    },
+    {
+      "worksheet_item": "57",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_055.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/055.json#state",
+        "corpus/nodes/Partnership-with-deeptech-companies.json"
+      ]
+    },
+    {
+      "worksheet_item": "58",
+      "prior_classification": "PLAN",
+      "classification": "PLAN",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3",
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE",
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure. Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_056.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/056.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ]
+    },
+    {
+      "worksheet_item": "59",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "AMBIGUOUS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_056.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/056.json#state",
+        "corpus/nodes/Sponsoring-Marathon.json"
+      ]
+    },
+    {
+      "worksheet_item": "60",
+      "prior_classification": "PLAN",
+      "classification": "PLAN",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q3",
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE",
+        "UNSPECIFIED_STALE_REQUEST_HANDLING"
+      ],
+      "score_changed": false,
+      "decision_summary": "Yes: all 11 listed checks involve delivery after the requested event date or deadline. Retain that PLAN/delivery defect alongside independent KEY/GRADER facts. Without a supplied backfill or recovery policy, the missing historical action alone does not establish a model reasoning failure. Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_057.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/057.json#state",
+        "corpus/nodes/World_Cup_Cleat_Launch.json"
+      ]
+    },
+    {
+      "worksheet_item": "B15",
+      "prior_classification": "PASS",
+      "classification": "PASS",
+      "status": "HUMAN_DECISION_RECORDED",
+      "decision_groups": [
+        "Q8"
+      ],
+      "model_attribution": [
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false,
+      "decision_summary": "Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.",
+      "evidence": [
+        "captures/baseline-sonnet-4-5/raw/day_055.jsonl:1",
+        "captures/baseline-sonnet-4-5/days/055.json#state",
+        "corpus/nodes/Innovation-comp.json"
+      ]
+    }
+  ],
+  "supplemental_items": [
+    {
+      "worksheet_item": "S1 (uncounted E20 sibling)",
+      "decision_group": "Q5",
+      "counted": false,
+      "decision": "Keep #26/#27/#28 KEY and withhold strict model penalties on disputed timing. The athlete context says August 22 but later refers to next week; the one-pager subject/body imply different timing; rehearsal text conflicts with the established reveal. Record these for corpus/context review. S1 is an unstated dependency, not a proven direct date contradiction."
+    },
+    {
+      "worksheet_item": "S2 (uncounted E22 sibling)",
+      "decision_group": "Q5",
+      "counted": false,
+      "decision": "Keep #26/#27/#28 KEY and withhold strict model penalties on disputed timing. The athlete context says August 22 but later refers to next week; the one-pager subject/body imply different timing; rehearsal text conflicts with the established reveal. Record these for corpus/context review. S1 is an unstated dependency, not a proven direct date contradiction."
+    },
+    {
+      "worksheet_item": "S3 (uncounted E33 historical time)",
+      "decision_group": "Q4",
+      "counted": false,
+      "decision": "Do not penalize a timing field merely for differing from an unsupported exact answer. #16 keeps KEY: the next-day reminder captures the approval request and before-announcement dependency; the available text does not distinguish June 24 from June 25 as the uniquely correct date. For S3, night does not uniquely require 20:00."
+    }
+  ],
+  "current_classification_counts": {
+    "KEY": 24,
+    "PLAN": 8,
+    "MODEL": 7,
+    "GRADER": 4,
+    "AMBIGUOUS": 17,
+    "PASS": 15
+  },
+  "coverage": {
+    "worksheet_checks": 75,
+    "affected_queued_checks": 35,
+    "recorded_decision_groups": 10,
+    "uncounted_observations": 3
+  },
+  "label_revisions": [
+    {
+      "item": "14",
+      "before": "KEY",
+      "after": "MODEL"
+    },
+    {
+      "item": "19",
+      "before": "MODEL",
+      "after": "AMBIGUOUS"
+    }
+  ],
+  "future_design_preference": "Validate run/inbox/corpus first; use deterministic checks for established constraints, model-assisted semantic review for defensible alternatives, and an unassessable/human-review path when evidence is insufficient. No grader design or implementation is authorized by this record."
+}

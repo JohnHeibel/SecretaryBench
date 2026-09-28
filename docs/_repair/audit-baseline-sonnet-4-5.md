@@ -297,6 +297,8 @@ _(nothing)_
 
 <!-- agent-continuation:start -->
 **Agent review for 8, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. August 7 is explicit, but a mandatory calendar milestone is unstated. Both reviewers find the FYI and calendar interpretations defensible. No release event exists in the complete stores; only the separate keynote was added. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q1](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #8/#19 AMBIGUOUS; no mandatory milestone rule supplied. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -524,6 +526,8 @@ _(nothing)_
 
 <!-- agent-continuation:start -->
 **Agent review for 14, 2026-09-26:** NEEDS_JAMES · KEY (saved); MODEL proposed. Saved human KEY label preserved. Pilot reviewers read explicit delegation to choose an offered slot. Only a reminder to pick a date was created; no slot booked. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q2](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **MODEL**. #14 MODEL; pick one explicitly delegated choosing and booking. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -606,6 +610,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 16, 2026-09-26:** HUMAN_REVIEWED; model credit pending · KEY (saved). Saved KEY label preserved: no support for the exact June 25 deadline. The June 24 reminder is discretionary; key invalidity does not establish full model compliance. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q4](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. Allow supported timing alternatives; do not require an unstated exact date/hour. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -727,6 +733,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 19, 2026-09-26:** NEEDS_JAMES · MODEL (saved); KEY/AMBIGUOUS proposed. Saved human MODEL label preserved. Pilot reviewers dispute a mandatory launch-calendar milestone. Sign-off reminder created; no launch event. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q1](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #8/#19 AMBIGUOUS; no mandatory milestone rule supplied. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -760,6 +768,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 20, 2026-09-26:** HUMAN_REVIEWED; model credit pending · PLAN (saved). Saved PLAN label preserved: June 15 vision-sync request delivered June 27. No event created; whether to backfill stale requests is unspecified. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **PLAN**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -975,6 +985,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 24, 2026-09-26:** AGENT_RESOLVED · PLAN. The June 29 delivery misses the explicitly pre-June-19 deadline; the exact June 19 key is also too restrictive. todo_49 substitutes unsupported July 3. Late-request handling and conflicting earlier Gold approval remain unresolved; no model pass is awarded. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **PLAN**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1069,6 +1081,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 26, 2026-09-26:** AGENT_RESOLVED · KEY. The key anchors preparation to July 22 despite the earlier explicit August 22 visit and conflicting next-week wording. todo_53 records the guest list due August 15. That fits August 22 but not next week; model credit remains unresolved. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q5](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. Record corpus/context conflicts; do not infer a unique date or assume every revision is contradictory. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1125,6 +1139,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 27, 2026-09-26:** AGENT_RESOLVED · KEY. Contacting invitees is a task before the visit, not an event exactly July 22. Both the keyed kind and date are unsupported. The combined todo_53 explicitly includes contacting invitees. Content is represented, but the conflicting visit date prevents a model pass; no actual outreach is established. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q5](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. Record corpus/context conflicts; do not infer a unique date or assume every revision is contradictory. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1178,6 +1194,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 28, 2026-09-26:** AGENT_RESOLVED · KEY. The exact July 15 deadline is unsupported by either the body’s pre-board window or a literal before-final reading of the subject. todo_54 is due July 21 before the July 22 board presentation, but after the July 15 final. Reviewers disagree on model credit; queued without overturning the definite key defect. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q5](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. Record corpus/context conflicts; do not infer a unique date or assume every revision is contradictory. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1223,6 +1241,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 29, 2026-09-26:** AGENT_RESOLVED · KEY. The requested pizza-party event move is to June 9; the key instead requires a July 14 task and selects unrelated todo_47. Delivery on July 5 is also stale. evt_7 remains June 8, with no replacement. Literal historical correction was not performed; unspecified stale-request handling prevents model-credit attribution. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1337,6 +1357,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 31, 2026-09-26:** AGENT_RESOLVED · KEY. The planning call explicitly names June 21, not the keyed July 21; July 8 delivery also makes it stale. No planning-call event exists or was created. Model credit depends on the unspecified treatment of historical requests, not on the invalid July key. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1401,6 +1423,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 32, 2026-09-26:** AGENT_RESOLVED · KEY. Forms are due before the June 21 call, not exactly July 21. The key has the wrong month and wrongly narrows a deadline window. No forms task exists or was created. A default 17:00 due time on the 09:00 call day would itself be late; delivery and missing backfill policy leave model credit unresolved. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1452,6 +1476,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 33, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The sponsor confirmation adds no new date, but its previously requested August 25 intro is absent from the before-store. evt_68 creates that missing call, distinct from the cancelled August 12 retail-sponsor call. Repair versus confirmation-only no-op is unsettled. Its 14:00 start independently violates the 09:00 default. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q6](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #33 AMBIGUOUS under delegated judgment; repair is defensible, 14:00 remains a separate default violation. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1739,6 +1765,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 38, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Sharing other company ideas is conditional on having them in mind; a mandatory brainstorm task is not clearly established. No company-suggestions task or equivalent exists. evt_74 covers only the strategy meeting; uncertainty about obligation, not a hidden match or outage, prevents attribution. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q7](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #38/#44 AMBIGUOUS, as James selected. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1864,6 +1892,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 40, 2026-09-26:** AGENT_RESOLVED · PLAN. The explicit July 17 tooling-approval deadline predates July 19 delivery, making on-time prospective fulfillment impossible. todo_83 is due July 19 and preserves the missed July 17 deadline in its description. Reviewers disagree whether this is acceptable recovery or an incorrect deadline replacement; no model pass is awarded. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **PLAN**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -1914,6 +1944,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 41, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Both reviewers call the missing trip start MODEL, but closure depends on interpreting from the week of August 3 as a unique Monday start and on the required trip representation. Only WHOOP August 4 and Dynamics August 6 visits exist, with no overall trip span. A separate start marker is unsupported; whether the first visit adequately records an allowed start is unresolved. Coordinator withholds automatic closure. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q9](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #41/#43 AMBIGUOUS; retain #42’s explicit missing endpoint and #53’s independent ordinal defect. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2014,6 +2046,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 43, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Both reviewers infer August 5 as the third day of a Monday-start trip. The coordinator finds from the week of insufficiently precise to close that exact-date judgment. evt_85 is August 6 and evt_84 is August 4, preserving a first/third-day relationship if the trip starts Tuesday. That start is not explicitly selected either. Eight-hour visits independently violate the one-hour default. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q9](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #41/#43 AMBIGUOUS; retain #42’s explicit missing endpoint and #53’s independent ordinal defect. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2050,6 +2084,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 44, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The email explicitly assigns a July 30 deliverable to Marketing, while its recipient is CEO. The personal-owner versus oversight-task rule is unstated. todo_86 accurately records ensuring Marketing prepares the deck by July 30. Reviewers disagree KEY versus AMBIGUOUS; the no-action key and model credit stay unresolved. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q7](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #38/#44 AMBIGUOUS, as James selected. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2121,6 +2157,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 45, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The July 22 manufacturing kickoff is explicit and absent; the key and state-level failure are supported. Day 51 secretary MCP failed, no tools or observed target read occurred, and complete stores are unchanged. Missing outcome is not demonstrated model reasoning failure. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2183,6 +2221,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 46, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The revised budget approval clearly moves to July 22, but todo_76 remains July 17; state-level failure is supported. No update or substitute exists. Day 51 MCP failure and no observed read prevent attribution to model decision-making. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2240,6 +2280,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 47, 2026-09-26:** AGENT_RESOLVED · KEY. Adding a promotion item to the recap does not require a new task exactly on September 25; an earlier reminder or agenda-description update can satisfy the request. No agenda update or equivalent task exists, but day 52 has failed tools and no observed read. The definite key defect does not prove correct model behavior. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2280,6 +2322,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 48, 2026-09-26:** AGENT_RESOLVED · KEY. The green-room block belongs immediately before the August 10 livestream, not on the keyed September 10. No green-room event exists. Day 52 failed tools and no observed read preclude model-reasoning attribution. The exact hour depends on inherited livestream timing, separate from the clear month defect. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2342,6 +2386,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 49, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. A July 24 Design Lead credit discussion is explicitly requested and absent; the state-level failure is supported. No equivalent event exists, including under the shared Manufacturing kickoff subject. Failed tools and no observed read prevent attribution to model reasoning. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2391,6 +2437,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 50, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The new Actnano visit is absent. Departure from Boston most naturally refers to the explicit August 9 trip end, independently of the start-window dispute. No Actnano event exists on any date. Day 52 failed tools and no observed read prevent model-quality attribution; the missing-event outcome is factual. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2462,6 +2510,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 51, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The Design Lead explicitly withdraws only her stage slot; identifiable evt_82 survives, so the cancellation remains unmet. Main reveal evt_60 and rehearsal evt_81 are distinct. Day 53 tools failed with no observed read or action, preventing attribution of the retained slot to a model decision. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2504,6 +2554,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 52, 2026-09-26:** AGENT_RESOLVED · KEY. The pitch briefing explicitly says July 2; the key substitutes August 2. July 23 delivery also makes the literal request stale. No briefing exists. Wrong key, late delivery and failed tools are independent issues; neither absence nor key invalidity establishes model correctness. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md), [decision Q3](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2565,6 +2617,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 53, 2026-09-26:** AGENT_RESOLVED · KEY. Second day requires start plus one day; the key instead uses start plus two. August 4 follows only if the trip starts August 3, whose precision is separately disputed. No SpadXTech event exists. The definite ordinal error does not grant model credit; day 53 failed tools and no observed read prevent capability attribution. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md), [decision Q9](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **KEY**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. #41/#43 AMBIGUOUS; retain #42’s explicit missing endpoint and #53’s independent ordinal defect. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2618,6 +2672,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 54, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The CEO is explicitly assigned sending the CFO a meeting link by July 24. No equivalent task exists. The source corpus declares CEO as you and addresses this message to CEO, resolving the reviewers’ subsidiary role uncertainty omitted from reconstructed Stage A metadata. The supported task remains absent, but day 53 failed tools and no observed read prevent reasoning attribution. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2699,6 +2755,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 55, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Reviewers disagree PLAN versus KEY: the proposed July 20 reveal move arrives July 23 and awaits approval. The grader also falsely describes an accomplished move and duplicate reveals. evt_60 remains August 13. evt_64 is a distinct press briefing and evt_82 a distinct stage slot; broad name matching produces the false duplicate explanation. This independently verified diagnostic defect does not establish a model pass. No read or mutation occurred during the tool outage. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q10](agent-audit-continuation/NEEDS_JAMES.md), [decision Q3](agent-audit-continuation/NEEDS_JAMES.md), [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. #55/#56 AMBIGUOUS; retain stale-date, diagnostic and infrastructure facts. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2780,6 +2838,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 56, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Reviewers disagree PLAN versus KEY: July 19 is the stated rehearsal proposal but is past at July 23 delivery and linked to an unapproved reveal move. evt_81 remains August 12, so the literal date predicate is unmet. Supported action and model credit remain unresolved; failed tools prevent attributing unchanged state to a decision. The distinct #55 duplicate explanation does not decide this target. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q10](agent-audit-continuation/NEEDS_JAMES.md), [decision Q3](agent-audit-continuation/NEEDS_JAMES.md), [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. #55/#56 AMBIGUOUS; retain stale-date, diagnostic and infrastructure facts. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2840,6 +2900,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 57, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. Boston Dynamics explicitly cancels its visit; identifiable evt_85 survives. The state-level failure is supported. No replacement date or personal rescheduling task is supplied. Day 55 failed tools prevent model-reasoning attribution. The historical visit-date dispute remains Q9 and is not needed to identify the cancellation. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2902,6 +2964,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 58, 2026-09-26:** AGENT_RESOLVED · PLAN. The explicit July 23 board-credit sync arrives July 26, already past. The key matches the literal date but prospective fulfillment is stale. No matching credit sync exists; earlier board calls are distinct. Neither an unsupported historical-insertion policy nor the disconnected day establishes model reasoning failure. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md), [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **PLAN**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -2954,6 +3018,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 59, 2026-09-26:** NEEDS_JAMES · AMBIGUOUS. The August 9 race-director pitch explicitly includes CEO and is absent. It is distinct from the August 10 Event Pop Up. The current key’s date and calendar requirement are supported, and the final store does not satisfy them. Day 56 failed tools and no observed read prevent model-reasoning attribution. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -3025,6 +3091,8 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 <!-- agent-continuation:start -->
 **Agent review for 60, 2026-09-26:** AGENT_RESOLVED · PLAN. The July 13 press-briefing move arrives July 27, after both the requested briefing and referenced July 20 reveal. The literal key date is supported but stale. evt_64 remains August 6; no revised briefing exists. Prospective chronology and the failed-tool day prevent model-quality attribution. The earlier August context does not authorize silently substituting August 13. See [review results](agent-audit-continuation/RESULTS.md) and [decision Q3](agent-audit-continuation/NEEDS_JAMES.md), [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **PLAN**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---
@@ -3627,6 +3695,8 @@ A grader that never fails a correct answer can still pass wrong ones. Same block
 
 <!-- agent-continuation:start -->
 **Agent review for B15, 2026-09-26:** AGENT_RESOLVED · PASS. The recap-agenda finalization is a confirmation with no new required calendar or task change; unchanged state satisfies the targeted no-action check. Day 55 tools failed and the email was not observably read. This is a state-only PASS, not demonstrated comprehension or recovery of the earlier missing promo-agenda update (#47). See [review results](agent-audit-continuation/RESULTS.md) and [decision Q8](agent-audit-continuation/NEEDS_JAMES.md).
+
+**Human disposition, 2026-09-28:** Current classification **PASS**. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
 ---

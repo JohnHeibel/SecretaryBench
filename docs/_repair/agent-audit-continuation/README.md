@@ -1,5 +1,9 @@
 # Continuation of the saved Sonnet 4.5 audit
 
+<!-- human-adjudication:start -->
+**Current: September 28 human adjudication.** James’s responses cover all ten decision groups. #14 is now MODEL and #19 AMBIGUOUS; their original worksheet labels remain as history. Other underspecified cases retain AMBIGUOUS or qualified model attribution. [Current results](RESULTS.md), [recorded dispositions](NEEDS_JAMES.md) and [decision record](human-decisions-2026-09-28.json) supersede the historical pending language below. All original reviewer and batch records are unchanged. The following methodology and counts describe the September 26 audit checkpoint.
+<!-- human-adjudication:end -->
+
 Authorized by James on 2026-09-26. Starting branch `codex/phase-1d-audit-pilot`, commit `9a506fb`; clean tracked checkout. Six approved batches cover 54 checks across 48 emails, with two fresh reviewers per email and at most three concurrent. This is a one-time assisted manual audit, not a future benchmark grader.
 
 The existing 19 human judgments and their notes are preserved. Pilot #21 and B9 are reused without new reviewer calls. #14 and #19 remain human decisions; settled defects in #16 and #20 do not imply model credit.

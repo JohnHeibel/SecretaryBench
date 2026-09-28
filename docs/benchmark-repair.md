@@ -2,11 +2,13 @@
 
 <!-- agent-continuation:register:start -->
 
-## Current phase 1d continuation checkpoint, 2026-09-26
+## Current phase 1d adjudication checkpoint, 2026-09-28
 
-6/6 batches; 54/54 fresh checks; 48/48 emails; 96/96 initial reviewer assignments. New classifications resolved: 40 (including two reused pilot checks); unresolved new classifications: 16. 35 checks have queued interpretation, model-credit or saved-label decisions. 75/75 worksheet checks accounted for, including 19 preserved human judgments.
+All six audit batches remain complete: 54 fresh checks, 48 emails, 96 reviewer assignments; all 75 worksheet checks covered including two reused pilot findings and 19 original human judgments. James’s responses are recorded for ten decision groups covering 35 checks and three uncounted observations. Approved amendments: #14 KEY to MODEL; #19 MODEL to AMBIGUOUS. Current audit classifications: MODEL 7, KEY 24, PLAN 8, GRADER 4, AMBIGUOUS 17, PASS 15. Ambiguity is retained intentionally; no unsupported exact constraint is imposed and no automatic model pass is awarded.
 
-James approved the full six-batch plan and its reviewer usage. This supersedes historical awaiting-approval language below. [Findings](_repair/agent-audit-continuation/RESULTS.md), [decision queue](_repair/agent-audit-continuation/NEEDS_JAMES.md), paired reports and batch archives provide provenance. No repair status is promoted, no benchmark score is changed, and no future grader is implemented. Original human labels remain intact; #14/#19 remain pending human decisions. Python tests: 107 passed. Webapp checks blocked by absent dependencies; audit integrity checks pass at each committed batch.
+Seventeen checks across sixteen emails are infrastructure-limited for model-capability attribution. Their factual state results and independent key/delivery/diagnostic defects remain recorded. Q3 shares late delivery; Q5 identifies corpus/context conflicts or unstated dependencies. These inform future corpus review. James favors deterministic checks plus model-assisted semantic grading with an insufficient-evidence outcome; this records a direction, not a grader implementation or contract change.
+
+[Current findings](_repair/agent-audit-continuation/RESULTS.md), [recorded decisions](_repair/agent-audit-continuation/NEEDS_JAMES.md), [structured adjudication](_repair/agent-audit-continuation/human-decisions-2026-09-28.json). Original worksheet text and all reviewer/batch records are preserved. No repair status promoted; no source, corpus, answer-key, score or production changes; no benchmark/model runs. See adjudication validation for checks.
 
 <!-- agent-continuation:register:end -->
 

@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-28",
+  "base_commit": "a9b0e53",
+  "decision_record_sha256": "c84927f4692a20ffbc16ea4e7ef1a782d7190bfa2ff4ed744d070be90aa6ecf9",
+  "decision_groups": 10,
+  "affected_checks": 35,
+  "supplemental_observations": 3,
+  "worksheet_coverage": 75,
+  "current_classification_counts": {
+    "KEY": 24,
+    "PLAN": 8,
+    "MODEL": 7,
+    "GRADER": 4,
+    "AMBIGUOUS": 17,
+    "PASS": 15
+  },
+  "approved_label_revisions": [
+    {
+      "item": "14",
+      "before": "KEY",
+      "after": "MODEL"
+    },
+    {
+      "item": "19",
+      "before": "MODEL",
+      "after": "AMBIGUOUS"
+    }
+  ],
+  "all_19_original_human_labels_and_notes_preserved": true,
+  "original_worksheet_sha256": "cea96bae113130e9f310cb42f66a178f3fcc49f20735fc85a1b8db34377a4e2f",
+  "all_96_reviewer_reports_and_six_batch_records_unchanged": true,
+  "continuation_packet_hashes_reverified": 336,
+  "pilot_packet_hashes_reverified": 56,
+  "source_corpus_keys_captures_grader_scores_production_unchanged": true,
+  "new_benchmark_or_model_runs": 0,
+  "python_tests": "107 passed in 2.40s",
+  "typecheck": "attempted; tsc: command not found",
+  "lint": "attempted; tsc: command not found",
+  "build": "blocked: next dependency absent; vendor step not invoked",
+  "diff_check": "passed",
+  "limitations": "Decisions record admissibility and attribution limits. Seventeen AMBIGUOUS classifications remain; no automatic pass or score recalculation."
+}
