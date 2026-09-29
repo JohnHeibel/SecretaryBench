@@ -12,6 +12,8 @@ Seventeen checks across sixteen emails are infrastructure-limited for model-capa
 
 **September 29 handoff:** [Claude Code handoff](_repair/agent-audit-continuation/CLAUDE_CODE_HANDOFF.md) collects the completed work, reasons, evidence, current decisions, and proposed next step. It is tracked so the context travels with the branch. The proposal to bring O-7 run validity forward requires a scoped plan and approval; no implementation or roadmap change is authorized by the handoff.
 
+**Clarified request:** James wants Claude Code to independently review the completed audit, evidence, decisions, and documentation first. The handoff now contains that review brief. No independent second-review findings exist yet; repair planning is not the immediate task.
+
 <!-- agent-continuation:register:end -->
 
 The single living record of what is wrong with this benchmark, what we changed, and

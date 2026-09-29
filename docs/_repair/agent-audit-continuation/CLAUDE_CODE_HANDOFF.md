@@ -1,6 +1,25 @@
 # SecretaryBench audit handoff for Claude Code
 
-Updated September 29, 2026. Scope: the work completed with James on the saved Sonnet 4.5 run, the reasons for the decisions, and the proposed next step.
+Updated September 29, 2026. Scope: the work completed with James on the saved Sonnet 4.5 run, the reasons for the decisions, and an independent second review by Claude Code.
+
+## Current request: independently review the completed work
+
+James clarified: “I just want it to verify and almost audit everything you did to give it a second look.” The next task is an independent audit of this work. The repair ideas later in this document are background, not the requested deliverable.
+
+Treat this handoff, the coordinator's findings, and earlier validation summaries as claims to check against primary evidence. Seek mistakes and unsupported conclusions as well as corroboration. Do not assume that reviewer agreement or James's acceptance establishes factual correctness. Distinguish a policy he selected from a factual claim that still requires evidence.
+
+Review scope:
+
+1. Verify the checkout and inspect the changes from `540c76e` through the current HEAD, including the pilot, all six batches, human adjudication, and handoff documentation. Preserve unexpected changes. Check that source, corpus, keys, captures, grader, and scores were left unchanged.
+2. Account for every one of the 75 worksheet checks. Reconstruct the supported requirement from the actual assistant instructions, email, recipient/role metadata, and available prior context before consulting that check's key or current judgment where possible. Then compare with saved tool evidence and before/after state. If conclusions have already been seen, disclose that limitation rather than claiming a blind review. Do not substitute future context or a repaired input for what the saved model received.
+3. Audit the review procedure and provenance: pilot reuse, 96 continuation assignments, paired reports, Stage A/B ordering, packet integrity, input reconstruction, missing metadata, source checks, and coordinator overrides. Separate what artifacts prove from procedural claims they cannot establish. Check original human notes and reviewer outputs were preserved.
+4. Challenge the substantive conclusions: KEY versus MODEL versus PLAN/GRADER, ambiguity, scope of accepted PASS results, the tool-outage evidence, and whether unavailable tools or invalid keys were wrongly converted into model credit or blame. Recompute coverage and classification counts independently.
+5. Check all ten adjudication groups, including the #14/#19 amendments, against James's recorded decisions and the cited evidence. Flag any case where his words were overinterpreted or a policy preference was presented as established fact. Keep disagreements with a policy distinct from factual errors in applying it.
+6. Verify the reported checks and limitations. Inspect validation scripts before running them because some rewrite historical artifacts or assume an older file scope. Use safe offline checks and source inspection; do not rely solely on a preexisting “passed” record.
+
+Return a findings-first review with severity, affected check IDs, exact file/line or capture references, the supporting evidence, and any proposed correction. Include coverage of all 75 checks and distinguish independently verified conclusions, disagreements, and unresolved questions. If anything was only sampled or could not be checked, state precisely what and why. A clean review should explain what was independently verified, not simply repeat the existing summary.
+
+Preserve existing results and evidence. Report proposed corrections without applying them. This authorizes review of the saved work, not corpus/grader repairs, score changes, production access, new benchmark/model runs, another reviewer campaign, or moving into the next repair phase. The independent review has not yet been performed.
 
 ## Start here
 
@@ -9,7 +28,7 @@ Updated September 29, 2026. Scope: the work completed with James on the saved So
 - The saved-run hand-grade is complete for its agreed scope: all 60 failing checks and 15 sampled passing checks. Seventeen classifications intentionally remain AMBIGUOUS. That is a recorded disposition, not unfinished reviewer work.
 - James's September 28 decisions supersede older pending-decision language. Read [current results](RESULTS.md), [recorded decisions](NEEDS_JAMES.md), and the [structured human decision record](human-decisions-2026-09-28.json).
 - This work audited an existing run. It did not implement a future grader, repair the corpus, alter scores, or launch a new benchmark run.
-- The next proposed work is a scoped repair plan. Implementation, a change in the approved repair order, and new paid runs are not authorized merely by this handoff.
+- The immediate task is the independent review above. A scoped repair plan is a later possibility; implementation, a change in the approved repair order, and new paid runs are not authorized by this handoff.
 
 ## What problem we were solving
 
@@ -106,7 +125,7 @@ No benchmark source, corpus, key, capture, grader, score, production system, or 
 
 ## Proposed next step, discussed September 29
 
-This is a recommendation, not an approved implementation plan or reordered roadmap:
+This is an earlier recommendation, not an approved implementation plan or reordered roadmap. James subsequently requested the independent review above first; do not start repair planning as a substitute for that review.
 
 1. Prepare a scoped post-audit repair plan. Reconcile historical status text and map clear reference cases to repeatable offline acceptance checks. Keep uncertain and infrastructure-limited dimensions explicit.
 2. Make **O-7 run validity** the first proposed implementation task: distinguish a failed tool connection from a valid model attempt, and investigate the connection problem before another live run. Bringing O-7 forward from phase 6 is a proposed sequencing change that needs plan approval.
@@ -215,6 +234,6 @@ The source diff should be empty at this handoff. Use the Python 3.13 virtual env
 
 Completed: the pilot, all six continuation batches, James's adjudication, and this visibility/handoff documentation.
 
-In progress: no repair implementation or live run. No reviewer assignments remain.
+Requested next: Claude Code independently reviews the completed work using the brief at the top of this document. No second-review findings exist yet. No repair implementation or live run is in progress, and no original reviewer assignments remain.
 
-Awaiting a future task: prepare and approve the scoped repair plan, including whether O-7 moves forward in the roadmap. The unresolved scientific questions are retained as limitations: the cause of the tool outage, intended facts in inconsistent corpus passages, and requirements the supplied instructions never specified. There is no need to repeat the audit to acknowledge those limits.
+After that review, a future task may prepare and approve the scoped repair plan, including whether O-7 moves forward in the roadmap. The unresolved scientific questions are retained as limitations: the cause of the tool outage, intended facts in inconsistent corpus passages, and requirements the supplied instructions never specified. These limits should be examined during the independent review without rerunning the original reviewer campaign.
