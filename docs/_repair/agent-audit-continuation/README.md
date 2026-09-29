@@ -1,5 +1,7 @@
 # Continuation of the saved Sonnet 4.5 audit
 
+**Start with the [Claude Code handoff](CLAUDE_CODE_HANDOFF.md)** for the complete work history, reasons, current decisions, evidence map, and proposed next step. Updated September 29, 2026.
+
 <!-- human-adjudication:start -->
 **Current: September 28 human adjudication.** James’s responses cover all ten decision groups. #14 is now MODEL and #19 AMBIGUOUS; their original worksheet labels remain as history. Other underspecified cases retain AMBIGUOUS or qualified model attribution. [Current results](RESULTS.md), [recorded dispositions](NEEDS_JAMES.md) and [decision record](human-decisions-2026-09-28.json) supersede the historical pending language below. All original reviewer and batch records are unchanged. The following methodology and counts describe the September 26 audit checkpoint.
 <!-- human-adjudication:end -->

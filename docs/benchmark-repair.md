@@ -10,6 +10,8 @@ Seventeen checks across sixteen emails are infrastructure-limited for model-capa
 
 [Current findings](_repair/agent-audit-continuation/RESULTS.md), [recorded decisions](_repair/agent-audit-continuation/NEEDS_JAMES.md), [structured adjudication](_repair/agent-audit-continuation/human-decisions-2026-09-28.json). Original worksheet text and all reviewer/batch records are preserved. No repair status promoted; no source, corpus, answer-key, score or production changes; no benchmark/model runs. See adjudication validation for checks.
 
+**September 29 handoff:** [Claude Code handoff](_repair/agent-audit-continuation/CLAUDE_CODE_HANDOFF.md) collects the completed work, reasons, evidence, current decisions, and proposed next step. It is tracked so the context travels with the branch. The proposal to bring O-7 run validity forward requires a scoped plan and approval; no implementation or roadmap change is authorized by the handoff.
+
 <!-- agent-continuation:register:end -->
 
 The single living record of what is wrong with this benchmark, what we changed, and
@@ -67,7 +69,9 @@ webapp and the `backups` branch are off limits.
 
 ---
 
-## Start here (next session)
+## Historical roadmap checkpoint before the completed hand-grade
+
+This section preserves the earlier roadmap and its rationale. For current audit status, use the dated checkpoint above and the [handoff](_repair/agent-audit-continuation/CLAUDE_CODE_HANDOFF.md). The hand-grade and human adjudication are now complete; pending-audit language below is historical. Existing verification gates and repair order are not changed by audit completion.
 
 Phase 0 and phase A are complete and committed, and the revised phase table is signed off.
 **Phase 2's grader contract is `applied`.** Iteration 4 shipped after passing its adversarial
@@ -211,7 +215,7 @@ Revised table. Old phase numbers in brackets.
 | **1a** | **O-1, O-3, O-5a** *(new)* | the minimum re-gradeable capture slice: `--out DIR`, an end-of-run store dump, and **recording objects that matched no keyword**. Built before any run so the run is a permanent asset rather than a fourth disposable log | free |
 | **1b** | — *(new)* | bounded smoke (`--limit`, background) to prove the capture writes what phase 2 needs, and that the runner certifies the served model | cheap, bounded |
 | **1c** | — *(new)* | **the baseline run**: certified model, known config, fully re-gradeable. Run at seed 42 / `daily_max=5` so it is directly comparable to `outputs/opus.md` and `outputs/sonnet.md`, which retroactively validates them | **paid** |
-| **1d** | **the hand-grade** *(bounded audit pilot completed 2026-09-25; adjudication pending)* | The worksheet `docs/_repair/audit-baseline-sonnet-4-5.md` contains all 60 failing checks and 15 sampled passes under the shipped grader. James has 19 saved judgments through item 20, with item 8 blank. The approved pilot separately reviewed six existing judgments and two new checks, twice each: `docs/_repair/agent-audit-pilot-sonnet-4-5.md` and its JSON evidence archive. Proposed labels have not replaced human judgments; the complete reference audit remains unfinished. No future benchmark grader was implemented | approved agent usage; no new benchmark run |
+| **1d** | **the hand-grade** *(audit and human adjudication completed 2026-09-28)* | All 75 worksheet checks covered: 19 preserved human judgments, two reused pilot findings, and 54 fresh checks across 48 emails with 96 reviewer assignments. [Current results](_repair/agent-audit-continuation/RESULTS.md) and [recorded decisions](_repair/agent-audit-continuation/NEEDS_JAMES.md) include dated amendments for #14/#19. Ambiguity and infrastructure limits remain explicit. Original labels, notes, and reviewer evidence are preserved. This is a qualified reference, not a recalculated score or future grader implementation | approved agent usage completed; no new benchmark run |
 | 2 | G *[was 2]* | the grader. Now testable against **real recorded behaviour** from 1c, and against 1d's human reference. **Fix G-1, G-2, G-7 and the kind filter as ONE contract** — 1c proved that widening identity alone relocates failures rather than removing them | free to iterate |
 | 3 | A *[was 3]* | depends on the identity contract G settles; A's no-action rule is 56–57% of every recorded score | free |
 | 4 | V *(part)*, C *[was 5]* | pin one lever and one config (C-2, C-3, K-2) and fix the **reporting** gaps: report V-3's null floor beside every score, make V-6's by-tier report exist, stamp provenance. **Does not decide what the benchmark claims** — see phase 8 | free |
