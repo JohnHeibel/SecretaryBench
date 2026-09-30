@@ -244,3 +244,24 @@ Totals over all 75 checks (B1-B15 counted individually): 50 ✓, 17 ✓*, 6 ✗ 
 3. Re-test #5 under the fairness principle?
 4. Confirm the Q4 limit ("little lead time alone is not a defect") matches what you meant.
 5. Did you personally tick items 1-5, 7 and 9?
+
+## James's responses, 2026-09-29
+
+Recorded verbatim from this session. These settle the questions above; the corrections themselves are not yet applied to RESULTS.md, NEEDS_JAMES.md or the decision record.
+
+1. **#14/#19:** "accept the changes." #14 MODEL and #19 AMBIGUOUS now rest on an explicit decision (F1 resolved on substance; the Sept 28 records should cite this date as the authority).
+2. **Trip blocking (#41/#42):** James asked for a recommendation and whether such rules should be given to the model up front. Recommendation below; awaiting his confirmation.
+3. **Re-test #5:** "sure please do." Result below.
+4. **Q4 lead-time limit:** "yes leave it." No change.
+5. **Items 1-5, 7, 9:** "slightly assistant drafted." Record as James's judgments with partly assistant-drafted notes (F10 resolved).
+
+### #5 re-test under the fairness principle
+
+- Supported by the email (served Tue Jun 9): make sure a retention conversation, which HR is putting together, happens "this week" and before the designer decides. No day, time or format is given.
+- Key: an **event** on exactly **Thu Jun 11** (`serve+2d`, `exact_day`). Nothing in the text selects Thursday (the original note concedes this, K-6). Requiring an event rather than a to-do is also not established: HR organizes the conversation, and the CEO's stated role is to make sure it happens.
+- Model: a to-do due Sat Jun 13 17:00, "HR wants retention conversation this week before decision is made". It fails only on kind. Its date is inside a Monday-to-Sunday week but after the working week, so whether it is timely is uncertain.
+- **Result: KEY** (the exact-day and event-only requirements are unsupported), with model credit unresolved because of the Saturday due date. This matches how the audit already treats #12, #16, #34 and #35. Proposed; to be applied in the corrections pass.
+
+### Recommendation on #41/#42 and preference rules
+
+For the saved run, the system prompt never said whether a multi-day trip should be blocked, so do not require it. That gives #41 KEY and #42 KEY (the separate start and end markers are unsupported, and the model is not penalized), consistent with Q1 and Q9. Whether future models should block trips is a preference to state in the prompt, not something to grade silently.
