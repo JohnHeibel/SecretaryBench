@@ -1,0 +1,191 @@
+{
+  "date": "2026-10-03",
+  "source_head": "58f8607",
+  "supplements": "human-decisions-2026-09-28.json (unchanged, kept as history)",
+  "authority": "James's answers to the independent review in the Claude Code session of 2026-09-29 and 2026-10-03, quoted per decision.",
+  "scope": "Audit adjudication only. No benchmark source, corpus, answer-key, grader, score, capture or production change; no runs.",
+  "decisions": [
+    {
+      "id": "R1",
+      "items": [
+        "14",
+        "19"
+      ],
+      "status": "CONFIRMED",
+      "quote": "accept the changes",
+      "decision": "The September 28 amendments (#14 KEY to MODEL, #19 MODEL to AMBIGUOUS) are explicitly confirmed. They had been applied under a general approval sentence that was cut off (\"I like your recommendations for\")."
+    },
+    {
+      "id": "R2",
+      "items": [
+        "5"
+      ],
+      "status": "LABEL_REVISION_APPROVED",
+      "quote": "sure please do; yes go ahead and include those",
+      "decision": "Re-tested under the fairness principle: the exact-Thursday and event-only requirements are unsupported, so KEY; the Saturday due date leaves model credit unresolved."
+    },
+    {
+      "id": "R3",
+      "items": [
+        "41",
+        "42"
+      ],
+      "status": "LABEL_REVISION_APPROVED",
+      "quote": "score 41/42 as key",
+      "decision": "Blocking a multi-day trip was never stated to the model, so separate start and end markers are unsupported; no model penalty."
+    },
+    {
+      "id": "R4",
+      "items": [
+        "43"
+      ],
+      "status": "LABEL_REVISION_APPROVED",
+      "quote": "yes go ahead and include those",
+      "decision": "The key grades the first day against the whole Aug 3-9 week but computes the third day from Monday; the model's Aug 4 / Aug 6 pair is consistent with the start the key accepted."
+    },
+    {
+      "id": "R5",
+      "items": [
+        "55",
+        "56"
+      ],
+      "status": "LABEL_REVISION_APPROVED",
+      "quote": "yes go ahead and include those",
+      "decision": "PLAN primary: the proposed dates were already past at delivery, as with #58/#60. The approval question stays as a secondary note; the outage still prevents model attribution."
+    },
+    {
+      "id": "R6",
+      "items": [
+        "Q4 limit"
+      ],
+      "status": "CONFIRMED",
+      "quote": "yes leave it",
+      "decision": "The Q4 limit (\"little lead time alone is not a defect if a feasible deadline is clear\") stays as written."
+    },
+    {
+      "id": "R7",
+      "items": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "7",
+        "9"
+      ],
+      "status": "PROVENANCE_CLARIFIED",
+      "quote": "slightly assistant drafted",
+      "decision": "These are James's judgments with partly assistant-drafted notes."
+    }
+  ],
+  "factual_corrections": [
+    {
+      "subject": "tool outage",
+      "record": "saved-tool-outage-amendment-2026-10-03.json",
+      "correction": "Seven days (51-57), 19 emails, 20 ops (16 failing, 4 passing), not six days."
+    }
+  ],
+  "targets": [
+    {
+      "worksheet_item": "5",
+      "prior_classification": "MODEL",
+      "classification": "KEY",
+      "decision": "R2",
+      "model_attribution": [
+        "NO_STRICT_PENALTY_ON_UNDERDETERMINED_DIMENSION",
+        "MODEL_CREDIT_UNRESOLVED"
+      ],
+      "score_changed": false
+    },
+    {
+      "worksheet_item": "41",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "KEY",
+      "decision": "R3",
+      "model_attribution": [
+        "NO_MODEL_PENALTY_UNSTATED_PREFERENCE"
+      ],
+      "score_changed": false
+    },
+    {
+      "worksheet_item": "42",
+      "prior_classification": "MODEL",
+      "classification": "KEY",
+      "decision": "R3",
+      "model_attribution": [
+        "NO_MODEL_PENALTY_UNSTATED_PREFERENCE"
+      ],
+      "score_changed": false
+    },
+    {
+      "worksheet_item": "43",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "KEY",
+      "decision": "R4",
+      "model_attribution": [
+        "CONSISTENT_WITH_KEY_ACCEPTED_START"
+      ],
+      "score_changed": false
+    },
+    {
+      "worksheet_item": "55",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "PLAN",
+      "decision": "R5",
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING",
+        "APPROVAL_PENDING_SECONDARY",
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false
+    },
+    {
+      "worksheet_item": "56",
+      "prior_classification": "AMBIGUOUS",
+      "classification": "PLAN",
+      "decision": "R5",
+      "model_attribution": [
+        "UNSPECIFIED_STALE_REQUEST_HANDLING",
+        "APPROVAL_PENDING_SECONDARY",
+        "UNASSESSABLE_INFRASTRUCTURE"
+      ],
+      "score_changed": false
+    }
+  ],
+  "current_classification_counts": {
+    "MODEL": 5,
+    "KEY": 28,
+    "PLAN": 10,
+    "GRADER": 4,
+    "AMBIGUOUS": 13,
+    "PASS": 15
+  },
+  "ambiguous_split": {
+    "unclear_instruction": [
+      "8",
+      "19",
+      "33",
+      "38",
+      "44"
+    ],
+    "tools_down": [
+      "45",
+      "46",
+      "49",
+      "50",
+      "51",
+      "54",
+      "57",
+      "59"
+    ]
+  },
+  "previous_classification_counts": {
+    "MODEL": 7,
+    "KEY": 24,
+    "PLAN": 8,
+    "GRADER": 4,
+    "AMBIGUOUS": 17,
+    "PASS": 15
+  },
+  "pending_outside_this_record": "Whether to give the model stated principal preferences changes what the benchmark measures; James is taking it to the club. No decision recorded."
+}

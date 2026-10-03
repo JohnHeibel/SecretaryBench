@@ -2,22 +2,40 @@
 
 James’s responses were recorded on 2026-09-28. All ten groups now have a recorded judgment, policy or delegated disposition. Scientific uncertainty remains where the evidence is insufficient; recording a disposition does not force a pass/fail answer. Original human notes and the September 26 reviewer/batch artifacts are retained.
 
-The current label amendments are **#14 KEY → MODEL** and **#19 MODEL → AMBIGUOUS**. They supersede the older labels for this audit without erasing the original worksheet text. [Machine-readable decisions](human-decisions-2026-09-28.json) contain authority, item coverage and attribution limits.
+The September 28 label amendments are **#14 KEY → MODEL** and **#19 MODEL → AMBIGUOUS** (explicitly confirmed by James 2026-09-29; later changes are in the October 3 update below). They supersede the older labels for this audit without erasing the original worksheet text. [Machine-readable decisions](human-decisions-2026-09-28.json) contain authority, item coverage and attribution limits.
+
+## October 3 update after the independent review
+
+James answered the [independent review](INDEPENDENT_REVIEW_2026-09-29.md) on September 29 and October 3. [Structured record](human-decisions-2026-10-03.json).
+
+| Item(s) | Disposition | James's words |
+|---|---|---|
+| #14, #19 | September 28 amendments explicitly confirmed | "accept the changes" |
+| #5 | MODEL → KEY after re-test under the fairness principle | "sure please do"; "yes go ahead and include those" |
+| #41, #42 | AMBIGUOUS / MODEL → KEY; trip blocking was never stated to the model | "score 41/42 as key" |
+| #43 | AMBIGUOUS → KEY; the key contradicts its own trip-start window | "yes go ahead and include those" |
+| #55, #56 | AMBIGUOUS → PLAN; proposed dates already past at delivery | "yes go ahead and include those" |
+| Q4 limit | Kept as written | "yes leave it" |
+| Items 1-5, 7, 9 | James's judgments, with partly assistant-drafted notes | "slightly assistant drafted" |
+
+Factual correction: the tool outage spans seven days (51-57), 19 emails and 20 ops, not six days. See Q8.
+
+Corpus-review list (extends Q5): Sponsoring-Marathon delivery order (#1, #18, #24, #30, #44, #52, #59); pizza-party order (#23, #29); the Planning board meeting moved after it had occurred (#25); and prose with hardcoded dates paired with serve-relative key tokens (#31, #32, #48, #52, #55, #56, #59, #60).
 
 ## Recorded decisions
 
 | Group | Disposition |
 |---|---|
-| Q1 | #8/#19 AMBIGUOUS; no mandatory milestone rule supplied. |
-| Q2 | #14 MODEL; pick one explicitly delegated choosing and booking. |
+| Q1 | #8/#19 AMBIGUOUS; no mandatory milestone rule supplied. #19 confirmed by James 2026-09-29. |
+| Q2 | #14 MODEL; pick one explicitly delegated choosing and booking. Confirmed by James 2026-09-29. |
 | Q3 | All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. |
 | Q4 | Allow supported timing alternatives; do not require an unstated exact date/hour. |
 | Q5 | Record corpus/context conflicts; do not infer a unique date or assume every revision is contradictory. |
 | Q6 | #33 AMBIGUOUS under delegated judgment; repair is defensible, 14:00 remains a separate default violation. |
 | Q7 | #38/#44 AMBIGUOUS, as James selected. |
 | Q8 | All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. |
-| Q9 | #41/#43 AMBIGUOUS; retain #42’s explicit missing endpoint and #53’s independent ordinal defect. |
-| Q10 | #55/#56 AMBIGUOUS; retain stale-date, diagnostic and infrastructure facts. |
+| Q9 | #41/#43 AMBIGUOUS; retain #42’s explicit missing endpoint and #53’s independent ordinal defect. Superseded 2026-10-03: #41, #42, #43 KEY. |
+| Q10 | #55/#56 AMBIGUOUS; retain stale-date, diagnostic and infrastructure facts. Superseded 2026-10-03: PLAN primary, approval kept as secondary. |
 
 ## Q1: Announcements versus required calendar milestones
 
@@ -27,7 +45,7 @@ Items: 8, 19.
 
 **Limits:** An explicit date remains a fact to remember. Ambiguity about making an event is not a universal rule that all announcements are FYIs.
 
-**Authority:** Approval of recommendations for questions not otherwise answered.
+**Authority:** Approval of recommendations for questions not otherwise answered. That September 28 sentence was cut off ("I like your recommendations for"); James explicitly confirmed the change on 2026-09-29 ("accept the changes").
 
 **Original question:** Should #8 require an event, and should the existing MODEL label for #19 remain or be reopened as KEY/AMBIGUOUS?
 
@@ -46,7 +64,7 @@ Items: 14.
 
 **Limits:** Multiple valid slots were already accepted by the key; this is a clear action omission, not punishment for selecting a different valid date.
 
-**Authority:** Approval of recommendations for questions not otherwise answered.
+**Authority:** Approval of recommendations for questions not otherwise answered. That September 28 sentence was cut off ("I like your recommendations for"); James explicitly confirmed the change on 2026-09-29 ("accept the changes").
 
 **Original question:** Approve changing #14 from saved KEY to MODEL?
 
@@ -92,6 +110,8 @@ Items: 16, S3 (uncounted E33 historical time).
 
 **Limits:** Accept supported ranges, relations and alternatives when they can be established. Otherwise mark that dimension underdetermined, not automatically passed. This does not prove the announcement prerequisite was met, and the explicit one-hour duration default still applies to S3’s 90-minute event. Little lead time alone is not a defect if a feasible deadline is clear.
 
+**Confirmed, 2026-09-29:** James chose to keep this limit as written ("yes leave it").
+
 **Authority:** User rejects overly precise grading where timing is underspecified and asks for multiple acceptable outcomes.
 
 **Original question:** Which reminder timing should receive credit without a stated deadline, and how should launch night constrain an unspecified event hour?
@@ -110,6 +130,8 @@ Items: 26, 27, 28, S1 (uncounted E20 sibling), S2 (uncounted E22 sibling).
 **Recorded disposition, 2026-09-28:** Keep #26/#27/#28 KEY and withhold strict model penalties on disputed timing. The athlete context says August 22 but later refers to next week; the one-pager subject/body imply different timing; rehearsal text conflicts with the established reveal. Record these for corpus/context review. S1 is an unstated dependency, not a proven direct date contradiction.
 
 **Limits:** An explicit later reschedule can validly supersede an earlier date. No contradictory or missing fact may be resolved by inventing author intent. These findings do not show that every observed error was caused by the corpus, nor establish what confused the model. No corpus changes are made.
+
+**Extended, 2026-10-03:** see the corpus-review list in the October 3 update above.
 
 **Authority:** User attributes unreconciled narrative contradictions to the corpus and calls for corpus review.
 
@@ -168,6 +190,8 @@ Items: 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, B15.
 
 **Recorded disposition, 2026-09-28:** Confirmed: six saved days record a failed secretary server, absent secretary tools/calls, no observed target reads and unchanged stores. The 17 affected checks include 16 recorded FAILs and B15’s no-action PASS. Mark model-capability attribution unassessable for all 17.
 
+**Correction, 2026-10-03:** the failed secretary server spans **seven** days, 51-57. Day 54 (one email, no audited check) was omitted. In total 19 emails and 20 ops: 16 failures and 4 incidental no-action passes (B15 plus three unsampled emails). See the [outage amendment](saved-tool-outage-amendment-2026-10-03.json). The disposition for the 17 audited checks is unchanged.
+
 **Limits:** State mismatches, incorrect keys, stale delivery and false grader diagnostics remain independently knowable. B15 is not evidence of successful reading. Failure cause, recoverability and performance with working tools are not established. No scores, denominators or runs are changed.
 
 **Authority:** User asks whether expected tools failed and agrees that model conclusions cannot yet be drawn.
@@ -204,6 +228,8 @@ Items: 41, 43, 53.
 
 **Limits:** #42 remains MODEL because the explicit August 9 endpoint is absent under every representation inspected. Hybrid grading may assess supported alternatives, but it cannot supply a missing departure date or repair the corpus by guesswork.
 
+**Superseded, 2026-10-03:** #41, #42 and #43 are KEY. #42's MODEL status came from the reviewers and coordinator (both E26 reviewers chose MODEL), not from James's Q9 answer; with trip blocking never stated to the model, the missing end marker is not a model failure. #43's key contradicts its own start window. #53 stays KEY.
+
 **Authority:** User explicitly adopts a universal rule against strict penalties without sufficient context and favors hybrid grading.
 
 **Original question:** Does from the week of August 3 fix departure to Monday, and what counts as representing the trip start?
@@ -223,6 +249,8 @@ Items: 55, 56.
 **Recorded disposition, 2026-09-28:** Retain #55/#56 as AMBIGUOUS because the proposal awaits approval and its dates are already past on delivery. Do not penalize the unresolved approval interpretation as if only one behavior were authorized.
 
 **Limits:** The stale-date facts and #55’s false duplicate diagnostic remain established. The tool outage independently prevents attribution. No fulfilled move or model pass is inferred.
+
+**Superseded, 2026-10-03:** #55/#56 are PLAN (proposed dates already past at delivery, as with #58/#60), with the approval question kept as a secondary note.
 
 **Authority:** User explicitly accepts the recommendation.
 

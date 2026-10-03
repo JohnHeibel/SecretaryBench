@@ -2,7 +2,13 @@
 
 <!-- agent-continuation:register:start -->
 
-## Current phase 1d adjudication checkpoint, 2026-09-28
+## Current phase 1d checkpoint, 2026-10-03 (after independent review)
+
+Claude Code independently reviewed the completed audit ([review](_repair/agent-audit-continuation/INDEPENDENT_REVIEW_2026-09-29.md)) and James accepted its corrections: #5, #41, #42, #43 → KEY; #55/#56 → PLAN; the #14/#19 amendments explicitly confirmed. Current audit classifications: **MODEL 5, KEY 28, PLAN 10, GRADER 4, AMBIGUOUS 13 (5 unclear instruction, 8 tools down), PASS 15**. By primary classification, 42 of the 60 failing checks are benchmark defects (keys, delivery plan, grader), 5 are model errors and 13 cannot be judged; these are primary labels, not sole causes (8 of the 42 also fall on outage days). A recurring corpus defect for the K-series: prose with hardcoded dates paired with serve-relative key tokens, which diverge when the serve plan shifts (#31, #32, #48, #52, #55, #56, #59, #60). The secretary MCP failed on days 51-57 (19 of 167 emails, 20 ops: 16 failures and 4 incidental no-action passes), not six days as first recorded; this sharpens O-7. The as-run grader also passed one cancel (#51) that never happened. Reviewer isolation and Stage A/B ordering were verified from the Codex session logs. This is still a qualified reference, not a recalculated score.
+
+Proposed next steps, not yet approved: O-7 run validity first; corpus and key repairs one K-ID at a time; grader work measured against this reference. Whether to give the model stated principal preferences (and possibly measure preference persistence) changes what the benchmark claims; James is taking that to the club, consistent with the phase 8 / V-1 scope rule.
+
+## Phase 1d adjudication checkpoint, 2026-09-28 (counts superseded 2026-10-03)
 
 All six audit batches remain complete: 54 fresh checks, 48 emails, 96 reviewer assignments; all 75 worksheet checks covered including two reused pilot findings and 19 original human judgments. James’s responses are recorded for ten decision groups covering 35 checks and three uncounted observations. Approved amendments: #14 KEY to MODEL; #19 MODEL to AMBIGUOUS. Current audit classifications: MODEL 7, KEY 24, PLAN 8, GRADER 4, AMBIGUOUS 17, PASS 15. Ambiguity is retained intentionally; no unsupported exact constraint is imposed and no automatic model pass is awarded.
 
@@ -12,7 +18,7 @@ Seventeen checks across sixteen emails are infrastructure-limited for model-capa
 
 **September 29 handoff:** [Claude Code handoff](_repair/agent-audit-continuation/CLAUDE_CODE_HANDOFF.md) collects the completed work, reasons, evidence, current decisions, and proposed next step. It is tracked so the context travels with the branch. The proposal to bring O-7 run validity forward requires a scoped plan and approval; no implementation or roadmap change is authorized by the handoff.
 
-**Clarified request:** James wants Claude Code to independently review the completed audit, evidence, decisions, and documentation first. The handoff now contains that review brief. No independent second-review findings exist yet; repair planning is not the immediate task.
+**Clarified request:** James wants Claude Code to independently review the completed audit, evidence, decisions, and documentation first. The handoff now contains that review brief. The review is now complete; see the 2026-10-03 checkpoint above.
 
 <!-- agent-continuation:register:end -->
 
@@ -1772,6 +1778,8 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-10-03**: Phase 1d independent review (Claude Code) and corrections, docs only. Evidence: `docs/_repair/agent-audit-continuation/INDEPENDENT_REVIEW_2026-09-29.md`, `human-decisions-2026-10-03.json`, `saved-tool-outage-amendment-2026-10-03.json`. Verified from primary sources: all 75 checks re-derived; all 112 reviewer sessions stayed in their own packets and saved Stage A before opening Stage B; 192 reviewer and 392 packet hashes match; packet bodies match the runner's renderer; 107 tests pass. Corrections accepted by James: #5/#41/#42/#43 KEY, #55/#56 PLAN, outage days 51-57. Counts now MODEL 5, KEY 28, PLAN 10, GRADER 4, AMBIGUOUS 13, PASS 15. No source, corpus, key, grader, score or capture change; no runs.
 
 - **2026-09-25** — Phase 1d, approved agent-assisted audit pilot. Six previously
   reviewed checks (6, 9, 14, 16, 19, 20), one unreviewed failure (21), and one sampled

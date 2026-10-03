@@ -3,8 +3,12 @@
 **Start with the [Claude Code handoff](CLAUDE_CODE_HANDOFF.md)** for the complete work history, reasons, current decisions, evidence map, and proposed next step. Updated September 29, 2026.
 
 <!-- human-adjudication:start -->
-**Current: September 28 human adjudication.** James’s responses cover all ten decision groups. #14 is now MODEL and #19 AMBIGUOUS; their original worksheet labels remain as history. Other underspecified cases retain AMBIGUOUS or qualified model attribution. [Current results](RESULTS.md), [recorded dispositions](NEEDS_JAMES.md) and [decision record](human-decisions-2026-09-28.json) supersede the historical pending language below. All original reviewer and batch records are unchanged. The following methodology and counts describe the September 26 audit checkpoint.
+**September 28 human adjudication (superseded by the October 3 block below).** James’s responses cover all ten decision groups. #14 is now MODEL and #19 AMBIGUOUS; their original worksheet labels remain as history. Other underspecified cases retain AMBIGUOUS or qualified model attribution. [Current results](RESULTS.md), [recorded dispositions](NEEDS_JAMES.md) and [decision record](human-decisions-2026-09-28.json) supersede the historical pending language below. All original reviewer and batch records are unchanged. The following methodology and counts describe the September 26 audit checkpoint.
 <!-- human-adjudication:end -->
+
+<!-- independent-review:start -->
+**Current: October 3 corrections.** An [independent review](INDEPENDENT_REVIEW_2026-09-29.md) found, and James accepted: #5, #41, #42, #43 → KEY; #55/#56 → PLAN; #14/#19 amendments explicitly confirmed; outage corrected to days 51-57. Counts: MODEL 5, KEY 28, PLAN 10, GRADER 4, AMBIGUOUS 13, PASS 15. See [results](RESULTS.md).
+<!-- independent-review:end -->
 
 Authorized by James on 2026-09-26. Starting branch `codex/phase-1d-audit-pilot`, commit `9a506fb`; clean tracked checkout. Six approved batches cover 54 checks across 48 emails, with two fresh reviewers per email and at most three concurrent. This is a one-time assisted manual audit, not a future benchmark grader.
 

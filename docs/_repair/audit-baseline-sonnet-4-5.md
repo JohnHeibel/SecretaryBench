@@ -193,6 +193,10 @@ _(nothing)_
 
 **Key defect, separate, does not change the verdict:** `serve+2d` + `tolerance: exact_day` turns "this week" into one exact day with nothing in the prose picking Thursday. K-6. Should be `within:`.
 
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** Current classification **KEY** (was MODEL). Re-tested under the fairness principle at James's request: the exact Thursday and the event-only kind are unsupported; the Saturday due date leaves model credit unresolved. The note's "fails on day under any reading" is incorrect for a Monday-Sunday week. The original label and note above are preserved.
+<!-- independent-review:end -->
+
 ---
 
 ### 6. `World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight` · create `Outsole sample delivery` (todo)
@@ -530,6 +534,10 @@ _(nothing)_
 **Human disposition, 2026-09-28:** Current classification **MODEL**. #14 MODEL; pick one explicitly delegated choosing and booking. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** James explicitly confirmed the MODEL amendment on 2026-09-29 ("accept the changes"). The September 28 approval sentence had been cut off.
+<!-- independent-review:end -->
+
 ---
 
 ### 15. `shoe-product-launch-delays.design-team-meeting` · create `Decide who to cut` (todo)
@@ -736,6 +744,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #8/#19 AMBIGUOUS; no mandatory milestone rule supplied. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
+
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** James explicitly confirmed the AMBIGUOUS amendment on 2026-09-29 ("accept the changes"). Both pilot reviewers had classified this KEY. The September 28 approval sentence had been cut off.
+<!-- independent-review:end -->
 
 ---
 
@@ -1948,6 +1960,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #41/#43 AMBIGUOUS; retain #42’s explicit missing endpoint and #53’s independent ordinal defect. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** Current classification **KEY** (was AMBIGUOUS). James: "score 41/42 as key." The separate start marker is unsupported and trip blocking was never stated to the model; no model penalty.
+<!-- independent-review:end -->
+
 ---
 
 ### 42. `Partnership-with-deeptech-companies.boston-trip-details` · create `Boston Trip End` (event)
@@ -1997,6 +2013,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 <!-- agent-continuation:start -->
 **Agent review for 42, 2026-09-26:** AGENT_RESOLVED · MODEL. The explicit August 9 trip endpoint is absent from every calendar object and description; the August 9 floor reset is unrelated. The two visit entries do not represent the trip through August 9. This omission survives correction of the key’s separate-end-marker requirement: one coherent trip interval would also suffice. Exact start-day uncertainty does not erase the explicit endpoint. See [review results](agent-audit-continuation/RESULTS.md).
 <!-- agent-continuation:end -->
+
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** Current classification **KEY** (was MODEL). James: "score 41/42 as key." The separate end marker is unsupported and trip blocking was never stated to the model; no model penalty.
+<!-- independent-review:end -->
 
 ---
 
@@ -2049,6 +2069,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. #41/#43 AMBIGUOUS; retain #42’s explicit missing endpoint and #53’s independent ordinal defect. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
+
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** Current classification **KEY** (was AMBIGUOUS). The key grades the first day against the whole Aug 3-9 week but computes the third day from Monday; the model's Aug 4 / Aug 6 pair is consistent with the start the key accepted.
+<!-- independent-review:end -->
 
 ---
 
@@ -2759,6 +2783,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 **Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. #55/#56 AMBIGUOUS; retain stale-date, diagnostic and infrastructure facts. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
 
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** Current classification **PLAN** (was AMBIGUOUS). The proposed Jul 20 date was already past at Jul 23 delivery; the approval question is kept as secondary.
+<!-- independent-review:end -->
+
 ---
 
 ### 56. `World_Cup_Cleat_Launch.reveal-event-date-and-venue-3` · move `Reveal Rehearsal` (event)
@@ -2841,6 +2869,10 @@ Model got it right, and key is fine, but the grader still got it wrong. Since it
 
 **Human disposition, 2026-09-28:** Current classification **AMBIGUOUS**. All 11 entries arrived late; retain delivery defects and withhold unsupported model-failure attribution. All 17 checks unassessable for model capability; 16 failed state checks and one no-action pass remain factual. #55/#56 AMBIGUOUS; retain stale-date, diagnostic and infrastructure facts. This dated disposition supersedes the older pending language above. Original notes are retained. See [recorded decisions](agent-audit-continuation/NEEDS_JAMES.md).
 <!-- agent-continuation:end -->
+
+<!-- independent-review:start -->
+**Independent review, 2026-10-03:** Current classification **PLAN** (was AMBIGUOUS). The proposed Jul 19 rehearsal date was already past at delivery; the approval question is kept as secondary.
+<!-- independent-review:end -->
 
 ---
 

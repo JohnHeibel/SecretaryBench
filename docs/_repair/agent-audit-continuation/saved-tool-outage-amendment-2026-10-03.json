@@ -1,0 +1,202 @@
+{
+  "date": "2026-10-03",
+  "amends": "saved-tool-outage.json (unchanged, kept as history)",
+  "correction": "The failed secretary server spans seven consecutive captured days, 51-57. Day 54 was omitted from the original record, which listed only days with audited checks. Days 1-50 initialized the secretary server as connected and had zero tool errors.",
+  "totals": {
+    "days": 7,
+    "emails": 19,
+    "emails_share_of_run": "19/167",
+    "ops": 20,
+    "current_grader_failing_ops": 16,
+    "current_grader_passing_ops": 4,
+    "share_of_all_60_failing_ops": "16/60",
+    "audited_checks_affected": 17
+  },
+  "incidental_no_action_passes": [
+    {
+      "email_id": "Innovation-comp.one-pager-looks-good",
+      "day": 51,
+      "serve_date": "2026-07-21",
+      "sampled_in_worksheet": false,
+      "worksheet_item": null
+    },
+    {
+      "email_id": "Sponsoring-Marathon.launch-meeting-conflict",
+      "day": 52,
+      "serve_date": "2026-07-22",
+      "sampled_in_worksheet": false,
+      "worksheet_item": null
+    },
+    {
+      "email_id": "Partnership-with-deeptech-companies.confirmation-from-spadxtech",
+      "day": 54,
+      "serve_date": "2026-07-24",
+      "sampled_in_worksheet": false,
+      "worksheet_item": null
+    },
+    {
+      "email_id": "Innovation-comp.recap-agenda-finalized",
+      "day": 55,
+      "serve_date": "2026-07-25",
+      "sampled_in_worksheet": true,
+      "worksheet_item": "B15"
+    }
+  ],
+  "as_run_false_pass": {
+    "worksheet_item": "51",
+    "email_id": "World_Cup_Cleat_Launch.manufacturing-kickoff-3",
+    "as_run_passed": true,
+    "current_grader_passed": false,
+    "evidence": "captures/baseline-sonnet-4-5/verdicts.json; evt_82 still present in captures/baseline-sonnet-4-5/days/053.json#state"
+  },
+  "capture_readme_note": "captures/baseline-sonnet-4-5/README.md:14 reports \"0 errored\"; the runner marked these days ok although the secretary server had failed.",
+  "days": [
+    {
+      "day": 51,
+      "serve_date": "2026-07-21",
+      "source": "captures/baseline-sonnet-4-5/raw/day_051.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_use_events": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "3d933bbd4a9590ee0d3883f077d83bab0f6ad81f261a15528faf82a5e1147099",
+      "emails": [
+        "Innovation-comp.one-pager-looks-good",
+        "World_Cup_Cleat_Launch.manufacturing-kickoff",
+        "World_Cup_Cleat_Launch.reveal-event-budget-is-over-2"
+      ],
+      "in_original_record": true
+    },
+    {
+      "day": 52,
+      "serve_date": "2026-07-22",
+      "source": "captures/baseline-sonnet-4-5/raw/day_052.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_use_events": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "b449ef54558310600329267e9df208c1903aa0698688a927e80013c8e092e7ef",
+      "emails": [
+        "Innovation-comp.add-this-to-the-recap-agenda",
+        "Day-of-execution_and_Aftermath.green-room-before-we-go-live",
+        "World_Cup_Cleat_Launch.manufacturing-kickoff-2",
+        "Sponsoring-Marathon.launch-meeting-conflict",
+        "Partnership-with-deeptech-companies.new-meeting-during-boston-trip"
+      ],
+      "in_original_record": true
+    },
+    {
+      "day": 53,
+      "serve_date": "2026-07-23",
+      "source": "captures/baseline-sonnet-4-5/raw/day_053.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_use_events": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "0eea3363aaf8ef131c2fa27786ae086fa2e219e04652d733344a5e3d5c5b85a8",
+      "emails": [
+        "World_Cup_Cleat_Launch.manufacturing-kickoff-3",
+        "Sponsoring-Marathon.pitch-deck-2",
+        "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs",
+        "Sponsoring-Marathon.launch-meeting-conflict-2",
+        "World_Cup_Cleat_Launch.reveal-event-date-and-venue-3"
+      ],
+      "in_original_record": true
+    },
+    {
+      "day": 54,
+      "serve_date": "2026-07-24",
+      "source": "captures/baseline-sonnet-4-5/raw/day_054.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_use_events": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "7f3b803268b149b5e72893d787065bf4d81164973288e5fc98ec07b3c38156f1",
+      "emails": [
+        "Partnership-with-deeptech-companies.confirmation-from-spadxtech"
+      ],
+      "in_original_record": false
+    },
+    {
+      "day": 55,
+      "serve_date": "2026-07-25",
+      "source": "captures/baseline-sonnet-4-5/raw/day_055.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_use_events": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "da6fb3af1fb76355770b651a266f2f7f00ada823deb53529ca25d763892a648d",
+      "emails": [
+        "Innovation-comp.recap-agenda-finalized",
+        "Partnership-with-deeptech-companies.boston-dynamics-cancel"
+      ],
+      "in_original_record": true
+    },
+    {
+      "day": 56,
+      "serve_date": "2026-07-26",
+      "source": "captures/baseline-sonnet-4-5/raw/day_056.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_use_events": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "6c948be16b1832b62484faa09feced0c4a4a0d52595771dd9fcc4ae2b013248b",
+      "emails": [
+        "World_Cup_Cleat_Launch.board-sync-on-the-credit-issue",
+        "Sponsoring-Marathon.launch-meeting-recap"
+      ],
+      "in_original_record": true
+    },
+    {
+      "day": 57,
+      "serve_date": "2026-07-27",
+      "source": "captures/baseline-sonnet-4-5/raw/day_057.jsonl:1",
+      "mcp_servers": [
+        {
+          "name": "secretary",
+          "status": "failed"
+        }
+      ],
+      "secretary_tools_present": false,
+      "tool_use_events": 0,
+      "complete_stores_unchanged": true,
+      "raw_sha256": "ab4b510c287e8f1a6c7807bec95b48b5ff85db0763ae72dc3402666af281812c",
+      "emails": [
+        "World_Cup_Cleat_Launch.press-briefing-and-embargo-2"
+      ],
+      "in_original_record": true
+    }
+  ],
+  "method": "Init event mcp_servers status and tool_use count read from every raw day file; stores compared with the previous day; outcomes from an offline sb.regrade of the capture.",
+  "implication": "Unchanged from the original record: missing actions on these days cannot establish model reasoning failure. The Q8 disposition for the 17 audited checks stands."
+}

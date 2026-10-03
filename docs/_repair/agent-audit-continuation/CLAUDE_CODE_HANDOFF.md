@@ -1,5 +1,7 @@
 # SecretaryBench audit handoff for Claude Code
 
+> **Update, 2026-10-03.** The independent review is done: [INDEPENDENT_REVIEW_2026-09-29.md](INDEPENDENT_REVIEW_2026-09-29.md). James accepted its corrections, which are applied in RESULTS.md, NEEDS_JAMES.md, [human-decisions-2026-10-03.json](human-decisions-2026-10-03.json) and the [outage amendment](saved-tool-outage-amendment-2026-10-03.json). Current counts: MODEL 5, KEY 28, PLAN 10, GRADER 4, AMBIGUOUS 13 (5 unclear instruction, 8 tools down), PASS 15. The outage spans days 51-57, not six days. Counts and outage figures below are the September 29 state, kept as history.
+
 Updated September 29, 2026. Scope: the work completed with James on the saved Sonnet 4.5 run, the reasons for the decisions, and an independent second review by Claude Code.
 
 ## Current request: independently review the completed work
@@ -107,7 +109,7 @@ The original worksheet still contains #14's old KEY label and #19's old MODEL la
 
 ## Major discovery: the saved tool outage
 
-[Saved outage evidence](saved-tool-outage.json) verifies six captured days: 51, 52, 53, 55, 56, and 57. Each has a failed secretary-server initialization, absent secretary tools, no tool calls, no observed target email retrieval, and unchanged complete stores.
+[Saved outage evidence](saved-tool-outage.json) verifies six captured days: 51, 52, 53, 55, 56, and 57 (corrected 2026-10-03: day 54 also failed, so the outage is days 51-57 and 19 emails). Each has a failed secretary-server initialization, absent secretary tools, no tool calls, no observed target email retrieval, and unchanged complete stores.
 
 This affects 16 reviewed emails and 17 checks: #45 through #60, plus B15. The grader recorded 16 FAILs and B15's no-action PASS. Those are factual state results. Neither the failures nor the incidental pass establishes how the model would perform with working tools. A successful capture wrapper did not mean that the secretary connection worked.
 
@@ -234,6 +236,6 @@ The source diff should be empty at this handoff. Use the Python 3.13 virtual env
 
 Completed: the pilot, all six continuation batches, James's adjudication, and this visibility/handoff documentation.
 
-Requested next: Claude Code independently reviews the completed work using the brief at the top of this document. No second-review findings exist yet. No repair implementation or live run is in progress, and no original reviewer assignments remain.
+Requested next: Claude Code independently reviews the completed work using the brief at the top of this document. No second-review findings exist yet (superseded: see the 2026-10-03 update at the top). No repair implementation or live run is in progress, and no original reviewer assignments remain.
 
 After that review, a future task may prepare and approve the scoped repair plan, including whether O-7 moves forward in the roadmap. The unresolved scientific questions are retained as limitations: the cause of the tool outage, intended facts in inconsistent corpus passages, and requirements the supplied instructions never specified. These limits should be examined during the independent review without rerunning the original reviewer campaign.
