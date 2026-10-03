@@ -265,3 +265,7 @@ Recorded verbatim from this session. These settle the questions above; the corre
 ### Recommendation on #41/#42 and preference rules
 
 For the saved run, the system prompt never said whether a multi-day trip should be blocked, so do not require it. That gives #41 KEY and #42 KEY (the separate start and end markers are unsupported, and the model is not penalized), consistent with Q1 and Q9. Whether future models should block trips is a preference to state in the prompt, not something to grade silently.
+
+### Decision, 2026-10-03
+
+James: "score 41/42 as key." For the saved run, blocking a multi-day trip was never stated to the model, so #41 (AMBIGUOUS → KEY) and #42 (MODEL → KEY) are scored as unsupported separate start and end markers, with no model penalty. Not yet applied to RESULTS.md or the decision record; that happens in the corrections pass.
