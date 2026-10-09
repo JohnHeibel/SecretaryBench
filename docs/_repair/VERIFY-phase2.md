@@ -6,7 +6,7 @@ identity contract. **This file reports; it changes nothing.** No edit to `sb/`, 
 and `scripts/fix_match.py` were neither read nor executed.
 
 Prototype under test:
-`/private/tmp/claude-501/-Users-jamesoc-dev-SecretaryBench/fe67c85a-9c16-441a-99a9-a4b047c35b38/scratchpad/phase2.py`
+`<session scratchpad>/phase2.py`
 (`grade_email_v2`, `keywords_of`, `score_v2`, `eval_v2`).
 
 **Method.** I wrote my own scoring harness from the spec rather than calling `eval_v2`, so a
@@ -16,7 +16,7 @@ construction, the date predicate and the day loop. It shares nothing with `phase
 borrows from `sb/` only `resolver.resolve` (date arithmetic, identical under both contracts).
 Scratch code lives outside the repo at
 `…/scratchpad/ref.py`; every command below is prefixed
-`PYTHONPATH=/Users/jamesoc/dev/SecretaryBench:…/scratchpad .venv/bin/python`.
+`PYTHONPATH=<repo>:…/scratchpad .venv/bin/python`.
 
 ---
 

@@ -56,7 +56,7 @@ place before anyone reaches phase 4.
   (Search space: `daily_min` 1-5 × `daily_max` 1-29 × `urgency_horizon ∈ {3,5,7,10,14,21}`,
   seed 42, start 2026-06-01, `n_days=200`; digest = sha256 of `id@date` pairs in serve
   order, first 12 hex. Script:
-  `/private/tmp/claude-501/-Users-jamesoc-dev-SecretaryBench/fe67c85a-9c16-441a-99a9-a4b047c35b38/scratchpad/matchlog.py`.)
+  `<session scratchpad>/matchlog.py`.)
 - The recovery depends on the corpus being unchanged, and it is:
   `git diff 24331fb HEAD --stat -- corpus/` → empty. `git log --all --oneline -- corpus/`
   shows `24331fb` (2026-07-26) as the only commit touching `corpus/` since
@@ -144,7 +144,7 @@ everyone reads off the header is nearly blind to it, so the omission is invisibl
 - By contrast `--days` is inert once feasible: `daily_max=5` at `n_days` 60 / 90 / 200 all
   give digest `832b0b44bce0`. It only gates feasibility — minimum feasible `--days` is 57
   at `daily_max=5`, 68 at 4, 16 at 21, and `daily_max=3` is infeasible at any ceiling.
-  Reproduce: `/private/tmp/claude-501/-Users-jamesoc-dev-SecretaryBench/fe67c85a-9c16-441a-99a9-a4b047c35b38/scratchpad/plans2.py`.
+  Reproduce: `<session scratchpad>/plans2.py`.
 - The framing that plausibly caused the omission: `docs/design/SERVING_AND_SCHEMA.md:139`
   — `| `urgency_horizon` | Buffer before `date` deadlines; mostly a safety knob,
   secondarily affects clustering. |`
@@ -213,7 +213,7 @@ runs at the argparse defaults only — `sb/scale.py:111` calls `build_plan` with
   `n_days=730, Levers(daily_max=21)` — a third lever setting, matching neither the
   argparse defaults nor `sb.scale`.
 - Reproduce (about 4 minutes offline):
-  `/private/tmp/claude-501/-Users-jamesoc-dev-SecretaryBench/fe67c85a-9c16-441a-99a9-a4b047c35b38/scratchpad/` — the sweep is inlined in the session transcript; the shape is
+  `<session scratchpad>/` — the sweep is inlined in the session transcript; the shape is
   `build_plan(corpus, start_date=date(2026,6,1), seed=42, n_days=200, levers=Levers(dmin,dmax,hor))`
   then `run(corpus, plan, oracle_model, store=Store(corpus))`.
 
@@ -353,7 +353,7 @@ against anything.
   | canonical JSON list | `d0a8dc20579fa1a7` |
   | concat decoded text | `0adbe090d13dde1a` |
 
-  Script: `/private/tmp/claude-501/-Users-jamesoc-dev-SecretaryBench/fe67c85a-9c16-441a-99a9-a4b047c35b38/scratchpad/tryhash.py`.
+  Script: `<session scratchpad>/tryhash.py`.
 - What the runner stamps instead is a path, not content: `runner.py:531` prints
   `{corpus_dir}` — the string `corpus`. Two runs against completely different corpora at
   the same path stamp identically.

@@ -35,7 +35,7 @@ Three of the seven MODEL items (#5, #14, #42) are contested below. Because MODEL
 
 ### F1. #14 and #19 were changed without an explicit decision (High, provenance)
 
-- On Sept 26 James wrote: "Preserve my existing labels and notes; #14 and #19 remain pending decisions for me." (Codex session `~/.codex/sessions/2026/09/26/rollout-2026-09-26T00-08-37-01a0dc8b-617b-7d13-92bd-1683ca118c16.jsonl`, 2026-09-26T07:09:23Z)
+- On Sept 26 James wrote: "Preserve my existing labels and notes; #14 and #19 remain pending decisions for me." (Codex session `<Codex sessions>/2026/09/26/rollout-2026-09-26T00-08-37-01a0dc8b-617b-7d13-92bd-1683ca118c16.jsonl`, 2026-09-26T07:09:23Z)
 - James's Sept 28 reply (same file, 2026-09-28T20:08:19Z) answers Q3-Q10 individually and never mentions Q1 or Q2. It ends: *"For all other questions I didn't specifically respond to, I like your recommendations for "*. The sentence is cut off there. There is no later message from James before the commit.
 - Codex's reply at 20:11:34Z: "Your approval of the remaining recommendations also authorizes #14's change to MODEL and #19's change to AMBIGUOUS." `59d02bb` followed within minutes.
 - The records then state it as fact: RESULTS.md:41 "James approved the MODEL amendment on September 28", RESULTS.md:46 "James approved the AMBIGUOUS amendment". NEEDS_JAMES.md Q1/Q2 give "Authority: Approval of recommendations for questions not otherwise answered."
@@ -143,7 +143,7 @@ James answered Q3, Q4, Q8 and Q9 largely with questions ("are those all ... plan
 - **Worksheet:** removing the `agent-continuation` blocks from the current worksheet reproduces `540c76e` (SHA `cea96bae...`) apart from blank lines.
 - **Regrade:** `python -m sb.regrade` gives 114/167 emails, 190 ops, 60 failing and 130 passing, matching the worksheet. The serve plan regenerated from the manifest levers is identical to `manifest.json`. The system prompt is unchanged since the capture commit.
 - **Counts:** RESULTS.md has 75 unique rows: MODEL 7 (5, 11, 13, 14, 25, 30, 42), KEY 24, PLAN 8 (3, 10, 18, 20, 24, 40, 58, 60), GRADER 4 (9, 15, 36, 37), AMBIGUOUS 17, PASS 15. There are 35 queued checks. The Sept 26 split of 40 resolved (38 + 2 pilot) and 16 pending reconciles.
-- **Reviewer isolation and ordering**, from Codex's native session logs (`~/.codex/sessions/2026/09/2[56]/`), all 112 reviewer sessions (96 continuation, 16 pilot):
+- **Reviewer isolation and ordering**, from Codex's native session logs (`<Codex sessions>/2026/09/2[56]/`), all 112 reviewer sessions (96 continuation, 16 pilot):
   - Every command touched only the protocol, the reviewer's own packet and its own output directory.
   - No reviewer read `corpus/` (which contains the answer keys), `captures/`, the worksheet, coordinator files, or any other packet or review. `captures/` paths appear only as citation text inside their reports.
   - Every reviewer saved Stage A before opening any Stage B file (`stage-b.json`, after-store, trace, history), and none rewrote Stage A afterwards.

@@ -16,10 +16,10 @@ borrows from `sb/` only `resolver.resolve`/`Interval` (date arithmetic, identica
 every contract), `schema.load_corpus`, `scheduler.build_plan`, and `oracle._target`/
 `_as_dt` for the synthetic agents' dates. I then ran the prototype's own
 `report([...])` and compared. Scratch code lives outside the repo at
-`/private/tmp/claude-501/-Users-jamesoc-dev-SecretaryBench/cf81dddf-4a9b-49d4-996d-ea65d999c189/scratchpad/verify3/`
+`<session scratchpad>/verify3/`
 — `ref3.py` (contract + worlds), `eng.py` (engine path), `adv.py` (new adversaries),
 `cases.py` (constructed cases). Every command below is prefixed
-`PYTHONPATH=/Users/jamesoc/dev/SecretaryBench:<scratchdir> .venv/bin/python`.
+`PYTHONPATH=<repo>:<scratchdir> .venv/bin/python`.
 
 ---
 

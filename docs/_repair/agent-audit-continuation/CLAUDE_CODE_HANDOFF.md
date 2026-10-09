@@ -25,7 +25,7 @@ Preserve existing results and evidence. Report proposed corrections without appl
 
 ## Start here
 
-- Repository: `/Users/jamesoc/dev/SecretaryBench`.
+- Repository: `<repo>`.
 - Working branch: `codex/phase-1d-audit-pilot`. The completed human adjudication is commit `59d02bb`; this handoff is a later documentation-only commit on the same branch.
 - The saved-run hand-grade is complete for its agreed scope: all 60 failing checks and 15 sampled passing checks. Seventeen classifications intentionally remain AMBIGUOUS. That is a recorded disposition, not unfinished reviewer work.
 - James's September 28 decisions supersede older pending-decision language. Read [current results](RESULTS.md), [recorded decisions](NEEDS_JAMES.md), and the [structured human decision record](human-decisions-2026-09-28.json).
@@ -176,7 +176,7 @@ Paths below are relative to this handoff unless explicitly absolute. The essenti
 
 Local-only working material:
 
-- `/Users/jamesoc/dev/SecretaryBench/.Codex/plans/codex-setup-and-handoff.md`: concise active operational handoff.
+- `<repo>/.Codex/plans/codex-setup-and-handoff.md`: concise active operational handoff.
 - `.Codex/plans/codex-setup-and-handoff-history-through-2026-09-28.md`: preserved earlier setup and assessment notes; historical, not current instructions.
 - `.Codex/plans/audit-continuation-2026-09-25.md`: approved continuation plan and historical context.
 - `.Codex/plans/audit-continuation-2026-09-26/`: immutable input packets, maps, checksums, original worksheet snapshot, and working validation scripts.

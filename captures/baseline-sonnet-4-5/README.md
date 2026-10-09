@@ -41,8 +41,8 @@ finding O-5, and closing it is why this capture exists.
 ## Redaction
 
 The raw streams and `run.log` were edited in exactly one respect before committing:
-the absolute path `/Users/jamesoc` was replaced with `/Users/REDACTED`, and
-`/Users/jamesoc/dev/SecretaryBench` with `<repo>`. In the raw streams this string
+the absolute home-directory path was replaced with `/Users/REDACTED`, and
+the repository path with `<repo>`. In the raw streams this string
 occurred once per file, only inside the CLI's own `memory_paths.auto` field, which
 records where Claude Code keeps its session memory and has no bearing on the benchmark.
 Total change: 57 bytes across 57 files. Verified by re-running `sb.regrade` after the

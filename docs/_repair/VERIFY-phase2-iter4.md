@@ -20,7 +20,7 @@ that is identical under every contract: `resolver`, `schema.load_corpus`,
 prototype's own `report5([...])` and diffed the overlay's `grade_batch` against mine at
 **verdict *and* per-op reason *and* per-op `actual` level** on 21 worlds × 2 paths.
 Scratch code lives outside the repo at
-`/private/tmp/claude-501/-Users-jamesoc-dev-SecretaryBench/cf81dddf-4a9b-49d4-996d-ea65d999c189/scratchpad/verify4/`
+`<session scratchpad>/verify4/`
 — `ref4.py` (contract), `ref4_worlds.py` (worlds), `adv.py` / `adv2.py` (new adversaries),
 `cases.py` (constructed cases), `profile.py`, `look.py`, `dump_ref.py` / `dump_overlay.py`
 (the port diff), `mutate.py` (guard mutation testing).

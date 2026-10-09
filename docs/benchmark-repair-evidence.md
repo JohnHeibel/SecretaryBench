@@ -185,7 +185,7 @@ tool allowlist (`--tools ""` was removed because it zeroed the MCP tools —
 `BENCHMARK_RESULTS.md` §0). The model therefore has all built-in CLI tools alongside the
 benchmark's MCP tools; `ToolSearch` appears in every run log. The isolated temp cwd blocks
 `CLAUDE.md` ingestion but does not block `Read`/`Bash` from reaching
-`/Users/jamesoc/dev/SecretaryBench/corpus/nodes/*.json`, which is the answer key. No log
+`<repo>/corpus/nodes/*.json`, which is the answer key. No log
 shows any model doing this (no `Bash`, `Read`, `Grep`, `Glob` in any of the four records).
 
 ---

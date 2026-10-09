@@ -8,7 +8,7 @@ never executed.
 Every objection below carries a command, a `file:line`, or a quoted line. Scratch scripts
 live outside the repo (`/private/tmp/.../scratchpad/v_*.py`); every number here was
 produced by a script written for this pass, not by re-running a category agent's method.
-`PYTHONPATH=/Users/jamesoc/dev/SecretaryBench` prefixes each command.
+`PYTHONPATH=<repo>` prefixes each command.
 
 **Bottom line.** ~200 discrete claims checked: 6 headline numbers re-derived from scratch,
 ~50 further numeric claims re-derived, ~145 `file:line` anchors opened, 8 grep assertions
