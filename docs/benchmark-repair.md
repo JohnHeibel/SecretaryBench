@@ -1,5 +1,20 @@
 # SecretaryBench repair register
 
+## Roadmap decisions, 2026-10-09
+
+James reviewed a plain-language breakdown of the post-audit plan and an adversarial review of it (Claude Code session, 2026-10-09) and decided the following. These supersede the "proposed next steps" in the 2026-10-03 checkpoint below.
+
+1. **Publish.** Local machine paths were redacted from the current tree (earlier commits still contain them) and `debug/model-resolution` was pushed. `main` is untouched.
+2. **O-7 moves to the front** (was phase 6). Likely cause of the day 51-57 outage, not yet tested: `start_mcp` pipes the MCP server's stderr and never reads it after startup (`sb/live/runner.py:265-268`), while the store server, sent to `DEVNULL`, survived. Day 51's first attempt hit the 240 s turn timeout (`captures/baseline-sonnet-4-5/run.log:1014`) and the secretary server never reconnected. If confirmed, the failure scales with request volume, recurs, and hits chattier models sooner; a `--limit` smoke cannot show it, so the fix needs an offline stress test. O-7's "latent, not observed" text below is now wrong: the 1c capture observed it.
+3. **Saved-run reporting:** report 114/167 and 110/148 (days 51-57 excluded) side by side; neither is "the" score. The excluded tail is not representative: moves and cancels are 6 of its 20 ops against 26 of 190 overall. `sb.regrade` already scores `ok: false` days as errored but keeps them in the denominator, and the outage days are recorded `ok: true`, so validity must be derived from the raw init events, not by editing `days/*.json`.
+4. **Approved paid run:** one full rerun of the 1c baseline (seed 42, unchanged corpus and system prompt) after the O-7 fix lands and passes the offline stress test. The 1c run took 57 turns, 1847 s and $7.64 API-equivalent (sum of `total_cost_usd` in `raw/`). It gives a clean 167-email number and the first same-seed replicate.
+5. **Pass audit:** all 115 unaudited grader passes (47 no-action, 53 create, 8 move, 7 cancel), agent-assisted as in phase 1d. Timing not set; it needs its own plan when scheduled. Three of them are outage-day no-action passes and are infrastructure-limited.
+6. **Principal preferences (scope change).** The model will be given stated principal preferences, adherence will be scored, and it counts in the headline score rather than as a separate sub-score. This deliberately amends the phase 1-7 scope rule ("do not make it harder") and changes what the benchmark claims. Scores under the new prompt are a new benchmark version, not comparable with 1c, the approved rerun or the historical logs. Open: where preferences are stated (system prompt or mail; only mail tests persistence), who authors them, and what the club still decides.
+7. **Pinned levers:** seed 42, `daily_max=5`, `urgency_horizon=7` (the 1c levers) for corpus repair and the next runs.
+8. **Model-assisted grading** is accepted as a paid component (model calls per regrade), with a pinned model, stored verdicts and its own problem ID and approval, designed after the deterministic work.
+
+**Amended order.** (1) publish; (2) O-7; (3) freeze the reference: `sb.regrade` refuses a corpus or serve plan that differs from the capture's manifest unless given the frozen corpus; (4) C-1 lever record at the pinned levers; (5) the approved rerun; (6) the pass audit; (7) register new IDs (out-of-order storylines, identity words absent from the email, principal preferences), then K repairs one ID at a time, preference-independent ones first; key-only repairs are scored against the frozen capture, prose or plan repairs need a new run; (8) grader and the A series, calibrated on the 75 audited checks and tested on the pass-audit labels; (9) phase 4 reporting (null floor, per-op counts) before the next paid run; (10) paid runs: at least two, or the roster, also designed to exercise A-5; (11) phase 8. Standing rules unchanged: one problem ID at a time, never grader and corpus in one commit, nothing `verified` without a named artifact, no live run without approval.
+
 <!-- agent-continuation:register:start -->
 
 ## Current phase 1d checkpoint, 2026-10-03 (after independent review)
@@ -117,7 +132,8 @@ phase 7; and V-1's rescope-or-rebuild decision belongs to **phase 8**, after the
 
 **The scope rule for phases 1 through 7, in one line:** fix what is broken about the
 benchmark we have. Do not make it harder. What a repaired-but-trivial score implies is
-phase 8's problem.
+phase 8's problem. *(Amended 2026-10-09: stated principal preferences, scored in the
+headline score, are brought into scope by decision; see the roadmap decisions at the top.)*
 
 **Revised 2026-08-18: a baseline run moves to the front (phases 1a-1c).** The O-timing
 decision taken at sign-off assumed no run would happen before phase 7, which made O's
@@ -295,7 +311,7 @@ matched something.
 | **O-4** | retrieval is unobservable server-side; only the lossy client trace sees it | blocks-measurement | open | 6 |
 | **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | **verified** *(capture half; the log still renders only matches)* | 1a |
 | **O-6** | tools and narration attributed per day not per email; narration truncated at 200 chars | distorts-measurement | open | 6 |
-| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | open | 6 |
+| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | open | **next** *(was 6; moved 2026-10-09)* |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
 | **O-9** | objects with an unparseable date are dropped from grading without a trace | distorts-measurement | open | 6 |
 | **C-1** | no artifact records its levers; two documented commands overwrite the corpus they are recovered from | blocks-measurement | open | **1** |
@@ -1778,6 +1794,8 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-10-09**: Roadmap decisions after a plan breakdown and adversarial review, docs only: O-7 first, saved-run scores reported with and without the outage, one full baseline rerun approved after the O-7 fix, all 115 unaudited passes to be audited later, principal preferences brought into scope and into the headline score, levers pinned to the 1c baseline, model-assisted grading accepted as a paid component. Local paths redacted from the tree and the branch pushed. Evidence: the roadmap decisions at the top of this file. No source, corpus, key, grader, score or capture change; no runs.
 
 - **2026-10-03**: Phase 1d independent review (Claude Code) and corrections, docs only. Evidence: `docs/_repair/agent-audit-continuation/INDEPENDENT_REVIEW_2026-09-29.md`, `human-decisions-2026-10-03.json`, `saved-tool-outage-amendment-2026-10-03.json`. Verified from primary sources: all 75 checks re-derived; all 112 reviewer sessions stayed in their own packets and saved Stage A before opening Stage B; 192 reviewer and 392 packet hashes match; packet bodies match the runner's renderer; 107 tests pass. Corrections accepted by James: #5/#41/#42/#43 KEY, #55/#56 PLAN, outage days 51-57. Counts now MODEL 5, KEY 28, PLAN 10, GRADER 4, AMBIGUOUS 13, PASS 15. No source, corpus, key, grader, score or capture change; no runs.
 
