@@ -1,0 +1,2501 @@
+{
+  "Rebrand-goes-company-wide.hard-no-on-teasers": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.sponsor-mixer-before-the-final": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "press-tour.press-plan-for-launch": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~cover interview",
+        "expected": "event ~\"cover interview\" @ Thu Aug 06",
+        "actual": "\"Cover-story interview\" Thu Aug 06 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"cover interview\" @ Thu Aug 06"
+  },
+  "Innovation-comp.come-check-out-the-semifinal-showcase": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~budget meeting",
+        "expected": "event ~\"budget meeting\" @ Sun Jul 05",
+        "actual": "\"Budget meeting - pitch comp\" Sun Jul 05 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"budget meeting\" @ Sun Jul 05"
+  },
+  "press-tour.morning-show-launch-day": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~morning show",
+        "expected": "event ~\"morning show\" @ Mon Aug 10",
+        "actual": "\"National morning show (anchor slot)\" Mon Aug 10 7 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"morning show\" @ Mon Aug 10"
+  },
+  "Company-Retreat.company-retreat-date-conformed": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Company Retreat",
+        "expected": "event ~\"Company Retreat\" @ Mon Jun 22",
+        "actual": "\"Company retreat\" Mon Jun 22 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Company Retreat\" @ Mon Jun 22"
+  },
+  "Innovation-comp.pitch-comp-budget-review-optional-sit-in": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.quick-win-to-share": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~pitch final",
+        "expected": "event ~\"pitch final\" @ Wed Jul 15",
+        "actual": "\"Innovation pitch comp final\" Wed Jul 15 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"pitch final\" @ Wed Jul 15"
+  },
+  "shoe-product-launch-delays.product-launch-ready": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Sponsoring-Marathon.approval-of-event": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~event day!",
+        "expected": "to-do ~\"event day!\" @ Mon Aug 10",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"event day!\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"event day!\" was created"
+  },
+  "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "pizza-party.end-of-year-pizza-party": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Team pizza party",
+        "expected": "to-do ~\"Team pizza party\" @ Mon Jun 08",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"Team pizza party\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"Team pizza party\" was created"
+  },
+  "Enterprise_Ai_Selection.final-review": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~AI Final Meeting Review",
+        "expected": "to-do ~\"AI Final Meeting Review\" @ Fri Jun 05",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"AI Final Meeting Review\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"AI Final Meeting Review\" was created"
+  },
+  "Day-of-execution_and_Aftermath.billboard-photo-op": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~billboard unveiling",
+        "expected": "event ~\"billboard unveiling\" @ Mon Aug 10",
+        "actual": "\"Billboard unveiling photo op\" Mon Aug 10 11 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"billboard unveiling\" @ Mon Aug 10"
+  },
+  "Innovation-comp.judges-prep-session-want-in": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "press-tour.local-evening-news-hit": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~news segment",
+        "expected": "event ~\"news segment\" @ Tue Aug 11",
+        "actual": "\"Local evening news segment\" Tue Aug 11 6 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"news segment\" @ Tue Aug 11"
+  },
+  "Innovation-comp.heads-up-one-of-the-pitches-might-step-o": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~ask about patent overlap",
+        "expected": "event ~\"ask about patent overlap\" @ Thu Jul 16",
+        "actual": "\"Ask about patent conflict with pitch comp team\" Thu Jul 16 5 PM",
+        "reason": "wrong kind: created a to-do, expected a event"
+      }
+    ],
+    "headline": "wrong kind: created a to-do, expected a event"
+  },
+  "Day-of-execution_and_Aftermath.billboard-s-off": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "cancel ~billboard unveiling",
+        "expected": "event ~\"billboard unveiling\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      }
+    ],
+    "headline": "event ~\"billboard unveiling\" cancelled"
+  },
+  "Innovation-comp.one-of-our-designers-got-a-job-offer": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~ retention conversation",
+        "expected": "event ~\" retention conversation\" @ Thu Jun 11",
+        "actual": "\"Retention conversation with designer (team two)\" Sat Jun 13 5 PM",
+        "reason": "wrong kind: created a to-do, expected a event"
+      }
+    ],
+    "headline": "wrong kind: created a to-do, expected a event"
+  },
+  "Planning.might-be-too-much": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~board signoff",
+        "expected": "event ~\"board signoff\" @ Thu Jun 11",
+        "actual": "\"Board sign-off meeting\" Thu Jun 11 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"board signoff\" @ Thu Jun 11"
+  },
+  "Innovation-comp.a-kid-drew-the-new-logo-concept": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.two-weeks-out-from-the-final": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.storm-warning-for-finals-week": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Day-of-execution_and_Aftermath.launch-livestream": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~launch livestream",
+        "expected": "event ~\"launch livestream\" @ Mon Aug 10",
+        "actual": "\"Launch livestream (on camera)\" Mon Aug 10 7 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"launch livestream\" @ Mon Aug 10"
+  },
+  "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Outsole sample delivery",
+        "expected": "to-do ~\"Outsole sample delivery\" @ Fri Jun 12",
+        "actual": "\"Push tooling vendor for outsole sample\" Fri Jun 12 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Outsole sample delivery\" @ Fri Jun 12"
+  },
+  "Day-of-execution_and_Aftermath.metrics-readout": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~launch metrics readout",
+        "expected": "to-do ~\"launch metrics readout\" @ by Thu Aug 13",
+        "actual": "\"Compile launch metrics readout\" Thu Aug 13 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"launch metrics readout\" @ by Thu Aug 13"
+  },
+  "Innovation-comp.found-a-typo-on-the-trophy": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~approve trophy correction",
+        "expected": "event ~\"approve trophy correction\" @ Fri Jun 12",
+        "actual": "\"Approve corrected trophy engraving text\" Sat Jun 13 5 PM",
+        "reason": "wrong kind: created a to-do, expected a event"
+      }
+    ],
+    "headline": "wrong kind: created a to-do, expected a event"
+  },
+  "Innovation-comp.press-preview-ahead-of-the-final": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "press-tour.keynote-at-the-footwear": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~expo keynote",
+        "expected": "event ~\"expo keynote\" @ Wed Aug 12",
+        "actual": "\"Footwear expo keynote\" Wed Aug 12 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"expo keynote\" @ Wed Aug 12"
+  },
+  "Marketing-campaign-new-product-delay.need-to-delay-the-release-of-the-new-pro": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Delayed release date of new product",
+        "expected": "event ~\"Delayed release date of new product\" @ Fri Aug 07",
+        "actual": "\"New product release\" Fri Aug 07 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Delayed release date of new product\" @ Fri Aug 07"
+  },
+  "shoe-product-launch-delays.product-launch-ready-soon": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Enterprise_Ai_Selection.fridays-meeting-time": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Friday AI Review",
+        "expected": "event ~\"Friday AI Review\" @ Fri Jun 19",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Friday AI Review\" was created"
+      }
+    ],
+    "headline": "no event titled like \"Friday AI Review\" was created"
+  },
+  "press-tour.news-hit-fell-through": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "cancel ~news segment",
+        "expected": "event ~\"news segment\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      }
+    ],
+    "headline": "event ~\"news segment\" cancelled"
+  },
+  "Rebrand-goes-company-wide.we-need-to-talk-about-morale": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~HR morale sync",
+        "expected": "event ~\"HR morale sync\" @ Fri Jul 10",
+        "actual": "\"Morale discussion with HR\" Fri Jul 10 9 AM (45m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"HR morale sync\" @ Fri Jul 10"
+  },
+  "Innovation-comp.today-s-the-day": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Pre-Launch.dry-run-of-the-flip": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~launch-dry-run",
+        "expected": "event ~\"launch-dry-run\" @ Thu Aug 06",
+        "actual": "\"Launch dry run - site flip rehearsal\" Thu Aug 06 2 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"launch-dry-run\" @ Thu Aug 06"
+  },
+  "World_Cup_Cleat_Launch.project-design-kickoff": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Launch Window Decision",
+        "expected": "to-do ~\"Launch Window Decision\" @ Fri Jun 12",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"Launch Window Decision\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"Launch Window Decision\" was created"
+  },
+  "Innovation-comp.vp-product": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.new-sponsor-wants-to-chat": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~prospect call",
+        "expected": "event ~\"prospect call\" @ Tue Aug 25",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"prospect call\" was created"
+      }
+    ],
+    "headline": "no event titled like \"prospect call\" was created"
+  },
+  "Company-Retreat.tasks-before-the-retreat": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Contact Retreat Location",
+        "expected": "to-do ~\"Contact Retreat Location\" @ Fri Jun 19",
+        "actual": "\"Contact retreat location to approve plans\" Fri Jun 19 5 PM",
+        "reason": "matched"
+      },
+      {
+        "passed": true,
+        "label": "create ~Create VIP List",
+        "expected": "to-do ~\"Create VIP List\" @ by Mon Jun 22",
+        "actual": "\"Prepare VIP access list for retreat\" Mon Jun 22 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Contact Retreat Location\" @ Fri Jun 19; to-do ~\"Create VIP List\" @ by Mon Jun 22"
+  },
+  "Innovation-comp.great-session-today": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Serena William marketing campaign ",
+        "expected": "event ~\"Serena William marketing campaign \" @ Fri Sep 11",
+        "actual": "\"Marketing campaign - Serena Williams\" Fri Sep 11 9 AM (60m)",
+        "reason": "matched"
+      },
+      {
+        "passed": true,
+        "label": "create ~Michael Phelps Marketing Campaign ",
+        "expected": "event ~\"Michael Phelps Marketing Campaign \" @ Fri Sep 18",
+        "actual": "\"Marketing campaign - Michael Phelps\" Fri Sep 18 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Serena William marketing campaign \" @ Fri Sep 11; event ~\"Michael Phelps Marketing Campaign \" @ Fri Sep 18"
+  },
+  "Enterprise_Ai_Selection.ai-selection-finalization": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~AI Sign Off",
+        "expected": "to-do ~\"AI Sign Off\" @ Sun Jun 21",
+        "actual": "\"Sign Anthropic deal docs\" Sun Jun 21 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"AI Sign Off\" @ Sun Jun 21"
+  },
+  "Innovation-comp.brief-for-the-new-sponsor-call": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Partnership-with-deeptech-companies.whoop-collaboration-meeting": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~WHOOP Meeting",
+        "expected": "event ~\"WHOOP Meeting\" @ Wed Jun 24",
+        "actual": "\"WHOOP collaboration meeting\" Wed Jun 24 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"WHOOP Meeting\" @ Wed Jun 24"
+  },
+  "Rebrand-goes-company-wide.teaser-campaign": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~teaser review",
+        "expected": "event ~\"teaser review\" @ Tue Jun 30",
+        "actual": "\"Teaser campaign walkthrough with COMMS\" Tue Jun 30 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"teaser review\" @ Tue Jun 30"
+  },
+  "Partnership-with-deeptech-companies.whoop-meeting-reschedule": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~WHOOP Meeting",
+        "expected": "event ~\"WHOOP Meeting\" @ Wed Jun 24",
+        "actual": "\"WHOOP collaboration meeting\" Wed Jun 24 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"WHOOP Meeting\" @ Wed Jun 24"
+  },
+  "Innovation-comp.final-lineup-confirmed": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Enterprise_Ai_Selection.enterprise-ai-selection-kickoff": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Enterprise_Ai_Selection.openai-review": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.trophy-design-quick-look": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~ review trophy design",
+        "expected": "to-do ~\" review trophy design\" @ Sun Jun 21",
+        "actual": "\"Review winner's trophy design\" Sat Jun 20 5 PM",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "pizza-party.pizza-order-deadline": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~order-the-pizzas",
+        "expected": "to-do ~\"order-the-pizzas\" @ Fri Jun 19",
+        "actual": "\"Remind EA to submit pizza order\" Fri Jun 19 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"order-the-pizzas\" @ Fri Jun 19"
+  },
+  "project_atlas.freeze": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Atlas code freeze",
+        "expected": "event ~\"Atlas code freeze\" @ Mon Jun 22",
+        "actual": "\"Project Atlas code freeze go/no-go\" Mon Jun 22 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Atlas code freeze\" @ Mon Jun 22"
+  },
+  "Partnership-with-deeptech-companies.caltech-conference-invitation": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Talk to CTO about team for FBS",
+        "expected": "to-do ~\"Talk to CTO about team for FBS\" @ Fri Jun 19",
+        "actual": "\"Talk to CTO about FBS delegation candidates\" Fri Jun 19 5 PM",
+        "reason": "matched"
+      },
+      {
+        "passed": true,
+        "label": "create ~FBS Planning Meeting",
+        "expected": "event ~\"FBS Planning Meeting\" @ Fri Jun 19",
+        "actual": "\"FBS delegation planning meeting\" Fri Jun 19 2 PM (60m)",
+        "reason": "matched"
+      },
+      {
+        "passed": false,
+        "label": "create ~FBS Conference",
+        "expected": "event ~\"FBS Conference\" @ Tue Aug 25",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"FBS Conference\" was created"
+      }
+    ],
+    "headline": "no event titled like \"FBS Conference\" was created"
+  },
+  "press-tour.podcast-taping-pick-a-day": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~podcast taping",
+        "expected": "event ~\"podcast taping\" @ Mon Aug 03 or Tue Aug 04 or Wed Aug 05",
+        "actual": "\"Pick podcast taping date (Aug 3, 4, or 5)\" Mon Jun 22 5 PM",
+        "reason": "wrong kind: created a to-do, expected a event"
+      }
+    ],
+    "headline": "wrong kind: created a to-do, expected a event"
+  },
+  "shoe-product-launch-delays.design-team-meeting": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Design cut meeting",
+        "expected": "event ~\"Design cut meeting\" @ Mon Jun 22",
+        "actual": "\"Design team personnel discussion\" Mon Jun 22 9 AM (60m)",
+        "reason": "matched"
+      },
+      {
+        "passed": false,
+        "label": "create ~Decide who to cut",
+        "expected": "to-do ~\"Decide who to cut\" @ by Mon Jun 22",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"Decide who to cut\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"Decide who to cut\" was created"
+  },
+  "Sponsoring-Marathon.launching-sponsoring-eugene-marathon": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.travel-heads-up-for-finals-week": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "World_Cup_Cleat_Launch.wc-cleat-launch-window-options": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Launch Window Decision",
+        "expected": "to-do ~\"Launch Window Decision\" @ Mon Jun 29",
+        "actual": "\"Decide on WC cleat launch window\" Mon Jun 29 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Launch Window Decision\" @ Mon Jun 29"
+  },
+  "Marketing-campaign-new-product-delay.lebron-james-canceled": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Meeting with PR head about Lebron James cancellation ",
+        "expected": "event ~\"Meeting with PR head about Lebron James cancellation \" @ Wed Jun 24",
+        "actual": "\"LeBron PR discussion with COMMS\" Wed Jun 24 2 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Meeting with PR head about Lebron James cancellation \" @ Wed Jun 24"
+  },
+  "Innovation-comp.need-your-sign-off-on-prize-amounts": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~approve prize amounts",
+        "expected": "to-do ~\"approve prize amounts\" @ Thu Jun 25",
+        "actual": "\"Sign off on pitch comp prize amounts\" Thu Jun 25 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"approve prize amounts\" @ Thu Jun 25"
+  },
+  "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Confirm Outsole PO",
+        "expected": "to-do ~\"Confirm Outsole PO\" @ Tue Jun 23",
+        "actual": "\"Confirm PO with vendor for outsole sample\" Fri Jun 26 5 PM",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "Rebrand-goes-company-wide.please-reconsider-this-rebrand": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Sponsoring-Marathon.approval-needed-race-sponsorship-budget": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Marketing-campaign-new-product-delay.serena-williams-reschedule": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Serena William marketing campaign ",
+        "expected": "event ~\"Serena William marketing campaign \" @ Tue Sep 22",
+        "actual": "\"Marketing campaign - Serena Williams\" Tue Sep 22 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Serena William marketing campaign \" @ Tue Sep 22"
+  },
+  "Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~all hands webinar",
+        "expected": "event ~\"all hands webinar\" @ by Fri Aug 07",
+        "actual": "\"All-hands webinar - rebrand alignment\" Fri Aug 07 2 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"all hands webinar\" @ by Fri Aug 07"
+  },
+  "Planning.acme-trademark-clear": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~LeBron James marketing campaign scheduled",
+        "expected": "event ~\"LeBron James marketing campaign scheduled\" @ Mon Aug 24",
+        "actual": "\"Marketing campaign - LeBron James\" Mon Aug 24 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"LeBron James marketing campaign scheduled\" @ Mon Aug 24"
+  },
+  "Innovation-comp.kickoff-went-well": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "pizza-party.conference-room-reservation": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~launchmeeting",
+        "expected": "event ~\"launchmeeting\" @ Thu Jun 25",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"launchmeeting\" was created"
+      }
+    ],
+    "headline": "no event titled like \"launchmeeting\" was created"
+  },
+  "Innovation-comp.board-slot-the-week-after-finals": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~board presentation",
+        "expected": "event ~\"board presentation\" @ Wed Jul 22",
+        "actual": "\"Board presentation - pitch comp results\" Wed Jul 22 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"board presentation\" @ Wed Jul 22"
+  },
+  "project_atlas.beta": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Atlas beta feedback",
+        "expected": "to-do ~\"Atlas beta feedback\" @ by Mon Jul 06",
+        "actual": "\"Compile and summarize Atlas beta feedback\" Mon Jul 06 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Atlas beta feedback\" @ by Mon Jul 06"
+  },
+  "Pre-Launch.launch-day-locked": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~site go-live",
+        "expected": "event ~\"site go-live\" @ Mon Aug 10",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"site go-live\" was created"
+      },
+      {
+        "passed": true,
+        "label": "create ~sign COO docs",
+        "expected": "to-do ~\"sign COO docs\" @ by Mon Aug 03",
+        "actual": "\"Sign off on COO items for launch\" Mon Aug 03 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "no event titled like \"site go-live\" was created"
+  },
+  "Innovation-comp.thanks-for-the-sign-off": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Planning.rebrand-pitch": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~vision sync",
+        "expected": "event ~\"vision sync\" @ Mon Jun 15",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"vision sync\" was created"
+      }
+    ],
+    "headline": "no event titled like \"vision sync\" was created"
+  },
+  "Day-of-execution_and_Aftermath.we-are-live": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Greenlight Call",
+        "expected": "event ~\"Greenlight Call\" @ Mon Jun 29",
+        "actual": "\"WC cleat greenlight call with board\" Mon Jun 29 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Greenlight Call\" @ Mon Jun 29"
+  },
+  "Company-Retreat.in-town-and-would-love-to-connect": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Company Retreat",
+        "expected": "event ~\"Company Retreat\" @ Mon Jun 29",
+        "actual": "\"Company retreat (rescheduled)\" Mon Jun 29 9 AM (60m)",
+        "reason": "matched"
+      },
+      {
+        "passed": false,
+        "label": "move ~Contact Retreat Location",
+        "expected": "to-do ~\"Contact Retreat Location\" @ Mon Jun 29",
+        "actual": "\"Contact retreat location to approve plans\" Fri Jun 19 5 PM",
+        "reason": "on the wrong day"
+      },
+      {
+        "passed": false,
+        "label": "create ~Athlete Meeting",
+        "expected": "event ~\"Athlete Meeting\" @ Mon Jun 22",
+        "actual": "\"Meeting with major athlete\" Sat Aug 22 9 AM (60m)",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "Sponsoring-Marathon.race-sponsorship-budget-goals": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "pizza-party.pizza-place-selection": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Pizza decision",
+        "expected": "to-do ~\"Pizza decision\" @ by Mon Jun 29",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"Pizza decision\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"Pizza decision\" was created"
+  },
+  "project_atlas.board-demo": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Atlas board demo",
+        "expected": "event ~\"Atlas board demo\" @ Mon Jul 06",
+        "actual": "\"Atlas live board demo\" Mon Jul 06 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Atlas board demo\" @ Mon Jul 06"
+  },
+  "project_atlas.demo-moved": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Atlas board demo",
+        "expected": "event ~\"Atlas board demo\" @ Fri Jul 03",
+        "actual": "\"Atlas live board demo\" Fri Jul 03 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Atlas board demo\" @ Fri Jul 03"
+  },
+  "Sponsoring-Marathon.sponsorship-tiers": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~approval of tier",
+        "expected": "to-do ~\"approval of tier\" @ Fri Jun 19",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"approval of tier\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"approval of tier\" was created"
+  },
+  "Rebrand-goes-company-wide.standing-down-on-teasers": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "cancel ~teaser review",
+        "expected": "event ~\"teaser review\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      }
+    ],
+    "headline": "event ~\"teaser review\" cancelled"
+  },
+  "Marketing-campaign-new-product-delay.ronaldo-s-availability-for-marketing-cam": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Giano Ronaldo marketing campaign ",
+        "expected": "event ~\"Giano Ronaldo marketing campaign \" @ Sat Aug 08",
+        "actual": "\"Marketing campaign - Ronaldo\" Sat Aug 08 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Giano Ronaldo marketing campaign \" @ Sat Aug 08"
+  },
+  "World_Cup_Cleat_Launch.final-colorway-for-sign-off": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Design Freeze Sign Off",
+        "expected": "to-do ~\"Design Freeze Sign Off\" @ Sun Jul 19",
+        "actual": "\"Sign off on WC cleat final colorway\" Sun Jul 19 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Design Freeze Sign Off\" @ Sun Jul 19"
+  },
+  "pizza-party.pizza-party-budget": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Pre-Launch.embargo-lifts-at-six": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~embargo lift",
+        "expected": "event ~\"embargo lift\" @ Mon Aug 10",
+        "actual": "\"Press embargo lift\" Mon Aug 10 6 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"embargo lift\" @ Mon Aug 10"
+  },
+  "Day-of-execution_and_Aftermath.congrats-on-the-relaunch": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Planning.can-t-do-thursday": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "move ~board signoff",
+        "expected": "event ~\"board signoff\" @ Wed Jul 15",
+        "actual": "\"Board sign-off meeting\" Thu Jun 11 9 AM (60m)",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "project_atlas.legal-fyi": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "World_Cup_Cleat_Launch.final-colorway-for-sign-off-2": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Design Freeze Sign Off",
+        "expected": "to-do ~\"Design Freeze Sign Off\" @ Wed Jul 08",
+        "actual": "\"Sign off on WC cleat final colorway\" Wed Jul 08 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Design Freeze Sign Off\" @ Wed Jul 08"
+  },
+  "Innovation-comp.team-morale-lunch-during-the-comp": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Company-Retreat.athelete-visit": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Create A List For Athlete Visit",
+        "expected": "to-do ~\"Create A List For Athlete Visit\" @ by Wed Jul 22",
+        "actual": "\"Create guest list for athlete visit and contact attendees\" Thu Aug 20 5 PM",
+        "reason": "on the wrong day"
+      },
+      {
+        "passed": false,
+        "label": "create ~Contact People Added To List",
+        "expected": "event ~\"Contact People Added To List\" @ Wed Jul 22",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Contact People Added To List\" was created"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "Innovation-comp.quick-favor-before-the-final": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~board deck one pager",
+        "expected": "to-do ~\"board deck one pager\" @ Wed Jul 15",
+        "actual": "\"Prepare one-pager on pitch comp for board deck\" Tue Jul 21 5 PM",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "Innovation-comp.sponsor-wants-a-follow-up-call": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~sponsor call",
+        "expected": "event ~\"sponsor call\" @ Wed Aug 12",
+        "actual": "\"Follow-up call with retail sponsor\" Wed Aug 12 2 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"sponsor call\" @ Wed Aug 12"
+  },
+  "Innovation-comp.she-s-staying": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Enterprise_Ai_Selection.anthropic-google-review": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Send CTO Rubric from Meetings",
+        "expected": "to-do ~\"Send CTO Rubric from Meetings\" @ Sun Jul 05",
+        "actual": "\"Send AI notes and complete rubric for CTO\" Sun Jul 05 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Send CTO Rubric from Meetings\" @ Sun Jul 05"
+  },
+  "Pre-Launch.store-floors-reset-overnight": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~floor reset",
+        "expected": "event ~\"floor reset\" @ Sun Aug 09",
+        "actual": "\"Retail floor reset - new branding\" Sun Aug 09 8 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"floor reset\" @ Sun Aug 09"
+  },
+  "Innovation-comp.sponsor-call-no-longer-needed": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "cancel ~sponsor call",
+        "expected": "event ~\"sponsor call\" cancelled",
+        "actual": "\"Intro call with potential sponsor\" Tue Aug 25 9 AM (60m)",
+        "reason": "should be cancelled, but still on the calendar"
+      }
+    ],
+    "headline": "should be cancelled, but still on the calendar"
+  },
+  "Planning.memo-before-the-board-sits": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~budget memo",
+        "expected": "to-do ~\"budget memo\" @ Tue Jul 14",
+        "actual": "\"Finalize rebrand budget memo for CFO\" Tue Jul 14 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"budget memo\" @ Tue Jul 14"
+  },
+  "Pre-Launch.design-locked": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~production handoff design",
+        "expected": "to-do ~\"production handoff design\" @ by Mon Aug 03",
+        "actual": "\"Finalize hero film and campaign stills\" Mon Aug 03 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"production handoff design\" @ by Mon Aug 03"
+  },
+  "pizza-party.client-demo-conflict": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "move ~Team pizza party",
+        "expected": "to-do ~\"Team pizza party\" @ Tue Jul 14",
+        "actual": "\"Remind EA to submit pizza order\" Fri Jun 19 5 PM",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "World_Cup_Cleat_Launch.reveal-event-date-and-venue": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Reveal Event",
+        "expected": "event ~\"Reveal Event\" @ Thu Aug 13",
+        "actual": "\"WC cleat reveal event (on stage)\" Thu Aug 13 6 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Reveal Event\" @ Thu Aug 13"
+  },
+  "Day-of-execution_and_Aftermath.thank-the-team": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~thank you lunch",
+        "expected": "event ~\"thank you lunch\" @ Tue Aug 11",
+        "actual": "\"Launch team thank-you lunch\" Tue Aug 11 12 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"thank you lunch\" @ Tue Aug 11"
+  },
+  "Innovation-comp.let-s-set-up-a-recap": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~recap meeting",
+        "expected": "event ~\"recap meeting\" @ Fri Sep 25",
+        "actual": "\"Pitch comp recap with VP Product\" Fri Sep 25 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"recap meeting\" @ Fri Sep 25"
+  },
+  "Innovation-comp.great-year-overall": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Sponsoring-Marathon.approval-of-budget-tier": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~sponsorship & budget approval meeting",
+        "expected": "event ~\"sponsorship & budget approval meeting\" @ Wed Jul 22",
+        "actual": "\"Final approval meeting - sponsorship tier/budget\" Tue Jul 14 9 AM (60m)",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Endorsement LOI Review",
+        "expected": "to-do ~\"Endorsement LOI Review\" @ Fri Jul 10",
+        "actual": "\"Review and approve athlete endorsement LOI\" Fri Jul 10 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Endorsement LOI Review\" @ Fri Jul 10"
+  },
+  "World_Cup_Cleat_Launch.press-briefing-and-embargo": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Press Briefing",
+        "expected": "event ~\"Press Briefing\" @ Thu Aug 06",
+        "actual": "\"Press briefing (under embargo)\" Thu Aug 06 9 AM (60m)",
+        "reason": "matched"
+      },
+      {
+        "passed": true,
+        "label": "create ~Approve Press Embargo",
+        "expected": "to-do ~\"Approve Press Embargo\" @ Tue Jul 14",
+        "actual": "\"Approve press embargo plan for WC reveal\" Tue Jul 14 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Press Briefing\" @ Thu Aug 06; to-do ~\"Approve Press Embargo\" @ Tue Jul 14"
+  },
+  "Company-Retreat.planning-call-and-forms-for-your-company": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Retreat Company Meeting Call",
+        "expected": "event ~\"Retreat Company Meeting Call\" @ Tue Jul 21",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Retreat Company Meeting Call\" was created"
+      },
+      {
+        "passed": false,
+        "label": "create ~Fill out Retreat Forms",
+        "expected": "to-do ~\"Fill out Retreat Forms\" @ Tue Jul 21",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"Fill out Retreat Forms\" was created"
+      }
+    ],
+    "headline": "no event titled like \"Retreat Company Meeting Call\" was created"
+  },
+  "shoe-product-launch-delays.design-delays-internal-conflicts": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Double check Josh's advertising work",
+        "expected": "to-do ~\"Double check Josh's advertising work\" @ Wed Jul 15",
+        "actual": "\"Review Josh's marketing advertisements\" Wed Jul 15 5 PM",
+        "reason": "matched"
+      },
+      {
+        "passed": false,
+        "label": "create ~Meet with Melissa 1",
+        "expected": "event ~\"Meet with Melissa 1\" @ Wed Jul 08",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Meet with Melissa 1\" was created"
+      }
+    ],
+    "headline": "no event titled like \"Meet with Melissa 1\" was created"
+  },
+  "Innovation-comp.confirmed-for-the-new-sponsor-call": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.press-wants-a-short-interview": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~press interview",
+        "expected": "event ~\"press interview\" @ Fri Sep 18",
+        "actual": "\"Press interview - pitch comp follow-up\" Fri Sep 18 2 PM (20m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"press interview\" @ Fri Sep 18"
+  },
+  "press-tour.keynote-slot-swapped": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~expo keynote",
+        "expected": "event ~\"expo keynote\" @ Sun Sep 13",
+        "actual": "\"Footwear expo keynote\" Sun Sep 13 11 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"expo keynote\" @ Sun Sep 13"
+  },
+  "Innovation-comp.mid-comp-check-in-with-the-teams": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.press-interview-confirmed": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.post-recap-follow-ups": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~ thank judges",
+        "expected": "to-do ~\" thank judges\" @ Sun Sep 27",
+        "actual": "\"Send thank you note to pitch comp judges\" Sun Sep 27 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\" thank judges\" @ Sun Sep 27"
+  },
+  "Innovation-comp.prep-doc-for-the-board-presentation": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~review board slides",
+        "expected": "to-do ~\"review board slides\" @ Mon Jul 20",
+        "actual": "\"Review board presentation slide draft\" Tue Jul 21 5 PM",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "Innovation-comp.mixer-was-a-hit": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.final-headcount-for-the-recap": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "shoe-product-launch-delays.budget-exceeded": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Double check Josh's advertising work",
+        "expected": "to-do ~\"Double check Josh's advertising work\" @ Wed Jul 22",
+        "actual": "\"Review Josh's marketing advertisements\" Wed Jul 22 5 PM",
+        "reason": "matched"
+      },
+      {
+        "passed": false,
+        "label": "create ~First bill meeting",
+        "expected": "event ~\"First bill meeting\" @ Wed Jul 15",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"First bill meeting\" was created"
+      },
+      {
+        "passed": false,
+        "label": "create ~Second bill meeting",
+        "expected": "event ~\"Second bill meeting\" @ Wed Jul 29",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Second bill meeting\" was created"
+      }
+    ],
+    "headline": "no event titled like \"First bill meeting\" was created"
+  },
+  "Partnership-with-deeptech-companies.boston-partnership-trip": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Boston Companies Brainstorm",
+        "expected": "to-do ~\"Boston Companies Brainstorm\" @ by Mon Jul 20",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"Boston Companies Brainstorm\" was created"
+      },
+      {
+        "passed": true,
+        "label": "create ~Ad-hoc Strategy Meeting for Boston Trip",
+        "expected": "event ~\"Ad-hoc Strategy Meeting for Boston Trip\" @ Mon Jul 20",
+        "actual": "\"WHOOP Boston trip strategy meeting\" Mon Jul 20 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "no to-do titled like \"Boston Companies Brainstorm\" was created"
+  },
+  "Planning.locked-in-for": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "project_atlas.ceo-note": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Atlas press interview",
+        "expected": "event ~\"Atlas press interview\" @ Mon Sep 07",
+        "actual": "\"First Atlas press interview\" Mon Sep 07 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Atlas press interview\" @ Mon Sep 07"
+  },
+  "World_Cup_Cleat_Launch.reveal-event-budget-is-over": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Approve revised event budget",
+        "expected": "to-do ~\"Approve revised event budget\" @ Fri Jul 17",
+        "actual": "\"Approve revised WC reveal event budget\" Fri Jul 17 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Approve revised event budget\" @ Fri Jul 17"
+  },
+  "Company-Retreat.inquiry-on-vip-list": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Create VIP List",
+        "expected": "to-do ~\"Create VIP List\" @ by Thu Jul 16",
+        "actual": "\"Prepare VIP access list for retreat\" Thu Jul 16 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Create VIP List\" @ by Thu Jul 16"
+  },
+  "Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "pizza-party.updated-pizza-party-schedule": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Partnership-with-deeptech-companies.boston-dynamics": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "pizza-party.room-change": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.order-placed-for-trophies": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "project_atlas.launch-dinner": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Atlas launch dinner",
+        "expected": "event ~\"Atlas launch dinner\" @ Mon Aug 31",
+        "actual": "\"Atlas launch-night team dinner\" Mon Aug 31 6 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Atlas launch dinner\" @ Mon Aug 31"
+  },
+  "Enterprise_Ai_Selection.ai-meeting-schedule": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Anthropic Zoom Call ",
+        "expected": "event ~\"Anthropic Zoom Call \" @ Tue Jul 21",
+        "actual": "\"Anthropic demo (Zoom)\" Tue Jul 21 9 AM (60m)",
+        "reason": "matched"
+      },
+      {
+        "passed": true,
+        "label": "create ~Google Zoom Call",
+        "expected": "event ~\"Google Zoom Call\" @ Tue Jul 21",
+        "actual": "\"Google Gemini demo (Zoom)\" Tue Jul 21 2 PM (60m)",
+        "reason": "matched"
+      },
+      {
+        "passed": true,
+        "label": "create ~OpenAI In Person Walk Through ",
+        "expected": "event ~\"OpenAI In Person Walk Through \" @ Wed Jul 22",
+        "actual": "\"OpenAI ChatGPT demo (in-person)\" Wed Jul 22 2 PM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Anthropic Zoom Call \" @ Tue Jul 21; event ~\"Google Zoom Call\" @ Tue Jul 21; event ~\"OpenAI In Person Walk Through \" @ Wed Jul 22"
+  },
+  "shoe-product-launch-delays.re-design-team-meeting": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "cancel ~Decide who to cut",
+        "expected": "to-do ~\"Decide who to cut\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      },
+      {
+        "passed": true,
+        "label": "cancel ~Design cut meeting",
+        "expected": "event ~\"Design cut meeting\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      }
+    ],
+    "headline": "to-do ~\"Decide who to cut\" cancelled; event ~\"Design cut meeting\" cancelled"
+  },
+  "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal-2": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Endorsement LOI Review",
+        "expected": "to-do ~\"Endorsement LOI Review\" @ Wed Jul 22",
+        "actual": "\"Review and approve athlete endorsement LOI\" Wed Jul 22 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Endorsement LOI Review\" @ Wed Jul 22"
+  },
+  "project_atlas.dinner-cancel": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "cancel ~Atlas launch dinner",
+        "expected": "event ~\"Atlas launch dinner\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      }
+    ],
+    "headline": "event ~\"Atlas launch dinner\" cancelled"
+  },
+  "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat-2": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.last-year-s-recap-notes-for-reference": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "World_Cup_Cleat_Launch.reveal-event-date-and-venue-2": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Reveal Rehearsal",
+        "expected": "event ~\"Reveal Rehearsal\" @ Wed Aug 12",
+        "actual": "\"Design walk-through at WC reveal\" Thu Aug 13 7 PM (30m)",
+        "reason": "on the wrong day"
+      },
+      {
+        "passed": false,
+        "label": "create ~Design Lead Stage Slot",
+        "expected": "event ~\"Design Lead Stage Slot\" @ Mon Jul 20",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Design Lead Stage Slot\" was created"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "World_Cup_Cleat_Launch.tooling-po-needs-approval": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Approve tooling PO",
+        "expected": "to-do ~\"Approve tooling PO\" @ Fri Jul 17",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"Approve tooling PO\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"Approve tooling PO\" was created"
+  },
+  "Partnership-with-deeptech-companies.boston-trip-details": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Boston Trip Start",
+        "expected": "event ~\"Boston Trip Start\" @ Mon Aug 03\u2013Aug 09",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Boston Trip Start\" was created"
+      },
+      {
+        "passed": false,
+        "label": "create ~Boston Trip End",
+        "expected": "event ~\"Boston Trip End\" @ Sun Aug 09",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Boston Trip End\" was created"
+      },
+      {
+        "passed": true,
+        "label": "create ~WHOOP HQ Visit",
+        "expected": "event ~\"WHOOP HQ Visit\" @ Mon Aug 03\u2013Aug 09",
+        "actual": "\"Boston trip - WHOOP HQ visit\" Mon Aug 03 9 AM (480m)",
+        "reason": "matched"
+      },
+      {
+        "passed": true,
+        "label": "create ~Boston Dynamics Visit",
+        "expected": "event ~\"Boston Dynamics Visit\" @ Wed Aug 05",
+        "actual": "\"Boston trip - Boston Dynamics visit\" Wed Aug 05 9 AM (480m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "no event titled like \"Boston Trip Start\" was created"
+  },
+  "Innovation-comp.this-pitch-comp-thing-is-going-around": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Sponsoring-Marathon.pitch-deck": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "\"Ensure Marketing creates pitch deck for race director\" Thu Jul 30 5 PM",
+        "reason": "over-acted \u2014 created \"Ensure Marketing creates pitch deck for race director\" Thu Jul 30 5 PM"
+      }
+    ],
+    "headline": "over-acted \u2014 created \"Ensure Marketing creates pitch deck for race director\" Thu Jul 30 5 PM"
+  },
+  "Innovation-comp.one-pager-looks-good": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "World_Cup_Cleat_Launch.manufacturing-kickoff": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Manufacturing Kickoff",
+        "expected": "event ~\"Manufacturing Kickoff\" @ Wed Jul 22",
+        "actual": "\"WC cleat manufacturing kickoff\" Wed Jul 22 11 AM (30m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Manufacturing Kickoff\" @ Wed Jul 22"
+  },
+  "World_Cup_Cleat_Launch.reveal-event-budget-is-over-2": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "move ~Approve revised event budget",
+        "expected": "to-do ~\"Approve revised event budget\" @ Wed Jul 22",
+        "actual": "\"Approve revised WC reveal event budget\" Wed Jul 22 5 PM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"Approve revised event budget\" @ Wed Jul 22"
+  },
+  "Innovation-comp.add-this-to-the-recap-agenda": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~add promo agenda item",
+        "expected": "to-do ~\"add promo agenda item\" @ Fri Sep 25",
+        "actual": "\"Add early promotion item to recap agenda\" Fri Sep 25 9 AM",
+        "reason": "matched"
+      }
+    ],
+    "headline": "to-do ~\"add promo agenda item\" @ Fri Sep 25"
+  },
+  "Day-of-execution_and_Aftermath.green-room-before-we-go-live": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~green room",
+        "expected": "event ~\"green room\" @ Thu Sep 10",
+        "actual": "\"Green room - mic check and talking points\" Mon Aug 10 6 PM (60m)",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "World_Cup_Cleat_Launch.manufacturing-kickoff-2": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Design Lead 1:1",
+        "expected": "event ~\"Design Lead 1:1\" @ Fri Jul 24",
+        "actual": "\"Design team credit discussion\" Fri Jul 24 9 AM (60m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Design Lead 1:1\" @ Fri Jul 24"
+  },
+  "Sponsoring-Marathon.launch-meeting-conflict": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "\"Launch meeting (rescheduled)\" Fri Jul 24 1 PM (60m)",
+        "reason": "over-acted \u2014 created \"Launch meeting (rescheduled)\" Fri Jul 24 1 PM (60m)"
+      }
+    ],
+    "headline": "over-acted \u2014 created \"Launch meeting (rescheduled)\" Fri Jul 24 1 PM (60m)"
+  },
+  "Partnership-with-deeptech-companies.new-meeting-during-boston-trip": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "create ~Actnano Visit",
+        "expected": "event ~\"Actnano Visit\" @ Sun Aug 09",
+        "actual": "\"Boston trip - Actnano Inc. visit\" Sun Aug 09 9 AM (480m)",
+        "reason": "matched"
+      }
+    ],
+    "headline": "event ~\"Actnano Visit\" @ Sun Aug 09"
+  },
+  "World_Cup_Cleat_Launch.manufacturing-kickoff-3": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "cancel ~Design Lead Stage Slot",
+        "expected": "event ~\"Design Lead Stage Slot\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      }
+    ],
+    "headline": "event ~\"Design Lead Stage Slot\" cancelled"
+  },
+  "Sponsoring-Marathon.pitch-deck-2": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Pitch Breifing",
+        "expected": "event ~\"Pitch Breifing\" @ Sun Aug 02",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Pitch Breifing\" was created"
+      }
+    ],
+    "headline": "no event titled like \"Pitch Breifing\" was created"
+  },
+  "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~SpadXTech Meeting",
+        "expected": "event ~\"SpadXTech Meeting\" @ Wed Aug 05",
+        "actual": "\"Boston trip - SpadXTech meeting\" Tue Aug 04 9 AM (480m)",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  },
+  "Sponsoring-Marathon.launch-meeting-conflict-2": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~send launch meeting link",
+        "expected": "to-do ~\"send launch meeting link\" @ by Fri Jul 24",
+        "actual": "(nothing matching created)",
+        "reason": "no to-do titled like \"send launch meeting link\" was created"
+      }
+    ],
+    "headline": "no to-do titled like \"send launch meeting link\" was created"
+  },
+  "World_Cup_Cleat_Launch.reveal-event-date-and-venue-3": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "move ~Reveal Event",
+        "expected": "event ~\"Reveal Event\" @ Mon Jul 20",
+        "actual": "\"WC cleat reveal event (on stage)\" Thu Aug 20 6 PM (60m); \"Press briefing (under embargo)\" Thu Aug 06 9 AM (60m)",
+        "reason": "moved, but 1 stale copy left behind (double-booked)"
+      },
+      {
+        "passed": false,
+        "label": "move ~Reveal Rehearsal",
+        "expected": "event ~\"Reveal Rehearsal\" @ Sun Jul 19",
+        "actual": "\"Design team credit discussion\" Fri Jul 24 9 AM (60m)",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "moved, but 1 stale copy left behind (double-booked)"
+  },
+  "Partnership-with-deeptech-companies.confirmation-from-spadxtech": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Innovation-comp.recap-agenda-finalized": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "no-action",
+        "expected": "take no action (FYI / no scheduling needed)",
+        "actual": "(nothing)",
+        "reason": "correctly took no action"
+      }
+    ],
+    "headline": "correctly took no action"
+  },
+  "Partnership-with-deeptech-companies.boston-dynamics-cancel": {
+    "passed": true,
+    "max": 1,
+    "details": [
+      {
+        "passed": true,
+        "label": "cancel ~Boston Dynamics Visit",
+        "expected": "event ~\"Boston Dynamics Visit\" cancelled",
+        "actual": "(nothing \u2014 cancelled)",
+        "reason": "cancelled"
+      }
+    ],
+    "headline": "event ~\"Boston Dynamics Visit\" cancelled"
+  },
+  "World_Cup_Cleat_Launch.board-sync-on-the-credit-issue": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~Board Sync",
+        "expected": "event ~\"Board Sync\" @ Thu Jul 23",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"Board Sync\" was created"
+      }
+    ],
+    "headline": "no event titled like \"Board Sync\" was created"
+  },
+  "Sponsoring-Marathon.launch-meeting-recap": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "create ~sponsorshippitch",
+        "expected": "event ~\"sponsorshippitch\" @ Sun Aug 09",
+        "actual": "(nothing matching created)",
+        "reason": "no event titled like \"sponsorshippitch\" was created"
+      }
+    ],
+    "headline": "no event titled like \"sponsorshippitch\" was created"
+  },
+  "World_Cup_Cleat_Launch.press-briefing-and-embargo-2": {
+    "passed": false,
+    "max": 1,
+    "details": [
+      {
+        "passed": false,
+        "label": "move ~Press Briefing",
+        "expected": "event ~\"Press Briefing\" @ Mon Jul 13",
+        "actual": "\"Press briefing (under embargo)\" Thu Aug 13 9 AM (60m)",
+        "reason": "on the wrong day"
+      }
+    ],
+    "headline": "on the wrong day"
+  }
+}

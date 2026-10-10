@@ -1,0 +1,1845 @@
+--- sb.live.runner start_mcp 2026-10-09T21:57:56 ---
+<repo>/.venv/lib/python3.13/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+  warnings.warn(
+INFO:     Started server process [63747]
+INFO:     Waiting for application startup.
+StreamableHTTP session manager started
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8078 (Press CTRL+C to quit)
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Rebrand-goes-company-wide.hard-no-on-teasers "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.sponsor-mixer-before-the-final "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/press-tour.press-plan-for-launch "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.come-check-out-the-semifinal-showcase "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.need-a-budget-meeting-for-the-pitch-comp "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/search?regex=false&limit=20&q=final "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/search?regex=false&limit=20&q=innovation+comp "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/search?regex=false&limit=20&q=pitch "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/press-tour.morning-show-launch-day "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Company-Retreat.company-retreat-date-conformed "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.pitch-comp-budget-review-optional-sit-in "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.quick-win-to-share "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.pitch-comp-is-on-locking-in-the-final-da "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/search?regex=false&limit=10&q=sponsor+mixer+before+the+final "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/shoe-product-launch-delays.product-launch-ready "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.approval-of-event "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/search?regex=false&limit=10&q=marathon "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/search?regex=false&limit=10&q=event+pop+up "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.pitch-comp-is-on-locking-in-the-final-da-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.end-of-year-pizza-party "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Enterprise_Ai_Selection.final-review "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.billboard-photo-op "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.judges-prep-session-want-in "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/press-tour.local-evening-news-hit "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.heads-up-one-of-the-pitches-might-step-o "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.billboard-s-off "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/events "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: DELETE http://localhost:8077/events/evt_9 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.one-of-our-designers-got-a-job-offer "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Planning.might-be-too-much "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.a-kid-drew-the-new-logo-concept "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.two-weeks-out-from-the-final "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.storm-warning-for-finals-week "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.launch-livestream "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.metrics-readout "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.found-a-typo-on-the-trophy "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.press-preview-ahead-of-the-final "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/press-tour.keynote-at-the-footwear "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.need-to-delay-the-release-of-the-new-pro "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/shoe-product-launch-delays.product-launch-ready-soon "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Enterprise_Ai_Selection.fridays-meeting-time "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/press-tour.news-hit-fell-through "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Rebrand-goes-company-wide.we-need-to-talk-about-morale "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.today-s-the-day "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Pre-Launch.dry-run-of-the-flip "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: DELETE http://localhost:8077/events/evt_10 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.project-design-kickoff "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.vp-product "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.new-sponsor-wants-to-chat "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Company-Retreat.tasks-before-the-retreat "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.great-session-today "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Enterprise_Ai_Selection.ai-selection-finalization "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.brief-for-the-new-sponsor-call "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.whoop-collaboration-meeting "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Rebrand-goes-company-wide.teaser-campaign "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.whoop-meeting-reschedule "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.final-lineup-confirmed "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Enterprise_Ai_Selection.enterprise-ai-selection-kickoff "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Enterprise_Ai_Selection.openai-review "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.trophy-design-quick-look "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.pizza-order-deadline "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.freeze "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.caltech-conference-invitation "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/press-tour.podcast-taping-pick-a-day "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/shoe-product-launch-delays.design-team-meeting "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.launching-sponsoring-eugene-marathon "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.travel-heads-up-for-finals-week "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.wc-cleat-launch-window-options "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.lebron-james-canceled "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.need-your-sign-off-on-prize-amounts "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Rebrand-goes-company-wide.please-reconsider-this-rebrand "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.approval-needed-race-sponsorship-budget "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.serena-williams-reschedule "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/events/evt_27 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Rebrand-goes-company-wide.all-hands-to-get-everyone-aligned "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Planning.acme-trademark-clear "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.kickoff-went-well "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.conference-room-reservation "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.launching-sponsoring-eugene-marathon-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.board-slot-the-week-after-finals "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.beta "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Pre-Launch.launch-day-locked "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.thanks-for-the-sign-off "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Planning.rebrand-pitch "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.we-are-live "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Company-Retreat.in-town-and-would-love-to-connect "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.race-sponsorship-budget-goals "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.pizza-place-selection "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.board-demo "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/events/evt_5 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.demo-moved "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.sponsorship-tiers "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/events/evt_52 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Rebrand-goes-company-wide.standing-down-on-teasers "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: DELETE http://localhost:8077/events/evt_30 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.ronaldo-s-availability-for-marketing-cam "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.final-colorway-for-sign-off "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.pizza-party-budget "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Pre-Launch.embargo-lifts-at-six "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.congrats-on-the-relaunch "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Planning.can-t-do-thursday "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.legal-fyi "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.final-colorway-for-sign-off-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.team-morale-lunch-during-the-comp "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/events/evt_52 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/todos/todo_54 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Company-Retreat.athelete-visit "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.quick-favor-before-the-final "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.sponsor-wants-a-follow-up-call "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.she-s-staying "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Enterprise_Ai_Selection.anthropic-google-review "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Pre-Launch.store-floors-reset-overnight "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.sponsor-call-no-longer-needed "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Planning.memo-before-the-board-sits "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Pre-Launch.design-locked "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.client-demo-conflict "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.reveal-event-date-and-venue "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: DELETE http://localhost:8077/events/evt_58 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.thank-the-team "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.let-s-set-up-a-recap "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.great-year-overall "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.approval-of-budget-tier "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.press-briefing-and-embargo "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Company-Retreat.planning-call-and-forms-for-your-company "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/shoe-product-launch-delays.design-delays-internal-conflicts "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.confirmed-for-the-new-sponsor-call "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.press-wants-a-short-interview "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/press-tour.keynote-slot-swapped "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.mid-comp-check-in-with-the-teams "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/events/evt_18 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.press-interview-confirmed "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.post-recap-follow-ups "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.prep-doc-for-the-board-presentation "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.mixer-was-a-hit "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.final-headcount-for-the-recap "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/shoe-product-launch-delays.budget-exceeded "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.boston-partnership-trip "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Planning.locked-in-for "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/todos/todo_70 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.ceo-note "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.reveal-event-budget-is-over "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Company-Retreat.inquiry-on-vip-list "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/todos/todo_25 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.updated-pizza-party-schedule "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.boston-dynamics "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/pizza-party.room-change "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.order-placed-for-trophies "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.launch-dinner "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Enterprise_Ai_Selection.ai-meeting-schedule "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/shoe-product-launch-delays.re-design-team-meeting "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/project_atlas.dinner-cancel "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/todos/todo_67 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: DELETE http://localhost:8077/events/evt_79 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.last-year-s-recap-notes-for-reference "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.reveal-event-date-and-venue-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.tooling-po-needs-approval "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.boston-trip-details "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.this-pitch-comp-thing-is-going-around "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.pitch-deck "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.one-pager-looks-good "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.manufacturing-kickoff "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.reveal-event-budget-is-over-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/todos/todo_78 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.add-this-to-the-recap-agenda "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Day-of-execution_and_Aftermath.green-room-before-we-go-live "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.manufacturing-kickoff-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.launch-meeting-conflict "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.new-meeting-during-boston-trip "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/todos "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.manufacturing-kickoff-3 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.pitch-deck-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.launch-meeting-conflict-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.reveal-event-date-and-venue-3 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: DELETE http://localhost:8077/events/evt_83 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/events/evt_63 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.confirmation-from-spadxtech "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Innovation-comp.recap-agenda-finalized "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Partnership-with-deeptech-companies.boston-dynamics-cancel "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: DELETE http://localhost:8077/events/evt_85 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.board-sync-on-the-credit-issue "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/Sponsoring-Marathon.launch-meeting-recap "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: POST http://localhost:8077/events "HTTP/1.1 201 Created"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Processing request of type ListPromptsRequest
+Processing request of type ListResourcesRequest
+Terminating session: None
+Terminating session: None
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/new "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: GET http://localhost:8077/inbox/World_Cup_Cleat_Launch.press-briefing-and-embargo-2 "HTTP/1.1 200 OK"
+Terminating session: None
+Processing request of type CallToolRequest
+HTTP Request: PATCH http://localhost:8077/events/evt_68 "HTTP/1.1 200 OK"
+Terminating session: None
+Terminating session: None
+Processing request of type ListToolsRequest
+Terminating session: None
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+StreamableHTTP session manager shutting down
+INFO:     Application shutdown complete.
+INFO:     Finished server process [63747]

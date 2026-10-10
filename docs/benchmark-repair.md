@@ -311,7 +311,7 @@ matched something.
 | **O-4** | retrieval is unobservable server-side; only the lossy client trace sees it | blocks-measurement | open | 6 |
 | **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | **verified** *(capture half; the log still renders only matches)* | 1a |
 | **O-6** | tools and narration attributed per day not per email; narration truncated at 200 chars | distorts-measurement | open | 6 |
-| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | **applied** *(cause reproduced offline; runner detects, restarts, rolls back, marks errored; regrade reports all-days and valid-only; verified after the approved rerun)* | **next** *(was 6; moved 2026-10-09)* |
+| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | **verified** *(rerun `captures/baseline-sonnet-4-5-r2`: 57/57 days clean; regrade reports all-days and valid-only)* | 2 *(amended order; was 6)* |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
 | **O-9** | objects with an unparseable date are dropped from grading without a trace | distorts-measurement | open | 6 |
 | **C-1** | no artifact records its levers; two documented commands overwrite the corpus they are recovered from | blocks-measurement | open | **1** |
@@ -913,8 +913,9 @@ in the artifact and truncate only in the terminal · attribute by inspecting too
 log-scraping (breaks its ability to read the four historical logs).
 
 **O-7 · infrastructure errors and retries fold into the score with no marker** —
-distorts-measurement · free-offline · **applied** *(2026-10-09; not `verified` until the approved
-rerun shows a clean 57-day run: every day `ok`, `mcp_status: connected`, no errored emails)*
+distorts-measurement · free-offline · **verified** *(2026-10-09, by the approved rerun
+`captures/baseline-sonnet-4-5-r2`: 57/57 days `ok`, `mcp_status: connected` every turn, no
+retries, restarts or errored emails)*
 
 **Observed, not latent (2026-10-09).** The 1c capture lost the secretary MCP server for its
 last 7 days (51-57: 19 emails, 20 ops). Day 51's first attempt hit the 240 s turn timeout
@@ -1008,6 +1009,23 @@ part 2 restarted it and retried both days, the run finished with nothing errored
 test fails on the retry count. This exercises the real failure mode end to end, not only
 SIGSTOP. It does not exercise the claude CLI itself; only the rerun does.
 
+**Verified (2026-10-09): the approved rerun.** `captures/baseline-sonnet-4-5-r2` (Sonnet 4.5,
+served `claude-sonnet-4-5-20250929`, seed 42, levers 1/5/7, corpus `03e0d963b9866d8f`, CLI
+2.1.296 where 1c ran 2.1.235): 57/57 days `ok`, the secretary server `connected` on every turn,
+one attempt per day, no MCP restarts, no errored emails, 1,423 s, $7.48 API-equivalent. Score
+123/167 as run and re-graded, every day valid. The server log also corroborates the day 51
+cause: leaving out the runner's own health checks, the model's and CLI's traffic had written
+65,307 bytes of stderr when day 51's turn opened (305 tool calls by day 50; 1c made 302),
+229 bytes short of the 64 KiB at which the pre-O-7 server blocked. Each Claude Code turn
+also lists tools, prompts and resources before its first tool call, the per-turn traffic
+the offline client did not replicate. The run carried on to 81,944 bytes with no hang.
+
+**First same-seed replicate.** Graded by the current grader: 1c 114/167, r2 123/167. On the 148
+emails valid in both runs (days 1-50), 1c 110 and r2 113; 141 verdicts agree (95%), 5 went
+fail to pass and 2 pass to fail. On the 19 outage emails r2 passes 10, 1c 4 (tools down).
+The flips mix run-to-run variance with the CLI version change, so they bound the noise
+rather than measure it. Full comparison: `captures/baseline-sonnet-4-5-r2/README.md`.
+
 **Not fixed: the CLI transcript keeps a failed attempt.** On days after the first, every
 attempt runs `claude -p --resume <session>`, which appends to the same session, so a retry
 sees the failed attempt's prompt and whatever the model did or said in it. The store is rolled back, so
@@ -1043,6 +1061,10 @@ the rest. `grep -rn "total_cost_usd\|duration_ms\|num_turns\|usage" sb/` returns
 inside the rate-limit regex. No timestamp, no CLI version, no repo sha anywhere. The register's
 whole sequencing argument is economic and the project cannot state what a run costs; M-3 was
 settled against "CLI 2.1.233", a version no artifact records.
+*Observed 2026-10-09:* the CLI changed the meaning of `total_cost_usd` between versions. 2.1.235
+(1c) reports it per turn; 2.1.296 (`captures/baseline-sonnet-4-5-r2`) reports it cumulatively
+over the resumed session, so summing it over `raw/` gives $183 for a $7.48 run. Any cost
+capture has to record the CLI version and read the field accordingly.
 *Options:* keep the whole `result` event per turn · extract a fixed small set · stamp
 environment provenance once per run (also settles M-5) · time turns in the runner rather than
 trusting the CLI.
@@ -1905,6 +1927,8 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-10-09**: O-7 `verified` by the approved baseline rerun, `captures/baseline-sonnet-4-5-r2` (Sonnet 4.5, seed 42, levers 1/5/7, unchanged corpus and prompt, CLI 2.1.296): 57/57 days clean, no retries or restarts, 123/167, $7.48. First same-seed replicate: 141/148 verdicts agree with 1c on the days valid in both (110 vs 113). The server log puts the model's own stderr at 229 bytes short of 64 KiB when day 51 opened, corroborating the cause. O-8 note: `total_cost_usd` is cumulative in CLI 2.1.296. New capture plus docs only; no source, corpus, key or grader change.
 
 - **2026-10-09**: O-7 run validity, `applied`. Part 1: the day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Part 2: the runner reads the secretary MCP status from each turn's init event, health-checks the server before each day and after each attempt, restarts it and retries, records `mcp_status` and every attempt per day, and marks a day errored when the tools never connected. Evidence: `sb/tests/test_runner_validity.py`. Part 3: the store is snapshotted after the day's mail is posted and restored after every failed attempt, so retries cannot leave duplicates and an errored day leaves nothing behind (new runner-only store endpoints; ids unchanged). Evidence: the two rollback tests in `test_runner_validity.py` and `test_live_store.py`. Part 4: `sb.regrade` reports `RESCORE 114/167` (all days) and `VALID 110/148` (days 51-57 excluded) for the 1c baseline, deriving the outage from the raw init events without editing `days/*.json`; capture README updated. Evidence: `test_capture_regrade.py`. O-7 is `applied`, not `verified`, until the approved rerun shows a clean 57-day run. Still open: a retried turn's CLI transcript keeps the failed attempt; `sb/analyze.py` still drops errored lines. Runner, store, regrade and capture README only; no corpus, key or grader change, no capture data edited (`days/`, `raw/`, `verdicts.json` untouched); no runs.
 

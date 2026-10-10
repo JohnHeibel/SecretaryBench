@@ -1,0 +1,156 @@
+{
+  "day": 8,
+  "serve_date": "2026-06-08",
+  "batch": [
+    "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+    "Day-of-execution_and_Aftermath.billboard-s-off"
+  ],
+  "ok": true,
+  "tools": [
+    "list_new_emails",
+    "get_email",
+    "ToolSearch",
+    "list_events",
+    "create_todo"
+  ],
+  "said": "Processed 2 emails. Deleted billboard unveiling event (canceled). Created to-do: ask about patent conflict after pitch comp final (due July 16).",
+  "mcp_status": "connected",
+  "attempts": [
+    {
+      "attempt": 1,
+      "ok": true,
+      "mcp_status": "connected"
+    }
+  ],
+  "warnings": [],
+  "state": {
+    "events": [
+      {
+        "id": "evt_1",
+        "email_id": "press-tour.press-plan-for-launch",
+        "title": "Cover-story interview",
+        "start": "2026-08-06T09:00:00",
+        "end": "2026-08-06T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_2",
+        "email_id": "press-tour.press-plan-for-launch",
+        "title": "Launch reveal",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_3",
+        "email_id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+        "title": "Budget meeting - pitch comp",
+        "start": "2026-07-05T09:00:00",
+        "end": "2026-07-05T10:00:00",
+        "description": "With VP Product and Finance to discuss prize money and event costs"
+      },
+      {
+        "id": "evt_4",
+        "email_id": "press-tour.morning-show-launch-day",
+        "title": "National morning show (anchor slot)",
+        "start": "2026-08-10T07:00:00",
+        "end": "2026-08-10T08:00:00",
+        "description": "Launch day appearance"
+      },
+      {
+        "id": "evt_5",
+        "email_id": "Company-Retreat.company-retreat-date-conformed",
+        "title": "Company retreat",
+        "start": "2026-06-22T09:00:00",
+        "end": "2026-06-22T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_6",
+        "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+        "title": "Innovation pitch comp final",
+        "start": "2026-07-15T09:00:00",
+        "end": "2026-07-15T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_7",
+        "email_id": "Innovation-comp.sponsor-mixer-before-the-final",
+        "title": "Sponsor mixer with retail partners",
+        "start": "2026-07-14T18:00:00",
+        "end": "2026-07-14T19:00:00",
+        "description": "Informal mixer night before the final"
+      },
+      {
+        "id": "evt_8",
+        "email_id": "Sponsoring-Marathon.approval-of-event",
+        "title": "Event Pop Up",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:00:00",
+        "description": "Gold Tier sponsorship event - be present"
+      },
+      {
+        "id": "evt_10",
+        "email_id": "press-tour.local-evening-news-hit",
+        "title": "Local evening news segment",
+        "start": "2026-08-11T18:00:00",
+        "end": "2026-08-11T19:00:00",
+        "description": ""
+      }
+    ],
+    "todos": [
+      {
+        "id": "todo_11",
+        "email_id": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+        "title": "Ask about patent conflict with pitch comp team",
+        "due_date": "2026-07-16T17:00:00",
+        "description": "One team pitch involves a sole design close to internal patent - follow up after final"
+      }
+    ]
+  },
+  "day_new": [
+    "todo_11"
+  ],
+  "by_eid": {
+    "evt_1": "press-tour.press-plan-for-launch",
+    "evt_2": "press-tour.press-plan-for-launch",
+    "evt_3": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+    "evt_4": "press-tour.morning-show-launch-day",
+    "evt_5": "Company-Retreat.company-retreat-date-conformed",
+    "evt_6": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+    "evt_7": "Innovation-comp.sponsor-mixer-before-the-final",
+    "evt_8": "Sponsoring-Marathon.approval-of-event",
+    "evt_10": "press-tour.local-evening-news-hit",
+    "todo_11": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o"
+  },
+  "verdicts": {
+    "Innovation-comp.heads-up-one-of-the-pitches-might-step-o": {
+      "passed": false,
+      "max": 1,
+      "details": [
+        {
+          "passed": false,
+          "label": "create ~ask about patent overlap",
+          "expected": "event ~\"ask about patent overlap\" @ Thu Jul 16",
+          "actual": "\"Ask about patent conflict with pitch comp team\" Thu Jul 16 5 PM",
+          "reason": "wrong kind: created a to-do, expected a event"
+        }
+      ],
+      "headline": "wrong kind: created a to-do, expected a event"
+    },
+    "Day-of-execution_and_Aftermath.billboard-s-off": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "cancel ~billboard unveiling",
+          "expected": "event ~\"billboard unveiling\" cancelled",
+          "actual": "(nothing \u2014 cancelled)",
+          "reason": "cancelled"
+        }
+      ],
+      "headline": "event ~\"billboard unveiling\" cancelled"
+    }
+  }
+}

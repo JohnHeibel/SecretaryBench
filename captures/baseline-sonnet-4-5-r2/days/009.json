@@ -1,0 +1,187 @@
+{
+  "day": 9,
+  "serve_date": "2026-06-09",
+  "batch": [
+    "Innovation-comp.one-of-our-designers-got-a-job-offer",
+    "Planning.might-be-too-much",
+    "Innovation-comp.a-kid-drew-the-new-logo-concept"
+  ],
+  "ok": true,
+  "tools": [
+    "list_new_emails",
+    "get_email",
+    "create_todo"
+  ],
+  "said": "Processed 3 emails. Created event: board sign-off meeting (June 11). Created to-do: retention conversation with designer (due June 13).",
+  "mcp_status": "connected",
+  "attempts": [
+    {
+      "attempt": 1,
+      "ok": true,
+      "mcp_status": "connected"
+    }
+  ],
+  "warnings": [],
+  "state": {
+    "events": [
+      {
+        "id": "evt_1",
+        "email_id": "press-tour.press-plan-for-launch",
+        "title": "Cover-story interview",
+        "start": "2026-08-06T09:00:00",
+        "end": "2026-08-06T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_2",
+        "email_id": "press-tour.press-plan-for-launch",
+        "title": "Launch reveal",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_3",
+        "email_id": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+        "title": "Budget meeting - pitch comp",
+        "start": "2026-07-05T09:00:00",
+        "end": "2026-07-05T10:00:00",
+        "description": "With VP Product and Finance to discuss prize money and event costs"
+      },
+      {
+        "id": "evt_4",
+        "email_id": "press-tour.morning-show-launch-day",
+        "title": "National morning show (anchor slot)",
+        "start": "2026-08-10T07:00:00",
+        "end": "2026-08-10T08:00:00",
+        "description": "Launch day appearance"
+      },
+      {
+        "id": "evt_5",
+        "email_id": "Company-Retreat.company-retreat-date-conformed",
+        "title": "Company retreat",
+        "start": "2026-06-22T09:00:00",
+        "end": "2026-06-22T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_6",
+        "email_id": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+        "title": "Innovation pitch comp final",
+        "start": "2026-07-15T09:00:00",
+        "end": "2026-07-15T10:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_7",
+        "email_id": "Innovation-comp.sponsor-mixer-before-the-final",
+        "title": "Sponsor mixer with retail partners",
+        "start": "2026-07-14T18:00:00",
+        "end": "2026-07-14T19:00:00",
+        "description": "Informal mixer night before the final"
+      },
+      {
+        "id": "evt_8",
+        "email_id": "Sponsoring-Marathon.approval-of-event",
+        "title": "Event Pop Up",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:00:00",
+        "description": "Gold Tier sponsorship event - be present"
+      },
+      {
+        "id": "evt_10",
+        "email_id": "press-tour.local-evening-news-hit",
+        "title": "Local evening news segment",
+        "start": "2026-08-11T18:00:00",
+        "end": "2026-08-11T19:00:00",
+        "description": ""
+      },
+      {
+        "id": "evt_12",
+        "email_id": "Planning.might-be-too-much",
+        "title": "Board sign-off meeting",
+        "start": "2026-06-11T09:00:00",
+        "end": "2026-06-11T10:00:00",
+        "description": "Need at least three board members - sign-off for large spend"
+      }
+    ],
+    "todos": [
+      {
+        "id": "todo_11",
+        "email_id": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+        "title": "Ask about patent conflict with pitch comp team",
+        "due_date": "2026-07-16T17:00:00",
+        "description": "One team pitch involves a sole design close to internal patent - follow up after final"
+      },
+      {
+        "id": "todo_13",
+        "email_id": "Innovation-comp.one-of-our-designers-got-a-job-offer",
+        "title": "Retention conversation with designer (team two)",
+        "due_date": "2026-06-13T17:00:00",
+        "description": "Designer got external offer - HR wants retention conversation this week"
+      }
+    ]
+  },
+  "day_new": [
+    "evt_12",
+    "todo_13"
+  ],
+  "by_eid": {
+    "evt_1": "press-tour.press-plan-for-launch",
+    "evt_2": "press-tour.press-plan-for-launch",
+    "evt_3": "Innovation-comp.need-a-budget-meeting-for-the-pitch-comp",
+    "evt_4": "press-tour.morning-show-launch-day",
+    "evt_5": "Company-Retreat.company-retreat-date-conformed",
+    "evt_6": "Innovation-comp.pitch-comp-is-on-locking-in-the-final-da",
+    "evt_7": "Innovation-comp.sponsor-mixer-before-the-final",
+    "evt_8": "Sponsoring-Marathon.approval-of-event",
+    "evt_10": "press-tour.local-evening-news-hit",
+    "evt_12": "Planning.might-be-too-much",
+    "todo_11": "Innovation-comp.heads-up-one-of-the-pitches-might-step-o",
+    "todo_13": "Innovation-comp.one-of-our-designers-got-a-job-offer"
+  },
+  "verdicts": {
+    "Innovation-comp.one-of-our-designers-got-a-job-offer": {
+      "passed": false,
+      "max": 1,
+      "details": [
+        {
+          "passed": false,
+          "label": "create ~ retention conversation",
+          "expected": "event ~\" retention conversation\" @ Thu Jun 11",
+          "actual": "\"Retention conversation with designer (team two)\" Sat Jun 13 5 PM",
+          "reason": "wrong kind: created a to-do, expected a event"
+        }
+      ],
+      "headline": "wrong kind: created a to-do, expected a event"
+    },
+    "Planning.might-be-too-much": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "create ~board signoff",
+          "expected": "event ~\"board signoff\" @ Thu Jun 11",
+          "actual": "\"Board sign-off meeting\" Thu Jun 11 9 AM (60m)",
+          "reason": "matched"
+        }
+      ],
+      "headline": "event ~\"board signoff\" @ Thu Jun 11"
+    },
+    "Innovation-comp.a-kid-drew-the-new-logo-concept": {
+      "passed": true,
+      "max": 1,
+      "details": [
+        {
+          "passed": true,
+          "label": "no-action",
+          "expected": "take no action (FYI / no scheduling needed)",
+          "actual": "(nothing)",
+          "reason": "correctly took no action"
+        }
+      ],
+      "headline": "correctly took no action"
+    }
+  }
+}
