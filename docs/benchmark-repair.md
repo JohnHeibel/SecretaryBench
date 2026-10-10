@@ -951,6 +951,27 @@ raises with the log tail (E-3). Verified by
 `test_runner_mcp_server_survives_a_runs_worth_of_requests`: 250 turns, 1,250 tool calls,
 more than twice the pipe capacity written to stderr, no hang.
 
+**Fix, part 2 (detect, restart, mark errored).** The runner reads the secretary server's
+status from every claude turn's init event (`_secretary_status`); a turn that started without
+`connected` is an infrastructure failure, not a model result. The server is health-checked
+with a real MCP request before each day, after each turn that otherwise succeeded (a server
+that stopped answering mid-turn fails the attempt), and after every failed attempt (a timeout
+can be a hung server, as on day 51). A failed check or a non-connected init restarts the
+server and the day is retried; after `ATTEMPTS` (7) the day is `ok: false` with the cause as
+its error, and its emails are errored, not failed. Each day record now carries `mcp_status`
+and an `attempts` list (status, detail, whether the server was restarted); a failed attempt's
+stream is kept as `raw/day_NNN.attempt_K.jsonl`; the manifest adds `errored_days`,
+`retried_days` and `mcp_restarts`. The final print draws errored emails as `○`, and adds a
+`VALID passed/(total - errored)` line beside the all-days `SCORE`. A timeout now reads
+"turn timed out after 240s" instead of a truncated command line. The codex stream carries no
+MCP status, so for codex only the health checks apply. Verified by
+`sb/tests/test_runner_validity.py`: the detector on connected / failed / no secretary / no
+init event and on the 1c raw streams (days 51-57 failed, all others connected), and the real
+day loop with a scripted CLI against real servers: a failed init, a server wedged mid-turn
+and one wedged between days (SIGSTOP: port open, nothing answers) each cause one restart and
+a successful retry; a day whose tools never connect is errored. With the detector blinded,
+the three day-loop tests fail.
+
 **Original finding (phase A).** `runner.py:491-496` prints `ERROR after retries` on a line carrying no `PASS`/`FAIL` token, so
 `analyze.py:25`'s regex never matches it and the email vanishes from analysis rather than being
 counted. `runner.py:518-528` renders an errored email with the same red dot as a failed one.
@@ -1835,7 +1856,7 @@ gitignored `build/`.
 
 ## Changelog
 
-- **2026-10-09**: O-7, part 1. The day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Runner only; no corpus, key, grader, score or capture change; no runs.
+- **2026-10-09**: O-7, part 1. The day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Part 2: the runner reads the secretary MCP status from each turn's init event, health-checks the server before each day and after each attempt, restarts it and retries, records `mcp_status` and every attempt per day, and marks a day errored when the tools never connected. Evidence: `sb/tests/test_runner_validity.py`. Runner only; no corpus, key, grader, score or capture change; no runs.
 
 - **2026-10-09**: Roadmap decisions after a plan breakdown and adversarial review, docs only: O-7 first, saved-run scores reported with and without the outage, one full baseline rerun approved after the O-7 fix, all 115 unaudited passes to be audited later, principal preferences brought into scope and into the headline score, levers pinned to the 1c baseline, model-assisted grading accepted as a paid component. Local paths redacted from the tree and the branch pushed. Evidence: the roadmap decisions at the top of this file. No source, corpus, key, grader, score or capture change; no runs.
 

@@ -45,6 +45,7 @@ STORE_PORT = int(os.environ.get("STORE_PORT", "8077"))
 STORE_URL = f"http://localhost:{STORE_PORT}"
 MCP_PORT = int(os.environ.get("MCP_PORT", "8078"))
 MCP_URL = f"http://127.0.0.1:{MCP_PORT}/mcp"
+ATTEMPTS = 7    # model turns per day before it is recorded as errored; limit pauses don't count
 
 # --- ANSI palette (disabled if stdout isn't a tty or NO_COLOR is set) -------
 _COLOR = (sys.stdout.isatty() or os.environ.get("FORCE_COLOR")) and not os.environ.get("NO_COLOR")
@@ -219,6 +220,26 @@ def _parse_stream(stdout: str) -> tuple[Optional[str], list[str], bool, str, Opt
     return session_id, tools, is_error, " ".join(texts), resolved_model
 
 
+def _secretary_status(stdout: str) -> Optional[str]:
+    """The secretary MCP server's status in the claude CLI's init event.
+
+    "connected", "failed", "pending", ... as the CLI reports it; "absent" if the init
+    event lists no secretary server; None if there is no init event. A turn whose
+    tools never connected measures nothing: in the 1c capture days 51-57 ran with
+    "failed" and were scored as model failures (register O-7)."""
+    for line in stdout.splitlines():
+        try:
+            ev = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(ev, dict) and ev.get("type") == "system" and ev.get("subtype") == "init":
+            for server in ev.get("mcp_servers") or []:
+                if server.get("name") == "secretary":
+                    return server.get("status") or "unknown"
+            return "absent"
+    return None
+
+
 def _free_port(port: int) -> None:
     """Best-effort kill of any process still holding `port` from a previous
     (e.g. interrupted) run, so every run owns fresh servers."""
@@ -297,6 +318,13 @@ def start_mcp(log_path: Path) -> subprocess.Popen:
         time.sleep(0.5)
     proc.kill()
     raise RuntimeError("mcp server did not come up within 30s")
+
+
+def _restart_mcp(proc: subprocess.Popen, log_path: Path, reason: str) -> subprocess.Popen:
+    print(f"   {YELLOW}restarting secretary MCP server{RESET} ({reason})")
+    proc.kill()          # SIGKILL: a wedged or stopped server may never act on SIGTERM
+    proc.wait()
+    return start_mcp(log_path)
 
 
 # --- model drivers ---------------------------------------------------------
@@ -443,9 +471,11 @@ class _Capture:
         verdicts.json     per-email grade + details
         state_final.json  every object at end of run
         warnings.json     attribution warnings (currently printed, then lost)
-        days/NNN.json     per day: state snapshot, new ids, tools, verdicts
+        days/NNN.json     per day: state snapshot, new ids, tools, verdicts,
+                          secretary MCP status and every attempt (O-7)
         raw/day_NNN.jsonl the CLI's raw stream, so a later parser fix (O-2)
                           can be applied retroactively to this run
+        raw/day_NNN.attempt_K.jsonl  the stream of failed attempt K, if any
         mcp_server.log    the secretary MCP server's stderr (O-7)
     """
 
@@ -472,17 +502,18 @@ class _Capture:
         self.manifest = dict(fields)
         self._write("manifest.json", self.manifest)
 
-    def raw(self, day_no: int, stdout: str) -> None:
+    def raw(self, day_no: int, stdout: str, failed_attempt: Optional[int] = None) -> None:
         if not self.on or not stdout:
             return
-        (self.dir / "raw" / f"day_{day_no:03d}.jsonl").write_text(stdout)
+        suffix = f".attempt_{failed_attempt}" if failed_attempt else ""
+        (self.dir / "raw" / f"day_{day_no:03d}{suffix}.jsonl").write_text(stdout)
 
     def day(self, day_no: int, **fields) -> None:
         if not self.on:
             return
         self._write(f"days/{day_no:03d}.json", {"day": day_no, **fields})
-        self.index.append({k: fields.get(k) for k in ("serve_date", "batch", "ok")}
-                          | {"day": day_no})
+        self.index.append({k: fields.get(k) for k in ("serve_date", "batch", "ok", "mcp_status")}
+                          | {"day": day_no, "attempts": len(fields.get("attempts") or [])})
 
     def finish(self, results: dict, **fields) -> None:
         if not self.on:
@@ -556,6 +587,9 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     print(f"{BOLD}{BLUE}╚═════════════════════════════════╝{RESET}")
     email_no = 0
     resolved_model: Optional[str] = None
+    mcp_restarts = 0
+    errored_days: list[int] = []
+    retried_days: list[int] = []
     try:
         for day_no, batch in enumerate(days, 1):
             sd = plan.serve_date[batch[0]]   # every email in a batch shares the serve day
@@ -576,6 +610,12 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                 f"New mail has arrived. List your inbox, work through everything that "
                 f"arrived today, then stop.")
 
+            # A hung server still accepts TCP, so ask it a real MCP question before
+            # spending a model turn on it (O-7).
+            if not _mcp_healthy():
+                mcp = _restart_mcp(mcp, mcp_log, f"not answering before day {day_no}")
+                mcp_restarts += 1
+
             before = _all_ids(httpx.get(f"{STORE_URL}/state", timeout=10).json())
 
             cmd = build_cmd(driver, model, session, user_msg, mcp_config, MCP_URL,
@@ -585,19 +625,40 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             # blip should pause-and-resume, not throw the day away. A subscription
             # session-limit window ("resets 2:20pm") can last hours — pause until
             # the stated reset instead of counting it against the retry budget.
+            # A turn whose secretary tools were not connected is an infrastructure
+            # failure, not a model result: restart the server and retry (O-7).
             ok, sid, tools, said, detail = False, None, [], "", f"{driver} error"
             raw_stdout = ""
-            attempts = 7
+            mcp_status: Optional[str] = None
+            attempt_log: list[dict] = []
             attempt = limit_pauses = 0
-            while attempt < attempts:
+            while attempt < ATTEMPTS:
+                stdout, mcp_status, cli_detail, infra = "", None, "", False
                 try:
                     # stdin=DEVNULL: codex exec blocks reading piped stdin otherwise;
                     # harmless for claude -p (it takes the prompt as an arg).
                     proc = subprocess.run(cmd, capture_output=True, text=True,
                                           timeout=per_turn_timeout, stdin=subprocess.DEVNULL,
                                           cwd=iso_cwd)
+                    stdout = proc.stdout
                     sid, tools, is_err, said, rmodel = parse_output(driver, proc.stdout)
-                    if not is_err and proc.returncode == 0:
+                    # codex reports no MCP status in its stream; the health checks cover it.
+                    if driver == "claude":
+                        mcp_status = _secretary_status(proc.stdout)
+                    cli_ok = not is_err and proc.returncode == 0
+                    cli_detail = ((proc.stderr.strip() or proc.stdout.strip()[-160:])[:160]
+                                  or f"{driver} returned is_error")
+                    # No init event on a failed CLI call means it died before connecting
+                    # anything, so its own error is the better detail.
+                    tools_down = (driver == "claude" and mcp_status != "connected"
+                                  and (cli_ok or mcp_status is not None))
+                    if tools_down:
+                        infra = True
+                        detail = f"secretary MCP {mcp_status or 'not reported'} at turn start"
+                    elif cli_ok and not _mcp_healthy():
+                        infra = True
+                        detail = "secretary MCP stopped answering during the turn"
+                    elif cli_ok:
                         session = session or sid
                         # What the CLI actually loaded. Checked EVERY turn, not just the
                         # first: --resume could quietly drop back to a default model
@@ -618,11 +679,28 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                                 resolved_model = rmodel
                         ok = True
                         raw_stdout = proc.stdout
+                        attempt_log.append({"attempt": len(attempt_log) + 1, "ok": True,
+                                            "mcp_status": mcp_status})
                         break
-                    detail = (proc.stderr.strip() or proc.stdout.strip()[-160:])[:160] or f"{driver} returned is_error"
+                    else:
+                        detail = cli_detail
+                except subprocess.TimeoutExpired as exc:
+                    out = exc.stdout or ""
+                    stdout = out.decode(errors="replace") if isinstance(out, bytes) else out
+                    detail = f"turn timed out after {per_turn_timeout:.0f}s"
+                    if driver == "claude":
+                        mcp_status = _secretary_status(stdout)
                 except Exception as exc:
                     detail = str(exc)[:160]
-                pause = _limit_reset_wait(f"{said} {detail}")
+                attempt_log.append({"attempt": len(attempt_log) + 1, "ok": False,
+                                    "detail": detail, "mcp_status": mcp_status})
+                cap.raw(day_no, stdout, failed_attempt=len(attempt_log))
+                # A timeout can be a hung server (1c day 51), so check it after any failure.
+                if infra or not _mcp_healthy():
+                    mcp = _restart_mcp(mcp, mcp_log, f"day {day_no}: {detail}")
+                    mcp_restarts += 1
+                    attempt_log[-1]["restarted_mcp"] = True
+                pause = _limit_reset_wait(f"{said} {cli_detail} {detail}")
                 if pause is not None and limit_pauses < 12:
                     limit_pauses += 1
                     print(f"day {day_no:>2} ({sd}): session limit — pausing "
@@ -630,22 +708,27 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                     time.sleep(pause)
                     continue                      # a limit window is not a failed attempt
                 attempt += 1
-                if attempt < attempts:
+                if attempt < ATTEMPTS:
                     wait = min(240, 15 * (2 ** (attempt - 1)))  # 15,30,60,120,240,240 (~12min total)
-                    print(f"day {day_no:>2} ({sd}): transient ({detail}) — retry {attempt}/{attempts-1} in {wait}s")
+                    print(f"day {day_no:>2} ({sd}): transient ({detail}) — retry {attempt}/{ATTEMPTS-1} in {wait}s")
                     time.sleep(wait)
 
+            if len(attempt_log) > 1:
+                retried_days.append(day_no)
             _print_day(day_no, sd.strftime("%a %b %d"), len(batch), tools, said)
             all_warnings = httpx.get(f"{STORE_URL}/warnings", timeout=10).json()
             _print_warnings(all_warnings[warning_cursor:])
             cap.raw(day_no, raw_stdout)
             if not ok:
+                errored_days.append(day_no)
                 for eid in batch:
                     email_no += 1
                     results[eid] = None
-                    print(f"[{email_no:>2}] {eid:24s}  ERROR after retries: {detail}")
+                    print(f"{GREY}[{email_no:>2}] {eid:24s}  ERRORED after {len(attempt_log)} "
+                          f"attempts, not scored as a model result: {detail}{RESET}")
                 cap.day(day_no, serve_date=str(sd), batch=list(batch), ok=False,
                         error=detail, tools=list(tools), said=said,
+                        mcp_status=mcp_status, attempts=attempt_log,
                         warnings=all_warnings[warning_cursor:])
                 continue
 
@@ -665,6 +748,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             # is what makes this re-gradeable under a different grader later.
             cap.day(day_no, serve_date=str(sd), batch=list(batch), ok=True,
                     tools=list(tools), said=said,
+                    mcp_status=mcp_status, attempts=attempt_log,
                     warnings=all_warnings[warning_cursor:],
                     state=state, day_new=sorted(day_new), by_eid=by_eid,
                     verdicts={e: asdict(results[e]) for e in batch
@@ -683,20 +767,31 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     graded = [r for r in results.values() if r is not None]
     passed = sum(1 for r in graded if r.passed)
     errored = len(order) - len(graded)
-    bar = "".join((f"{GREEN}●{RESET}" if (r and r.passed) else f"{RED}●{RESET}")
+    # An errored email is an infrastructure gap, not a model failure: own glyph, own count,
+    # and a valid-only score beside the all-days one (O-7).
+    bar = "".join(f"{GREY}○{RESET}" if r is None else
+                  (f"{GREEN}●{RESET}" if r.passed else f"{RED}●{RESET}")
                   for r in results.values())
     pct = passed / len(order) if order else 0
     pct_col = GREEN if pct >= 0.8 else (YELLOW if pct >= 0.5 else RED)
     print(f"\n{BOLD}{BLUE}══════════════════════════════════{RESET}")
     print(f"  {bar}")
     print(f"  {BOLD}SCORE {pct_col}{passed}/{len(order)}{RESET} {BOLD}({pct:.0%}){RESET}"
-          + (f"  {RED}{errored} errored{RESET}" if errored else ""))
+          + (f"  {DIM}errored count as failed{RESET}" if errored else ""))
+    if errored:
+        valid = len(order) - errored
+        print(f"  {BOLD}VALID {passed}/{valid}{RESET} ({passed / valid if valid else 0:.0%})  "
+              f"{RED}{errored} errored on day(s) {', '.join(map(str, errored_days))}{RESET}")
+    if retried_days or mcp_restarts:
+        print(f"  {YELLOW}{len(retried_days)} day(s) took more than one attempt; "
+              f"secretary MCP restarted {mcp_restarts}x{RESET}")
     # Stamp the config next to the score so a saved log can't be mislabelled later.
     print(f"  {DIM}served {resolved_model or model} · seed {seed} · daily "
           f"{levers.daily_min}-{levers.daily_max} · {len(order)} emails · {corpus_dir}{RESET}")
     print(f"{BOLD}{BLUE}══════════════════════════════════{RESET}\n")
     cap.finish(results, served_model=resolved_model, model_certified=resolved_model is not None,
                score_passed=passed, score_total=len(order), errored=errored,
+               errored_days=errored_days, retried_days=retried_days, mcp_restarts=mcp_restarts,
                finished_at=str(datetime.now()),
                elapsed_s=round((datetime.now() - started_at).total_seconds(), 1))
 
