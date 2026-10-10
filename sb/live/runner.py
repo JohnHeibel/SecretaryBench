@@ -23,7 +23,6 @@ import os
 import re
 import shutil
 import signal
-import socket
 import subprocess
 import sys
 import tempfile
@@ -255,27 +254,48 @@ def start_store() -> subprocess.Popen:
     raise RuntimeError("store did not come up")
 
 
-def start_mcp() -> subprocess.Popen:
-    """Start the ONE persistent MCP server every claude turn attaches to."""
+def _mcp_healthy(timeout: float = 5.0) -> bool:
+    """True if the MCP server answers a real MCP request in time.
+
+    A TCP connect is not enough: a server blocked on a write still accepts
+    connections (register O-7). The server is stateless HTTP, so tools/list
+    needs no handshake and has no side effects."""
+    try:
+        r = httpx.post(MCP_URL, timeout=timeout,
+                       json={"jsonrpc": "2.0", "id": "health", "method": "tools/list"},
+                       headers={"Accept": "application/json, text/event-stream"})
+    except httpx.HTTPError:
+        return False
+    return r.status_code == 200 and "list_new_emails" in r.text
+
+
+def start_mcp(log_path: Path) -> subprocess.Popen:
+    """Start the ONE persistent MCP server every claude turn attaches to.
+
+    Its stderr is appended to `log_path`, never left in an unread pipe. FastMCP
+    logs every request at INFO; with stderr=PIPE and no reader, the 1c run filled
+    the ~64 KiB pipe buffer on day 51, the server blocked on a log write, and the
+    secretary tools were gone for the rest of the run (register O-7)."""
     _free_port(MCP_PORT)
     env = {**os.environ, "MCP_TRANSPORT": "streamable-http", "MCP_PORT": str(MCP_PORT),
            "STORE_BASE_URL": STORE_URL, "PYTHONPATH": str(REPO)}
-    # Keep stderr: a crash here (bad mcp version, port in use) used to surface only as
-    # the generic "did not come up", which hides the actual traceback.
-    proc = subprocess.Popen(
-        [sys.executable, "-m", "sb.live.mcp_app"],
-        cwd=str(REPO), env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
-    )
+    with open(log_path, "ab") as log:
+        log.write(f"--- sb.live.runner start_mcp {datetime.now().isoformat(timespec='seconds')} ---\n"
+                  .encode())
+        log.flush()
+        offset = log.tell()
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "sb.live.mcp_app"],
+            cwd=str(REPO), env=env, stdout=subprocess.DEVNULL, stderr=log,
+        )
     for _ in range(60):
-        if proc.poll() is not None:      # died on startup — report why
-            err = (proc.stderr.read() if proc.stderr else "").strip()
+        if proc.poll() is not None:      # died on startup — report why (E-3)
+            err = Path(log_path).read_bytes()[offset:].decode(errors="replace").strip()
             raise RuntimeError(f"mcp server exited immediately:\n{err[-800:]}")
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(1)
-            if s.connect_ex(("127.0.0.1", MCP_PORT)) == 0:  # port is accepting connections
-                return proc
+        if _mcp_healthy(timeout=2):
+            return proc
         time.sleep(0.5)
-    proc.terminate()
+    proc.kill()
     raise RuntimeError("mcp server did not come up within 30s")
 
 
@@ -426,6 +446,7 @@ class _Capture:
         days/NNN.json     per day: state snapshot, new ids, tools, verdicts
         raw/day_NNN.jsonl the CLI's raw stream, so a later parser fix (O-2)
                           can be applied retroactively to this run
+        mcp_server.log    the secretary MCP server's stderr (O-7)
     """
 
     def __init__(self, out: Optional[str]):
@@ -504,13 +525,19 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             break
     order = [e for b in days for e in b]
 
+    cap = _Capture(out_dir)
+    if cap.on:
+        mcp_log = cap.dir / "mcp_server.log"
+    else:
+        fd, name = tempfile.mkstemp(prefix="sb_mcp_", suffix=".log")
+        os.close(fd)
+        mcp_log = Path(name)
     store = start_store()
     httpx.post(f"{STORE_URL}/reset", timeout=10)
-    mcp = start_mcp()
+    mcp = start_mcp(mcp_log)
     mcp_config = _mcp_config()
     session: Optional[str] = None
     results: dict[str, object] = {}
-    cap = _Capture(out_dir)
     started_at = datetime.now()
     cap.start(requested_model=model, driver=driver, seed=seed, start=str(start),
               n_days=n_days, limit=limit, corpus_dir=corpus_dir,
@@ -650,6 +677,8 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
         mcp.terminate()
         store.terminate()
         shutil.rmtree(iso_cwd, ignore_errors=True)
+        if not cap.on:
+            mcp_log.unlink(missing_ok=True)
 
     graded = [r for r in results.values() if r is not None]
     passed = sum(1 for r in graded if r.passed)

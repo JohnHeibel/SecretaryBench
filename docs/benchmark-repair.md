@@ -311,7 +311,7 @@ matched something.
 | **O-4** | retrieval is unobservable server-side; only the lossy client trace sees it | blocks-measurement | open | 6 |
 | **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | **verified** *(capture half; the log still renders only matches)* | 1a |
 | **O-6** | tools and narration attributed per day not per email; narration truncated at 200 chars | distorts-measurement | open | 6 |
-| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | open | **next** *(was 6; moved 2026-10-09)* |
+| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | **investigating** *(cause reproduced offline; fix in progress)* | **next** *(was 6; moved 2026-10-09)* |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
 | **O-9** | objects with an unparseable date are dropped from grading without a trace | distorts-measurement | open | 6 |
 | **C-1** | no artifact records its levers; two documented commands overwrite the corpus they are recovered from | blocks-measurement | open | **1** |
@@ -383,6 +383,9 @@ its own verification, not a dependency bump.
 **Fix:** keep stderr, poll `proc.poll()`, and put the child's traceback in the raised
 error.
 **Verified by:** this is how E-2 was diagnosed.
+**Superseded 2026-10-09 (O-7):** stderr was kept in a pipe nobody read after startup, and
+it filled and hung the server in the 1c run. It now goes to a log file; the startup-crash
+traceback is still raised (`test_start_mcp_reports_a_startup_crash`).
 
 ### M-1 · `run.sh` silently discarded every flag
 **Status:** verified. **This is the reported bug.**
@@ -910,8 +913,45 @@ in the artifact and truncate only in the terminal · attribute by inspecting too
 log-scraping (breaks its ability to read the four historical logs).
 
 **O-7 · infrastructure errors and retries fold into the score with no marker** —
-distorts-measurement · free-offline · open
-`runner.py:491-496` prints `ERROR after retries` on a line carrying no `PASS`/`FAIL` token, so
+distorts-measurement · free-offline · **investigating** *(fix in progress on `o-7-run-validity`;
+not `verified` until a rerun shows a clean 57-day run)*
+
+**Observed, not latent (2026-10-09).** The 1c capture lost the secretary MCP server for its
+last 7 days (51-57: 19 emails, 20 ops). Day 51's first attempt hit the 240 s turn timeout
+(`captures/baseline-sonnet-4-5/run.log:1014`); every later turn's init event reports
+`mcp_servers: [{name: secretary, status: failed}]` (`raw/day_051.jsonl`-`day_057.jsonl`, line 1)
+with zero tool calls, and the model said "the MCP server has disconnected". The runner recorded
+all seven days `ok: true`, and the capture README said "0 errored".
+
+**Cause, reproduced offline with no model.** `start_mcp` started the server with
+`stderr=subprocess.PIPE` and never read it after startup (E-3 kept stderr for crash
+tracebacks). FastMCP (mcp 1.29.0, `rich` not installed) logs to stderr at INFO: one
+"Terminating session: None" per HTTP request, one "Processing request of type ..." per
+`tools/list` and tool call, and the server's own httpx "HTTP Request: ..." line per store call.
+Driven by the `mcp` Python client (fresh session per simulated turn, 5 tool calls per turn):
+the control run, stderr to a file, wrote 849 bytes per turn and finished 150 turns / 750 calls
+with no hang; the same run with stderr piped exactly as `start_mcp` did hung on turn 77 after
+380 calls with 65,566 bytes in the pipe, the process alive and still accepting TCP. Draining
+the pipe let the next turn complete, so the server was blocked on its stderr write. Nothing
+ever read the pipe, so a hung server never recovered. The failure scales with request volume,
+recurs on any long enough run and arrives sooner for chattier models; a `--limit` smoke
+cannot show it. Day 51 is consistent with this but not proven: the 1c run made 302 secretary
+tool calls over days 1-50 (counted by `tool_use` id in `raw/`; O-2's message-id collapse shows
+148), which at this client's measured line sizes puts at least 55.0 KB in the pipe by the end
+of day 50, 10.5 KB short of 64 KiB. Claude Code's own per-turn session requests, which the
+offline client does not replicate, would have to add about 210 bytes per turn (roughly three
+requests) for the overflow to land on day 51. Measuring that needs the real CLI.
+Durable artifact: `sb/tests/test_mcp_liveness.py::test_unread_stderr_pipe_blocks_the_server`
+reproduces the hang, the open TCP port, and recovery after draining.
+
+**Fix, part 1 (stderr).** `start_mcp(log_path)` appends the server's stderr to a file
+(`<out>/mcp_server.log` in a capture, a deleted temp file otherwise). Readiness is a real MCP
+`tools/list` request (`_mcp_healthy`) instead of a TCP connect, and a startup crash still
+raises with the log tail (E-3). Verified by
+`test_runner_mcp_server_survives_a_runs_worth_of_requests`: 250 turns, 1,250 tool calls,
+more than twice the pipe capacity written to stderr, no hang.
+
+**Original finding (phase A).** `runner.py:491-496` prints `ERROR after retries` on a line carrying no `PASS`/`FAIL` token, so
 `analyze.py:25`'s regex never matches it and the email vanishes from analysis rather than being
 counted. `runner.py:518-528` renders an errored email with the same red dot as a failed one.
 Worse, `before = _all_ids(...)` is captured at `:431`, **outside** the retry loop at `:443-486`,
@@ -1794,6 +1834,8 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-10-09**: O-7, part 1. The day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Runner only; no corpus, key, grader, score or capture change; no runs.
 
 - **2026-10-09**: Roadmap decisions after a plan breakdown and adversarial review, docs only: O-7 first, saved-run scores reported with and without the outage, one full baseline rerun approved after the O-7 fix, all 115 unaudited passes to be audited later, principal preferences brought into scope and into the headline score, levers pinned to the 1c baseline, model-assisted grading accepted as a paid component. Local paths redacted from the tree and the branch pushed. Evidence: the roadmap decisions at the top of this file. No source, corpus, key, grader, score or capture change; no runs.
 
