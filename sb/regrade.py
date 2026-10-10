@@ -14,6 +14,12 @@ capture keeps the objects rather than the log's rendering of them.
 
     python -m sb.regrade build/capture_x
     python -m sb.regrade build/capture_x --corpus corpus
+
+It prints two scores. RESCORE counts every email. VALID drops the emails on
+days that did not measure the model: days the runner marked errored, and days
+whose turn started without the secretary MCP server connected (register O-7).
+Captures written before O-7 record the latter only in the CLI's init event, so
+it is read from raw/day_NNN.jsonl; day records are never edited.
 """
 from __future__ import annotations
 
@@ -24,7 +30,7 @@ from datetime import date
 from pathlib import Path
 from typing import Optional
 
-from sb.live.runner import _grade_day
+from sb.live.runner import _grade_day, _secretary_status
 from sb.schema import load_corpus
 from sb.scheduler import Levers, build_plan
 
@@ -67,6 +73,54 @@ def score(results: dict) -> tuple[int, int, int]:
     return sum(1 for r in graded if r.passed), len(results), len(results) - len(graded)
 
 
+def mcp_status(capture_dir: str, rec: dict) -> Optional[str]:
+    """The secretary server's status when the day's graded turn started, or None if
+    unobservable (codex driver, or no raw stream)."""
+    if "mcp_status" in rec:                      # recorded by the runner since O-7
+        return rec["mcp_status"]
+    raw = Path(capture_dir) / "raw" / f"day_{rec['day']:03d}.jsonl"
+    return _secretary_status(raw.read_text()) if raw.exists() else None
+
+
+def invalid_days(capture_dir: str, days: list[dict]) -> dict[int, str]:
+    """{day: reason} for every day that does not measure the model."""
+    out = {}
+    for rec in days:
+        if not rec.get("ok"):
+            out[rec["day"]] = "errored"
+            continue
+        status = mcp_status(capture_dir, rec)
+        if status is not None and status != "connected":
+            out[rec["day"]] = f"secretary MCP {status}"
+    return out
+
+
+def _emails_on(days: list[dict], bad: dict[int, str]) -> dict[str, str]:
+    return {eid: bad[rec["day"]] for rec in days if rec["day"] in bad for eid in rec["batch"]}
+
+
+def validity(capture_dir: str) -> dict[str, str]:
+    """{email_id: reason} for every email on an invalid day."""
+    _, days = load_capture(capture_dir)
+    return _emails_on(days, invalid_days(capture_dir, days))
+
+
+def score_valid(results: dict, invalid: dict) -> tuple[int, int]:
+    """(passed, total) over the emails on valid days only."""
+    valid = [r for eid, r in results.items() if eid not in invalid]
+    return sum(1 for r in valid if r is not None and r.passed), len(valid)
+
+
+def _day_ranges(days: list[int]) -> str:
+    runs: list[list[int]] = []
+    for d in sorted(days):
+        if runs and d == runs[-1][-1] + 1:
+            runs[-1].append(d)
+        else:
+            runs.append([d])
+    return ", ".join(f"{r[0]}-{r[-1]}" if len(r) > 1 else f"{r[0]}" for r in runs)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[1])
     ap.add_argument("capture", help="a directory written by `sb.live.runner --out`")
@@ -75,7 +129,7 @@ def main() -> None:
     ap.add_argument("--json", action="store_true", help="emit per-email verdicts as JSON")
     a = ap.parse_args()
 
-    manifest, _ = load_capture(a.capture)
+    manifest, days = load_capture(a.capture)
     results = regrade(a.capture, a.corpus)
     passed, total, errored = score(results)
 
@@ -84,14 +138,27 @@ def main() -> None:
                           for eid, r in results.items()}, indent=2, default=str))
         return
 
+    bad_days = invalid_days(a.capture, days)
+    invalid = _emails_on(days, bad_days)
+    v_passed, v_total = score_valid(results, invalid)
+    unobserved = sum(1 for rec in days if rec.get("ok") and mcp_status(a.capture, rec) is None)
+
     served = manifest.get("served_model") or manifest.get("requested_model")
     cert = "certified" if manifest.get("model_certified") else "ASSERTED, not observed"
     print(f"capture   {a.capture}")
     print(f"model     {served}  ({cert})")
     print(f"corpus    {a.corpus or manifest['corpus_dir']}  sha {manifest.get('corpus_hash')}")
     print(f"levers    {manifest['levers']}  seed {manifest['seed']}")
-    print(f"RESCORE   {passed}/{total} ({passed / total:.0%})"
-          + (f"  {errored} errored" if errored else ""))
+    print(f"RESCORE   {passed}/{total} ({passed / total:.0%})  all days"
+          + (f", {errored} errored count as failed" if errored else ""))
+    by_reason: dict[str, list[int]] = {}
+    for d, why in bad_days.items():
+        by_reason.setdefault(why, []).append(d)
+    excluded = "; ".join(f"days {_day_ranges(ds)} {r}" for r, ds in by_reason.items())
+    print(f"VALID     {v_passed}/{v_total} ({v_passed / v_total if v_total else 0:.0%})  "
+          + (f"{len(invalid)} emails excluded: {excluded}" if bad_days else "every day valid"))
+    if unobserved:
+        print(f"          {unobserved} day(s) have no secretary MCP status on record, counted valid")
     was = manifest.get("score_passed")
     if was is not None:
         delta = passed - was

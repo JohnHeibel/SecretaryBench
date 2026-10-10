@@ -19,7 +19,7 @@ import pytest
 
 from sb.live.runner import _corpus_hash, _grade_day
 from sb.oracle import _as_dt, _target
-from sb.regrade import regrade, score
+from sb.regrade import invalid_days, load_capture, regrade, score, score_valid, validity
 from sb.resolver import Context
 from sb.schema import load_corpus
 from sb.scheduler import Levers, build_plan
@@ -136,3 +136,45 @@ def test_capture_preserves_objects_the_log_would_never_show():
     assert len(final["events"]) + len(final["todos"]) >= len(captured) * 0.5
     for rec in final["events"] + final["todos"]:
         assert "email_id" in rec and "title" in rec and "description" in rec
+
+
+BASELINE = "captures/baseline-sonnet-4-5"
+
+
+def test_validity_overlay_on_the_1c_baseline():
+    """O-7: days 51-57 ran without the secretary tools but were recorded ok. The overlay
+    finds them from the raw init events and leaves the day records as they are."""
+    _, days = load_capture(BASELINE)
+    assert all(rec["ok"] for rec in days) and not any("mcp_status" in rec for rec in days)
+
+    assert invalid_days(BASELINE, days) == {d: "secretary MCP failed" for d in range(51, 58)}
+    invalid = validity(BASELINE)
+    assert len(invalid) == 19
+
+    results = regrade(BASELINE)
+    assert score(results) == (114, 167, 0)
+    assert score_valid(results, invalid) == (110, 148)
+
+
+@pytest.mark.parametrize("change,reason", [
+    ({"ok": False}, "errored"),
+    ({"mcp_status": "failed"}, "secretary MCP failed"),
+    ({"mcp_status": "connected"}, None),
+    ({"mcp_status": None}, None),               # codex: unobservable, counted valid
+])
+def test_validity_reads_the_runners_own_record(tmp_path, change, reason):
+    corpus = load_corpus(CORPUS)
+    plan = build_plan(corpus, start_date=START, seed=42, n_days=200, levers=LEVERS)
+    live, day_records = simulate(corpus, plan, _key_title)
+    day_records[2].update(change)
+    if change.get("ok") is False:
+        del day_records[2]["state"]
+    capture = write_capture(tmp_path, corpus, plan, day_records, 200)
+
+    _, days = load_capture(capture)
+    assert invalid_days(capture, days) == ({3: reason} if reason else {})
+    invalid = validity(capture)
+    assert set(invalid) == (set(day_records[2]["batch"]) if reason else set())
+    passed, total = score_valid(regrade(capture), invalid)
+    assert total == len(live) - len(invalid)
+    assert passed == sum(1 for e, r in live.items() if e not in invalid and r.passed)

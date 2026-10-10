@@ -311,7 +311,7 @@ matched something.
 | **O-4** | retrieval is unobservable server-side; only the lossy client trace sees it | blocks-measurement | open | 6 |
 | **O-5** | the log renders only keyword-matched objects, so the dominant failure is unfalsifiable | blocks-measurement | **verified** *(capture half; the log still renders only matches)* | 1a |
 | **O-6** | tools and narration attributed per day not per email; narration truncated at 200 chars | distorts-measurement | open | 6 |
-| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | **investigating** *(cause reproduced offline; fix in progress)* | **next** *(was 6; moved 2026-10-09)* |
+| **O-7** | infra errors and retries fold into the score with no machine-readable marker | distorts-measurement | **applied** *(cause reproduced offline; runner detects, restarts, rolls back, marks errored; regrade reports all-days and valid-only; verified after the approved rerun)* | **next** *(was 6; moved 2026-10-09)* |
 | **O-8** | no cost, timing, token or version capture, although the CLI hands them over | slows-work | open | 6 |
 | **O-9** | objects with an unparseable date are dropped from grading without a trace | distorts-measurement | open | 6 |
 | **C-1** | no artifact records its levers; two documented commands overwrite the corpus they are recovered from | blocks-measurement | open | **1** |
@@ -913,8 +913,8 @@ in the artifact and truncate only in the terminal · attribute by inspecting too
 log-scraping (breaks its ability to read the four historical logs).
 
 **O-7 · infrastructure errors and retries fold into the score with no marker** —
-distorts-measurement · free-offline · **investigating** *(fix in progress on `o-7-run-validity`;
-not `verified` until a rerun shows a clean 57-day run)*
+distorts-measurement · free-offline · **applied** *(2026-10-09; not `verified` until the approved
+rerun shows a clean 57-day run: every day `ok`, `mcp_status: connected`, no errored emails)*
 
 **Observed, not latent (2026-10-09).** The 1c capture lost the secretary MCP server for its
 last 7 days (51-57: 19 emails, 20 ops). Day 51's first attempt hit the 240 s turn timeout
@@ -984,6 +984,19 @@ store as it was before the day. Verified by `test_store_restore_undoes_everythin
 and `test_a_failed_attempt_leaves_nothing_behind` / `test_an_errored_day_leaves_nothing_behind`
 (both fail with the restore removed).
 
+**Fix, part 4 (scoring and reporting).** `sb.regrade` prints `RESCORE` over all days and
+`VALID` over valid days only, with the excluded days and why. A day is invalid if the runner
+marked it errored or its graded turn started without the secretary server connected. Old
+captures record the latter only in the CLI's init event, so `invalid_days` reads it from
+`raw/day_NNN.jsonl`; `days/*.json` is never edited. A day with no observable status (codex,
+or no raw stream) counts as valid and is reported as such. On the 1c baseline:
+`RESCORE 114/167 (68%) all days` and `VALID 110/148 (74%) 19 emails excluded: days 51-57
+secretary MCP failed`. Neither number is "the" score (roadmap decision 3). `--json` is
+unchanged. Verified by `sb/tests/test_capture_regrade.py::test_validity_overlay_on_the_1c_baseline`
+(19 errored, 114/167, 110/148, day records untouched) and
+`test_validity_reads_the_runners_own_record` (errored, failed, connected and unobserved days in
+the post-O-7 record). The capture README's "0 errored" now carries the outage note.
+
 **Not fixed: the CLI transcript keeps a failed attempt.** On days after the first, every
 attempt runs `claude -p --resume <session>`, which appends to the same session, so a retry
 sees the failed attempt's prompt and whatever the model did or said in it. The store is rolled back, so
@@ -992,6 +1005,10 @@ marked (`attempts`, `retried_days`), so the exposure is measurable per run. A fi
 (`--resume <last good> --fork-session` on every turn, adopting the new session id only on
 success) changes how every turn is driven and cannot be checked without a live run, so it is
 left for its own decision.
+
+**Not fixed: `sb/analyze.py`.** It scrapes printed logs for `PASS`/`FAIL` tokens, so an
+errored email still vanishes from its analysis. Captures carry the marker now; retiring the
+log scraper is O-6's question.
 
 **Original finding (phase A).** `runner.py:491-496` prints `ERROR after retries` on a line carrying no `PASS`/`FAIL` token, so
 `analyze.py:25`'s regex never matches it and the email vanishes from analysis rather than being
@@ -1005,7 +1022,8 @@ run this way.
 *Options:* tri-state per-email status plus an attempt count, and report the score with and
 without errored emails · snapshot and roll back the store before each attempt · refuse to score
 a run with any errored day · recompute `before` inside the retry loop (strands the failed
-attempt's objects in the cumulative pool).
+attempt's objects in the cumulative pool). *Taken (2026-10-09):* the first two; refusing to
+score was rejected because both scores are reported instead.
 
 **O-8 · no cost, timing, token or version capture, although the CLI hands them over** —
 slows-work · free-offline · open
@@ -1877,7 +1895,7 @@ gitignored `build/`.
 
 ## Changelog
 
-- **2026-10-09**: O-7, part 1. The day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Part 2: the runner reads the secretary MCP status from each turn's init event, health-checks the server before each day and after each attempt, restarts it and retries, records `mcp_status` and every attempt per day, and marks a day errored when the tools never connected. Evidence: `sb/tests/test_runner_validity.py`. Part 3: the store is snapshotted after the day's mail is posted and restored after every failed attempt, so retries cannot leave duplicates and an errored day leaves nothing behind (new runner-only store endpoints; ids unchanged). Evidence: the two rollback tests in `test_runner_validity.py` and `test_live_store.py`. Still open: a retried turn's CLI transcript keeps the failed attempt. Runner and store only; no corpus, key, grader, score or capture change; no runs.
+- **2026-10-09**: O-7 run validity, `applied`. Part 1: the day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Part 2: the runner reads the secretary MCP status from each turn's init event, health-checks the server before each day and after each attempt, restarts it and retries, records `mcp_status` and every attempt per day, and marks a day errored when the tools never connected. Evidence: `sb/tests/test_runner_validity.py`. Part 3: the store is snapshotted after the day's mail is posted and restored after every failed attempt, so retries cannot leave duplicates and an errored day leaves nothing behind (new runner-only store endpoints; ids unchanged). Evidence: the two rollback tests in `test_runner_validity.py` and `test_live_store.py`. Part 4: `sb.regrade` reports `RESCORE 114/167` (all days) and `VALID 110/148` (days 51-57 excluded) for the 1c baseline, deriving the outage from the raw init events without editing `days/*.json`; capture README updated. Evidence: `test_capture_regrade.py`. O-7 is `applied`, not `verified`, until the approved rerun shows a clean 57-day run. Still open: a retried turn's CLI transcript keeps the failed attempt; `sb/analyze.py` still drops errored lines. Runner, store, regrade and capture README only; no corpus, key or grader change, no capture data edited (`days/`, `raw/`, `verdicts.json` untouched); no runs.
 
 - **2026-10-09**: Roadmap decisions after a plan breakdown and adversarial review, docs only: O-7 first, saved-run scores reported with and without the outage, one full baseline rerun approved after the O-7 fix, all 115 unaudited passes to be audited later, principal preferences brought into scope and into the headline score, levers pinned to the 1c baseline, model-assisted grading accepted as a paid component. Local paths redacted from the tree and the branch pushed. Evidence: the roadmap decisions at the top of this file. No source, corpus, key, grader, score or capture change; no runs.
 
