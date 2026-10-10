@@ -972,6 +972,27 @@ and one wedged between days (SIGSTOP: port open, nothing answers) each cause one
 a successful retry; a day whose tools never connect is errored. With the detector blinded,
 the three day-loop tests fail.
 
+**Fix, part 3 (store rollback per attempt).** Decided in-session to keep this in O-7, as its
+own commit: it is the latent half of this finding (below), and part 2 makes retries more
+frequent, so retrying without it would manufacture the duplicates described there. The store
+gains runner-only `GET /snapshot` and `POST /restore` (not reachable from the MCP tool
+surface; object ids are numbered exactly as before). The runner snapshots the store after
+posting the day's mail and restores it after every failed attempt, once the health check has
+run, so a tool call still in flight from a killed turn has landed or its server is dead. A
+retry's day delta therefore holds only the retry's objects, and an errored day leaves the
+store as it was before the day. Verified by `test_store_restore_undoes_everything_since_the_snapshot`
+and `test_a_failed_attempt_leaves_nothing_behind` / `test_an_errored_day_leaves_nothing_behind`
+(both fail with the restore removed).
+
+**Not fixed: the CLI transcript keeps a failed attempt.** On days after the first, every
+attempt runs `claude -p --resume <session>`, which appends to the same session, so a retry
+sees the failed attempt's prompt and whatever the model did or said in it. The store is rolled back, so
+the model may remember objects that no longer exist. Days with more than one attempt are now
+marked (`attempts`, `retried_days`), so the exposure is measurable per run. A fix
+(`--resume <last good> --fork-session` on every turn, adopting the new session id only on
+success) changes how every turn is driven and cannot be checked without a live run, so it is
+left for its own decision.
+
 **Original finding (phase A).** `runner.py:491-496` prints `ERROR after retries` on a line carrying no `PASS`/`FAIL` token, so
 `analyze.py:25`'s regex never matches it and the email vanishes from analysis rather than being
 counted. `runner.py:518-528` renders an errored email with the same red dot as a failed one.
@@ -1856,7 +1877,7 @@ gitignored `build/`.
 
 ## Changelog
 
-- **2026-10-09**: O-7, part 1. The day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Part 2: the runner reads the secretary MCP status from each turn's init event, health-checks the server before each day and after each attempt, restarts it and retries, records `mcp_status` and every attempt per day, and marks a day errored when the tools never connected. Evidence: `sb/tests/test_runner_validity.py`. Runner only; no corpus, key, grader, score or capture change; no runs.
+- **2026-10-09**: O-7, part 1. The day 51-57 outage cause was reproduced offline with no model: the MCP server's unread stderr pipe filled at ~64 KiB and the server blocked on a log write while still accepting TCP. `start_mcp` now logs stderr to a file and checks readiness with a real MCP request. Evidence: `sb/tests/test_mcp_liveness.py` (mechanism, fix, E-3 crash report). Part 2: the runner reads the secretary MCP status from each turn's init event, health-checks the server before each day and after each attempt, restarts it and retries, records `mcp_status` and every attempt per day, and marks a day errored when the tools never connected. Evidence: `sb/tests/test_runner_validity.py`. Part 3: the store is snapshotted after the day's mail is posted and restored after every failed attempt, so retries cannot leave duplicates and an errored day leaves nothing behind (new runner-only store endpoints; ids unchanged). Evidence: the two rollback tests in `test_runner_validity.py` and `test_live_store.py`. Still open: a retried turn's CLI transcript keeps the failed attempt. Runner and store only; no corpus, key, grader, score or capture change; no runs.
 
 - **2026-10-09**: Roadmap decisions after a plan breakdown and adversarial review, docs only: O-7 first, saved-run scores reported with and without the outage, one full baseline rerun approved after the O-7 fix, all 115 unaudited passes to be audited later, principal preferences brought into scope and into the headline score, levers pinned to the 1c baseline, model-assisted grading accepted as a paid component. Local paths redacted from the tree and the branch pushed. Evidence: the roadmap decisions at the top of this file. No source, corpus, key, grader, score or capture change; no runs.
 

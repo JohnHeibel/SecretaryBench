@@ -617,6 +617,10 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                 mcp_restarts += 1
 
             before = _all_ids(httpx.get(f"{STORE_URL}/state", timeout=10).json())
+            # Every attempt starts from this store, so a failed attempt's objects cannot
+            # land in the retry's day delta as duplicates, and an errored day leaves
+            # nothing behind for later days to be graded against (O-7).
+            day_start = httpx.get(f"{STORE_URL}/snapshot", timeout=10).json()
 
             cmd = build_cmd(driver, model, session, user_msg, mcp_config, MCP_URL,
                             iso_cwd, reasoning)
@@ -700,6 +704,9 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
                     mcp = _restart_mcp(mcp, mcp_log, f"day {day_no}: {detail}")
                     mcp_restarts += 1
                     attempt_log[-1]["restarted_mcp"] = True
+                # After the check, so a tool call still in flight from the killed turn has
+                # landed (or its server is dead) before the store is put back.
+                httpx.post(f"{STORE_URL}/restore", timeout=10, json=day_start)
                 pause = _limit_reset_wait(f"{said} {cli_detail} {detail}")
                 if pause is not None and limit_pauses < 12:
                     limit_pauses += 1

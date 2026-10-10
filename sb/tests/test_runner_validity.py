@@ -194,3 +194,31 @@ def test_a_turn_with_no_secretary_server_is_not_a_model_result(harness, monkeypa
     manifest, days = h.run(limit=1)
     assert days[1]["attempts"][0]["detail"] == "secretary MCP absent at turn start"
     assert days[1]["ok"] and manifest["errored"] == 0
+
+
+def test_a_failed_attempt_leaves_nothing_behind(harness):
+    """Attempt 1 files a to-do and then times out. Without a rollback that to-do would sit
+    in the retry's day delta, the duplicate O-7's original finding predicted."""
+    h = harness
+
+    def acts_then_times_out(cmd):
+        _acts_then("connected")(cmd)
+        raise subprocess.TimeoutExpired(cmd, 240, output=_stream("connected").encode())
+    h.script = [acts_then_times_out, _turn("connected")]
+    manifest, days = h.run(limit=1)
+
+    d1 = days[1]
+    assert d1["ok"] and [a["ok"] for a in d1["attempts"]] == [False, True]
+    assert d1["attempts"][0]["detail"] == "turn timed out after 240s"
+    assert d1["attempts"][0]["mcp_status"] == "connected"     # read from the partial stream
+    assert "restarted_mcp" not in d1["attempts"][0]           # healthy server, not restarted
+    assert d1["day_new"] == [] and d1["state"] == {"events": [], "todos": []}
+
+
+def test_an_errored_day_leaves_nothing_behind(harness, monkeypatch):
+    h = harness
+    monkeypatch.setattr(runner, "ATTEMPTS", 2)
+    h.script = [_acts_then("failed")] * 2
+    manifest, days = h.run(limit=1)
+    assert days[1]["ok"] is False
+    assert json.loads((h.out / "state_final.json").read_text()) == {"events": [], "todos": []}

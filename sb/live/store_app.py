@@ -10,7 +10,7 @@ served emails.
 """
 from __future__ import annotations
 
-import itertools
+import copy
 import re
 from typing import Optional
 
@@ -19,7 +19,7 @@ from pydantic import BaseModel
 
 app = FastAPI(title="secretary-bench store")
 
-_ids = itertools.count(1)
+_next_id = 1
 _events: dict[str, dict] = {}
 _todos: dict[str, dict] = {}
 _inbox: list[dict] = []         # served emails, in serve order
@@ -71,6 +71,12 @@ class DayIn(BaseModel):
     date: str
 
 
+def _new_id(prefix: str) -> str:
+    global _next_id
+    _next_id += 1
+    return f"{prefix}_{_next_id - 1}"
+
+
 def _warn(kind: str, **fields) -> None:
     _warnings.append({"kind": kind, "today": _today, **fields})
 
@@ -102,13 +108,35 @@ def health():
 
 @app.post("/reset")
 def reset():
-    global _ids, _today
+    global _next_id, _today
     _events.clear()
     _todos.clear()
     _inbox.clear()
     _warnings.clear()
-    _ids = itertools.count(1)
+    _next_id = 1
     _today = None
+    return {"ok": True}
+
+
+@app.get("/snapshot")
+def snapshot():
+    """Everything, so the runner can undo a failed attempt (register O-7). Runner-only:
+    the MCP tool surface has no route to this or to /restore."""
+    return copy.deepcopy({"events": _events, "todos": _todos, "inbox": _inbox,
+                          "warnings": _warnings, "today": _today, "next_id": _next_id})
+
+
+@app.post("/restore")
+def restore(snap: dict):
+    global _next_id, _today
+    _events.clear()
+    _events.update(snap["events"])
+    _todos.clear()
+    _todos.update(snap["todos"])
+    _inbox[:] = snap["inbox"]
+    _warnings[:] = snap["warnings"]
+    _today = snap["today"]
+    _next_id = snap["next_id"]
     return {"ok": True}
 
 
@@ -126,7 +154,7 @@ def set_day(d: DayIn):
 @app.post("/events", status_code=201)
 def create_event(e: EventIn):
     _watch_attribution("event", e.email_id, e.title)
-    eid = f"evt_{next(_ids)}"
+    eid = _new_id("evt")
     _events[eid] = {"id": eid, **e.model_dump()}
     return _events[eid]
 
@@ -156,7 +184,7 @@ def delete_event(eid: str):
 @app.post("/todos", status_code=201)
 def create_todo(t: TodoIn):
     _watch_attribution("todo", t.email_id, t.title)
-    tid = f"todo_{next(_ids)}"
+    tid = _new_id("todo")
     _todos[tid] = {"id": tid, **t.model_dump()}
     return _todos[tid]
 
