@@ -222,3 +222,54 @@ def test_an_errored_day_leaves_nothing_behind(harness, monkeypatch):
     manifest, days = h.run(limit=1)
     assert days[1]["ok"] is False
     assert json.loads((h.out / "state_final.json").read_text()) == {"events": [], "todos": []}
+
+
+def test_offline_full_length_run(harness):
+    """The offline stress test the approved rerun waits on: the real day loop over the
+    1c plan (seed 42, 60 days -> 57 turns, 167 emails), with a scripted CLI that drives
+    the real MCP server through the `mcp` client harder than the 1c model did (302
+    secretary calls by day 50). The pre-O-7 server hung after ~64 KiB of stderr."""
+    import asyncio
+
+    from mcp import ClientSession
+    from mcp.client.streamable_http import streamable_http_client
+
+    h = harness
+    calls = 0
+
+    async def work_the_inbox():
+        nonlocal calls
+        async with streamable_http_client(runner.MCP_URL) as (r, w, _):
+            async with ClientSession(r, w) as s:
+                await s.initialize()
+                await s.list_tools()
+                new = (await s.call_tool("list_new_emails", {})).structuredContent["result"]
+                calls += 1
+                for m in new:
+                    for name, args in [
+                            ("get_email", {"email_id": m["email_id"]}),
+                            ("search_inbox", {"query": m["subject"][:12]}),
+                            ("get_email", {"email_id": m["email_id"]}),
+                            ("create_todo", {"email_id": m["email_id"], "title": m["subject"],
+                                             "due_date": "2026-09-01T17:00:00"})]:
+                        res = await s.call_tool(name, args)
+                        assert not res.isError, res
+                        calls += 1
+
+    def day(cmd):
+        try:
+            asyncio.run(asyncio.wait_for(work_the_inbox(), timeout=30))
+        except Exception:
+            # what the CLI would report on a turn that lost its tools
+            return subprocess.CompletedProcess(cmd, 0, _stream("failed"), "")
+        return subprocess.CompletedProcess(cmd, 0, _stream("connected"), "")
+
+    h.script = [day] * 100                  # room for retries, so h.calls can catch one
+    manifest, days = h.run(limit=None)
+
+    assert len(days) == 57 and manifest["planned_emails"] == 167
+    assert h.calls == 57, "a day needed a retry"
+    assert calls == 57 + 4 * 167
+    assert manifest["errored"] == 0 and manifest["mcp_restarts"] == 0
+    assert {d["mcp_status"] for d in days.values()} == {"connected"}
+    assert (h.out / "mcp_server.log").stat().st_size > 2 * 65536

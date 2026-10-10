@@ -294,9 +294,9 @@ def start_mcp(log_path: Path) -> subprocess.Popen:
     """Start the ONE persistent MCP server every claude turn attaches to.
 
     Its stderr is appended to `log_path`, never left in an unread pipe. FastMCP
-    logs every request at INFO; with stderr=PIPE and no reader, the 1c run filled
-    the ~64 KiB pipe buffer on day 51, the server blocked on a log write, and the
-    secretary tools were gone for the rest of the run (register O-7)."""
+    logs every request at INFO; with stderr=PIPE and no reader the ~64 KiB pipe
+    fills and the server blocks on a log write (reproduced offline). That is the
+    likely cause of the 1c run losing its secretary tools from day 51 (register O-7)."""
     _free_port(MCP_PORT)
     env = {**os.environ, "MCP_TRANSPORT": "streamable-http", "MCP_PORT": str(MCP_PORT),
            "STORE_BASE_URL": STORE_URL, "PYTHONPATH": str(REPO)}

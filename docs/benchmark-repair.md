@@ -997,6 +997,17 @@ unchanged. Verified by `sb/tests/test_capture_regrade.py::test_validity_overlay_
 `test_validity_reads_the_runners_own_record` (errored, failed, connected and unobserved days in
 the post-O-7 record). The capture README's "0 errored" now carries the outage note.
 
+**Offline stress test (the gate for the approved rerun).**
+`test_runner_validity.py::test_offline_full_length_run` runs the real day loop over the 1c
+plan (seed 42, 60 days → 57 turns, 167 emails) against real servers. A scripted CLI drives
+the MCP server through the `mcp` client at 725 tool calls (1c made 302 by day 50) and
+reports `failed` on any turn that loses its tools. With the fix: 57 turns, no retries, no
+restarts, no errored emails, over 128 KiB of server stderr. With `stderr=subprocess.PIPE`
+put back in `start_mcp` (mutation check), the server hung on day 27 and again on day 53;
+part 2 restarted it and retried both days, the run finished with nothing errored, and the
+test fails on the retry count. This exercises the real failure mode end to end, not only
+SIGSTOP. It does not exercise the claude CLI itself; only the rerun does.
+
 **Not fixed: the CLI transcript keeps a failed attempt.** On days after the first, every
 attempt runs `claude -p --resume <session>`, which appends to the same session, so a retry
 sees the failed attempt's prompt and whatever the model did or said in it. The store is rolled back, so

@@ -1,11 +1,12 @@
 """
 O-7: the secretary MCP server must keep answering for a whole run.
 
-The 1c capture lost days 51-57 because `start_mcp` piped the server's stderr
-and never read it. FastMCP logs every request at INFO; once ~64 KiB sat unread
-in the pipe, the server blocked on a log write and stopped answering, while the
-kernel kept accepting its TCP connections. Every later `claude -p` turn saw the
-secretary server as "failed" and the runner still recorded the days `ok`.
+The 1c capture lost its secretary tools on days 51-57, most likely because
+`start_mcp` piped the server's stderr and never read it. FastMCP logs every
+request at INFO; once ~64 KiB sat unread in the pipe, the server blocked on a
+log write and stopped answering, while the kernel kept accepting its TCP
+connections. Every later `claude -p` turn saw the secretary server as "failed"
+and the runner still recorded the days `ok`.
 
 No model is involved. Real store and MCP servers run on free ports, driven by
 the `mcp` Python client the way a `claude -p` turn drives them: a fresh session
