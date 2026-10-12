@@ -37,6 +37,42 @@ On the 148 emails valid in both runs, 141 verdicts agree (95%): 5 went from fail
 days. The flips mix run-to-run variance with the CLI version change, so they bound the noise
 rather than measure it.
 
+## Against the phase 1d audit
+
+The phase 1d audit labelled 75 checks of the 1c run (`docs/_repair/agent-audit-continuation/RESULTS.md`).
+Each label implies what a second run should do. Same grader, check by check:
+
+| 1c audit label | checks | r2 | what the label predicts |
+|---|---:|---|---|
+| PASS (sampled passes) | 15 | 15 pass | should hold |
+| PLAN (delivered too late or impossible) | 10 | 10 fail | cannot be passed |
+| GRADER (grader rejects correct work) | 4 | 4 fail | fails until the grader changes |
+| KEY (answer key wrong) | 28 | 23 fail, 5 pass | mostly fails |
+| MODEL (genuine model error) | 5 | 4 fail, 1 pass | a real weakness repeats |
+| AMBIGUOUS, tools down (1c days 51-57) | 8 | 6 pass, 2 fail | unknown; now judgeable |
+| AMBIGUOUS, unclear instruction | 5 | 2 pass, 3 fail | a coin flip |
+
+The labels held: 37 of the 42 benchmark-defect checks failed again, every sampled pass held,
+and 4 of 5 model errors repeated. The 5 KEY checks that passed (#6, #16, #34, #43, #47) look
+like keys that demand more than the email supports, which the model sometimes meets anyway.
+The two tools-down checks that still fail with tools (#54 `launch-meeting-conflict-2`, #59
+`launch-meeting-recap`) are now unexplained failures. MODEL #13 passed this time while the
+same email's other check failed, so the model's behavior on that email varies.
+
+This run fails 51 of 190 checks (1c: 60). By the 1c labels: 37 known benchmark defects,
+4 known model errors, 5 ambiguous, and **5 not audited**, all of them 1c passes:
+
+| email | check | r2 |
+|---|---|---|
+| `Partnership-with-deeptech-companies.caltech-conference-invitation` | create FBS Conference | not created |
+| `Innovation-comp.sponsor-call-no-longer-needed` | cancel sponsor call | still on the calendar |
+| `shoe-product-launch-delays.design-delays-internal-conflicts` | create Meet with Melissa 1 | not created |
+| `World_Cup_Cleat_Launch.reveal-event-date-and-venue-2` | create Reveal Rehearsal | wrong day |
+| `Sponsoring-Marathon.launch-meeting-conflict` (day 51) | no action | over-acted |
+
+The last one is one of 1c's four outage-day no-action passes: with tools, the model acted on
+it, so that 1c pass was earned only because the tools were down.
+
 ## What this run shows about O-7
 
 The MCP server's stderr went to `mcp_server.log` (81,944 bytes by the end). Leaving out the

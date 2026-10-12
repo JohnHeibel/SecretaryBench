@@ -1,5 +1,54 @@
 # SecretaryBench repair register
 
+## Baseline replicate, 2026-10-11
+
+The approved rerun (roadmap decision 4) is `captures/baseline-sonnet-4-5-r2`: Sonnet 4.5,
+seed 42, levers 1/5/7, unchanged corpus and prompt, CLI 2.1.296 (1c: 2.1.235). All 57 days ran
+with the secretary tools connected, so it verifies O-7 and is the first clean 167-email number
+and the first same-seed replicate. Full comparison: `captures/baseline-sonnet-4-5-r2/README.md`.
+
+| current grader | 1c | r2 |
+|---|---:|---:|
+| all 167 emails | 114 | 123 |
+| days 1-50, 148 emails valid in both runs | 110 | 113 |
+| days 51-57, 19 emails (1c had no tools) | 4 | 10 |
+| failing checks, of 190 | 60 | 51 |
+
+Against the phase 1d audit's labels for the 1c run, check by check: PASS 15/15 pass again;
+PLAN 10/10 and GRADER 4/4 fail again; KEY 23 of 28 fail again; MODEL 4 of 5 fail again;
+tools-down 6 of 8 now pass; unclear-instruction 2 of 5 pass. No audit label is changed by
+this; see the dated note in `_repair/agent-audit-continuation/RESULTS.md`.
+
+What this says about the benchmark (findings, not decisions):
+
+1. **The harness can now be trusted at the run level.** The served model is certified, the
+   tools stayed up for 57 days, the re-grade reproduces the as-run score, and a day without
+   tools can no longer be scored as a model result (O-7).
+2. **Run-to-run noise is small at this size.** 141 of the 148 emails valid in both runs got the
+   same verdict (5 fail to pass, 2 pass to fail, net +3), with a CLI version change in between.
+   A gap of a few emails between two single runs is within that noise. This is one replicate,
+   so it gives a size, not a confidence interval.
+3. **The audit's labels are predictive.** Defects reproduced, sampled passes held and most model
+   errors repeated, which supports using the 75 audited checks as the calibration set for key
+   and grader work (amended order step 8).
+4. **The score mostly measures the benchmark.** Of the 51 checks r2 fails, 37 are failures the
+   audit attributes to keys, delivery or grader, 4 to the model, 5 are ambiguous, and 5 were 1c
+   passes nobody audited. Most of the distance between 123 and 167 is the benchmark, not
+   Sonnet 4.5, so comparing models now would compress real differences into a few emails,
+   the same size as the noise.
+5. **Some passes are not earned.** One of 1c's four outage-day no-action passes failed once
+   the tools worked; only inaction had passed it. With A-1 (56-57% of every score is the
+   no-action check), the passes need the same scrutiny the failures got: the pass audit and
+   the null floor (phase 4).
+6. **Not explained yet:** the 5 newly failing checks (4 of them 1c passes on days 1-50) and the
+   two tools-down checks that still fail with tools (#54, #59).
+
+Implications for the amended order (proposed, not decided): no reordering is needed. K repairs
+remain the main lever, and a key-only repair can now be checked against two captures: a
+correct fix should change the verdict the same way in both runs. The pass audit can start
+with the passes that flipped between runs. Paid runs on newer models still wait for the K
+repairs and the null floor, since today their scores would be bounded by the same defects.
+
 ## Roadmap decisions, 2026-10-09
 
 James reviewed a plain-language breakdown of the post-audit plan and an adversarial review of it (Claude Code session, 2026-10-09) and decided the following. These supersede the "proposed next steps" in the 2026-10-03 checkpoint below.
@@ -1024,7 +1073,8 @@ the offline client did not replicate. The run carried on to 81,944 bytes with no
 emails valid in both runs (days 1-50), 1c 110 and r2 113; 141 verdicts agree (95%), 5 went
 fail to pass and 2 pass to fail. On the 19 outage emails r2 passes 10, 1c 4 (tools down).
 The flips mix run-to-run variance with the CLI version change, so they bound the noise
-rather than measure it. Full comparison: `captures/baseline-sonnet-4-5-r2/README.md`.
+rather than measure it. Full comparison: `captures/baseline-sonnet-4-5-r2/README.md`; what it
+says about the benchmark: "Baseline replicate, 2026-10-11" at the top of this file.
 
 **Not fixed: the CLI transcript keeps a failed attempt.** On days after the first, every
 attempt runs `claude -p --resume <session>`, which appends to the same session, so a retry
@@ -1927,6 +1977,8 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-10-11**: Baseline replicate analysis, docs only: the r2 capture compared with 1c and with the phase 1d audit labels, check by check. Labels held (PASS 15/15, PLAN 10/10, GRADER 4/4, KEY 23/28 failing again, MODEL 4/5 repeated, tools-down 6/8 now pass); 37 of r2's 51 failing checks are known benchmark defects. Evidence: "Baseline replicate, 2026-10-11" at the top, `captures/baseline-sonnet-4-5-r2/README.md`, dated note in `_repair/agent-audit-continuation/RESULTS.md`. No audit label, source, corpus, key or grader change; no runs.
 
 - **2026-10-09**: O-7 `verified` by the approved baseline rerun, `captures/baseline-sonnet-4-5-r2` (Sonnet 4.5, seed 42, levers 1/5/7, unchanged corpus and prompt, CLI 2.1.296): 57/57 days clean, no retries or restarts, 123/167, $7.48. First same-seed replicate: 141/148 verdicts agree with 1c on the days valid in both (110 vs 113). The server log puts the model's own stderr at 229 bytes short of 64 KiB when day 51 opened, corroborating the cause. O-8 note: `total_cost_usd` is cumulative in CLI 2.1.296. New capture plus docs only; no source, corpus, key or grader change.
 
