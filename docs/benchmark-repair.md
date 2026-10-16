@@ -374,7 +374,7 @@ matched something.
 | **C-8** | run logs default to a gitignored path; artifacts preserved only by hand | slows-work | open | 4 |
 | **C-10** | `corpus/` has forked from upstream; `match` is generated, not authored | blocks-measurement | **resolved** *(corpus/ authoritative; `match` to drop)* | 5 |
 | **C-9** | residual stale claims in the durable record the phase-A1 banner does not cover | slows-work | open | 4 |
-| **C-11** | `sb.regrade` grades a capture against whatever corpus is on disk | distorts-measurement | **applied** *(frozen corpus in each capture; a corpus that changes what was served, or when, is refused)* | 3 *(amended order)* |
+| **C-11** | `sb.regrade` grades a capture against whatever corpus is on disk | distorts-measurement | **verified** *(frozen corpus in each capture; a corpus that changes what was served, or when, is refused; independently verified)* | 3 *(amended order)* |
 | **K-1** | the serve plan drifts past the dates the corpus narrates (18 emails, 11 ops) | blocks-measurement | open | 5 |
 | **K-2** | corpus date-coherence needs a high `daily_max`; the two headline runs used 5 | blocks-measurement | open | 5 |
 | **K-3** | prose states a date the answer key contradicts (8 emails) | distorts-measurement | open | 5 |
@@ -1274,7 +1274,8 @@ docs to `docs/history/` · fix only the mechanically checkable items now and def
 · add a docs test that fails on a non-existent CLI flag or a 404 link.
 
 **C-11 · `sb.regrade` grades a capture against whatever corpus is on disk** —
-distorts-measurement · free-offline · **applied** *(2026-10-16; amended order step 3)*
+distorts-measurement · free-offline · **verified** *(2026-10-16; amended order step 3; independent
+verification below)*
 `sb.regrade` loaded `--corpus`, else the manifest's `corpus_dir` (the live `corpus/`), and
 never compared it with the corpus the run was served from: the manifest's `corpus_hash` was
 printed, not checked. Once K repairs edit `corpus/nodes/*.json`, re-grading
@@ -1345,7 +1346,32 @@ corpus is a tmp copy of a capture's snapshot, so the tests survive K repairs.
 plan repair and is refused, as intended (step 7: plan repairs need a new run). It does so only
 sometimes: of the two date-edge edits above, the 10-day one keeps the plan and the 20-day one
 moves it. *Not covered:* a corpus that fails to load still raises `CorpusError` as before,
-not `REFUSED`.
+not `REFUSED`. `keys_changed` lists the captured emails whose own answer differs; an email
+graded against an anchor another email's key defines can change verdict without being
+listed, so compare `--json` output to see every moved verdict.
+
+*Independent verification (2026-10-16).* Implemented by a subagent from a written plan;
+verified separately by the coordinating session with its own scripts, not the implementer's
+tests. (1) Baseline: 156 tests pass, oracle 167/167, both captures re-grade to the pre-C-11
+numbers by default and with `--corpus <capture>/corpus`. (2) Scope: only `sb/regrade.py`,
+`sb/live/runner.py`, two test files, the register, two capture READMEs and 30 added snapshot
+files; no grader, corpus, webapp or existing capture data change; no attribution. (3) Each
+snapshot hashes to its manifest and is identical to `corpus/nodes` (only `.gitkeep`, which the
+hash ignores, is absent). (4) An independent renderer (plan rebuilt by hand, `render_body`
+called directly) reproduces every `get_email` result in both raw streams from the snapshots:
+148 and 167 comparisons, no mismatch. (5) Differential fuzz against an independent
+accept/refuse oracle: 62 random single edits per capture (body, subject, sender, kind,
+`dom:` shift, op rename, whitespace, removal) and 400 anchored-date edits on both captures
+(18 moved the plan, 9 made it infeasible), zero disagreements; the order-only day-28 case
+agrees too. A CLI matrix (key-only, whitespace, body, subject, plan-moving, removed email,
+tampered snapshot, snapshot-less capture with a changed and an unchanged corpus) gave the
+right exit code and named the email and field each time. (6) Mutation: disabling the plan
+comparison, the served-email comparison, the snapshot hash check, the batch check, the
+email-set check, or the whole check each fails a test in `test_regrade_reference.py`.
+(7) The runner change is a straight substitution of the inline payload by `_served_email`
+(same keys and order; every email in a batch shares the serve date). (8) Every number above
+reproduced, including r2 123 → 122 on the rename and 11 moved serve dates. (9) No servers
+left listening; tree clean.
 
 ### K — corpus authoring (`docs/_repair/K.md`)
 
@@ -2052,6 +2078,8 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-10-16**: C-11 `verified` by an independent pass (fidelity 148 + 167 with no mismatch, 524 fuzzed edits with zero disagreements against an independent oracle, CLI matrix, six mutants all caught); see the C-11 entry.
 
 - **2026-10-16**: C-11, `applied`; amended-order step 3 (freeze the reference) done. `sb.regrade` now checks the corpus against the run before grading: the same corpus is accepted, and a different one only if the serve plan rebuilt from it is the one the run used and every captured email renders to exactly what the model was served, so only answer keys differ; anything else is refused with exit 2. Each capture carries its frozen corpus (`<capture>/corpus/`, copied into both baselines; new runs freeze it at start), and `--corpus <capture>/corpus` grades with the run's own keys. The runner posts mail through the same `_served_email` the check uses. Key edits on date-edge emails that move the plan are refused as plan repairs. Both baselines re-grade unchanged (114/167, 110/148; 123/167). Evidence: the C-11 entry, `sb/tests/test_regrade_reference.py`, `test_runner_validity.py::test_capture_freezes_the_corpus_it_serves`. Runner, regrade, tests, additive capture snapshots and capture READMEs; no corpus, key or grader change; no existing capture data edited; no runs.
 
