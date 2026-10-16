@@ -1,0 +1,200 @@
+{
+  "id": "Day-of-execution_and_Aftermath",
+  "cast": {
+    "EA": "Executive Assistant",
+    "IR": "Investor Relations",
+    "CEO": "you",
+    "COMMS": "Communications / PR",
+    "VENDOR": "Vendor Contact",
+    "CHIEF_OF_STAFF": "Chief of Staff"
+  },
+  "emails": [
+    {
+      "id": "Day-of-execution_and_Aftermath.launch-livestream",
+      "to": "CEO",
+      "body": "The public moment is a livestream launch night; you on camera, walking everyone through the new ACME. We're running it {!launch_livestream = dom:10,+2m}. Get the launch livestream blocked.\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:10,+2m"
+            },
+            "kind": "event",
+            "create": "launch_livestream",
+            "match": [
+              "livestream"
+            ]
+          }
+        ]
+      },
+      "subject": "The Launch livestream",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Day-of-execution_and_Aftermath.green-room-before-we-go-live",
+      "to": "CEO",
+      "body": "I want you in the green room an hour before the livestream for a mic check and a last run of the talking points. Block the hour right before it as green room.\n\n",
+      "from": "CHIEF_OF_STAFF",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:10,+2m"
+            },
+            "kind": "event",
+            "create": "green_room",
+            "match": [
+              "green"
+            ]
+          }
+        ]
+      },
+      "subject": "Green room before we go live",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Day-of-execution_and_Aftermath.launch-livestream"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Day-of-execution_and_Aftermath.billboard-photo-op",
+      "to": "CEO",
+      "body": "We've got the downtown billboard reveal staged for 11 AM on launch day: big crowd photo op right after the site goes live. Hold {dom:10,+2m} for the billboard unveiling.\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:10,+2m"
+            },
+            "kind": "event",
+            "create": "billboard_unveiling",
+            "match": [
+              "billboard"
+            ]
+          }
+        ]
+      },
+      "subject": "Billboard photo op",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Day-of-execution_and_Aftermath.billboard-s-off",
+      "to": "CEO",
+      "body": "Bad news on the billboard. The city pulled our outdoor assembly permit this morning and there's no appeal in time. Kill the billboard unveiling, we can't hold a crowd there legally.",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "billboard_unveiling",
+            "match": [
+              "billboard"
+            ]
+          }
+        ]
+      },
+      "subject": "Billboard's off",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Day-of-execution_and_Aftermath.billboard-photo-op"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Day-of-execution_and_Aftermath.metrics-readout",
+      "to": "CEO",
+      "body": "The board and a few key investors will want hard launch numbers fast, traffic, conversion, sell-through. I need a clean metrics readout compiled three days after we go live, by {dom:13,+2m}.",
+      "from": "IR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "@launch_livestream+3d"
+            },
+            "kind": "todo",
+            "create": "launch_metrics_readout",
+            "match": [
+              "metrics"
+            ]
+          }
+        ]
+      },
+      "subject": "Metrics readout",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Day-of-execution_and_Aftermath.launch-livestream"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Day-of-execution_and_Aftermath.congrats-on-the-relaunch",
+      "to": "CEO",
+      "body": "Saw the teasers floating around, congratulations on the bold new direction! While I have you, we'd love to provide a quote for refreshed in-store signage to match. Happy to send a deck whenever.",
+      "from": "VENDOR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Congrats on the relaunch! ",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Day-of-execution_and_Aftermath.we-are-live"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Day-of-execution_and_Aftermath.we-are-live",
+      "to": "CEO",
+      "body": "It's live!!!",
+      "from": "EA",
+      "answer": {
+        "ops": []
+      },
+      "subject": "We are live!",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Day-of-execution_and_Aftermath.thank-the-team",
+      "to": "CEO",
+      "body": "Whatever the numbers say, this team ran through walls. Let's do a launch team thank-you lunch the day after we go live, at {@launch_livestream+1d}. Get it on the calendar before everyone scatters.",
+      "from": "CHIEF_OF_STAFF",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@launch_livestream+1d"
+            },
+            "kind": "event",
+            "create": "thank_you_lunch",
+            "match": [
+              "thank"
+            ]
+          }
+        ]
+      },
+      "subject": "Thank the team",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Day-of-execution_and_Aftermath.launch-livestream"
+        },
+        {
+          "type": "static",
+          "email": "Day-of-execution_and_Aftermath.congrats-on-the-relaunch"
+        }
+      ],
+      "tier": "T3"
+    }
+  ]
+}

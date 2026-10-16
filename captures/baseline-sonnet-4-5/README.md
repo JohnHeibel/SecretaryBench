@@ -21,7 +21,9 @@ Prints `RESCORE 114/167` (all days) and `VALID 110/148` (days 51-57 excluded) ag
 `as-run 97/167`; the 17-point gap to the as-run score is the phase 2 grader contract. Any
 change to `sb/grader.py` can be scored against this run for free, as many times as you like.
 That is the entire point: before this capture existed, evaluating a grader change meant
-paying for a whole new run.
+paying for a whole new run. `sb.regrade` refuses a corpus that changes what the model saw or
+when it saw it, so a key repair can be scored here and a prose or plan repair cannot
+(register C-11); `--corpus captures/baseline-sonnet-4-5/corpus` grades with the run's own keys.
 
 ## Tool outage, days 51-57 (register O-7)
 
@@ -50,6 +52,7 @@ against 26 of 190 overall, so 110/148 is measured on an easier mix.
 | `warnings.json` | attribution warnings |
 | `raw/day_NNN.jsonl` | the CLI's raw stream, so a later parser fix (O-2) applies here |
 | `run.log` | human-readable stdout, as printed |
+| `corpus/nodes/*.json` | frozen copy of the corpus the run was served (sha `03e0d963b9866d8f`); added 2026-10-16 from the unchanged `corpus/` (C-11) |
 
 `days/NNN.json` holds the **complete** store state, not only the objects the grader
 matched. In this run the model created **81** objects and the printed log renders

@@ -1,0 +1,216 @@
+{
+  "id": "project_atlas",
+  "cast": {
+    "GC": "General Counsel",
+    "CEO": "you (the boss)",
+    "COMMS": "Communications / PR",
+    "VP_ENG": "VP Engineering",
+    "VP_PRODUCT": "VP Product",
+    "BOARD_CHAIR": "Board Chair"
+  },
+  "emails": [
+    {
+      "id": "project_atlas.freeze",
+      "to": "CEO",
+      "body": "We're locking the Atlas launch plan. Code freeze is set for {!atlas_freeze = next:MON}; please hold that hour for the go/no-go. Public launch is targeted for {!atlas_launch = next:MON+10w}.",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@atlas_freeze"
+            },
+            "kind": "event",
+            "create": "Atlas code freeze",
+            "match": [
+              "freeze"
+            ]
+          }
+        ]
+      },
+      "subject": "Project Atlas: code freeze Monday, launch in 10 weeks",
+      "depends_on": [],
+      "tier": "T2"
+    },
+    {
+      "id": "project_atlas.ceo-note",
+      "to": "CEO",
+      "body": "Note for you to action: once Atlas launches, get my first press interview on the books the week after at {@atlas_launch+1w}.",
+      "from": "CEO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@atlas_launch+1w"
+            },
+            "kind": "event",
+            "create": "Atlas press interview",
+            "match": [
+              "interview"
+            ]
+          }
+        ]
+      },
+      "subject": "Set up my launch-week press interview",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "project_atlas.freeze"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "project_atlas.legal-fyi",
+      "to": "CEO",
+      "body": "FYI only: the Atlas trademark cleared this morning, so marketing is unblocked on the name. No action needed from you, I just wanted you in the loop.",
+      "from": "GC",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Re: Project Atlas trademark cleared",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "project_atlas.freeze"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "project_atlas.beta",
+      "to": "CEO",
+      "body": "One to-do for you: the Atlas beta feedback needs to be compiled and summarized by {@atlas_freeze+10bd}. Add it to your list so it doesn't slip.",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "@atlas_freeze+10bd"
+            },
+            "kind": "todo",
+            "create": "Atlas beta feedback",
+            "match": [
+              "feedback"
+            ]
+          }
+        ]
+      },
+      "subject": "Atlas beta feedback: compile the results",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "project_atlas.freeze"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "project_atlas.board-demo",
+      "to": "CEO",
+      "body": "The board wants a live Atlas demo two weeks after freeze. Please put it on the calendar for {@atlas_freeze+2w}.",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@atlas_freeze+2w"
+            },
+            "kind": "event",
+            "create": "Atlas board demo",
+            "match": [
+              "atlas"
+            ]
+          }
+        ]
+      },
+      "subject": "Atlas live board demo",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "project_atlas.freeze"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "project_atlas.demo-moved",
+      "to": "CEO",
+      "body": "Scheduling is tight that week, so we are pulling the Atlas board demo in to {@atlas_freeze+11d}, same hour.",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@atlas_freeze+11d"
+            },
+            "move": "Atlas board demo",
+            "match": [
+              "atlas"
+            ]
+          }
+        ]
+      },
+      "subject": "Re: Atlas board demo, pulling it in",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "project_atlas.board-demo"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "project_atlas.launch-dinner",
+      "to": "CEO",
+      "body": "Let's celebrate the Atlas launch with a team dinner the evening of launch day: {@atlas_launch}. Penciling it in.",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@atlas_launch"
+            },
+            "kind": "event",
+            "create": "Atlas launch dinner",
+            "match": [
+              "launch"
+            ]
+          }
+        ]
+      },
+      "subject": "Atlas launch-night team dinner",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "project_atlas.freeze"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "project_atlas.dinner-cancel",
+      "to": "CEO",
+      "body": "Change of plan: with the team spread across offices we are going to skip the Atlas launch dinner this time. If it's on your calendar, please take it off.",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "Atlas launch dinner",
+            "match": [
+              "launch"
+            ]
+          }
+        ]
+      },
+      "subject": "Re: Atlas launch dinner, let's not",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "project_atlas.launch-dinner"
+        }
+      ],
+      "tier": "T2"
+    }
+  ]
+}

@@ -158,6 +158,19 @@ def _all_ids(state: dict) -> set[str]:
     return {r["id"] for r in state["events"]} | {r["id"] for r in state["todos"]}
 
 
+def _served_email(corpus: Corpus, plan: Plan, eid: str) -> dict:
+    """The email as the model is served it: exactly what the day loop posts to the
+    store's /inbox, which get_email returns as is. sb.regrade compares it across
+    corpora to refuse a corpus that changes what a captured run saw (C-11), so the
+    two cannot drift."""
+    email = corpus.emails[eid]
+    sd = plan.serve_date[eid]
+    return {"email_id": eid, "sender": email.sender, "recipients": email.recipients,
+            "subject": email.subject,
+            "body": resolver.render_body(email.body, Context(sd, plan.anchors)).text,
+            "served_date": sd.isoformat()}
+
+
 def _grade_day(corpus: Corpus, plan: Plan, batch: list[str], state: dict,
                day_new: set[str]) -> dict[str, EmailResult]:
     """Grade one day's batch from the day-end store state.
@@ -477,6 +490,7 @@ class _Capture:
                           can be applied retroactively to this run
         raw/day_NNN.attempt_K.jsonl  the stream of failed attempt K, if any
         mcp_server.log    the secretary MCP server's stderr (O-7)
+        corpus/           frozen copy of the corpus served (C-11)
     """
 
     def __init__(self, out: Optional[str]):
@@ -501,6 +515,20 @@ class _Capture:
             return
         self.manifest = dict(fields)
         self._write("manifest.json", self.manifest)
+
+    def freeze_corpus(self, corpus_dir: str, corpus_hash: str) -> None:
+        """Byte copy of the corpus the run is served from, so sb.regrade can check a
+        later corpus against it, or grade against it, after `corpus/` moves on (C-11)."""
+        if not self.on:
+            return
+        dst = self.dir / "corpus"
+        shutil.rmtree(dst, ignore_errors=True)     # a reused --out must not keep stale nodes
+        (dst / "nodes").mkdir(parents=True)
+        for path in sorted(Path(corpus_dir).glob("nodes/*.json")):
+            shutil.copyfile(path, dst / "nodes" / path.name)
+        if _corpus_hash(str(dst)) != corpus_hash:
+            raise RuntimeError(f"frozen corpus {dst} does not hash to {corpus_hash}: "
+                               f"{corpus_dir} changed while the run was starting")
 
     def raw(self, day_no: int, stdout: str, failed_attempt: Optional[int] = None) -> None:
         if not self.on or not stdout:
@@ -557,6 +585,8 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     order = [e for b in days for e in b]
 
     cap = _Capture(out_dir)
+    corpus_hash = _corpus_hash(corpus_dir)
+    cap.freeze_corpus(corpus_dir, corpus_hash)    # before any server starts, so a failure leaks none
     if cap.on:
         mcp_log = cap.dir / "mcp_server.log"
     else:
@@ -572,7 +602,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
     started_at = datetime.now()
     cap.start(requested_model=model, driver=driver, seed=seed, start=str(start),
               n_days=n_days, limit=limit, corpus_dir=corpus_dir,
-              corpus_hash=_corpus_hash(corpus_dir),
+              corpus_hash=corpus_hash,
               levers={"daily_min": levers.daily_min, "daily_max": levers.daily_max,
                       "urgency_horizon": levers.urgency_horizon},
               planned_days=len(days), planned_emails=len(order),
@@ -599,11 +629,7 @@ def run(model: str, seed: int, start: date, n_days: int, limit: Optional[int],
             # list_new_emails can see it. Bodies go to the store, NOT the prompt.
             httpx.post(f"{STORE_URL}/day", timeout=10, json={"date": sd.isoformat()})
             for eid in batch:
-                email = corpus.emails[eid]
-                rendered = resolver.render_body(email.body, Context(sd, plan.anchors)).text
-                httpx.post(f"{STORE_URL}/inbox", timeout=10, json={
-                    "email_id": eid, "sender": email.sender, "recipients": email.recipients,
-                    "subject": email.subject, "body": rendered, "served_date": sd.isoformat()})
+                httpx.post(f"{STORE_URL}/inbox", timeout=10, json=_served_email(corpus, plan, eid))
 
             user_msg = (
                 f"Today: {sd.strftime('%A, %B %d, %Y')}\n"

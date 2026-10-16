@@ -374,6 +374,7 @@ matched something.
 | **C-8** | run logs default to a gitignored path; artifacts preserved only by hand | slows-work | open | 4 |
 | **C-10** | `corpus/` has forked from upstream; `match` is generated, not authored | blocks-measurement | **resolved** *(corpus/ authoritative; `match` to drop)* | 5 |
 | **C-9** | residual stale claims in the durable record the phase-A1 banner does not cover | slows-work | open | 4 |
+| **C-11** | `sb.regrade` grades a capture against whatever corpus is on disk | distorts-measurement | **applied** *(frozen corpus in each capture; a corpus that changes what was served, or when, is refused)* | 3 *(amended order)* |
 | **K-1** | the serve plan drifts past the dates the corpus narrates (18 emails, 11 ops) | blocks-measurement | open | 5 |
 | **K-2** | corpus date-coherence needs a high `daily_max`; the two headline runs used 5 | blocks-measurement | open | 5 |
 | **K-3** | prose states a date the answer key contradicts (8 emails) | distorts-measurement | open | 5 |
@@ -1272,6 +1273,80 @@ no banner, on a corpus wiped in 2026-06, with a T1–T4 tier vocabulary against
 docs to `docs/history/` · fix only the mechanically checkable items now and defer prose to phase 4
 · add a docs test that fails on a non-existent CLI flag or a 404 link.
 
+**C-11 · `sb.regrade` grades a capture against whatever corpus is on disk** —
+distorts-measurement · free-offline · **applied** *(2026-10-16; amended order step 3)*
+`sb.regrade` loaded `--corpus`, else the manifest's `corpus_dir` (the live `corpus/`), and
+never compared it with the corpus the run was served from: the manifest's `corpus_hash` was
+printed, not checked. Once K repairs edit `corpus/nodes/*.json`, re-grading
+`captures/baseline-sonnet-4-5` (1c) or `captures/baseline-sonnet-4-5-r2` (r2) would mix the
+run with emails its model never read, or with a serve plan it was never run on, and print a
+plausible number. Roadmap step 3 asks for the refusal; step 7 needs the other half, that a
+key-only repair can still be scored against the frozen capture.
+
+*Decisions (planning, 2026-10-16).* (1) "Differs" means differs in what the model saw or
+when, not a different file hash; a hash check would refuse every key repair. (2) Strict plan
+check: the plan is rebuilt from the given corpus with the manifest's seed, start, `n_days` and
+levers and must equal the recorded one; replaying the recorded schedule instead is a possible
+later extension. (3) The frozen corpus lives in each capture, `<capture>/corpus/nodes/*.json`.
+(4) The default stays the live corpus; `--corpus <capture>/corpus` grades with the run's own
+keys; there is no override flag, a refusal is final. (5) New captures are frozen at run time.
+(6) One shared function says what the model is served, used by the runner and the check.
+
+*Fix.* `sb/live/runner.py`: `_served_email(corpus, plan, eid)` builds the `/inbox` payload
+(sender, recipients, subject, rendered body, served date) and the day loop posts it; the JSON
+is the same as before, key order included. With `--out`, the runner copies
+`<corpus_dir>/nodes/*.json` to `<out>/corpus/nodes/` before any server starts and stops if the
+copy does not hash to the manifest's `corpus_hash`. `sb/regrade.py`: `check_reference` runs
+before every grade (`regrade()` calls it, so library callers are covered). Same hash as the
+run: accepted, nothing else checked. Otherwise it is refused unless, in order: the capture has
+a `corpus/` snapshot; the snapshot hashes to the manifest; the given corpus has the same
+emails; its plan builds; every captured email's rebuilt serve date equals `serve_plan`, every
+day record's batch equals the rebuilt batch for its date in order (only the last day may be a
+prefix, and only under `--limit`), and no rebuilt day up to the last recorded one is missing
+from the capture; and every captured email's `_served_email` is identical under the given and
+the frozen corpus. When accepted, `keys_changed` lists the captured emails whose answer
+differs. The CLI's corpus line reads `(same as the run)` or `(run: <sha>; served emails and
+plan identical; answer keys differ on N emails)` followed by the ids. A refusal prints
+`REFUSED` and the reason to stderr, naming up to 10 emails and what differs, and exits 2.
+
+*Existing captures.* Both now carry `corpus/nodes/`: byte copies of `corpus/nodes/*.json`
+(15 files, 132,879 bytes), made after confirming that `corpus/` is unchanged since both runs
+(`git log 24331fb..HEAD -- corpus/` empty, `git status corpus/` clean, `_corpus_hash` =
+`03e0d963b9866d8f` = both manifests). No existing capture file changed apart from the READMEs.
+Both still re-grade to the pre-C-11 numbers, by default and with `--corpus <capture>/corpus`:
+1c `RESCORE 114/167`, `VALID 110/148`, as-run 97/167; r2 `RESCORE 123/167`, every day valid.
+
+*Evidence.* `sb/tests/test_regrade_reference.py` (29 tests) and
+`sb/tests/test_runner_validity.py::test_capture_freezes_the_corpus_it_serves`. Every changed
+corpus is a tmp copy of a capture's snapshot, so the tests survive K repairs.
+- Fidelity: the frozen snapshot rendered through `_served_email` reproduces every `get_email`
+  result in the raw streams field for field: 148 in 1c, 167 in r2, no mismatch.
+- Accepted: renaming `Planning.memo-before-the-board-sits`'s obligation gives
+  `keys_changed` = that email and moves only its verdict (pass to fail; 1c 114 → 113,
+  r2 123 → 122); a `match`-only edit moves no verdict (the grader does not read `match`); a
+  whitespace reformat has no key changes; moving `Company-Retreat.athelete-visit`'s deadline
+  10 days earlier leaves the plan as run and is accepted, which a hash check would refuse.
+- Refused: a body, subject, sender or recipients edit, naming the field;
+  `Partnership-with-deeptech-companies.new-meeting-during-boston-trip`'s `eq` 20 days earlier
+  moves 11 serve dates, its own from 2026-07-22 to 2026-07-20; `project_atlas.board-demo`'s
+  `eq` one day earlier moves no serve date but lists it first on day 28 (2026-06-28), refused
+  on order alone; an infeasible plan; a removed and an added email; a tampered snapshot; a
+  capture without a snapshot given a changed corpus; a capture missing a day.
+- CLI: exit 2 and `REFUSED` on stderr; the accepted line names the changed email.
+- Runner: a scripted `--limit 8` run writes `corpus/` with the manifest's hash, posts exactly
+  the pre-C-11 payloads (compared as JSON text), and the capture, whose last day was cut
+  short, passes against a reformatted corpus and is refused once its manifest drops the limit.
+- Mutation: disabling, one at a time, the serve-date comparison, the whole plan comparison,
+  the served-email comparison, the snapshot hash check, the batch check and the missing-day
+  check each fails at least one test.
+
+*Known consequence.* Answer predicates feed the scheduler's deadlines (`sb/scheduler.py`
+`_anchor_exprs`), so a key edit on a date-edge email can move the plan. That edit is then a
+plan repair and is refused, as intended (step 7: plan repairs need a new run). It does so only
+sometimes: of the two date-edge edits above, the 10-day one keeps the plan and the 20-day one
+moves it. *Not covered:* a corpus that fails to load still raises `CorpusError` as before,
+not `REFUSED`.
+
 ### K — corpus authoring (`docs/_repair/K.md`)
 
 Framing: the corpus lints clean (`sb/schema.py:490`) and the oracle scores 167/167 at seeds 42,
@@ -1977,6 +2052,8 @@ gitignored `build/`.
 ---
 
 ## Changelog
+
+- **2026-10-16**: C-11, `applied`; amended-order step 3 (freeze the reference) done. `sb.regrade` now checks the corpus against the run before grading: the same corpus is accepted, and a different one only if the serve plan rebuilt from it is the one the run used and every captured email renders to exactly what the model was served, so only answer keys differ; anything else is refused with exit 2. Each capture carries its frozen corpus (`<capture>/corpus/`, copied into both baselines; new runs freeze it at start), and `--corpus <capture>/corpus` grades with the run's own keys. The runner posts mail through the same `_served_email` the check uses. Key edits on date-edge emails that move the plan are refused as plan repairs. Both baselines re-grade unchanged (114/167, 110/148; 123/167). Evidence: the C-11 entry, `sb/tests/test_regrade_reference.py`, `test_runner_validity.py::test_capture_freezes_the_corpus_it_serves`. Runner, regrade, tests, additive capture snapshots and capture READMEs; no corpus, key or grader change; no existing capture data edited; no runs.
 
 - **2026-10-11**: Baseline replicate analysis, docs only: the r2 capture compared with 1c and with the phase 1d audit labels, check by check. Labels held (PASS 15/15, PLAN 10/10, GRADER 4/4, KEY 23/28 failing again, MODEL 4/5 repeated, tools-down 6/8 now pass); 37 of r2's 51 failing checks are known benchmark defects. Evidence: "Baseline replicate, 2026-10-11" at the top, `captures/baseline-sonnet-4-5-r2/README.md`, dated note in `_repair/agent-audit-continuation/RESULTS.md`. No audit label, source, corpus, key or grader change; no runs.
 

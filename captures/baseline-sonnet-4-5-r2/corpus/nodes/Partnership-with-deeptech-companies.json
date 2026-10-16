@@ -1,0 +1,321 @@
+{
+  "id": "Partnership-with-deeptech-companies",
+  "cast": {
+    "CEO": "you",
+    "COO": "Chief Operating Officer",
+    "CTO": "Chief Technology Officer",
+    "VP_ENG": "VP Engineering"
+  },
+  "emails": [
+    {
+      "id": "Partnership-with-deeptech-companies.whoop-collaboration-meeting",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nI just had a call with a WHOOP's CSO, and he shared that they designed a new device that can be integrated in running shoes to track any runner's performance and can potentially be used to improve performance. We can start working on a new shoe line with it. Let's have a meeting with them on {!whoop_meeting = this:WED+1w}.\n\n",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@whoop_meeting"
+            },
+            "kind": "event",
+            "create": "WHOOP Meeting"
+          }
+        ]
+      },
+      "subject": "WHOOP Collaboration Meeting",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.whoop-meeting-reschedule",
+      "to": "CEO",
+      "body": "Hi Mark,\nWHOOP just gave me a call and asked to reschedule our meeting to earlier on Wednesday morning, now we start at 9:00am. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@whoop_meeting"
+            },
+            "move": "WHOOP Meeting"
+          }
+        ]
+      },
+      "subject": "WHOOP Meeting Reschedule",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Partnership-with-deeptech-companies.whoop-collaboration-meeting"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.boston-partnership-trip",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nGuys from R&D and I are planning to visit WHOOP's HQ in Boston to advise on the fabrication process. We'd love you to join. We'll decide on dates during our ad-hoc strategy meeting on {!strategy_meeting = this:MON+1w}. If you have any other companies we can pay a visit to on your mind, please let me know till then. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "@strategy_meeting"
+            },
+            "kind": "todo",
+            "create": "Boston Companies Brainstorm",
+            "match": [
+              "brainstorm"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@strategy_meeting"
+            },
+            "kind": "event",
+            "create": "Ad-hoc Strategy Meeting for Boston Trip",
+            "match": [
+              "strategy"
+            ]
+          }
+        ]
+      },
+      "subject": "Boston Partnership Trip",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.whoop-meeting-reschedule"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.boston-dynamics",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nI think we can go talk to Boston Dynamics folks about testing our products. Humanoid robots seem to be a good prospect for improving our manufacturing process. I'll shoot an email to their CSO. ",
+      "from": "CTO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Boston Dynamics Visit in Boston",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.boston-partnership-trip"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.boston-trip-details",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWe finalized dates to for the trip to be from {!boston_trip_start = week_of:(dom:6,+1m)} till {!boston_trip_end = dom:9,+1m}. We will visit WHOOP on the first day, and Boston Dynamics on the third one. I'll notify you if other tech companies respond. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@boston_trip_start"
+            },
+            "kind": "event",
+            "create": "Boston Trip Start",
+            "match": [
+              "start"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@boston_trip_end"
+            },
+            "kind": "event",
+            "create": "Boston Trip End",
+            "match": [
+              "end"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@boston_trip_start"
+            },
+            "kind": "event",
+            "create": "WHOOP HQ Visit"
+          },
+          {
+            "on": {
+              "eq": "@boston_trip_start+2d"
+            },
+            "kind": "event",
+            "create": "Boston Dynamics Visit",
+            "match": [
+              "dynamics"
+            ]
+          }
+        ]
+      },
+      "subject": "Boston Trip Details",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.boston-partnership-trip"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.new-meeting-during-boston-trip",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWe'll also visit Actnano, Inc. They seem to be doing cool stuff with nano-coating, and we can work with them to develop new water- and water-repelling and dirt-resistant technology for our shoes. We'll go to them right the day we're leaving. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@boston_trip_end"
+            },
+            "kind": "event",
+            "create": "Actnano Visit",
+            "match": [
+              "actnano"
+            ]
+          }
+        ]
+      },
+      "subject": "New Meeting during Boston Trip",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Partnership-with-deeptech-companies.boston-trip-details"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.caltech-conference-invitation",
+      "to": "CEO",
+      "body": "Hello Mark,\n\nWe received an invitation to attend and present during Footwear Biomechanics Symposium in Oslo on {!fbs_conference = dom:25,+2m} . They would like us to tell more about our recently released line of shoes with degradable technology. Let's have a meeting on {!fbs_planning_meeting = this:FRI} to gather a delegation. Please talk to CTO about best candidates before then. ",
+      "from": "COO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@fbs_planning_meeting"
+            },
+            "kind": "todo",
+            "create": "Talk to CTO about team for FBS",
+            "match": [
+              "team"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@fbs_planning_meeting"
+            },
+            "kind": "event",
+            "create": "FBS Planning Meeting",
+            "match": [
+              "fbs"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@fbs_conference"
+            },
+            "kind": "event",
+            "create": "FBS Conference",
+            "match": [
+              "conference"
+            ]
+          }
+        ]
+      },
+      "subject": "FBS Invitation",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nGot your email about FBS. I'm sure we'll need to invite some guys from SpadXTech, since they were our primary partners developing this line. I've scheduled a meeting with them on the second day of our Boston trip, since we'll be nearby. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@boston_trip_start+2d"
+            },
+            "kind": "event",
+            "create": "SpadXTech Meeting",
+            "match": [
+              "spad"
+            ]
+          }
+        ]
+      },
+      "subject": "SpadXTech Meeting before FBS",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.caltech-conference-invitation"
+        },
+        {
+          "type": "date",
+          "email": "Partnership-with-deeptech-companies.boston-trip-details"
+        },
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.new-meeting-during-boston-trip"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.boston-dynamics-cancel",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nFor some reason, Boston Dynamics had to cancel our visit. I'll be figuring out if we can reschedule it before we leave. ",
+      "from": "CTO",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "Boston Dynamics Visit",
+            "match": [
+              "dynamics"
+            ]
+          }
+        ]
+      },
+      "subject": "Boston Dynamics Cancel",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.boston-trip-details"
+        },
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.new-meeting-during-boston-trip"
+        },
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Partnership-with-deeptech-companies.confirmation-from-spadxtech",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nJust letting you know - SpadXTech confirmed that they can send a couple of guys from their team with us. We'll still visit their office to discuss some details.",
+      "from": "CTO",
+      "answer": {
+        "ops": []
+      },
+      "subject": "SpadXTech confirmed FBS attendance",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Partnership-with-deeptech-companies.spadxtech-meeting-before-fbs"
+        }
+      ],
+      "tier": "T3"
+    }
+  ]
+}

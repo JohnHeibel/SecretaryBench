@@ -1,0 +1,617 @@
+{
+  "id": "World_Cup_Cleat_Launch",
+  "cast": {
+    "CEO": "you",
+    "CFO": "Chief Financial Officer",
+    "DESIGN": "Design Lead",
+    "VP_PRODUCT": "VP Product",
+    "BOARD_CHAIR": "Board Chair",
+    "VP_MARKETING": "VP Marketing"
+  },
+  "emails": [
+    {
+      "id": "World_Cup_Cleat_Launch.project-design-kickoff",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWe have it down to two good windows for the World Cup cleat reveal. The earlier one gives us a clean run of press and plenty of time to get the shoe into stores before the first match. The later one is closer to kickoff and may get more buzz, but it leaves a tight window to make and ship the shoe in time, since the tournament starts on a fixed date no matter what.\nBoth choices affect when we book the venue and lock in athletes. I need your call by this {this:FRI} so I can start booking. I think we should go with the earlier window.\n\nBest,\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "todo",
+            "create": "Launch Window Decision",
+            "match": [
+              "decision"
+            ]
+          }
+        ]
+      },
+      "subject": "WC cleat launch window options",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.wc-cleat-launch-window-options",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nJust following up so we stay on track. If I don't hear back by {next:MON}, I'll go with the earlier window and start holding venues. I'd rather not do that without your okay, since it locks in spending.\n\nBest,\nVP Marketing",
+      "from": "",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:MON"
+            },
+            "move": "Launch Window Decision",
+            "match": [
+              "decision"
+            ]
+          }
+        ]
+      },
+      "subject": "WC cleat launch window options",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.project-design-kickoff"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nQuick update before the board greenlight. Two of our three samples are here and look great. The third one, the outsole from our tooling vendor, is running late and may not make it in time for the review. A push from your office would mean more than one from me. Could you ask them to get it to us by {this:FRI}?\n\nBest,\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "todo",
+            "create": "Outsole sample delivery",
+            "match": [
+              "delivery"
+            ]
+          }
+        ]
+      },
+      "subject": "Prototype status ahead of greenlight",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nOne more thing. The vendor says they can hit our deadline only if we confirm the PO {this:FRI}. I'm flagging it because the greenlight assumes all three samples are on the table. If the outsole isn't there, the board will probably push the decision back.\n\nBest,\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "serve"
+            },
+            "kind": "todo",
+            "create": "Confirm Outsole PO",
+            "match": [
+              "outsole"
+            ]
+          }
+        ]
+      },
+      "subject": "Prototype status ahead of greenlight",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.prototype-status-ahead-of-greenlight"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nThe board is ready to greenlight the World Cup cleat. We want a live call instead of a written sign-off, since the spend is large. I'd like to hold it {next:MON}, while the samples are still fresh. Can you put this on the calendar?\n\nBest,\nBoard Chair",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:MON"
+            },
+            "kind": "event",
+            "create": "Greenlight Call",
+            "match": [
+              "greenlight"
+            ]
+          }
+        ]
+      },
+      "subject": "Greenlight call for the WC cleat",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nOne condition before the call. The greenlight only holds if we stay under the budget cap the CFO sent around. If the numbers have changed, I'd rather know before we meet. If not, the call stands.\n\nBest,\nBoard Chair",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Greenlight call for the WC cleat",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nThe greenlight is done, so we can move on the athlete. We have draft terms from the striker's camp to headline the reveal. The numbers are large but in line with what a World Cup face costs. I need you to review the letter of intent and give a yes or no by {this:FRI}. His agent is holding the slot for us only until then.\n\nBest,\nBoard Chair",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "todo",
+            "create": "Endorsement LOI Review",
+            "match": [
+              "endorsement"
+            ]
+          }
+        ]
+      },
+      "subject": "Endorsement terms for the reveal",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nThe agent now says he can hold the slot until next {next:WED}, so we have a little more room. Pushing the review date back to then. No need to rush it through today.\n\nBest,\nBoard Chair",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:WED"
+            },
+            "move": "Endorsement LOI Review",
+            "match": [
+              "endorsement"
+            ]
+          }
+        ]
+      },
+      "subject": "Endorsement terms for the reveal",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.endorsement-terms-for-the-reveal"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nVenue is confirmed for the reveal. Based on the earlier window you picked, we are set to hold the reveal event on the {dom:13,+1m}. It needs you on stage, so I'm putting it on your calendar now.\nLet me know if anything on your end conflicts.\n\nBest,\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:13,+1m"
+            },
+            "kind": "event",
+            "create": "Reveal Event",
+            "match": [
+              "reveal"
+            ]
+          }
+        ]
+      },
+      "subject": "Reveal event date and venue",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.wc-cleat-launch-window-options"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nQuick note. The striker can only do media the week of the reveal, so we want a short run-through with him the day before the main event. Adding a reveal rehearsal to your calendar for the {dom:12,0m}. I'm also locking the run of show. You and the Design Lead both have speaking slots on stage at the reveal, so I'm putting her design walk-through slot on the calendar for the reveal date as well.\n\nBest,\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:12,+1m"
+            },
+            "kind": "event",
+            "create": "Reveal Rehearsal",
+            "match": [
+              "rehearsal"
+            ]
+          },
+          {
+            "on": {
+              "eq": "dom:20,0m"
+            },
+            "kind": "event",
+            "create": "Design Lead Stage Slot"
+          }
+        ]
+      },
+      "subject": "Reveal event date and venue",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.reveal-event-date-and-venue"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.reveal-event-date-and-venue-3",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWe have a problem. The design freeze slipped, so finished shoes for the stage won't arrive in time for the {dom:13,0m}. I need to push the reveal event back to the {dom:20,0m} to have real product on stage. The rehearsal moves with it, to the {dom:19,0m}. This is the cleaner fix. Holding for your okay before I tell the venue.\n\nBest,\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:20,0m"
+            },
+            "move": "Reveal Event",
+            "match": [
+              "reveal"
+            ]
+          },
+          {
+            "on": {
+              "eq": "dom:19,0m"
+            },
+            "move": "Reveal Rehearsal",
+            "match": [
+              "rehearsal"
+            ]
+          }
+        ]
+      },
+      "subject": "Reveal event date and venue",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.reveal-event-date-and-venue"
+        },
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.final-colorway-for-sign-off-2"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.press-briefing-and-embargo",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWe want to brief press under embargo before the public reveal. I'm setting the press briefing for the {dom:6,+1m}, a week ahead of the reveal.\nThe embargo plan needs your sign-off so legal can send it to outlets. Can you approve it by next {next:TUE}?\n\nBest,\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:6,+1m"
+            },
+            "kind": "event",
+            "create": "Press Briefing",
+            "match": [
+              "briefing"
+            ]
+          },
+          {
+            "on": {
+              "eq": "next:TUE"
+            },
+            "kind": "todo",
+            "create": "Approve Press Embargo"
+          }
+        ]
+      },
+      "subject": "Press briefing and embargo",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.reveal-event-date-and-venue"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.press-briefing-and-embargo-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nSince the reveal moved to the {dom:20,0m}, the press briefing is now too early and would break embargo for two full weeks. Moving the press briefing to the {dom:13,0m} to keep it a week ahead of the new reveal date.\n\nBest,\nVP Marketing",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:13,0m"
+            },
+            "move": "Press Briefing",
+            "match": [
+              "briefing"
+            ]
+          }
+        ]
+      },
+      "subject": "Press briefing and embargo",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.press-briefing-and-embargo"
+        },
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.reveal-event-date-and-venue-3"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.reveal-event-budget-is-over",
+      "to": "CEO",
+      "body": "{!Budget_Approval_Deadline = this:FRI}Hi Mark,\n\nThe reveal event plan came in about 30 percent over the cap the board set. The overage is mostly venue and the athlete's media day.\nI've built a trimmed version that lands under the cap. I need you to approve the revised event budget by {!Budget_Approval_Deadline = this:FRI} so marketing can keep booking without overcommitting.\n\nBest,\nChief Financial Officer",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "todo",
+            "create": "Approve revised event budget"
+          }
+        ]
+      },
+      "subject": "Reveal event budget is over",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.reveal-event-date-and-venue"
+        },
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.reveal-event-budget-is-over-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nFollowing up since the budget approval didn't come through {@Budget_Approval_Deadline}. Marketing has booking calls waiting on it. I've moved the approval deadline to this {this:WED}, but that's the last safe day before we lose the venue rate.\n\nBest,\nChief Financial Officer",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:WED"
+            },
+            "move": "Approve revised event budget"
+          }
+        ]
+      },
+      "subject": "Reveal event budget is over",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.reveal-event-budget-is-over"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.final-colorway-for-sign-off",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWith the greenlight done, we're ready to lock the design. The final colorway is attached. Once you sign the design freeze, no more changes go in and we hand off to manufacturing. I need your sign-off by {dom:19,0m} to keep the factory slot we're holding.\n\nBest,\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:19,0m"
+            },
+            "kind": "todo",
+            "create": "Design Freeze Sign Off",
+            "match": [
+              "design"
+            ]
+          }
+        ]
+      },
+      "subject": "Final colorway for sign-off",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.greenlight-call-for-the-wc-cleat"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.final-colorway-for-sign-off-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWe hit a snag. Marketing wants a tweak to the heel logo for the cameras, and the factory needs the change drawn up and re-checked. That pushes the design freeze sign-off to {next:WED}. I know this is tight against manufacturing, so flagging it early.\n\nBest,\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:WED"
+            },
+            "move": "Design Freeze Sign Off",
+            "match": [
+              "design"
+            ]
+          }
+        ]
+      },
+      "subject": "Final colorway for sign-off",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.final-colorway-for-sign-off"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.tooling-po-needs-approval",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nThe factory won't start cutting tooling until the purchase order is approved. It's a big number, so it needs your name on it, not mine.\nPlease approve the tooling PO by {this:FRI}. Any later and we lose the production slot that the reveal date depends on.\n\nBest,\nChief Financial Officer",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "todo",
+            "create": "Approve tooling PO"
+          }
+        ]
+      },
+      "subject": "Tooling PO needs approval",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.final-colorway-for-sign-off"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.manufacturing-kickoff",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nFreeze is signed and tooling is approved, so we're go for production. I'm putting the manufacturing kickoff on your calendar for {this:WED}. It's short, mostly so the factory hears the timeline from you directly.\n\nBest,\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:WED"
+            },
+            "kind": "event",
+            "create": "Manufacturing Kickoff",
+            "match": [
+              "manufacturing"
+            ]
+          }
+        ]
+      },
+      "subject": "Manufacturing kickoff",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.final-colorway-for-sign-off"
+        },
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.tooling-po-needs-approval"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.manufacturing-kickoff-2",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nI need to raise something separate from the timeline. On the last launch, my team's work was left off the credit roll entirely, and the design got presented as if it came from the top. I let it go then. I won't this time.\nI'm not willing to stand on stage at the reveal unless my team is named as the designers of this boot. I'd like to talk it through with you directly. Can we meet {this:FRI}?\n\nBest,\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:FRI"
+            },
+            "kind": "event",
+            "create": "Design Lead 1:1"
+          }
+        ]
+      },
+      "subject": "Manufacturing kickoff",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.manufacturing-kickoff"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.manufacturing-kickoff-3",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nThanks for hearing me out. Until the credit question is settled, I'm pulling myself from the reveal lineup, so please take my stage slot off the run of show. I'm not walking away from the boot, just the stage, and only for now.\n\nBest,\nDesign Lead",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "Design Lead Stage Slot"
+          }
+        ]
+      },
+      "subject": "Manufacturing kickoff",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.manufacturing-kickoff-2"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "World_Cup_Cleat_Launch.board-sync-on-the-credit-issue",
+      "to": "CEO",
+      "body": "Hi Mark,\n\nWord reached the board that our lead designer has pulled herself from the reveal over how credit was handled last time. With the striker and the press already locked in, this could turn into a story we don't want.\nI'm calling a board sync for {this:THU} to get ahead of it. Putting it on your calendar.\n\nBest,\nBoard Chair",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "this:THU"
+            },
+            "kind": "event",
+            "create": "Board Sync",
+            "match": [
+              "board"
+            ]
+          }
+        ]
+      },
+      "subject": "Board sync on the credit issue",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "World_Cup_Cleat_Launch.manufacturing-kickoff-3"
+        }
+      ],
+      "tier": "T2"
+    }
+  ]
+}

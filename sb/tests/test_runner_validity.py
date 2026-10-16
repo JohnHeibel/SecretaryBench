@@ -8,6 +8,7 @@ tool calls would. No model is involved.
 """
 import json
 import os
+import shutil
 import signal
 import subprocess
 import time
@@ -17,8 +18,12 @@ from pathlib import Path
 import httpx
 import pytest
 
+from sb import resolver
 from sb.live import runner
-from sb.scheduler import Levers
+from sb.regrade import ReferenceMismatch, check_reference
+from sb.resolver import Context
+from sb.schema import load_corpus
+from sb.scheduler import Levers, build_plan
 
 RAW_1C = Path("captures/baseline-sonnet-4-5/raw")
 SERVED = "claude-sonnet-4-5-20250929"
@@ -222,6 +227,51 @@ def test_an_errored_day_leaves_nothing_behind(harness, monkeypatch):
     manifest, days = h.run(limit=1)
     assert days[1]["ok"] is False
     assert json.loads((h.out / "state_final.json").read_text()) == {"events": [], "todos": []}
+
+
+def test_capture_freezes_the_corpus_it_serves(harness, monkeypatch, tmp_path):
+    """C-11: the capture carries the corpus it was served from, the store is posted exactly
+    `_served_email` (same JSON as before C-11), and a --limit capture whose last day was cut
+    short still passes the regrade reference check against a reformatted corpus."""
+    h = harness
+    posted = []
+    real_post = runner.httpx.post
+
+    def post(url, *a, **kw):
+        if url.endswith("/inbox"):
+            posted.append(kw["json"])
+        return real_post(url, *a, **kw)
+    monkeypatch.setattr(runner.httpx, "post", post)
+    h.script = [_turn("connected")] * 3
+    manifest, days = h.run(limit=8)                       # days of 5, 2 and 1 of 2 emails
+
+    assert [len(days[d]["batch"]) for d in sorted(days)] == [5, 2, 1]
+    assert (sorted(p.name for p in (h.out / "corpus" / "nodes").iterdir())
+            == sorted(p.name for p in Path("corpus/nodes").glob("*.json")))
+    assert runner._corpus_hash(str(h.out / "corpus")) == manifest["corpus_hash"]
+
+    corpus = load_corpus("corpus")
+    plan = build_plan(corpus, start_date=date(2026, 6, 1), seed=42, n_days=60, levers=Levers(1, 5, 7))
+    expected = []
+    for eid in (e for d in sorted(days) for e in days[d]["batch"]):
+        email, sd = corpus.emails[eid], plan.serve_date[eid]
+        expected.append({"email_id": eid, "sender": email.sender, "recipients": email.recipients,
+                         "subject": email.subject,
+                         "body": resolver.render_body(email.body, Context(sd, plan.anchors)).text,
+                         "served_date": sd.isoformat()})
+    assert [json.dumps(p) for p in posted] == [json.dumps(e) for e in expected]
+    assert posted == [runner._served_email(corpus, plan, e["email_id"]) for e in expected]
+
+    given = tmp_path / "given"
+    shutil.copytree(h.out / "corpus", given)
+    node = given / "nodes" / "Planning.json"
+    node.write_text(json.dumps(json.loads(node.read_text()), indent=4))
+    ref = check_reference(str(h.out), str(given))
+    assert not ref.identical and ref.keys_changed == []
+    manifest["limit"] = None                 # without --limit, a short last day is a mismatch
+    (h.out / "manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(ReferenceMismatch, match=r"day 3 \("):
+        check_reference(str(h.out), str(given))
 
 
 def test_offline_full_length_run(harness):

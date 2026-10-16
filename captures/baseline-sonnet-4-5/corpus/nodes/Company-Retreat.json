@@ -1,0 +1,231 @@
+{
+  "id": "Company-Retreat",
+  "cast": {
+    "EA": "Executive Assistant",
+    "HR": "Head of HR",
+    "CEO": "you",
+    "OPS": "Operations",
+    "CLIENT": "Client Contact",
+    "PARTNER": "Partner Contact",
+    "RETREAT_HOST_COMPANY": "Retreat Host Company"
+  },
+  "emails": [
+    {
+      "id": "Company-Retreat.company-retreat-date-conformed",
+      "to": "CEO",
+      "body": "Hello Sir,\n\nI would like to inform you that the company trip has been officially scheduled! We have chosen June 22nd{!retreat_date = dom:22,0m} as the official start, so make sure you mark that on your calendar!\n\nBest,\nEvent Coordinator\n\n",
+      "from": "PARTNER",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:22,0m"
+            },
+            "kind": "event",
+            "create": "Company Retreat"
+          }
+        ]
+      },
+      "subject": "Company Retreat, Date Conformed ",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Company-Retreat.tasks-before-the-retreat",
+      "to": "CEO",
+      "body": "Hi Sir,\n\nI wanted to ask you if you could handle some tasks for the trip. I wanted you to get in contact with the location we are going on June 19th, just to approve everything we have planned. While you're at it, could you also bring me a list of all the employees you want to give VIP access to by June 22nd, the retreat date?\n\nThanks,\nEvent Corridnator",
+      "from": "PARTNER",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:19,0m"
+            },
+            "kind": "todo",
+            "create": "Contact Retreat Location",
+            "match": [
+              "location"
+            ]
+          },
+          {
+            "on": {
+              "by": "@retreat_date"
+            },
+            "kind": "todo",
+            "create": "Create VIP List",
+            "match": [
+              "list"
+            ]
+          }
+        ]
+      },
+      "subject": "Tasks before the retreat",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Company-Retreat.company-retreat-date-conformed"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Company-Retreat.in-town-and-would-love-to-connect",
+      "to": "CEO",
+      "body": "{!athlete_visit = dom:22,1m}Hey Man!\n\nA major athlete is going to be in town next week and wants to connect with us! I heard the company retreat is next week, but this visit is VERY important. I talked with the planner, and we are going to reschedule the retreat for the week after the week we originally scheduled, and I need you to put the date of the meeting with the athlete on your calander for August 22nd now!\n\nLate notice, but this is BIG!\nThanks,\nExecutive",
+      "from": "EA",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "next:MON"
+            },
+            "move": "Company Retreat"
+          },
+          {
+            "on": {
+              "eq": "next:MON"
+            },
+            "move": "Contact Retreat Location",
+            "match": [
+              "location"
+            ]
+          },
+          {
+            "on": {
+              "eq": "dom:22,0m"
+            },
+            "kind": "event",
+            "create": "Athlete Meeting",
+            "match": [
+              "athlete"
+            ]
+          }
+        ]
+      },
+      "subject": "In Town and would love to connect",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Company-Retreat.company-retreat-date-conformed"
+        },
+        {
+          "type": "static",
+          "email": "Company-Retreat.tasks-before-the-retreat"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Company-Retreat.athelete-visit",
+      "to": "CEO",
+      "body": "Hello Sir,\n\nI was told that an athlete will be arriving to talk with the company next week! I was told to ask you to create a list of people you want to come to the visit. Also, while you're at it, make sure to contact the people you've selected,letting them know! All this before the visit, of course!\n\nBest,\nCompany Employee \n",
+      "from": "OPS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "@athlete_visit"
+            },
+            "kind": "todo",
+            "create": "Create A List For Athlete Visit",
+            "match": [
+              "athlete"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@athlete_visit"
+            },
+            "kind": "event",
+            "create": "Contact People Added To List",
+            "match": [
+              "people"
+            ]
+          }
+        ]
+      },
+      "subject": "Athlete Visit, Guest List and Seating",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Company-Retreat.in-town-and-would-love-to-connect"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Company-Retreat.inquiry-on-vip-list",
+      "to": "CEO",
+      "body": "Hello Sir,\nA lot of employees are worried about if they are going to make the VIP list or not. Could you plan on making that list by tomorrow, {+1d}? \n\nThanks! ",
+      "from": "HR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "serve+1d"
+            },
+            "move": "Create VIP List",
+            "match": [
+              "list"
+            ]
+          }
+        ]
+      },
+      "subject": "Inquiry On VIP List",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Company-Retreat.tasks-before-the-retreat"
+        },
+        {
+          "type": "static",
+          "email": "Company-Retreat.in-town-and-would-love-to-connect"
+        },
+        {
+          "type": "static",
+          "email": "Company-Retreat.company-retreat-date-conformed"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Company-Retreat.planning-call-and-forms-for-your-company",
+      "to": "CEO",
+      "body": "Hello Sir,\n\nI wanted to ask you to join a call with me and some of my people on June 21st to discuss the plans for your company's retreat! I would also like you to fill out these forms I've attached before the meeting, so everything is cleared up!\n\nThank you sir!\nThe Retreat Company ",
+      "from": "RETREAT_HOST_COMPANY",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:21,0m"
+            },
+            "kind": "event",
+            "create": "Retreat Company Meeting Call"
+          },
+          {
+            "on": {
+              "eq": "dom:21,0m"
+            },
+            "kind": "todo",
+            "create": "Fill out Retreat Forms",
+            "match": [
+              "forms"
+            ]
+          }
+        ]
+      },
+      "subject": "Planning Call and Forms for your company retreat",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Company-Retreat.company-retreat-date-conformed"
+        },
+        {
+          "type": "static",
+          "email": "Company-Retreat.in-town-and-would-love-to-connect"
+        }
+      ],
+      "tier": "T3"
+    }
+  ]
+}

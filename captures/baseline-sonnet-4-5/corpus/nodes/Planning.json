@@ -1,0 +1,146 @@
+{
+  "id": "Planning",
+  "cast": {
+    "GC": "General Counsel",
+    "CEO": "you",
+    "CFO": "Chief Financial Officer",
+    "BOARD_CHAIR": "Board Chair",
+    "VP_MARKETING": "VP Marketing"
+  },
+  "emails": [
+    {
+      "id": "Planning.rebrand-pitch",
+      "to": "CEO",
+      "body": "Hey Mark, I want to make the full case for the rebrand before we take it further. Can you get a vision sync on your calendar for {!vision_sync = dom:15,0m}? I'll bring the whole deck. I'm also pushing for the public reveal to land on {!rebrand_reveal = dom:10,+1m}.",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:15,0m"
+            },
+            "kind": "event",
+            "create": "vision_sync",
+            "match": [
+              "vision"
+            ]
+          }
+        ]
+      },
+      "subject": "Rebrand pitch",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Planning.might-be-too-much",
+      "to": "CEO",
+      "body": "Mark, exciting stuff in the works! But Policy is clear that anything this size needs board sign-off before we spend a dollar. You'll want at least three board members in the room. Can you get a board sign-off meeting on the books for {!board_signoff = dom:11,+0m}",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:11,0m"
+            },
+            "kind": "event",
+            "create": "board_signoff",
+            "match": [
+              "signoff"
+            ]
+          }
+        ]
+      },
+      "subject": "Might be too much $$$",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Planning.can-t-do-thursday",
+      "to": "CEO",
+      "body": "I'm traveling Thursday; no can do. Can we push it to {dom:15,+0m}, same time of day? ",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:15,0m"
+            },
+            "move": "board_signoff",
+            "match": [
+              "signoff"
+            ]
+          }
+        ]
+      },
+      "subject": "Can't do thursday...",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Planning.might-be-too-much"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Planning.acme-trademark-clear",
+      "to": "CEO",
+      "body": "\nThe trademark search on the new ACME logo came back clean- no conflicts. Just wanted it in your hands before the board meets.\n",
+      "from": "GC",
+      "answer": {
+        "ops": []
+      },
+      "subject": "ACME trademark clear",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Planning.memo-before-the-board-sits",
+      "to": "CEO",
+      "body": "The board can't approve a number they haven't read. I need the rebrand budget memo finalized and on my desk the day before {dom:15,+0m}, end of day at the latest.",
+      "from": "CFO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:14,0m"
+            },
+            "kind": "todo",
+            "create": "budget memo",
+            "match": [
+              "budget"
+            ]
+          }
+        ]
+      },
+      "subject": "Memo before the board sits",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Planning.might-be-too-much"
+        },
+        {
+          "type": "static",
+          "email": "Planning.can-t-do-thursday"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Planning.locked-in-for",
+      "to": "CEO",
+      "body": "Mark, we're good to go! ",
+      "from": "BOARD_CHAIR",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Locked in for sign-off meeting",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Planning.can-t-do-thursday"
+        }
+      ],
+      "tier": "T3"
+    }
+  ]
+}

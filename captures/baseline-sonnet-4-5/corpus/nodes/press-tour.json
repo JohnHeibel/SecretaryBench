@@ -1,0 +1,184 @@
+{
+  "id": "press-tour",
+  "cast": {
+    "CEO": "you",
+    "COMMS": "Communications / PR"
+  },
+  "emails": [
+    {
+      "id": "press-tour.press-plan-for-launch",
+      "to": "CEO",
+      "body": "Here's the rundown of your media push: It all builds to the reveal on {!reveal = dom:10,+2m}. First up is the cover-story interview, {dom:6,+2m}. Will follow up shortly with more details.  \n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:6,+2m"
+            },
+            "kind": "event",
+            "create": "cover_interview",
+            "match": [
+              "interview"
+            ]
+          }
+        ]
+      },
+      "subject": "Press plan for launch",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "press-tour.morning-show-launch-day",
+      "to": "CEO",
+      "body": "We got you the anchor slot on the national morning show the day we go live, {@reveal}. Block it as the morning show so nothing else creeps onto launch-day breakfast.\n\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@reveal"
+            },
+            "kind": "event",
+            "create": "morning_show",
+            "match": [
+              "morning"
+            ]
+          }
+        ]
+      },
+      "subject": "Morning show, launch day",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "press-tour.press-plan-for-launch"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "press-tour.podcast-taping-pick-a-day",
+      "to": "CEO",
+      "body": "The big business podcast, \"mind your own business\" wants you the week before launch. Any of these afternoons works, pick one: {dom:3,+2m}, {dom:4,+2m}, or {dom:5,+2m}, 3-4 PM each.",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "any_of": [
+                "dom:3,+2m",
+                "dom:4,+2m",
+                "dom:5,+2m"
+              ]
+            },
+            "kind": "event",
+            "create": "podcast_taping",
+            "match": [
+              "podcast"
+            ]
+          }
+        ]
+      },
+      "subject": "podcast taping, pick a day",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "press-tour.keynote-at-the-footwear",
+      "to": "CEO",
+      "body": "You're confirmed for a keynote at the footwear expo, {dom:12,+2m}. Hold it as the expo keynote.\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:12,+2m"
+            },
+            "kind": "event",
+            "create": "expo_keynote",
+            "match": [
+              "keynote"
+            ]
+          }
+        ]
+      },
+      "subject": "Keynote at the footwear ",
+      "depends_on": [],
+      "tier": "T2"
+    },
+    {
+      "id": "press-tour.keynote-slot-swapped",
+      "to": "CEO",
+      "body": "The expo shuffled the mainstage and bumped you a day. The keynote moves to {dom:13,+2m}[insert date \u2192 the 13th, +2 months, + add time 11:00 AM-12:00 PM].\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:13,+2m"
+            },
+            "move": "expo_keynote",
+            "match": [
+              "keynote"
+            ]
+          }
+        ]
+      },
+      "subject": "Keynote slot swapped",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "press-tour.keynote-at-the-footwear"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "press-tour.local-evening-news-hit",
+      "to": "CEO",
+      "body": "Lined up a friendly evening news segment the day after launch, {dom:11,+2m}. Mark your calendars; you're gonna crush it!\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:11,+2m"
+            },
+            "kind": "event",
+            "create": "news_segment",
+            "match": [
+              "segment"
+            ]
+          }
+        ]
+      },
+      "subject": "local evening news opp",
+      "depends_on": [],
+      "tier": "T2"
+    },
+    {
+      "id": "press-tour.news-hit-fell-through",
+      "to": "CEO",
+      "body": "The station had to bump us and couldn't reslot in time. Cancel the news segment, we'll catch the next cycle.\n",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "cancel": "news_segment",
+            "match": [
+              "segment"
+            ]
+          }
+        ]
+      },
+      "subject": "News hit fell through",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "press-tour.local-evening-news-hit"
+        }
+      ],
+      "tier": "T2"
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "id": "Marketing-campaign-new-product-delay",
+  "cast": {
+    "EA": "Executive Assistant",
+    "CEO": "you",
+    "COMMS": "Communications / PR",
+    "VP_PRODUCT": "VP Product",
+    "VP_MARKETING": "VP Marketing"
+  },
+  "emails": [
+    {
+      "id": "Marketing-campaign-new-product-delay.need-to-delay-the-release-of-the-new-pro",
+      "to": "CEO",
+      "body": "Hey, Mark,\n\nSorry to inform you, but we need to delay the release of the new product to {!Delayed_Release_Date = +8w}. We realized that the design had a small problem with it, which needs to be fixed before we send it into production.",
+      "from": "VP_PRODUCT",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@Delayed_Release_Date"
+            },
+            "kind": "event",
+            "create": "Delayed release date of new product",
+            "match": [
+              "delayed"
+            ]
+          }
+        ]
+      },
+      "subject": "Need to delay the release of the new product",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin",
+      "to": "CEO",
+      "body": "Hey Mark, \nPlease make these dates available on your calendar. I need you to apologize for the inconvenience caused by the rescheduling. Serena Williams will be coming on {!SW_Marketing_Campaign = @Delayed_Release_Date+5w}. And Michael Phelps will be here {!MP_Marketing_Campaign = @Delayed_Release_Date+6w}. LeBron James is currently tentative and isn't sure yet. Also, Ronaldo hasn't made up his mind, so will let you know later. ",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@SW_Marketing_Campaign"
+            },
+            "kind": "event",
+            "create": "Serena William marketing campaign ",
+            "match": [
+              "william"
+            ]
+          },
+          {
+            "on": {
+              "eq": "@MP_Marketing_Campaign"
+            },
+            "kind": "event",
+            "create": "Michael Phelps Marketing Campaign ",
+            "match": [
+              "michael"
+            ]
+          }
+        ]
+      },
+      "subject": "Need to reschedule athletes for marketing campaigns ",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.need-to-delay-the-release-of-the-new-pro"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Marketing-campaign-new-product-delay.serena-williams-reschedule",
+      "to": "CEO",
+      "body": "Hey Mark, Serena is dealing with some family issues, hence she has to reschedule to {@SW_Marketing_Campaign+1w+4d}",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@SW_Marketing_Campaign+1w+4d"
+            },
+            "move": "Serena William marketing campaign ",
+            "match": [
+              "marketing"
+            ]
+          }
+        ]
+      },
+      "subject": "Serena Williams reschedule",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Marketing-campaign-new-product-delay.ronaldo-s-availability-for-marketing-cam",
+      "to": "CEO",
+      "body": "Hey Mark, \nRonaldo is available on {!CR7_marketing_campaign = @Delayed_Release_Date+1d}. ",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@CR7_marketing_campaign"
+            },
+            "kind": "event",
+            "create": "Giano Ronaldo marketing campaign "
+          }
+        ]
+      },
+      "subject": "Ronaldo's availability for marketing campaigns ",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig",
+      "to": "CEO",
+      "body": "Hey Mark, devastating news: LeBron James cancelled the marketing campaign because his schedule was too busy. This will have a huge impact on the basketball side.  ",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Lebron James cancelled marketing campaign ",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Marketing-campaign-new-product-delay.lebron-james-canceled",
+      "to": "CEO",
+      "body": "Hey Mark, I've been hearing Lebron James canceled on the marketing campaign. This is really bad PR. Can we please meet and talk about this {serve+1d}? ",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "serve+1d"
+            },
+            "kind": "event",
+            "create": "Meeting with PR head about Lebron James cancellation ",
+            "match": [
+              "cancellation"
+            ]
+          }
+        ]
+      },
+      "subject": "Lebron James canceled?",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig"
+        }
+      ],
+      "tier": "T2"
+    },
+    {
+      "id": "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule",
+      "to": "CEO",
+      "body": "Hey Mark, great news. I talked to Lebron James, and he's willing to reconsider and reschedule for the marketing campaign on {!LJ_marketing_campaign = @Delayed_Release_Date+2w+3d}. ",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@LJ_marketing_campaign"
+            },
+            "kind": "event",
+            "create": "LeBron James marketing campaign scheduled"
+          }
+        ]
+      },
+      "subject": "Able to get Lebron James to reschedule",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin"
+        },
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.lebron-james-cancelled-marketing-campaig"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Marketing-campaign-new-product-delay.confirmations-from-all-athletes-and-vp-o",
+      "to": "CEO",
+      "body": "Hey, Mark\nEveryone has confirmed meeting availability, and no more scheduling issues. ",
+      "from": "VP_MARKETING",
+      "answer": {
+        "ops": []
+      },
+      "subject": "Confirmations from all athletes and VP of product  ",
+      "depends_on": [
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.need-to-reschedule-athletes-for-marketin"
+        },
+        {
+          "type": "static",
+          "email": "Marketing-campaign-new-product-delay.able-to-get-lebron-james-to-reschedule"
+        }
+      ],
+      "tier": "T3"
+    }
+  ]
+}

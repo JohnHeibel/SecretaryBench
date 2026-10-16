@@ -1,0 +1,158 @@
+{
+  "id": "Pre-Launch",
+  "cast": {
+    "CEO": "you",
+    "COO": "Chief Operating Officer",
+    "OPS": "Operations",
+    "COMMS": "Communications / PR",
+    "DESIGN": "Design Lead",
+    "VENDOR": "Vendor Contact",
+    "VP_ENG": "VP Engineering"
+  },
+  "emails": [
+    {
+      "id": "Pre-Launch.launch-day-locked",
+      "to": "CEO",
+      "body": "It's official: the new site goes live on {dom:10,+2m}. That's the moment everything else hangs off of, so treat {!launch_day = dom:10,+2m} as fixed. \n\nAlso need your sign-off on a couple of things that I will be sending through momentarily; get them done by{dom:3,+2m}!",
+      "from": "COO",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:10,+2m"
+            },
+            "kind": "event",
+            "create": "site_go-live",
+            "match": [
+              "site"
+            ]
+          },
+          {
+            "on": {
+              "by": "dom:3,+2m"
+            },
+            "kind": "todo",
+            "create": "sign_COO_docs",
+            "match": [
+              "sign"
+            ]
+          }
+        ]
+      },
+      "subject": "Launch day locked",
+      "depends_on": [],
+      "tier": "T1"
+    },
+    {
+      "id": "Pre-Launch.embargo-lifts-at-six",
+      "to": "CEO",
+      "body": "Press embargo lifts at {@launch_day}, three hours ahead of the site, so the coverage is up first. Block that on your calendar as the embargo lift so nobody schedules over it.",
+      "from": "COMMS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@launch_day"
+            },
+            "kind": "event",
+            "create": "embargo_lift",
+            "match": [
+              "embargo"
+            ]
+          }
+        ]
+      },
+      "subject": "Embargo lifts at six",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Pre-Launch.launch-day-locked"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Pre-Launch.design-locked",
+      "to": "CEO",
+      "body": "No more changes to the hero film or the campaign stills after the freeze. I need everything final and handed to production by {@launch_day-1w}, end of day at the latest. Put a task on me so it doesn't slip.\n",
+      "from": "DESIGN",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "by": "@launch_day-1w"
+            },
+            "kind": "todo",
+            "create": "production_handoff_design",
+            "match": [
+              "production"
+            ]
+          }
+        ]
+      },
+      "subject": "Design locked",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Pre-Launch.launch-day-locked"
+        },
+        {
+          "type": "static",
+          "email": "Pre-Launch.embargo-lifts-at-six"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Pre-Launch.store-floors-reset-overnight",
+      "to": "CEO",
+      "body": "Every retail floor gets stripped and re-skinned to the new branding the night before we go live, {@launch_day-1d}, so customers walk into the new era Monday morning. Block the floor reset so the regional leads see it locked.\n",
+      "from": "OPS",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "@launch_day-1d"
+            },
+            "kind": "event",
+            "create": "floor_reset",
+            "match": [
+              "floor"
+            ]
+          }
+        ]
+      },
+      "subject": "Store floors reset overnight",
+      "depends_on": [
+        {
+          "type": "date",
+          "email": "Pre-Launch.launch-day-locked"
+        }
+      ],
+      "tier": "T3"
+    },
+    {
+      "id": "Pre-Launch.dry-run-of-the-flip",
+      "to": "CEO",
+      "body": "I want a full dress rehearsal of the site flip before the real thing, the whole team on the call watching the cutover end to end. Hold {dom:6,+2m} for the launch dry run.",
+      "from": "VP_ENG",
+      "answer": {
+        "ops": [
+          {
+            "on": {
+              "eq": "dom:6,+2m"
+            },
+            "kind": "event",
+            "create": "launch-dry-run",
+            "match": [
+              "launch"
+            ]
+          }
+        ]
+      },
+      "subject": "Dry run of the flip",
+      "depends_on": [],
+      "tier": "T1"
+    }
+  ]
+}

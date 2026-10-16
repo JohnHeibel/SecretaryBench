@@ -21,6 +21,9 @@ replicate in this project.
     python -m sb.regrade captures/baseline-sonnet-4-5-r2
 
 Prints `RESCORE 123/167` and `VALID 123/167 every day valid`, identical to the as-run score.
+`sb.regrade` refuses a corpus that changes what the model saw or when it saw it, so a key
+repair can be scored here and a prose or plan repair cannot (register C-11);
+`--corpus captures/baseline-sonnet-4-5-r2/corpus` grades with the run's own keys.
 
 ## Against 1c
 
@@ -98,6 +101,7 @@ As in `captures/baseline-sonnet-4-5`, plus:
 | `mcp_server.log` | the secretary MCP server's stderr (O-7) |
 | `days/NNN.json` | also `mcp_status` and `attempts` per day |
 | `manifest.json` | also `errored_days`, `retried_days`, `mcp_restarts` |
+| `corpus/nodes/*.json` | frozen copy of the corpus the run was served (sha `03e0d963b9866d8f`); added 2026-10-16 from the unchanged `corpus/` (C-11) |
 
 No `raw/day_NNN.attempt_K.jsonl` files: no attempt failed.
 
